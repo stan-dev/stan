@@ -67,7 +67,7 @@ int hmc_nuts_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
-    callbacks::json_writer<std::ostream>& metric_writer) {
+    callbacks::json_writer<std::ofstream>& metric_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<double> cont_vector;
@@ -155,7 +155,7 @@ int hmc_nuts_dense_e_adapt(
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
 
-  callbacks::json_writer<std::ostream> dummy_metric_writer;
+  callbacks::json_writer<std::ofstream> dummy_metric_writer;
   return hmc_nuts_dense_e_adapt(
       model, init, init_inv_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
@@ -208,7 +208,7 @@ int hmc_nuts_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
-    callbacks::json_writer<std::ostream>& metric_writer) {
+    callbacks::json_writer<std::ofstream>& metric_writer) {
   stan::io::dump dmp
       = util::create_unit_e_dense_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;
@@ -265,7 +265,7 @@ int hmc_nuts_dense_e_adapt(
   stan::io::dump dmp
       = util::create_unit_e_dense_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;
-  callbacks::json_writer<std::ostream> dummy_metric_writer;
+  callbacks::json_writer<std::ofstream> dummy_metric_writer;
   return hmc_nuts_dense_e_adapt(
       model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
@@ -340,7 +340,7 @@ int hmc_nuts_dense_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::json_writer<std::ostream>>& metric_writer) {
+    std::vector<callbacks::json_writer<std::ofstream>>& metric_writer) {
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
         model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
@@ -462,11 +462,11 @@ int hmc_nuts_dense_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<callbacks::json_writer<std::ostream>> dummy_metric_writer;
+  std::vector<callbacks::json_writer<std::ofstream>> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(
-        stan::callbacks::json_writer<std::ostream>());
+        stan::callbacks::json_writer<std::ofstream>());
   }
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
@@ -545,7 +545,7 @@ int hmc_nuts_dense_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::json_writer<std::ostream>>& metric_writer) {
+    std::vector<callbacks::json_writer<std::ofstream>>& metric_writer) {
   std::vector<std::unique_ptr<stan::io::dump>> unit_e_metric;
   unit_e_metric.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
@@ -634,11 +634,11 @@ int hmc_nuts_dense_e_adapt(
     unit_e_metric.emplace_back(std::make_unique<stan::io::dump>(
         util::create_unit_e_dense_inv_metric(model.num_params_r())));
   }
-  std::vector<callbacks::json_writer<std::ostream>> dummy_metric_writer;
+  std::vector<callbacks::json_writer<std::ofstream>> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(
-        stan::callbacks::json_writer<std::ostream>());
+        stan::callbacks::json_writer<std::ofstream>());
   }
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(

@@ -1,6 +1,7 @@
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <test/unit/util.hpp>
 #include <src/test/unit/services/util.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
@@ -76,13 +77,23 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   constexpr unsigned int term_buffer = 50;
   constexpr unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
+
+  std::vector<stan::callbacks::json_writer<std::ofstream>> jwriters;
+  jwriters.reserve(num_chains);
+  for (int i = 0; i < num_chains; ++i) {
+    auto ofs_metric
+        = std::make_unique<std::ofstream>("test/hmc_nuts_metric_" + std::to_string(i) + ".json");
+    stan::callbacks::json_writer<std::ofstream> jwriter(
+        std::move(ofs_metric));
+    jwriters.emplace_back(std::move(jwriter));
+  }
+
   EXPECT_EQ(interrupt.call_count(), 0);
   int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
       *model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, par_parameters, diagnostic);
-
+      interrupt, logger, init, par_parameters, diagnostic, jwriters);
   EXPECT_EQ(0, return_code);
 
   int num_output_lines = (num_warmup + num_samples) / num_thin;

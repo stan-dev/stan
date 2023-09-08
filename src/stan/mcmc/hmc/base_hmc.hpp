@@ -68,10 +68,10 @@ class base_hmc : public base_mcmc {
   /**
    * write stepsize and elements of mass matrix as a JSON object
    */
-  void write_sampler_state_json(callbacks::json_writer<std::ostream>& json_writer) {
+  void write_sampler_state_json(callbacks::json_writer<std::ofstream>& json_writer) {
     json_writer.begin_record();
     json_writer.write("stepsize", get_nominal_stepsize());
-    json_writer.write("metric", z_.inv_e_metric_);
+    json_writer.write("inv_metric", z_.inv_e_metric_);
     json_writer.end_record();
   }
   

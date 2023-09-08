@@ -49,7 +49,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::logger& logger,
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer,
-                          callbacks::json_writer<std::ostream>& metric_writer,
+                          callbacks::json_writer<std::ofstream>& metric_writer,
                           size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
