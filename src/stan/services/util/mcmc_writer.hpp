@@ -3,10 +3,12 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <iomanip>
+#include <iostream>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -25,6 +27,7 @@ class mcmc_writer {
  private:
   callbacks::writer& sample_writer_;
   callbacks::writer& diagnostic_writer_;
+  callbacks::json_writer<std::ostream>& metric_writer_;
   callbacks::logger& logger_;
 
  public:
@@ -40,9 +43,12 @@ class mcmc_writer {
    * @param[in,out] logger messages are written through the logger
    */
   mcmc_writer(callbacks::writer& sample_writer,
-              callbacks::writer& diagnostic_writer, callbacks::logger& logger)
+              callbacks::writer& diagnostic_writer,
+              callbacks::json_writer<std::ostream>& metric_writer,
+              callbacks::logger& logger)
       : sample_writer_(sample_writer),
         diagnostic_writer_(diagnostic_writer),
+        metric_writer_(metric_writer),
         logger_(logger),
         num_sample_params_(0),
         num_sampler_params_(0),

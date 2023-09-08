@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/random/uniform_01.hpp>
@@ -63,6 +64,17 @@ class base_hmc : public base_mcmc {
     write_sampler_metric(writer);
   }
 
+
+  /**
+   * write stepsize and elements of mass matrix as a JSON object
+   */
+  void write_sampler_state_json(callbacks::json_writer<std::ostream>& json_writer) {
+    json_writer.begin_record();
+    json_writer.write("stepsize", get_nominal_stepsize());
+    json_writer.write("metric", z_.inv_e_metric_);
+    json_writer.end_record();
+  }
+  
   void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
                                     std::vector<std::string>& names) {
     z_.get_param_names(model_names, names);

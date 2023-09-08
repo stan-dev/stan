@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
+
 auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
@@ -44,6 +45,7 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
       = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
   std::vector<str_writer> par_parameters;
   std::vector<str_writer> seq_parameters;
+
   std::vector<stan::test::unit::instrumented_writer> diagnostic;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   std::unique_ptr<rosenbrock_model_namespace::rosenbrock_model> model;

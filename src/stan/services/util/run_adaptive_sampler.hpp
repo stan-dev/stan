@@ -49,7 +49,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::logger& logger,
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer,
-                          callbacks::json_writer<std::ofstream>& metric_writer,
+                          callbacks::json_writer<std::ostream>& metric_writer,
                           size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
@@ -64,7 +64,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
     return;
   }
 
-  services::util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
+  services::util::mcmc_writer writer(sample_writer, diagnostic_writer, metric_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 
   // Headers
@@ -84,6 +84,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   sampler.disengage_adaptation();
   writer.write_adapt_finish(sampler);
   sampler.write_sampler_state(sample_writer);
+  sampler.write_sampler_state_json(metric_writer);
 
   auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, num_warmup,
