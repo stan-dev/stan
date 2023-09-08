@@ -146,7 +146,7 @@ class json_writer final : public structured_writer {
   /**
    * Writes the set of comma separated values in an Eigen (row) vector.
    *
-   * @param[in] v Values in a Eigen::Vector
+   * @param[in] v Values in an `Eigen::Vector`
    */
   template <typename Derived>
   void write_eigen_vector(const Eigen::DenseBase<Derived>& v) {
