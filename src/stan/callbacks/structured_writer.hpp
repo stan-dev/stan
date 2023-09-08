@@ -106,7 +106,7 @@ class structured_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  virtual void write(const std::string& key, const std::vector<double> values) {
+  virtual void write(const std::string& key, const std::vector<double>& values) {
   }
 
   /**
