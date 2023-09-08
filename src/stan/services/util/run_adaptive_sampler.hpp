@@ -5,8 +5,10 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <tbb/parallel_for.h>
 #include <chrono>
+#include <iostream>
 #include <vector>
 
 namespace stan {
@@ -47,6 +49,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::logger& logger,
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer,
+                          callbacks::json_writer<std::ofstream>& metric_writer,
                           size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
