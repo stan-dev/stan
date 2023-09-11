@@ -5,6 +5,7 @@
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <chrono>
+#include <iostream>
 #include <vector>
 
 namespace stan {
@@ -37,8 +38,7 @@ namespace util {
  * @param[in] num_chains The number of chains used in the program. This
  *  is used in generate transitions to print out the chain number.
  */
-template <class Model, class RNG, typename Stream,
-          typename Deleter = std::default_delete<Stream>>
+template <class Model, class RNG>
 void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
                  std::vector<double>& cont_vector, int num_warmup,
                  int num_samples, int num_thin, int refresh, bool save_warmup,
@@ -48,7 +48,9 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
                  size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
-  services::util::mcmc_writer<Stream, Deleter> writer(sample_writer, diagnostic_writer, logger);
+  callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  services::util::mcmc_writer<std::ofstream> writer(
+      sample_writer, diagnostic_writer, dummy_metric_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 
   // Headers
