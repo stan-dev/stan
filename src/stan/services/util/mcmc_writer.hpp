@@ -21,13 +21,15 @@ namespace util {
 /**
  * mcmc_writer writes out headers and samples
  *
- * @tparam Model Model class
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
  */
+template <typename Stream, typename Deleter = std::default_delete<Stream>>
 class mcmc_writer {
  private:
   callbacks::writer& sample_writer_;
   callbacks::writer& diagnostic_writer_;
-  callbacks::json_writer<std::ofstream>& metric_writer_;
+  callbacks::json_writer<Stream, Deleter>& metric_writer_;
   callbacks::logger& logger_;
 
  public:
@@ -44,7 +46,7 @@ class mcmc_writer {
    */
   mcmc_writer(callbacks::writer& sample_writer,
               callbacks::writer& diagnostic_writer,
-              callbacks::json_writer<std::ofstream>& metric_writer,
+              callbacks::json_writer<Stream, Deleter>& metric_writer,
               callbacks::logger& logger)
       : sample_writer_(sample_writer),
         diagnostic_writer_(diagnostic_writer),
@@ -63,6 +65,7 @@ class mcmc_writer {
    * The names are written to the sample_stream as comma separated values
    * with a newline at the end.
    *
+   * @tparam Model Model class
    * @param[in] sample a sample (unconstrained) that works with the model
    * @param[in] sampler a stan::mcmc::base_mcmc object
    * @param[in] model the model
@@ -93,6 +96,8 @@ class mcmc_writer {
    * The samples are written to the sample_stream as comma separated
    * values with a newline at the end.
    *
+   * @tparam Model Model class
+   * @tparam RNG Type of random number generator
    * @param[in,out] rng random number generator (used by
    *   model.write_array())
    * @param[in] sample the sample in constrained space
@@ -148,6 +153,7 @@ class mcmc_writer {
   /**
    * Print diagnostic names
    *
+   * @tparam Model Model class
    * @param[in] sample unconstrained sample
    * @param[in] sampler sampler
    * @param[in] model model

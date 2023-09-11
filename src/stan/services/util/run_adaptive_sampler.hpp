@@ -21,6 +21,8 @@ namespace util {
  * @tparam Sampler Type of adaptive sampler.
  * @tparam Model Type of model
  * @tparam RNG Type of random number generator
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
  * @param[in,out] sampler the mcmc sampler to use on the model
  * @param[in] model the model concept to use for computing log probability
  * @param[in] cont_vector initial parameter values
@@ -40,7 +42,8 @@ namespace util {
  * @param[in] num_chains The number of chains used in the program. This
  *  is used in generate transitions to print out the chain number.
  */
-template <typename Sampler, typename Model, typename RNG>
+template <typename Sampler, typename Model, typename RNG,
+          typename Stream, typename Deleter = std::default_delete<Stream>>
 void run_adaptive_sampler(Sampler& sampler, Model& model,
                           std::vector<double>& cont_vector, int num_warmup,
                           int num_samples, int num_thin, int refresh,
@@ -49,7 +52,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::logger& logger,
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer,
-                          callbacks::json_writer<std::ofstream>& metric_writer,
+                          callbacks::json_writer<Stream, Deleter>& metric_writer,
                           size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
@@ -64,7 +67,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
     return;
   }
 
-  services::util::mcmc_writer writer(sample_writer, diagnostic_writer, metric_writer, logger);
+  services::util::mcmc_writer<Stream, Deleter> writer(sample_writer, diagnostic_writer, metric_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 
   // Headers

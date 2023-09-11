@@ -6,6 +6,7 @@
 #include <src/test/unit/services/util.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <rapidjson/document.h>
 #include <gtest/gtest.h>
 #include <iostream>
 
@@ -23,6 +24,7 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
   ServicesSampleHmcNutsDenseEAdaptParMatch()
       : ss_par(num_chains),
         ss_seq(num_chains),
+        ss_metric(num_chains),
         model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
             data_context, 0, &model_log)) {
     for (int i = 0; i < num_chains; ++i) {
@@ -31,8 +33,19 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
           std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#");
       seq_parameters.emplace_back(
           std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#");
+      metrics.emplace_back(
+          stan::callbacks::json_writer<std::stringstream, deleter_noop>(
+              std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric[i])));
+
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
       context.push_back(std::make_shared<stan::io::empty_var_context>());
+    }
+  }
+
+  void SetUp() {
+    for (int i = 0; i < num_chains; ++i) {
+      ss_metric[i].str(std::string());
+      ss_metric[i].clear();
     }
   }
 
@@ -42,11 +55,12 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
   std::vector<stan::test::unit::instrumented_writer> init;
   std::vector<std::stringstream> ss_par;
   std::vector<std::stringstream> ss_seq;
+  std::vector<std::stringstream> ss_metric;
   using str_writer
       = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
   std::vector<str_writer> par_parameters;
   std::vector<str_writer> seq_parameters;
-
+  std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>> metrics;
   std::vector<stan::test::unit::instrumented_writer> diagnostic;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   std::unique_ptr<rosenbrock_model_namespace::rosenbrock_model> model;
@@ -78,22 +92,22 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   constexpr unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
 
-  std::vector<stan::callbacks::json_writer<std::ofstream>> jwriters;
-  jwriters.reserve(num_chains);
-  for (int i = 0; i < num_chains; ++i) {
-    auto ofs_metric
-        = std::make_unique<std::ofstream>("test/hmc_nuts_metric_" + std::to_string(i) + ".json");
-    stan::callbacks::json_writer<std::ofstream> jwriter(
-        std::move(ofs_metric));
-    jwriters.emplace_back(std::move(jwriter));
-  }
+  // std::vector<stan::callbacks::json_writer<std::ofstream>> jwriters;
+  // jwriters.reserve(num_chains);
+  // for (int i = 0; i < num_chains; ++i) {
+  //   auto ofs_metric
+  //       = std::make_unique<std::ofstream>("test/hmc_nuts_metric_" + std::to_string(i) + ".json");
+  //   stan::callbacks::json_writer<std::ofstream> jwriter(
+  //       std::move(ofs_metric));
+  //   jwriters.emplace_back(std::move(jwriter));
+  // }
 
   EXPECT_EQ(interrupt.call_count(), 0);
   int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
       *model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, par_parameters, diagnostic, jwriters);
+      interrupt, logger, init, par_parameters, diagnostic, metrics);
   EXPECT_EQ(0, return_code);
 
   int num_output_lines = (num_warmup + num_samples) / num_thin;
@@ -131,5 +145,11 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
     Eigen::MatrixXd diff_res
         = (par_res[i].array() - seq_res[i].array()).matrix();
     EXPECT_MATRIX_EQ(diff_res, Eigen::MatrixXd::Zero(80, 9));
+
+    rapidjson::Document document;
+    ASSERT_FALSE(document.Parse<0>(ss_metric[i].str().c_str()).HasParseError());
+    EXPECT_EQ(count_matches("stepsize", ss_metric[i].str()), 1);
+    EXPECT_EQ(count_matches("inv_metric", ss_metric[i].str()), 1);
+    EXPECT_EQ(count_matches("[", ss_metric[i].str()), 3);  // list has 2 rows
   }
 }

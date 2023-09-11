@@ -26,7 +26,9 @@ namespace sample {
  * stepsize and inverse metric.
  *
  * @tparam Model Model class
- * @param[in] model Input model to test (with data already instantiated)
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial dense
               inverse Euclidean metric (must be positive definite)
@@ -56,7 +58,8 @@ namespace sample {
  * @param[in,out] metric_writer Writer for tuning params
  * @return error_codes::OK if successful
  */
-template <class Model>
+template <class Model, typename Stream,
+          typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_dense_e_adapt(
     Model& model, const stan::io::var_context& init,
     const stan::io::var_context& init_inv_metric, unsigned int random_seed,
@@ -67,7 +70,7 @@ int hmc_nuts_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
-    callbacks::json_writer<std::ofstream>& metric_writer) {
+    callbacks::json_writer<Stream, Deleter>& metric_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<double> cont_vector;
@@ -114,7 +117,9 @@ int hmc_nuts_dense_e_adapt(
  * with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
- * @param[in] model Input model to test (with data already instantiated)
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial dense
               inverse Euclidean metric (must be positive definite)
@@ -143,7 +148,8 @@ int hmc_nuts_dense_e_adapt(
  * @param[in,out] diagnostic_writer Writer for diagnostic information
  * @return error_codes::OK if successful
  */
-template <class Model>
+template <class Model, typename Stream,
+          typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_dense_e_adapt(
     Model& model, const stan::io::var_context& init,
     const stan::io::var_context& init_inv_metric, unsigned int random_seed,
@@ -155,7 +161,7 @@ int hmc_nuts_dense_e_adapt(
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
 
-  callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  callbacks::json_writer<Stream, Deleter> dummy_metric_writer;
   return hmc_nuts_dense_e_adapt(
       model, init, init_inv_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
@@ -170,7 +176,9 @@ int hmc_nuts_dense_e_adapt(
  * stepsize and inverse metric.
  *
  * @tparam Model Model class
- * @param[in] model Input model to test (with data already instantiated)
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
@@ -198,7 +206,8 @@ int hmc_nuts_dense_e_adapt(
  * @param[in,out] metric_writer Writer for tuning params
  * @return error_codes::OK if successful
  */
-template <class Model>
+template <class Model, typename Stream,
+          typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_dense_e_adapt(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int chain, double init_radius, int num_warmup, int num_samples,
@@ -208,7 +217,7 @@ int hmc_nuts_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
-    callbacks::json_writer<std::ofstream>& metric_writer) {
+    callbacks::json_writer<Stream, Deleter>& metric_writer) {
   stan::io::dump dmp
       = util::create_unit_e_dense_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;
@@ -225,7 +234,7 @@ int hmc_nuts_dense_e_adapt(
  * with identity matrix as initial inv_metric.
  *
  * @tparam Model Model class
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
@@ -280,6 +289,8 @@ int hmc_nuts_dense_e_adapt(
  * stepsize and inverse metric.
  *
  * @tparam Model Model class
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
  * @tparam InitContextPtr A pointer with underlying type derived from
  `stan::io::var_context`
  * @tparam InitInvContextPtr A pointer with underlying type derived from
@@ -287,7 +298,7 @@ int hmc_nuts_dense_e_adapt(
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
  must
@@ -327,7 +338,8 @@ int hmc_nuts_dense_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitInvContextPtr,
-          typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
+          typename InitWriter, typename SampleWriter, typename DiagnosticWriter,
+          typename Stream, typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_dense_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     const std::vector<InitInvContextPtr>& init_inv_metric,
@@ -340,7 +352,7 @@ int hmc_nuts_dense_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::json_writer<std::ofstream>>& metric_writer) {
+    std::vector<callbacks::json_writer<Stream, Deleter>>& metric_writer) {
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
         model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
@@ -412,7 +424,9 @@ int hmc_nuts_dense_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
@@ -449,7 +463,8 @@ int hmc_nuts_dense_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitInvContextPtr,
-          typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
+          typename InitWriter, typename SampleWriter, typename DiagnosticWriter,
+          typename Stream, typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_dense_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     const std::vector<InitInvContextPtr>& init_inv_metric,
@@ -462,7 +477,7 @@ int hmc_nuts_dense_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<callbacks::json_writer<std::ofstream>> dummy_metric_writer;
+  std::vector<callbacks::json_writer<Stream, Deleter>> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(
@@ -496,7 +511,7 @@ int hmc_nuts_dense_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
@@ -533,7 +548,8 @@ int hmc_nuts_dense_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
-          typename SampleWriter, typename DiagnosticWriter>
+          typename SampleWriter, typename DiagnosticWriter, typename Stream,
+          typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_dense_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -545,7 +561,7 @@ int hmc_nuts_dense_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::json_writer<std::ofstream>>& metric_writer) {
+    std::vector<callbacks::json_writer<Stream, Deleter>>& metric_writer) {
   std::vector<std::unique_ptr<stan::io::dump>> unit_e_metric;
   unit_e_metric.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
@@ -580,7 +596,9 @@ int hmc_nuts_dense_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
+ * @param[in] model Input model to run (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
@@ -616,7 +634,8 @@ int hmc_nuts_dense_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
-          typename SampleWriter, typename DiagnosticWriter>
+          typename SampleWriter, typename DiagnosticWriter, typename Stream,
+          typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_dense_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -634,7 +653,7 @@ int hmc_nuts_dense_e_adapt(
     unit_e_metric.emplace_back(std::make_unique<stan::io::dump>(
         util::create_unit_e_dense_inv_metric(model.num_params_r())));
   }
-  std::vector<callbacks::json_writer<std::ofstream>> dummy_metric_writer;
+  std::vector<callbacks::json_writer<Stream, Deleter>> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(
