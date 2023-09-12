@@ -22,13 +22,13 @@ namespace sample {
 
 /**
  * Runs HMC with NUTS with adaptation using dense Euclidean metric
- * with a pre-specified Euclidean metric and saves adapted tuning parameters
+ * with a pre-specified dense metric and saves adapted tuning parameters
  * stepsize and inverse metric.
  *
  * @tparam Model Model class
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial dense
               inverse Euclidean metric (must be positive definite)
@@ -114,12 +114,12 @@ int hmc_nuts_dense_e_adapt(
 
 /**
  * Runs HMC with NUTS with adaptation using dense Euclidean metric
- * with a pre-specified Euclidean metric.
+ * with a pre-specified dense metric.
  *
  * @tparam Model Model class
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial dense
               inverse Euclidean metric (must be positive definite)
@@ -176,7 +176,7 @@ int hmc_nuts_dense_e_adapt(
  * @tparam Model Model class
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
@@ -232,7 +232,7 @@ int hmc_nuts_dense_e_adapt(
  * with identity matrix as initial inv_metric.
  *
  * @tparam Model Model class
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
@@ -283,7 +283,7 @@ int hmc_nuts_dense_e_adapt(
 
 /**
  * Runs multiple chains of NUTS with adaptation using dense Euclidean metric
- * with a pre-specified Euclidean metric and saves adapted tuning parameters
+ * with a pre-specified dense metric and saves adapted tuning parameters
  * stepsize and inverse metric.
  *
  * @tparam Model Model class
@@ -296,7 +296,7 @@ int hmc_nuts_dense_e_adapt(
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
  must
@@ -414,7 +414,7 @@ int hmc_nuts_dense_e_adapt(
 
 /**
  * Runs multiple chains of NUTS with adaptation using dense Euclidean metric,
- * with a pre-specified Euclidean metric.
+ * with a pre-specified dense metric.
  *
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
@@ -422,7 +422,7 @@ int hmc_nuts_dense_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
@@ -506,7 +506,7 @@ int hmc_nuts_dense_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
@@ -590,7 +590,7 @@ int hmc_nuts_dense_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to run (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.

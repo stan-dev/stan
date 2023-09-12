@@ -2,6 +2,7 @@
 #define STAN_SERVICES_SAMPLE_FIXED_PARAM_HPP
 
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim.hpp>
@@ -13,6 +14,7 @@
 #include <stan/services/util/initialize.hpp>
 #include <chrono>
 #include <vector>
+#include <iostream>
 
 namespace stan {
 namespace services {
@@ -63,7 +65,9 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   }
 
   stan::mcmc::fixed_param_sampler sampler;
-  util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
+  callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  services::util::mcmc_writer<std::ofstream> writer(
+      sample_writer, diagnostic_writer, dummy_metric_writer, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];
@@ -136,11 +140,13 @@ int fixed_param(Model& model, const std::size_t num_chains,
   }
   std::vector<boost::ecuyer1988> rngs;
   std::vector<Eigen::VectorXd> cont_vectors;
-  std::vector<util::mcmc_writer> writers;
+  std::vector<callbacks::json_writer<std::ofstream>> dummy_metric_writers;
+  std::vector<util::mcmc_writer<std::ofstream>> writers;
   std::vector<stan::mcmc::sample> samples;
   std::vector<stan::mcmc::fixed_param_sampler> samplers(num_chains);
   rngs.reserve(num_chains);
   cont_vectors.reserve(num_chains);
+  dummy_metric_writers.reserve(num_chains);
   writers.reserve(num_chains);
   samples.reserve(num_chains);
   for (int i = 0; i < num_chains; ++i) {
@@ -150,7 +156,9 @@ int fixed_param(Model& model, const std::size_t num_chains,
     cont_vectors.push_back(
         Eigen::Map<Eigen::VectorXd>(cont_vector.data(), cont_vector.size()));
     samples.emplace_back(cont_vectors[i], 0, 0);
-    writers.emplace_back(sample_writers[i], diagnostic_writers[i], logger);
+    dummy_metric_writers.emplace_back(
+        stan::callbacks::json_writer<std::ofstream>());
+    writers.emplace_back(sample_writers[i], diagnostic_writers[i], dummy_metric_writers[i], logger);
     // Headers
     writers[i].write_sample_names(samples[i], samplers[i], model);
     writers[i].write_diagnostic_names(samples[i], samplers[i], model);

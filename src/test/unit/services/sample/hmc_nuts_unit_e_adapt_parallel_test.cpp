@@ -1,9 +1,10 @@
 #include <stan/services/sample/hmc_nuts_unit_e_adapt.hpp>
-#include <gtest/gtest.h>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <iostream>
+#include <gtest/gtest.h>
 
 auto&& blah = stan::math::init_threadpool_tbb();
 
@@ -15,6 +16,9 @@ class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
+      metric.push_back(
+          stan::callbacks::json_writer<std::ofstream>(
+              std::unique_ptr<std::ofstream>(nullptr)));
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
@@ -24,6 +28,7 @@ class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
   std::vector<stan::test::unit::instrumented_writer> init;
   std::vector<stan::test::unit::instrumented_writer> parameter;
   std::vector<stan::test::unit::instrumented_writer> diagnostic;
+  std::vector<stan::callbacks::json_writer<std::ofstream>> metric;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   stan_model model;
 };

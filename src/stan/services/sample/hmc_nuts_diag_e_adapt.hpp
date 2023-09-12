@@ -21,8 +21,7 @@ namespace sample {
 
 /**
  * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
- * with a pre-specified Euclidean metric and saves adapted tuning parameters
- * stepsize and inverse metric.
+ * with a pre-specified diagonal metric and saves adapted tuning parameters.
  *
  * @tparam Model Model class
  * @tparam Stream A type with with a valid `operator<<(std::string)`
@@ -32,7 +31,7 @@ namespace sample {
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial diagonal
               inverse Euclidean metric (must be positive definite)
@@ -59,6 +58,7 @@ namespace sample {
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] sample_writer Writer for draws
  * @param[in,out] diagnostic_writer Writer for diagnostic information
+ * @param[in,out] metric_writer Writer for tuning params
  * @return error_codes::OK if successful
  */
 template <class Model, typename Stream,
@@ -117,7 +117,7 @@ int hmc_nuts_diag_e_adapt(
 
 /**
  * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
- * with a pre-specified Euclidean metric.
+ * with a pre-specified diagonal metric.
  *
  * @tparam Model Model class
  * @tparam InitContextPtr A type derived from `stan::io::var_context`
@@ -125,7 +125,7 @@ int hmc_nuts_diag_e_adapt(
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial diagonal
               inverse Euclidean metric (must be positive definite)
@@ -182,7 +182,7 @@ int hmc_nuts_diag_e_adapt(
  * @tparam Model Model class
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
@@ -238,7 +238,7 @@ int hmc_nuts_diag_e_adapt(
  * with identity matrix as initial inv_metric.
  *
  * @tparam Model Model class
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
@@ -290,7 +290,7 @@ int hmc_nuts_diag_e_adapt(
 
 /**
  * Runs multiple chains of HMC with NUTS with adaptation using diagonal
- * Euclidean metric with a pre-specified Euclidean metric and saves adapted
+ * Euclidean metric with a pre-specified diagonal metric and saves adapted
  * tuning parameters stepsize and inverse metric.
  *
  *
@@ -304,7 +304,7 @@ int hmc_nuts_diag_e_adapt(
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
  must
@@ -422,7 +422,7 @@ int hmc_nuts_diag_e_adapt(
 
 /**
  * Runs multiple chains of HMC with NUTS with adaptation using diagonal
- * Euclidean metric with a pre-specified Euclidean metric.
+ * Euclidean metric with a pre-specified diagonal metric.
  *
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
@@ -430,7 +430,7 @@ int hmc_nuts_diag_e_adapt(
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
@@ -516,7 +516,7 @@ int hmc_nuts_diag_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
@@ -601,7 +601,7 @@ int hmc_nuts_diag_e_adapt(
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
- * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
