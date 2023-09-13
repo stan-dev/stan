@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/empty_var_context.hpp>
@@ -162,13 +163,14 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 class ServicesUtil : public ::testing::Test {
  public:
   ServicesUtil()
-      : mcmc_writer(sample_writer, diagnostic_writer, logger),
+      : mcmc_writer(sample_writer, diagnostic_writer, dummy_metric_writer, logger),
         model(context, 0, &model_log),
         throwing_model(context, 0, &model_log) {}
 
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
+  stan::callbacks::json_writer<std::ofstream> dummy_metric_writer;
   stan::test::unit::instrumented_logger logger;
-  stan::services::util::mcmc_writer mcmc_writer;
+  stan::services::util::mcmc_writer<std::ofstream> mcmc_writer;
   std::stringstream model_log;
   stan::io::empty_var_context context;
   stan_model model;
