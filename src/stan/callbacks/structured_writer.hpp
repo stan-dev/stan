@@ -29,22 +29,12 @@ class structured_writer {
    * Writes key followed by start token of a structured record.
    * @param[in] key The name of the record.
    */
-  virtual void begin_record(const std::string& key, bool newline = false) {}
+  virtual void begin_record(const std::string& key) {}
 
   /**
    * Writes end token of a structured record.
    */
   virtual void end_record() {}
-
-  /**
-   * Writes start token of a list.
-   */
-  virtual void begin_list() {}
-
-  /**
-   * Writes end token of a list.
-   */
-  virtual void end_list() {}
 
   /**
    * Write a key-value pair to the output stream with a value of null as the
@@ -59,11 +49,6 @@ class structured_writer {
    * @param value string to write.
    */
   virtual void write(const std::string& key, const std::string& value) {}
-
-  /**
-   * No-op
-   */
-  virtual void write() {}
 
   /**
    * Write a key-value pair where the value is a bool.
@@ -87,6 +72,22 @@ class structured_writer {
   virtual void write(const std::string& key, std::size_t value) {}
 
   /**
+   * Write a key-value pair where the value is an `long long int`.
+   * @param key Name of the value pair
+   * @param value `long long int` to write.
+   */
+  virtual void write(const std::string& key,
+                     long long int value  // NOLINT(runtime/int)
+  ) {}
+
+  /**
+   * Write a key-value pair where the value is an `unsigned int`.
+   * @param key Name of the value pair
+   * @param value `unsigned int` to write.
+   */
+  virtual void write(const std::string& key, unsigned int value) {}
+
+  /**
    * Write a key-value pair where the value is a double.
    * @param key Name of the value pair
    * @param value double to write.
@@ -105,8 +106,8 @@ class structured_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  virtual void write(const std::string& key, const std::vector<double> values) {
-  }
+  virtual void write(const std::string& key,
+                     const std::vector<double>& values) {}
 
   /**
    * Write a key-value pair where the value is a vector of strings to be made a
@@ -114,40 +115,51 @@ class structured_writer {
    * @param key Name of the value pair
    * @param values vector of strings to write.
    */
-  void write(const std::string& key, const std::vector<std::string>& values) {}
+  virtual void write(const std::string& key,
+                     const std::vector<std::string>& values) {}
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  virtual void write(const std::string& key,
+                     const std::vector<std::complex<double>>& values) {}
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  virtual void write(const std::string& key, const std::vector<int>& values) {}
 
   /**
    * Write a key-value pair where the value is an Eigen Matrix.
    * @param key Name of the value pair
    * @param mat Eigen Matrix to write.
    */
-  void write(const std::string& key, const Eigen::MatrixXd& mat) {}
+  virtual void write(const std::string& key, const Eigen::MatrixXd& mat) {}
 
   /**
    * Write a key-value pair where the value is an Eigen Vector.
    * @param key Name of the value pair
    * @param vec Eigen Vector to write.
    */
-  void write(const std::string& key, const Eigen::VectorXd& vec) {}
+  virtual void write(const std::string& key, const Eigen::VectorXd& vec) {}
 
   /**
    * Write a key-value pair where the value is a Eigen RowVector.
    * @param key Name of the value pair
    * @param vec Eigen RowVector to write.
    */
-  void write(const std::string& key, const Eigen::RowVectorXd& vec) {}
+  virtual void write(const std::string& key, const Eigen::RowVectorXd& vec) {}
 
   /**
    * Write a key-value pair where the value is a const char*.
    * @param key Name of the value pair
    * @param value pointer to chars to write.
    */
-  void write(const std::string& key, const char* value) {}
-
-  /**
-   * Reset state
-   */
-  virtual void reset() {}
+  virtual void write(const std::string& key, const char* value) {}
 };
 
 }  // namespace callbacks

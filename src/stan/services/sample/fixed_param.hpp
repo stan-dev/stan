@@ -158,7 +158,8 @@ int fixed_param(Model& model, const std::size_t num_chains,
     samples.emplace_back(cont_vectors[i], 0, 0);
     dummy_metric_writers.emplace_back(
         stan::callbacks::json_writer<std::ofstream>());
-    writers.emplace_back(sample_writers[i], diagnostic_writers[i], dummy_metric_writers[i], logger);
+    writers.emplace_back(sample_writers[i], diagnostic_writers[i],
+                         dummy_metric_writers[i], logger);
     // Headers
     writers[i].write_sample_names(samples[i], samplers[i], model);
     writers[i].write_diagnostic_names(samples[i], samplers[i], model);

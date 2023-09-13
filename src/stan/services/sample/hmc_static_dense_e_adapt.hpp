@@ -99,10 +99,10 @@ int hmc_static_dense_e_adapt(
                             logger);
 
   callbacks::json_writer<std::ofstream> dummy_metric_writer;
-  util::run_adaptive_sampler(
-      sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer,
-      dummy_metric_writer);
+  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                             num_samples, num_thin, refresh, save_warmup, rng,
+                             interrupt, logger, sample_writer,
+                             diagnostic_writer, dummy_metric_writer);
 
   return error_codes::OK;
 }

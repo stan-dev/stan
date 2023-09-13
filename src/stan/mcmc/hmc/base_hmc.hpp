@@ -64,18 +64,18 @@ class base_hmc : public base_mcmc {
     write_sampler_metric(writer);
   }
 
-
   /**
    * write stepsize and elements of mass matrix as a JSON object
    */
   template <typename Stream, typename Deleter = std::default_delete<Stream>>
-  void write_sampler_state_json(callbacks::json_writer<Stream, Deleter>& json_writer) {
+  void write_sampler_state_json(
+      callbacks::json_writer<Stream, Deleter>& json_writer) {
     json_writer.begin_record();
     json_writer.write("stepsize", get_nominal_stepsize());
     json_writer.write("inv_metric", z_.inv_e_metric_);
     json_writer.end_record();
   }
-  
+
   void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
                                     std::vector<std::string>& names) {
     z_.get_param_names(model_names, names);
@@ -196,7 +196,7 @@ class base_hmc : public base_mcmc {
 
  protected:
   typename Hamiltonian<Model, BaseRNG>::PointType z_;
-  Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
+  Integrator<Hamiltonian<Model, BaseRNG>> integrator_;
   Hamiltonian<Model, BaseRNG> hamiltonian_;
 
   BaseRNG& rand_int_;
