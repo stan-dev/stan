@@ -97,12 +97,11 @@ int hmc_static_diag_e_adapt(
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
 
-
   callbacks::json_writer<std::ofstream> dummy_metric_writer;
-  util::run_adaptive_sampler(
-      sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer,
-      dummy_metric_writer);
+  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                             num_samples, num_thin, refresh, save_warmup, rng,
+                             interrupt, logger, sample_writer,
+                             diagnostic_writer, dummy_metric_writer);
 
   return error_codes::OK;
 }

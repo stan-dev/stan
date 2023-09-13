@@ -10,7 +10,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-
 auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
@@ -59,7 +58,8 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
       = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
   std::vector<str_writer> par_parameters;
   std::vector<str_writer> seq_parameters;
-  std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>> metrics;
+  std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>>
+      metrics;
   std::vector<stan::test::unit::instrumented_writer> diagnostics;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   std::unique_ptr<rosenbrock_model_namespace::rosenbrock_model> model;
@@ -114,7 +114,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   }
 
   std::vector<Eigen::MatrixXd> par_res;
-  std::vector<std::string>par_metrics;
+  std::vector<std::string> par_metrics;
   for (int i = 0; i < num_chains; ++i) {
     auto par_str = par_parameters[i].get_stream().str();
     auto sub_par_str = par_str.substr(par_str.find("Elements") - 1);
@@ -131,7 +131,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   }
 
   std::vector<Eigen::MatrixXd> seq_res;
-  std::vector<std::string>seq_metrics;
+  std::vector<std::string> seq_metrics;
   for (int i = 0; i < num_chains; ++i) {
     auto seq_str = seq_parameters[i].get_stream().str();
     auto sub_seq_str = seq_str.substr(seq_str.find("Elements") - 1);

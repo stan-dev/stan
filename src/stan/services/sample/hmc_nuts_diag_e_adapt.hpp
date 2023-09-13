@@ -107,10 +107,10 @@ int hmc_nuts_diag_e_adapt(
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
 
-  util::run_adaptive_sampler(
-      sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer,
-      metric_writer);
+  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                             num_samples, num_thin, refresh, save_warmup, rng,
+                             interrupt, logger, sample_writer,
+                             diagnostic_writer, metric_writer);
 
   return error_codes::OK;
 }
@@ -176,8 +176,8 @@ int hmc_nuts_diag_e_adapt(
 
 /**
  * Runs HMC with NUTS with adaptation using diagonal Euclidean metric,
- * with identity matrix as initial inv_metric and saves adapted tuning parameters
- * stepsize and inverse metric.
+ * with identity matrix as initial inv_metric and saves adapted tuning
+ * parameters stepsize and inverse metric.
  *
  * @tparam Model Model class
  * @tparam Stream A type with with a valid `operator<<(std::string)`
@@ -408,12 +408,11 @@ int hmc_nuts_diag_e_adapt(
        &sample_writer, &cont_vectors, &diagnostic_writer,
        &metric_writer](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
-          util::run_adaptive_sampler(samplers[i], model, cont_vectors[i],
-                                     num_warmup, num_samples, num_thin, refresh,
-                                     save_warmup, rngs[i], interrupt, logger,
-                                     sample_writer[i], diagnostic_writer[i],
-                                     metric_writer[i], init_chain_id + i,
-                                     num_chains);
+          util::run_adaptive_sampler(
+              samplers[i], model, cont_vectors[i], num_warmup, num_samples,
+              num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
+              sample_writer[i], diagnostic_writer[i], metric_writer[i],
+              init_chain_id + i, num_chains);
         }
       },
       tbb::simple_partitioner());
@@ -489,11 +488,10 @@ int hmc_nuts_diag_e_adapt(
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
         model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
-        init_radius, num_warmup, num_samples, num_thin, save_warmup,
-        refresh, stepsize, stepsize_jitter, max_depth, delta, gamma,
-        kappa, t0, init_buffer, term_buffer, window, interrupt, logger,
-        init_writer[0], sample_writer[0],
-        diagnostic_writer[0], dummy_metric_writer[0]);
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
+        sample_writer[0], diagnostic_writer[0], dummy_metric_writer[0]);
   }
   return hmc_nuts_diag_e_adapt(
       model, num_chains, init, init_inv_metric, random_seed, init_chain_id,
@@ -505,8 +503,8 @@ int hmc_nuts_diag_e_adapt(
 
 /**
  * Runs multiple chains of HMC with NUTS with adaptation using diagonal
- * with identity matrix as initial inv_metric and saves adapted tuning parameters
- * stepsize and inverse metric.
+ * with identity matrix as initial inv_metric and saves adapted tuning
+ * parameters stepsize and inverse metric.
  *
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
@@ -553,9 +551,9 @@ int hmc_nuts_diag_e_adapt(
  * @param[in,out] metric_writer std vector of Writers for tuning params
  * @return error_codes::OK if successful
  */
-template <class Model, typename InitContextPtr,
-          typename InitWriter, typename SampleWriter, typename DiagnosticWriter,
-          typename Stream, typename Deleter = std::default_delete<Stream>>
+template <class Model, typename InitContextPtr, typename InitWriter,
+          typename SampleWriter, typename DiagnosticWriter, typename Stream,
+          typename Deleter = std::default_delete<Stream>>
 int hmc_nuts_diag_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -577,11 +575,10 @@ int hmc_nuts_diag_e_adapt(
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
         model, *init[0], *unit_e_metric[0], random_seed, init_chain_id,
-        init_radius, num_warmup, num_samples, num_thin, save_warmup,
-        refresh, stepsize, stepsize_jitter, max_depth, delta, gamma,
-        kappa, t0, init_buffer, term_buffer, window, interrupt, logger,
-        init_writer[0], sample_writer[0],
-        diagnostic_writer[0], metric_writer[0]);
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
+        sample_writer[0], diagnostic_writer[0], metric_writer[0]);
   }
   return hmc_nuts_diag_e_adapt(
       model, num_chains, init, unit_e_metric, random_seed, init_chain_id,
@@ -637,8 +634,8 @@ int hmc_nuts_diag_e_adapt(
  * information of each chain.
  * @return error_codes::OK if successful
  */
-template <class Model, typename InitContextPtr,
-          typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
+template <class Model, typename InitContextPtr, typename InitWriter,
+          typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -665,11 +662,10 @@ int hmc_nuts_diag_e_adapt(
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
         model, *init[0], *unit_e_metric[0], random_seed, init_chain_id,
-        init_radius, num_warmup, num_samples, num_thin, save_warmup,
-        refresh, stepsize, stepsize_jitter, max_depth, delta, gamma,
-        kappa, t0, init_buffer, term_buffer, window, interrupt, logger,
-        init_writer[0], sample_writer[0],
-        diagnostic_writer[0], dummy_metric_writer[0]);
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
+        sample_writer[0], diagnostic_writer[0], dummy_metric_writer[0]);
   }
   return hmc_nuts_diag_e_adapt(
       model, num_chains, init, unit_e_metric, random_seed, init_chain_id,

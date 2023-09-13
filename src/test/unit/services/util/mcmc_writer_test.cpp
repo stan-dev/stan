@@ -163,7 +163,8 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 class ServicesUtil : public ::testing::Test {
  public:
   ServicesUtil()
-      : mcmc_writer(sample_writer, diagnostic_writer, dummy_metric_writer, logger),
+      : mcmc_writer(sample_writer, diagnostic_writer, dummy_metric_writer,
+                    logger),
         model(context, 0, &model_log),
         throwing_model(context, 0, &model_log) {}
 

@@ -16,9 +16,8 @@ class ServicesSampleHmcNutsUnitEPar : public testing::Test {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
-      metric.push_back(
-          stan::callbacks::json_writer<std::ofstream>(
-              std::unique_ptr<std::ofstream>(nullptr)));
+      metric.push_back(stan::callbacks::json_writer<std::ofstream>(
+          std::unique_ptr<std::ofstream>(nullptr)));
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
