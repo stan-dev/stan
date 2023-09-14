@@ -195,7 +195,8 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  *
  * @param x1 Final point, equal to \f$ x_0 + \alpha p \f$.
  *
- * @param f1 Final point function value, equal to \f$ f(x_0 + \alpha p) \f$.
+ * @param func_val Final point function value, equal to \f$ f(x_0 + \alpha p)
+ *\f$.
  *
  * @param gradx1 Final point gradient, equal to \f$ g(x_0 + \alpha p) \f$.
  *

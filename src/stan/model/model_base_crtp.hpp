@@ -137,7 +137,7 @@ class model_base_crtp : public stan::model::model_base {
                    Eigen::VectorXd& vars, bool include_tparams = true,
                    bool include_gqs = true,
                    std::ostream* msgs = 0) const override {
-    return static_cast<const M*>(this)->template write_array(
+    return static_cast<const M*>(this)->write_array(
         rng, theta, vars, include_tparams, include_gqs, msgs);
   }
 
@@ -206,7 +206,7 @@ class model_base_crtp : public stan::model::model_base {
                    std::vector<int>& theta_i, std::vector<double>& vars,
                    bool include_tparams = true, bool include_gqs = true,
                    std::ostream* msgs = 0) const override {
-    return static_cast<const M*>(this)->template write_array(
+    return static_cast<const M*>(this)->write_array(
         rng, theta, theta_i, vars, include_tparams, include_gqs, msgs);
   }
 
