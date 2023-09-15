@@ -42,14 +42,16 @@ namespace util {
  *  (optional, default == 1)
  */
 template <typename Sampler, typename Model, typename RNG>
-void run_adaptive_sampler(
-    Sampler& sampler, Model& model, std::vector<double>& cont_vector,
-    int num_warmup, int num_samples, int num_thin, int refresh,
-    bool save_warmup, RNG& rng, callbacks::interrupt& interrupt,
-    callbacks::logger& logger, callbacks::writer& sample_writer,
-    callbacks::writer& diagnostic_writer,
-    callbacks::structured_writer& metric_writer,
-    size_t chain_id = 1, size_t num_chains = 1) {
+void run_adaptive_sampler(Sampler& sampler, Model& model,
+                          std::vector<double>& cont_vector, int num_warmup,
+                          int num_samples, int num_thin, int refresh,
+                          bool save_warmup, RNG& rng,
+                          callbacks::interrupt& interrupt,
+                          callbacks::logger& logger,
+                          callbacks::writer& sample_writer,
+                          callbacks::writer& diagnostic_writer,
+                          callbacks::structured_writer& metric_writer,
+                          size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
 
@@ -63,8 +65,8 @@ void run_adaptive_sampler(
     return;
   }
 
-  services::util::mcmc_writer writer(
-      sample_writer, diagnostic_writer, metric_writer, logger);
+  services::util::mcmc_writer writer(sample_writer, diagnostic_writer,
+                                     metric_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 
   // Headers

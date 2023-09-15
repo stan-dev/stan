@@ -464,8 +464,7 @@ int hmc_nuts_dense_e_adapt(
   std::vector<stan::callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    dummy_metric_writer.emplace_back(
-        stan::callbacks::structured_writer());
+    dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());
   }
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
@@ -532,7 +531,8 @@ int hmc_nuts_dense_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
-          typename SampleWriter, typename DiagnosticWriter, typename MetricWriter>
+          typename SampleWriter, typename DiagnosticWriter,
+          typename MetricWriter>
 int hmc_nuts_dense_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -634,8 +634,7 @@ int hmc_nuts_dense_e_adapt(
   std::vector<callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    dummy_metric_writer.emplace_back(
-        stan::callbacks::structured_writer());
+    dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());
   }
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(

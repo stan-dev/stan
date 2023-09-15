@@ -66,8 +66,8 @@ int fixed_param(Model& model, const stan::io::var_context& init,
 
   stan::mcmc::fixed_param_sampler sampler;
   callbacks::structured_writer dummy_metric_writer;
-  services::util::mcmc_writer writer(
-      sample_writer, diagnostic_writer, dummy_metric_writer, logger);
+  services::util::mcmc_writer writer(sample_writer, diagnostic_writer,
+                                     dummy_metric_writer, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];
@@ -156,8 +156,7 @@ int fixed_param(Model& model, const std::size_t num_chains,
     cont_vectors.push_back(
         Eigen::Map<Eigen::VectorXd>(cont_vector.data(), cont_vector.size()));
     samples.emplace_back(cont_vectors[i], 0, 0);
-    dummy_metric_writers.emplace_back(
-        stan::callbacks::structured_writer());
+    dummy_metric_writers.emplace_back(stan::callbacks::structured_writer());
     writers.emplace_back(sample_writers[i], diagnostic_writers[i],
                          dummy_metric_writers[i], logger);
     // Headers
