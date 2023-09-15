@@ -1,5 +1,5 @@
 #include <stan/services/sample/hmc_nuts_unit_e.hpp>
-#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
@@ -16,8 +16,7 @@ class ServicesSampleHmcNutsUnitEPar : public testing::Test {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
-      metric.push_back(stan::callbacks::json_writer<std::ofstream>(
-          std::unique_ptr<std::ofstream>(nullptr)));
+      metric.push_back(stan::callbacks::structured_writer());
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
@@ -27,7 +26,7 @@ class ServicesSampleHmcNutsUnitEPar : public testing::Test {
   std::vector<stan::test::unit::instrumented_writer> init;
   std::vector<stan::test::unit::instrumented_writer> parameter;
   std::vector<stan::test::unit::instrumented_writer> diagnostic;
-  std::vector<stan::callbacks::json_writer<std::ofstream>> metric;
+  std::vector<stan::callbacks::structured_writer> metric;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   stan_model model;
 };
@@ -93,10 +92,18 @@ TEST_F(ServicesSampleHmcNutsUnitEPar, parameter_checks) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
+  std::vector<std::stringstream> ss_metric;
+  std::vector<stan::callbacks::structured_writer> metric;
+  for (int i = 0; i < num_chains; ++i) {
+      metric.emplace_back(
+          stan::callbacks::json_writer<std::stringstream, deleter_noop>(
+              std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric[i])));
+
+
   int return_code = stan::services::sample::hmc_nuts_unit_e(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, interrupt, logger, init, parameter, diagnostic);
+      max_depth, interrupt, logger, init, parameter, diagnostic, metric);
 
   for (size_t i = 0; i < num_chains; ++i) {
     std::vector<std::vector<std::string>> parameter_names;
@@ -107,6 +114,15 @@ TEST_F(ServicesSampleHmcNutsUnitEPar, parameter_checks) {
     diagnostic_names = diagnostic[i].vector_string_values();
     std::vector<std::vector<double>> diagnostic_values;
     diagnostic_values = diagnostic[i].vector_double_values();
+    std::vector<std::string> metrics;
+    metrics[i] = ss_metric[i].str();
+    // Adapted metric
+    rapidjson::Document document;
+    ASSERT_FALSE(document.Parse<0>(metrics[i].c_str()).HasParseError());
+    EXPECT_EQ(count_matches("stepsize", metrics[i]), 1);
+    EXPECT_EQ(count_matches("inv_metric", metrics[i]), 1);
+    EXPECT_EQ(count_matches("[", par_metrics[i]), 1);  // single list
+    EXPECT_EQ(count_matches("[ 0, 0 ]", par_metrics[i]), 1);  // unit diagonal
 
     // Expectations of parameter parameter names.
     ASSERT_EQ(9, parameter_names[0].size());

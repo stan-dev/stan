@@ -2,8 +2,8 @@
 #define STAN_SERVICES_SAMPLE_HMC_STATIC_DENSE_E_ADAPT_HPP
 
 #include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
@@ -98,7 +98,7 @@ int hmc_static_dense_e_adapt(
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
 
-  callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  callbacks::structured_writer dummy_metric_writer;
   util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
                              num_samples, num_thin, refresh, save_warmup, rng,
                              interrupt, logger, sample_writer,

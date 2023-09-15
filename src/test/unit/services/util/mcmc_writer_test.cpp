@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
-#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
@@ -169,7 +169,7 @@ class ServicesUtil : public ::testing::Test {
         throwing_model(context, 0, &model_log) {}
 
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
-  stan::callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  stan::callbacks::structured_writer dummy_metric_writer;
   stan::test::unit::instrumented_logger logger;
   stan::services::util::mcmc_writer<std::ofstream> mcmc_writer;
   std::stringstream model_log;

@@ -1,13 +1,13 @@
 #ifndef STAN_SERVICES_UTIL_RUN_SAMPLER_HPP
 #define STAN_SERVICES_UTIL_RUN_SAMPLER_HPP
 
-#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <chrono>
-#include <iostream>
 #include <vector>
 
 namespace stan {
@@ -19,8 +19,6 @@ namespace util {
  *
  * @tparam Model Type of model
  * @tparam RNG Type of random number generator
- * @tparam Stream A type with with a valid `operator<<(std::string)`
- * @tparam Deleter A class with a valid `operator()` method for deleting the
  * @param[in,out] sampler the mcmc sampler to use on the model
  * @param[in] model the model concept to use for computing log probability
  * @param[in] cont_vector initial parameter values
@@ -50,8 +48,8 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
                  size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
-  callbacks::json_writer<std::ofstream> dummy_metric_writer;
-  services::util::mcmc_writer<std::ofstream> writer(
+  callbacks::structured_writer dummy_metric_writer;
+  services::util::mcmc_writer writer(
       sample_writer, diagnostic_writer, dummy_metric_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 

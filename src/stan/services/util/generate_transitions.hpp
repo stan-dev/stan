@@ -15,8 +15,6 @@ namespace util {
  *
  * @tparam Model model class
  * @tparam RNG random number generator class
- * @tparam Stream A type with with a valid `operator<<(std::string)`
- * @tparam Deleter A class with a valid `operator()` method for deleting the
  * @param[in,out] sampler MCMC sampler used to generate transitions
  * @param[in] num_iterations number of MCMC transitions
  * @param[in] start starting iteration number used for printing messages
@@ -41,12 +39,11 @@ namespace util {
  * @param[in] num_chains The number of chains used in the program. This
  *  is used in generate transitions to print out the chain number.
  */
-template <class Model, class RNG, typename Stream,
-          typename Deleter = std::default_delete<Stream>>
+template <class Model, class RNG>
 void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           int start, int finish, int num_thin, int refresh,
                           bool save, bool warmup,
-                          util::mcmc_writer<Stream, Deleter>& mcmc_writer,
+                          util::mcmc_writer& mcmc_writer,
                           stan::mcmc::sample& init_s, Model& model,
                           RNG& base_rng, callbacks::interrupt& callback,
                           callbacks::logger& logger, size_t chain_id = 1,

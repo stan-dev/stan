@@ -1,7 +1,8 @@
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/unique_stream_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <test/unit/util.hpp>
 #include <src/test/unit/services/util.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>

@@ -1,13 +1,12 @@
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
-#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
-#include <iostream>
 
 class ServicesUtil : public testing::Test {
  public:
@@ -31,7 +30,7 @@ class ServicesUtil : public testing::Test {
   boost::ecuyer1988 rng;
   stan::test::unit::instrumented_interrupt interrupt;
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
-  stan::callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  stan::callbacks::structured_writer dummy_metric_writer;
   stan::test::unit::instrumented_logger logger;
   stan::mcmc::adapt_unit_e_nuts<stan_model, boost::ecuyer1988> sampler;
   int num_warmup, num_samples, num_thin, refresh;

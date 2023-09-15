@@ -3,12 +3,11 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <iomanip>
-#include <iostream>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -20,16 +19,12 @@ namespace util {
 
 /**
  * mcmc_writer writes out headers and samples
- *
- * @tparam Stream A type with with a valid `operator<<(std::string)`
- * @tparam Deleter A class with a valid `operator()` method for deleting the
  */
-template <typename Stream, typename Deleter = std::default_delete<Stream>>
 class mcmc_writer {
  private:
   callbacks::writer& sample_writer_;
   callbacks::writer& diagnostic_writer_;
-  callbacks::json_writer<Stream, Deleter>& metric_writer_;
+  callbacks::structured_writer& metric_writer_;
   callbacks::logger& logger_;
 
  public:
@@ -46,7 +41,7 @@ class mcmc_writer {
    */
   mcmc_writer(callbacks::writer& sample_writer,
               callbacks::writer& diagnostic_writer,
-              callbacks::json_writer<Stream, Deleter>& metric_writer,
+              callbacks::structured_writer& metric_writer,
               callbacks::logger& logger)
       : sample_writer_(sample_writer),
         diagnostic_writer_(diagnostic_writer),

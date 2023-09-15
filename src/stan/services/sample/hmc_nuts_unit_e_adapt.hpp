@@ -2,8 +2,8 @@
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_UNIT_E_ADAPT_HPP
 
 #include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
@@ -25,8 +25,6 @@ namespace sample {
  *
  * @tparam Model Model class
  * @param[in] model Input model (with data already instantiated)
- * @tparam Stream A type with with a valid `operator<<(std::string)`
- * @tparam Deleter A class with a valid `operator()` method for deleting the
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
@@ -51,8 +49,7 @@ namespace sample {
  * @param[in,out] metric_writer Writer for tuning params
  * @return error_codes::OK if successful
  */
-template <class Model, typename Stream,
-          typename Deleter = std::default_delete<Stream>>
+template <class Model>
 int hmc_nuts_unit_e_adapt(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int chain, double init_radius, int num_warmup, int num_samples,
@@ -61,7 +58,7 @@ int hmc_nuts_unit_e_adapt(
     double kappa, double t0, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
-    callbacks::json_writer<Stream, Deleter>& metric_writer) {
+    callbacks::structured_writer& metric_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
@@ -131,7 +128,7 @@ int hmc_nuts_unit_e_adapt(
     double kappa, double t0, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  callbacks::structured_writer dummy_metric_writer;
   return hmc_nuts_unit_e_adapt(
       model, init, random_seed, chain, init_radius, num_warmup, num_samples,
       num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
@@ -184,8 +181,7 @@ int hmc_nuts_unit_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
-          typename SampleWriter, typename DiagnosticWriter, typename Stream,
-          typename Deleter = std::default_delete<Stream>>
+          typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_unit_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -196,7 +192,7 @@ int hmc_nuts_unit_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::json_writer<Stream, Deleter>>& metric_writer) {
+    std::vector<callbacks::structured_writer>& metric_writer) {
   if (num_chains == 1) {
     return hmc_nuts_unit_e_adapt(
         model, *init[0], random_seed, init_chain_id, init_radius, num_warmup,
@@ -302,11 +298,11 @@ int hmc_nuts_unit_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<callbacks::json_writer<std::ofstream>> dummy_metric_writer;
+  std::vector<callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(
-        stan::callbacks::json_writer<std::ofstream>());
+        stan::callbacks::structured_writer());
   }
   if (num_chains == 1) {
     return hmc_nuts_unit_e_adapt(

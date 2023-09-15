@@ -1,5 +1,5 @@
 #include <stan/services/util/generate_transitions.hpp>
-#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
@@ -18,7 +18,7 @@ class ServicesSamplesGenerateTransitions : public testing::Test {
   stan::test::unit::instrumented_writer init;
   stan::test::unit::instrumented_writer parameter, diagnostic;
   stan::test::unit::instrumented_logger logger;
-  stan::callbacks::json_writer<std::ofstream> dummy_metric_writer;
+  stan::callbacks::structured_writer dummy_metric_writer;
   stan::io::empty_var_context context;
   stan_model model;
 };

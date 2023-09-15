@@ -2,10 +2,10 @@
 #define STAN_SERVICES_UTIL_RUN_ADAPTIVE_SAMPLER_HPP
 
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
-#include <stan/callbacks/json_writer.hpp>
 #include <tbb/parallel_for.h>
 #include <chrono>
 #include <iostream>
@@ -21,8 +21,6 @@ namespace util {
  * @tparam Sampler Type of adaptive sampler.
  * @tparam Model Type of model
  * @tparam RNG Type of random number generator
- * @tparam Stream A type with with a valid `operator<<(std::string)`
- * @tparam Deleter A class with a valid `operator()` method for deleting the
  * @param[in,out] sampler the mcmc sampler to use on the model
  * @param[in] model the model concept to use for computing log probability
  * @param[in] cont_vector initial parameter values
@@ -38,20 +36,20 @@ namespace util {
  * @param[in,out] logger logger for messages
  * @param[in,out] sample_writer writer for draws
  * @param[in,out] diagnostic_writer writer for diagnostic information
- * @param[in] chain_id The id for a given chain.
+ * @param[in] chain_id The id for a given chain, (optional, default == 1)
  * @param[in] num_chains The number of chains used in the program. This
- *  is used in generate transitions to print out the chain number.
+ *  is used in generate transitions to print out the chain number,
+ *  (optional, default == 1)
  */
-template <typename Sampler, typename Model, typename RNG, typename Stream,
-          typename Deleter = std::default_delete<Stream>>
+template <typename Sampler, typename Model, typename RNG>
 void run_adaptive_sampler(
     Sampler& sampler, Model& model, std::vector<double>& cont_vector,
     int num_warmup, int num_samples, int num_thin, int refresh,
     bool save_warmup, RNG& rng, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& sample_writer,
     callbacks::writer& diagnostic_writer,
-    callbacks::json_writer<Stream, Deleter>& metric_writer, size_t chain_id = 1,
-    size_t num_chains = 1) {
+    callbacks::structured_writer& metric_writer,
+    size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
 
@@ -65,7 +63,7 @@ void run_adaptive_sampler(
     return;
   }
 
-  services::util::mcmc_writer<Stream, Deleter> writer(
+  services::util::mcmc_writer writer(
       sample_writer, diagnostic_writer, metric_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 
@@ -86,7 +84,7 @@ void run_adaptive_sampler(
   sampler.disengage_adaptation();
   writer.write_adapt_finish(sampler);
   sampler.write_sampler_state(sample_writer);
-  sampler.write_sampler_state_json(metric_writer);
+  sampler.write_sampler_state_struct(metric_writer);
 
   auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, num_warmup,
