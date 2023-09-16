@@ -146,8 +146,7 @@ int hmc_nuts_unit_e_adapt(
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @tparam Stream A type with with a valid `operator<<(std::string)`
- * @tparam Deleter A class with a valid `operator()` method for deleting the
+ * @tparam MetricWriter A type derived from `stan::callbacks::structured_writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
@@ -181,7 +180,7 @@ int hmc_nuts_unit_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
-          typename SampleWriter, typename DiagnosticWriter>
+          typename SampleWriter, typename DiagnosticWriter, typename MetricWriter>
 int hmc_nuts_unit_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -192,7 +191,7 @@ int hmc_nuts_unit_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::structured_writer>& metric_writer) {
+    std::vector<MetricWriter>& metric_writer) {
   if (num_chains == 1) {
     return hmc_nuts_unit_e_adapt(
         model, *init[0], random_seed, init_chain_id, init_radius, num_warmup,
@@ -298,7 +297,7 @@ int hmc_nuts_unit_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<callbacks::structured_writer> dummy_metric_writer;
+  std::vector<stan::callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());

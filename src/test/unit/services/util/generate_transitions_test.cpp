@@ -39,7 +39,7 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
       model, context, rng, init_radius, false, logger, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
-  stan::services::util::mcmc_writer<std::ofstream> writer(
+  stan::services::util::mcmc_writer writer(
       parameter, diagnostic, dummy_metric_writer, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
@@ -96,7 +96,7 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
       model, context, rng, init_radius, false, logger, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
-  stan::services::util::mcmc_writer<std::ofstream> writer(
+  stan::services::util::mcmc_writer writer(
       parameter, diagnostic, dummy_metric_writer, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)

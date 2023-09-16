@@ -1,7 +1,7 @@
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
-#include <stan/io/empty_var_context.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/unit/util.hpp>
 #include <src/test/unit/services/util.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
@@ -44,8 +44,6 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
     for (int i = 0; i < num_chains; ++i) {
       ss_metric[i].str(std::string());
       ss_metric[i].clear();
-      metrics[i].begin_record();
-      metrics[i].end_record();
     }
   }
 
@@ -60,7 +58,8 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
       = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
   std::vector<str_writer> par_parameters;
   std::vector<str_writer> seq_parameters;
-  std::vector<stan::callbacks::structured_writer> metrics;
+  std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>>
+      metrics;
   std::vector<stan::test::unit::instrumented_writer> diagnostics;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   std::unique_ptr<rosenbrock_model_namespace::rosenbrock_model> model;
@@ -125,12 +124,11 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
     par_res.push_back(par_mat);
 
     par_metrics.push_back(ss_metric[i].str());
-    std::cout << "metric " << par_metrics[i] << std::endl << std::flush;
-    // rapidjson::Document document;
-    // ASSERT_FALSE(document.Parse<0>(par_metrics[i].c_str()).HasParseError());
-    // EXPECT_EQ(count_matches("stepsize", par_metrics[i]), 1);
-    // EXPECT_EQ(count_matches("inv_metric", par_metrics[i]), 1);
-    // EXPECT_EQ(count_matches("[", par_metrics[i]), 3);  // list has 2 rows
+    rapidjson::Document document;
+    ASSERT_FALSE(document.Parse<0>(par_metrics[i].c_str()).HasParseError());
+    EXPECT_EQ(count_matches("stepsize", par_metrics[i]), 1);
+    EXPECT_EQ(count_matches("inv_metric", par_metrics[i]), 1);
+    EXPECT_EQ(count_matches("[", par_metrics[i]), 3);  // list has 2 rows
   }
 
   std::vector<Eigen::MatrixXd> seq_res;

@@ -140,7 +140,7 @@ int fixed_param(Model& model, const std::size_t num_chains,
   }
   std::vector<boost::ecuyer1988> rngs;
   std::vector<Eigen::VectorXd> cont_vectors;
-  std::vector<callbacks::structured_writer> dummy_metric_writers;
+  std::vector<stan::callbacks::structured_writer> dummy_metric_writers;
   std::vector<util::mcmc_writer> writers;
   std::vector<stan::mcmc::sample> samples;
   std::vector<stan::mcmc::fixed_param_sampler> samplers(num_chains);

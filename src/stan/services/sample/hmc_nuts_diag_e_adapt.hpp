@@ -336,7 +336,8 @@ int hmc_nuts_diag_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitInvContextPtr,
-          typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
+          typename InitWriter, typename SampleWriter, typename DiagnosticWriter,
+          typename MetricWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     const std::vector<InitInvContextPtr>& init_inv_metric,
@@ -349,7 +350,7 @@ int hmc_nuts_diag_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::structured_writer>& metric_writer) {
+    std::vector<MetricWriter>& metric_writer) {
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
         model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
@@ -470,7 +471,7 @@ int hmc_nuts_diag_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<callbacks::structured_writer> dummy_metric_writer;
+  std::vector<stan::callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());
@@ -499,9 +500,10 @@ int hmc_nuts_diag_e_adapt(
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
  * `stan::io::var_context`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @tparam InitWriter A type derived from `stan::callbacks::writer`
+ * @tparam MetricWriter A type derived from `stan::callbacks::structured_writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
@@ -540,7 +542,8 @@ int hmc_nuts_diag_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
-          typename SampleWriter, typename DiagnosticWriter>
+          typename SampleWriter, typename DiagnosticWriter,
+          typename MetricWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
@@ -552,7 +555,7 @@ int hmc_nuts_diag_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
-    std::vector<callbacks::structured_writer>& metric_writer) {
+    std::vector<MetricWriter>& metric_writer) {
   std::vector<std::unique_ptr<stan::io::dump>> unit_e_metric;
   unit_e_metric.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
@@ -640,7 +643,7 @@ int hmc_nuts_diag_e_adapt(
     unit_e_metric.emplace_back(std::make_unique<stan::io::dump>(
         util::create_unit_e_diag_inv_metric(model.num_params_r())));
   }
-  std::vector<callbacks::structured_writer> dummy_metric_writer;
+  std::vector<stan::callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());

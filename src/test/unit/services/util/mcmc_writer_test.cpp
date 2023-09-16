@@ -171,7 +171,7 @@ class ServicesUtil : public ::testing::Test {
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
   stan::callbacks::structured_writer dummy_metric_writer;
   stan::test::unit::instrumented_logger logger;
-  stan::services::util::mcmc_writer<std::ofstream> mcmc_writer;
+  stan::services::util::mcmc_writer mcmc_writer;
   std::stringstream model_log;
   stan::io::empty_var_context context;
   stan_model model;
