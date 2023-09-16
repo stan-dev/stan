@@ -22,8 +22,7 @@ struct deleter_noop {
 class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
  public:
   ServicesSampleHmcNutsUnitEAdaptPar()
-      : ss_metric(num_chains),
-        model(data_context, 0, &model_log) {
+      : ss_metric(num_chains), model(data_context, 0, &model_log) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
@@ -52,7 +51,7 @@ class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
   stan_model model;
   std::vector<std::stringstream> ss_metric;
   std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>>
-  metric;
+      metric;
 };
 
 TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, call_count) {
