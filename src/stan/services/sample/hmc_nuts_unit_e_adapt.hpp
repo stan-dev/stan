@@ -180,7 +180,8 @@ int hmc_nuts_unit_e_adapt(
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
-          typename SampleWriter, typename DiagnosticWriter, typename MetricWriter>
+          typename SampleWriter, typename DiagnosticWriter,
+          typename MetricWriter>
 int hmc_nuts_unit_e_adapt(
     Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
