@@ -67,8 +67,7 @@ class base_hmc : public base_mcmc {
   /**
    * write stepsize and elements of mass matrix as a JSON object
    */
-  void write_sampler_state_struct(
-      callbacks::structured_writer& struct_writer) {
+  void write_sampler_state_struct(callbacks::structured_writer& struct_writer) {
     struct_writer.begin_record();
     struct_writer.write("stepsize", get_nominal_stepsize());
     struct_writer.write("inv_metric", z_.inv_e_metric_);

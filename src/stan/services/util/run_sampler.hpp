@@ -49,8 +49,8 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
   callbacks::structured_writer dummy_metric_writer;
-  services::util::mcmc_writer writer(
-      sample_writer, diagnostic_writer, dummy_metric_writer, logger);
+  services::util::mcmc_writer writer(sample_writer, diagnostic_writer,
+                                     dummy_metric_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 
   // Headers

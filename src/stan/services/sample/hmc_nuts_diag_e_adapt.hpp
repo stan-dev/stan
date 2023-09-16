@@ -473,8 +473,7 @@ int hmc_nuts_diag_e_adapt(
   std::vector<callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    dummy_metric_writer.emplace_back(
-        stan::callbacks::structured_writer());
+    dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());
   }
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
@@ -644,8 +643,7 @@ int hmc_nuts_diag_e_adapt(
   std::vector<callbacks::structured_writer> dummy_metric_writer;
   dummy_metric_writer.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    dummy_metric_writer.emplace_back(
-        stan::callbacks::structured_writer());
+    dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());
   }
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
