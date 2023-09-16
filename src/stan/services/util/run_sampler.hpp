@@ -1,7 +1,6 @@
 #ifndef STAN_SERVICES_UTIL_RUN_SAMPLER_HPP
 #define STAN_SERVICES_UTIL_RUN_SAMPLER_HPP
 
-#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
