@@ -22,13 +22,12 @@ namespace sample {
 /**
  * Runs HMC with NUTS with adaptation using dense Euclidean metric
  * with a pre-specified dense metric and saves adapted tuning parameters
- * stepsize and inverse metric.
  *
  * @tparam Model Model class
  * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial dense
-              inverse Euclidean metric (must be positive definite)
+ *            inverse Euclidean metric (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
@@ -44,7 +43,7 @@ namespace sample {
  * @param[in] gamma adaptation regularization scale
  * @param[in] kappa adaptation relaxation exponent
  * @param[in] t0 adaptation iteration offset
- * @param[in] init_buffer width of initial fast adaptation intervalniu
+ * @param[in] init_buffer width of initial fast adaptation interval
  * @param[in] term_buffer width of final fast adaptation interval
  * @param[in] window initial width of slow adaptation interval
  * @param[in,out] interrupt Callback for interrupts
@@ -116,7 +115,7 @@ int hmc_nuts_dense_e_adapt(
  * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial dense
-              inverse Euclidean metric (must be positive definite)
+ *            inverse Euclidean metric (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
@@ -279,9 +278,9 @@ int hmc_nuts_dense_e_adapt(
  *
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
- `stan::io::var_context`
+ * `stan::io::var_context`
  * @tparam InitInvContextPtr A pointer with underlying type derived from
- `stan::io::var_context`
+ * `stan::io::var_context`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
@@ -289,12 +288,10 @@ int hmc_nuts_dense_e_adapt(
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
- must
- * be the same length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
- * chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial
- * diagonal inverse Euclidean metric for each chain (must be positive definite)
+ * must be the same length as this value.
+ * @param[in] init A std vector of init var contexts for per-chain initialization.
+ * @param[in] init_inv_metric A std vector of var contexts exposing an initial
+ * dense inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance by for each chain by an integer sequence from `init_chain_id` to
@@ -318,7 +315,7 @@ int hmc_nuts_dense_e_adapt(
  * @param[in,out] interrupt Callback for interrupts
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
- inits of each chain.
+ * inits of each chain.
  * @param[in,out] sample_writer std vector of Writers for draws of each chain.
  * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
  * information of each chain.
@@ -408,16 +405,19 @@ int hmc_nuts_dense_e_adapt(
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
  * `stan::io::var_context`
+ * @tparam InitInvContextPtr A pointer with underlying type derived from
+ * `stan::io::var_context`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
- * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
- * length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
- * chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial
+ * `init_writer`, `sample_writer`, and `diagnostic_writer`
+ * must be the same length as this value.
+ * @param[in] init A std vector of init var contexts for initialization
+ * of each chain.
+ * @param[in] init_inv_metric var context exposing an initial dense
+ *            inverse Euclidean metric (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance by for each chain by an integer sequence from `init_chain_id` to
@@ -496,9 +496,9 @@ int hmc_nuts_dense_e_adapt(
  * @tparam MetricWriter A type derived from `stan::callbacks::structured_writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
- * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
- * length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
+ * `init_writer`, `sample_writer`, `diagnostic_writer`, and `metric_wrter`
+ * must be the same length as this value.
+ * @param[in] init A std vector of init var contexts for initialization of each
  * chain.
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
@@ -579,9 +579,9 @@ int hmc_nuts_dense_e_adapt(
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
- * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
- * length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
+ * `init_writer`, `sample_writer`, and `diagnostic_writer`
+ * must be the same length as this value.
+ * @param[in] init A std vector of init var contexts for initialization of each
  * chain.
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator

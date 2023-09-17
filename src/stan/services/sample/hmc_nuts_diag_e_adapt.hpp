@@ -3,16 +3,16 @@
 
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/callbacks/structured_writer.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
-#include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
+#include <stan/services/util/initialize.hpp>
+#include <stan/services/util/run_adaptive_sampler.hpp>
 #include <vector>
 
 namespace stan {
@@ -24,15 +24,10 @@ namespace sample {
  * with a pre-specified diagonal metric and saves adapted tuning parameters.
  *
  * @tparam Model Model class
- * @tparam InitContextPtr A type derived from `stan::io::var_context`
- * @tparam InitMetricContext A type derived from `stan::io::var_context`
- * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
- * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial diagonal
-              inverse Euclidean metric (must be positive definite)
+ *              inverse Euclidean metric (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
@@ -117,15 +112,10 @@ int hmc_nuts_diag_e_adapt(
  * with a pre-specified diagonal metric.
  *
  * @tparam Model Model class
- * @tparam InitContextPtr A type derived from `stan::io::var_context`
- * @tparam InitMetricContext A type derived from `stan::io::var_context`
- * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
- * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial diagonal
-              inverse Euclidean metric (must be positive definite)
+ *            inverse Euclidean metric (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
@@ -257,7 +247,6 @@ int hmc_nuts_diag_e_adapt(
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] sample_writer Writer for draws
  * @param[in,out] diagnostic_writer Writer for diagnostic information
- * @param[in,out] metric_writer Writer for tuning params
  * @return error_codes::OK if successful
  */
 template <class Model>
@@ -287,24 +276,22 @@ int hmc_nuts_diag_e_adapt(
  * Euclidean metric with a pre-specified diagonal metric and saves adapted
  * tuning parameters stepsize and inverse metric.
  *
- *
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
- `stan::io::var_context`
+ * `stan::io::var_context`
  * @tparam InitInvContextPtr A pointer with underlying type derived from
- `stan::io::var_context`
+ * `stan::io::var_context`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @tparam InitWriter A type derived from `stan::callbacks::writer`
+ * @tparam MetricWriter A type derived from `stan::callbacks::structured_writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
- must
- * be the same length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
- * chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial
- diagonal inverse Euclidean metric for each chain (must be positive definite)
+ * must be the same length as this value.
+ * @param[in] init A std vector of init var contexts for per-chain initialization.
+ * @param[in] init_inv_metric A std vector of var contexts exposing an initial
+ * diagonal inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance for each chain by an integer sequence from `init_chain_id` to
@@ -418,16 +405,19 @@ int hmc_nuts_diag_e_adapt(
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
  * `stan::io::var_context`
+ * @tparam InitContextPtr A pointer with underlying type derived from
+ * `stan::io::var_context`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
- * chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial
+ * @param[in] init A std vector of init var contexts for initialization
+ * of each chain.
+ * @param[in] init_inv_metric A std vector of var contexts exposing an initial
+ * diagonal inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance by for each chain by an integer sequence from `init_chain_id` to
@@ -508,9 +498,8 @@ int hmc_nuts_diag_e_adapt(
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
+ * @param[in] init A std vector of init var contexts for initialization of each
  * chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance by for each chain by an integer sequence from `init_chain_id` to
@@ -585,16 +574,17 @@ int hmc_nuts_diag_e_adapt(
  * @tparam Model Model class
  * @tparam InitContextPtr A pointer with underlying type derived from
  * `stan::io::var_context`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
- * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model (with data already instantiated)
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
  * length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each
+ * @param[in] init A std vector of init var contexts for initialization of each
  * chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial
+ * @param[in] init_inv_metric var context exposing an initial diagonal
+ *            inverse Euclidean metric (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance by for each chain by an integer sequence from `init_chain_id` to
