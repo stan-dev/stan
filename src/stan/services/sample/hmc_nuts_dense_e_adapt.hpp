@@ -289,7 +289,8 @@ int hmc_nuts_dense_e_adapt(
  * @param[in] num_chains The number of chains to run in parallel. `init`,
  * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
  * must be the same length as this value.
- * @param[in] init A std vector of init var contexts for per-chain initialization.
+ * @param[in] init A std vector of init var contexts for per-chain
+ * initialization.
  * @param[in] init_inv_metric A std vector of var contexts exposing an initial
  * dense inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
