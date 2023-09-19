@@ -38,8 +38,7 @@ class mcmc_writer {
    * @param[in,out] logger messages are written through the logger
    */
   mcmc_writer(callbacks::writer& sample_writer,
-              callbacks::writer& diagnostic_writer,
-              callbacks::logger& logger)
+              callbacks::writer& diagnostic_writer, callbacks::logger& logger)
       : sample_writer_(sample_writer),
         diagnostic_writer_(diagnostic_writer),
         logger_(logger),
