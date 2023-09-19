@@ -65,8 +65,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
     return;
   }
 
-  services::util::mcmc_writer writer(sample_writer, diagnostic_writer,
-                                     metric_writer, logger);
+  services::util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
   stan::mcmc::sample s(cont_params, 0, 0);
 
   // Headers

@@ -3,7 +3,6 @@
 
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
-#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
@@ -65,9 +64,7 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   }
 
   stan::mcmc::fixed_param_sampler sampler;
-  callbacks::structured_writer dummy_metric_writer;
-  services::util::mcmc_writer writer(sample_writer, diagnostic_writer,
-                                     dummy_metric_writer, logger);
+  services::util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];
@@ -140,13 +137,11 @@ int fixed_param(Model& model, const std::size_t num_chains,
   }
   std::vector<boost::ecuyer1988> rngs;
   std::vector<Eigen::VectorXd> cont_vectors;
-  std::vector<stan::callbacks::structured_writer> dummy_metric_writers;
   std::vector<util::mcmc_writer> writers;
   std::vector<stan::mcmc::sample> samples;
   std::vector<stan::mcmc::fixed_param_sampler> samplers(num_chains);
   rngs.reserve(num_chains);
   cont_vectors.reserve(num_chains);
-  dummy_metric_writers.reserve(num_chains);
   writers.reserve(num_chains);
   samples.reserve(num_chains);
   for (int i = 0; i < num_chains; ++i) {
@@ -156,9 +151,7 @@ int fixed_param(Model& model, const std::size_t num_chains,
     cont_vectors.push_back(
         Eigen::Map<Eigen::VectorXd>(cont_vector.data(), cont_vector.size()));
     samples.emplace_back(cont_vectors[i], 0, 0);
-    dummy_metric_writers.emplace_back(stan::callbacks::structured_writer());
-    writers.emplace_back(sample_writers[i], diagnostic_writers[i],
-                         dummy_metric_writers[i], logger);
+    writers.emplace_back(sample_writers[i], diagnostic_writers[i], logger);
     // Headers
     writers[i].write_sample_names(samples[i], samplers[i], model);
     writers[i].write_diagnostic_names(samples[i], samplers[i], model);
