@@ -13,7 +13,6 @@
 #include <stan/services/util/mcmc_writer.hpp>
 #include <chrono>
 #include <vector>
-#include <iostream>
 
 namespace stan {
 namespace services {
