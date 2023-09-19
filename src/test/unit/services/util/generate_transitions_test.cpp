@@ -1,5 +1,4 @@
 #include <stan/services/util/generate_transitions.hpp>
-#include <stan/callbacks/structured_writer.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
@@ -18,7 +17,6 @@ class ServicesSamplesGenerateTransitions : public testing::Test {
   stan::test::unit::instrumented_writer init;
   stan::test::unit::instrumented_writer parameter, diagnostic;
   stan::test::unit::instrumented_logger logger;
-  stan::callbacks::structured_writer dummy_metric_writer;
   stan::io::empty_var_context context;
   stan_model model;
 };
@@ -39,8 +37,7 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
       model, context, rng, init_radius, false, logger, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
-  stan::services::util::mcmc_writer writer(parameter, diagnostic,
-                                           dummy_metric_writer, logger);
+  stan::services::util::mcmc_writer writer(parameter, diagnostic, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];
@@ -96,8 +93,7 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
       model, context, rng, init_radius, false, logger, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
-  stan::services::util::mcmc_writer writer(parameter, diagnostic,
-                                           dummy_metric_writer, logger);
+  stan::services::util::mcmc_writer writer(parameter, diagnostic, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];

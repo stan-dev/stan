@@ -6,7 +6,6 @@
 #include <src/test/unit/services/util.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
-#include <rapidjson/document.h>
 #include <gtest/gtest.h>
 #include <iostream>
 
@@ -103,7 +102,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   int num_output_lines = (num_warmup + num_samples) / num_thin;
   EXPECT_EQ((num_warmup + num_samples) * num_chains, interrupt.call_count());
   for (int i = 0; i < num_chains; ++i) {
-    stan::test::unit::instrumented_writer seq_init;  // MM: what does this do?
+    stan::test::unit::instrumented_writer seq_init;
     stan::test::unit::instrumented_writer seq_diagnostic;
     return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
         *model, *(context[i]), random_seed, i, init_radius, num_warmup,
@@ -124,8 +123,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
     par_res.push_back(par_mat);
 
     par_metrics.push_back(ss_metric[i].str());
-    rapidjson::Document document;
-    ASSERT_FALSE(document.Parse<0>(par_metrics[i].c_str()).HasParseError());
+    ASSERT_TRUE(stan::test::is_valid_JSON(par_metrics[i]));
     EXPECT_EQ(count_matches("stepsize", par_metrics[i]), 1);
     EXPECT_EQ(count_matches("inv_metric", par_metrics[i]), 1);
     EXPECT_EQ(count_matches("[", par_metrics[i]), 3);  // list has 2 rows
