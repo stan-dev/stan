@@ -172,8 +172,8 @@ void reset_std_streams() {
  * @param text String of JSON
  */
 bool is_valid_JSON(std::string& text) {
-    rapidjson::Document document;
-    return !document.Parse<0>(text.c_str()).HasParseError();
+  rapidjson::Document document;
+  return !document.Parse<0>(text.c_str()).HasParseError();
 }
 
 }  // namespace test
