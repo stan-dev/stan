@@ -6,7 +6,6 @@
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
-#include <rapidjson/document.h>
 #include <gtest/gtest.h>
 #include <iostream>
 
@@ -127,8 +126,7 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, parameter_checks) {
     diagnostic_values = diagnostic[i].vector_double_values();
     std::string metric = ss_metric[i].str();
     // Adapted metric
-    rapidjson::Document document;
-    ASSERT_FALSE(document.Parse<0>(metric.c_str()).HasParseError());
+    ASSERT_TRUE(stan::test::is_valid_JSON(metric));
     EXPECT_EQ(count_matches("stepsize", metric), 1);
     EXPECT_EQ(count_matches("inv_metric", metric), 1);
     EXPECT_EQ(count_matches("[", metric), 1);         // single list

@@ -298,11 +298,7 @@ int hmc_nuts_unit_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<stan::callbacks::structured_writer> dummy_metric_writer;
-  dummy_metric_writer.reserve(num_chains);
-  for (size_t i = 0; i < num_chains; ++i) {
-    dummy_metric_writer.emplace_back(stan::callbacks::structured_writer());
-  }
+  std::vector<stan::callbacks::structured_writer> dummy_metric_writer(num_chains);
   if (num_chains == 1) {
     return hmc_nuts_unit_e_adapt(
         model, *init[0], random_seed, init_chain_id, init_radius, num_warmup,

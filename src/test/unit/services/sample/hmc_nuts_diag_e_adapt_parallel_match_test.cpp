@@ -7,7 +7,6 @@
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
-#include <rapidjson/document.h>
 #include <gtest/gtest.h>
 #include <iostream>
 
@@ -123,8 +122,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
         = stan::test::read_stan_sample_csv(sub_par_stream, 80, 9);
     par_res.push_back(par_mat);
     par_metrics.push_back(ss_metric[i].str());
-    rapidjson::Document document;
-    ASSERT_FALSE(document.Parse<0>(par_metrics[i].c_str()).HasParseError());
+    ASSERT_TRUE(stan::test::is_valid_JSON(par_metrics[i]));
     EXPECT_EQ(count_matches("stepsize", par_metrics[i]), 1);
     EXPECT_EQ(count_matches("inv_metric", par_metrics[i]), 1);
     EXPECT_EQ(count_matches("[", par_metrics[i]), 1);  // single list
