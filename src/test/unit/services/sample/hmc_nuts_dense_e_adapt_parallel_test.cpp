@@ -1,8 +1,9 @@
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
-#include <gtest/gtest.h>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 
 auto&& blah = stan::math::init_threadpool_tbb();
@@ -16,6 +17,7 @@ class ServicesSampleHmcNutsDenseEAdaptPar : public testing::Test {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
+      metric.push_back(stan::callbacks::structured_writer());
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
@@ -25,6 +27,7 @@ class ServicesSampleHmcNutsDenseEAdaptPar : public testing::Test {
   std::vector<stan::test::unit::instrumented_writer> init;
   std::vector<stan::test::unit::instrumented_writer> parameter;
   std::vector<stan::test::unit::instrumented_writer> diagnostic;
+  std::vector<stan::callbacks::structured_writer> metric;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   stan_model model;
 };
@@ -55,7 +58,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, call_count) {
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      interrupt, logger, init, parameter, diagnostic, metric);
 
   EXPECT_EQ(0, return_code);
 
@@ -95,7 +98,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, parameter_checks) {
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      interrupt, logger, init, parameter, diagnostic, metric);
 
   for (size_t i = 0; i < num_chains; ++i) {
     std::vector<std::vector<std::string>> parameter_names;
@@ -159,7 +162,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, output_regression) {
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      interrupt, logger, init, parameter, diagnostic, metric);
 
   for (auto&& init_it : init) {
     std::vector<std::string> init_values;
