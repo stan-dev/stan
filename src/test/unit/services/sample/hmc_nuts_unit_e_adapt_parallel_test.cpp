@@ -76,7 +76,7 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, call_count) {
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
-      diagnostic);
+      diagnostic, metric);
 
   EXPECT_EQ(0, return_code);
 
@@ -181,7 +181,7 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, output_regression) {
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
-      diagnostic);
+      diagnostic, metric);
 
   for (auto&& init_it : init) {
     std::vector<std::string> init_values;
