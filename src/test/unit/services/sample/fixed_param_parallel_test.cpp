@@ -1,9 +1,9 @@
 #include <stan/services/sample/fixed_param.hpp>
-#include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <iostream>
+#include <gtest/gtest.h>
 
 auto&& blah = stan::math::init_threadpool_tbb();
 

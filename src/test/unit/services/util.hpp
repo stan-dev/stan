@@ -49,6 +49,7 @@ Eigen::MatrixXd read_stan_sample_csv(std::istringstream& in, int rows,
   }
   return res;
 }
+
 }  // namespace test
 }  // namespace stan
 #endif
