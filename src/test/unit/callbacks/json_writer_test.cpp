@@ -1,5 +1,5 @@
 #include <stan/callbacks/json_writer.hpp>
-#include<test/unit/util.hpp>
+#include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 #include <string>
 
