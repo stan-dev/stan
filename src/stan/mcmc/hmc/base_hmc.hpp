@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/random/uniform_01.hpp>
@@ -61,6 +62,16 @@ class base_hmc : public base_mcmc {
   void write_sampler_state(callbacks::writer& writer) {
     write_sampler_stepsize(writer);
     write_sampler_metric(writer);
+  }
+
+  /**
+   * write stepsize and elements of mass matrix as a JSON object
+   */
+  void write_sampler_state_struct(callbacks::structured_writer& struct_writer) {
+    struct_writer.begin_record();
+    struct_writer.write("stepsize", get_nominal_stepsize());
+    struct_writer.write("inv_metric", z_.inv_e_metric_);
+    struct_writer.end_record();
   }
 
   void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
@@ -183,7 +194,7 @@ class base_hmc : public base_mcmc {
 
  protected:
   typename Hamiltonian<Model, BaseRNG>::PointType z_;
-  Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
+  Integrator<Hamiltonian<Model, BaseRNG>> integrator_;
   Hamiltonian<Model, BaseRNG> hamiltonian_;
 
   BaseRNG& rand_int_;

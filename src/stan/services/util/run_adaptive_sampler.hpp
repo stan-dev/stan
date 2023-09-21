@@ -2,11 +2,13 @@
 #define STAN_SERVICES_UTIL_RUN_ADAPTIVE_SAMPLER_HPP
 
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <tbb/parallel_for.h>
 #include <chrono>
+#include <iostream>
 #include <vector>
 
 namespace stan {
@@ -14,7 +16,8 @@ namespace services {
 namespace util {
 
 /**
- * Runs the sampler with adaptation.
+ * Runs the sampler with adaptation, with writers for the sample,
+ * diagnostics, and the adapted hmc tuning parameters.
  *
  * @tparam Sampler Type of adaptive sampler.
  * @tparam Model Type of model
@@ -34,9 +37,11 @@ namespace util {
  * @param[in,out] logger logger for messages
  * @param[in,out] sample_writer writer for draws
  * @param[in,out] diagnostic_writer writer for diagnostic information
- * @param[in] chain_id The id for a given chain.
+ * @param[in,out] metric_writer writer for adapted stepsize, metric
+ * @param[in] chain_id The id for a given chain, (optional, default == 1)
  * @param[in] num_chains The number of chains used in the program. This
- *  is used in generate transitions to print out the chain number.
+ *  is used in generate transitions to print out the chain number,
+ *  (optional, default == 1)
  */
 template <typename Sampler, typename Model, typename RNG>
 void run_adaptive_sampler(Sampler& sampler, Model& model,
@@ -47,6 +52,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::logger& logger,
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer,
+                          callbacks::structured_writer& metric_writer,
                           size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
@@ -81,6 +87,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   sampler.disengage_adaptation();
   writer.write_adapt_finish(sampler);
   sampler.write_sampler_state(sample_writer);
+  sampler.write_sampler_state_struct(metric_writer);
 
   auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, num_warmup,
@@ -93,6 +100,49 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                               .count()
                           / 1000.0;
   writer.write_timing(warm_delta_t, sample_delta_t);
+}
+
+/**
+ * Runs the sampler with adaptation.
+ *
+ * @tparam Sampler Type of adaptive sampler.
+ * @tparam Model Type of model
+ * @tparam RNG Type of random number generator
+ * @param[in,out] sampler the mcmc sampler to use on the model
+ * @param[in] model the model concept to use for computing log probability
+ * @param[in] cont_vector initial parameter values
+ * @param[in] num_warmup number of warmup draws
+ * @param[in] num_samples number of post warmup draws
+ * @param[in] num_thin number to thin the draws. Must be greater than
+ *   or equal to 1.
+ * @param[in] refresh controls output to the <code>logger</code>
+ * @param[in] save_warmup indicates whether the warmup draws should be
+ *   sent to the sample writer
+ * @param[in,out] rng random number generator
+ * @param[in,out] interrupt interrupt callback
+ * @param[in,out] logger logger for messages
+ * @param[in,out] sample_writer writer for draws
+ * @param[in,out] diagnostic_writer writer for diagnostic information
+ * @param[in] chain_id The id for a given chain, (optional, default == 1)
+ * @param[in] num_chains The number of chains used in the program. This
+ *  is used in generate transitions to print out the chain number,
+ *  (optional, default == 1)
+ */
+template <typename Sampler, typename Model, typename RNG>
+void run_adaptive_sampler(Sampler& sampler, Model& model,
+                          std::vector<double>& cont_vector, int num_warmup,
+                          int num_samples, int num_thin, int refresh,
+                          bool save_warmup, RNG& rng,
+                          callbacks::interrupt& interrupt,
+                          callbacks::logger& logger,
+                          callbacks::writer& sample_writer,
+                          callbacks::writer& diagnostic_writer,
+                          size_t chain_id = 1, size_t num_chains = 1) {
+  callbacks::structured_writer dummy_metric_writer;
+  return run_adaptive_sampler(
+      sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer,
+      dummy_metric_writer, chain_id, num_chains);
 }
 
 }  // namespace util

@@ -1,23 +1,45 @@
 #include <stan/services/sample/hmc_nuts_unit_e_adapt.hpp>
-#include <gtest/gtest.h>
+#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/io/empty_var_context.hpp>
+#include <src/test/unit/services/util.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <test/unit/util.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 
 auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
+
+struct deleter_noop {
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
+};
+
 class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
  public:
-  ServicesSampleHmcNutsUnitEAdaptPar() : model(data_context, 0, &model_log) {
+  ServicesSampleHmcNutsUnitEAdaptPar()
+      : ss_metric(num_chains), model(data_context, 0, &model_log) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
+      metric.push_back(
+          stan::callbacks::json_writer<std::stringstream, deleter_noop>(
+              std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric[i])));
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
+
+  void SetUp() {
+    for (int i = 0; i < num_chains; ++i) {
+      ss_metric[i].str(std::string());
+      ss_metric[i].clear();
+    }
+  }
+
   stan::io::empty_var_context data_context;
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
@@ -26,6 +48,9 @@ class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
   std::vector<stan::test::unit::instrumented_writer> diagnostic;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   stan_model model;
+  std::vector<std::stringstream> ss_metric;
+  std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>>
+      metric;
 };
 
 TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, call_count) {
@@ -88,7 +113,7 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, parameter_checks) {
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
-      diagnostic);
+      diagnostic, metric);
 
   for (size_t i = 0; i < num_chains; ++i) {
     std::vector<std::vector<std::string>> parameter_names;
@@ -99,6 +124,13 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, parameter_checks) {
     diagnostic_names = diagnostic[i].vector_string_values();
     std::vector<std::vector<double>> diagnostic_values;
     diagnostic_values = diagnostic[i].vector_double_values();
+    std::string metric = ss_metric[i].str();
+    // Adapted metric
+    ASSERT_TRUE(stan::test::is_valid_JSON(metric));
+    EXPECT_EQ(count_matches("stepsize", metric), 1);
+    EXPECT_EQ(count_matches("inv_metric", metric), 1);
+    EXPECT_EQ(count_matches("[", metric), 1);         // single list
+    EXPECT_EQ(count_matches("[ 1, 1 ]", metric), 1);  // unit diagonal
 
     // Expectations of parameter parameter names.
     ASSERT_EQ(9, parameter_names[0].size());

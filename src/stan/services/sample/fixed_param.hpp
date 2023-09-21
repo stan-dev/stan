@@ -7,10 +7,10 @@
 #include <stan/math/prim.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/services/util/mcmc_writer.hpp>
-#include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <stan/services/util/mcmc_writer.hpp>
 #include <chrono>
 #include <vector>
 
@@ -63,7 +63,7 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   }
 
   stan::mcmc::fixed_param_sampler sampler;
-  util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
+  services::util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];

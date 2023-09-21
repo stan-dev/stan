@@ -1,6 +1,7 @@
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
-#include <stan/io/empty_var_context.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/unit/util.hpp>
 #include <src/test/unit/services/util.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
@@ -21,6 +22,7 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
   ServicesSampleHmcNutsDenseEAdaptParMatch()
       : ss_par(num_chains),
         ss_seq(num_chains),
+        ss_metric(num_chains),
         model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
             data_context, 0, &model_log)) {
     for (int i = 0; i < num_chains; ++i) {
@@ -29,8 +31,18 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
           std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#");
       seq_parameters.emplace_back(
           std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#");
-      diagnostic.push_back(stan::test::unit::instrumented_writer{});
+      metrics.emplace_back(
+          stan::callbacks::json_writer<std::stringstream, deleter_noop>(
+              std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric[i])));
+      diagnostics.push_back(stan::test::unit::instrumented_writer{});
       context.push_back(std::make_shared<stan::io::empty_var_context>());
+    }
+  }
+
+  void SetUp() {
+    for (int i = 0; i < num_chains; ++i) {
+      ss_metric[i].str(std::string());
+      ss_metric[i].clear();
     }
   }
 
@@ -40,11 +52,14 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
   std::vector<stan::test::unit::instrumented_writer> init;
   std::vector<std::stringstream> ss_par;
   std::vector<std::stringstream> ss_seq;
+  std::vector<std::stringstream> ss_metric;
   using str_writer
       = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
   std::vector<str_writer> par_parameters;
   std::vector<str_writer> seq_parameters;
-  std::vector<stan::test::unit::instrumented_writer> diagnostic;
+  std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>>
+      metrics;
+  std::vector<stan::test::unit::instrumented_writer> diagnostics;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   std::unique_ptr<rosenbrock_model_namespace::rosenbrock_model> model;
 };
@@ -53,6 +68,7 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
  * This test checks that running multiple chains in one call
  * with the same initial id is the same as running multiple calls
  * with incrementing chain ids.
+ * It also checks that the metric can be saved as json.
  */
 TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   constexpr unsigned int random_seed = 0;
@@ -75,12 +91,12 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   constexpr unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
+
   int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
       *model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, par_parameters, diagnostic);
-
+      interrupt, logger, init, par_parameters, diagnostics, metrics);
   EXPECT_EQ(0, return_code);
 
   int num_output_lines = (num_warmup + num_samples) / num_thin;
@@ -97,6 +113,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   }
 
   std::vector<Eigen::MatrixXd> par_res;
+  std::vector<std::string> par_metrics;
   for (int i = 0; i < num_chains; ++i) {
     auto par_str = par_parameters[i].get_stream().str();
     auto sub_par_str = par_str.substr(par_str.find("Elements") - 1);
@@ -104,8 +121,16 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
     Eigen::MatrixXd par_mat
         = stan::test::read_stan_sample_csv(sub_par_stream, 80, 9);
     par_res.push_back(par_mat);
+
+    par_metrics.push_back(ss_metric[i].str());
+    ASSERT_TRUE(stan::test::is_valid_JSON(par_metrics[i]));
+    EXPECT_EQ(count_matches("stepsize", par_metrics[i]), 1);
+    EXPECT_EQ(count_matches("inv_metric", par_metrics[i]), 1);
+    EXPECT_EQ(count_matches("[", par_metrics[i]), 3);  // list has 2 rows
   }
+
   std::vector<Eigen::MatrixXd> seq_res;
+  std::vector<std::string> seq_metrics;
   for (int i = 0; i < num_chains; ++i) {
     auto seq_str = seq_parameters[i].get_stream().str();
     auto sub_seq_str = seq_str.substr(seq_str.find("Elements") - 1);
@@ -113,10 +138,12 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
     Eigen::MatrixXd seq_mat
         = stan::test::read_stan_sample_csv(sub_seq_stream, 80, 9);
     seq_res.push_back(seq_mat);
+    seq_metrics.push_back(ss_metric[i].str());
   }
   for (int i = 0; i < num_chains; ++i) {
     Eigen::MatrixXd diff_res
         = (par_res[i].array() - seq_res[i].array()).matrix();
     EXPECT_MATRIX_EQ(diff_res, Eigen::MatrixXd::Zero(80, 9));
+    EXPECT_EQ(par_metrics[i], seq_metrics[i]);
   }
 }

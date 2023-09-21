@@ -1,8 +1,8 @@
 #include <stan/services/sample/hmc_nuts_unit_e.hpp>
-#include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 
 auto&& blah = stan::math::init_threadpool_tbb();
@@ -18,6 +18,7 @@ class ServicesSampleHmcNutsUnitEPar : public testing::Test {
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
+
   stan::io::empty_var_context data_context;
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;

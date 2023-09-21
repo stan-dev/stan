@@ -6,6 +6,7 @@
 #include <boost/algorithm/string.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <gtest/gtest.h>
+#include <rapidjson/document.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -164,6 +165,15 @@ void reset_std_streams() {
   std::cerr.rdbuf(cerr_buf);
   cout_buf = 0;
   cerr_buf = 0;
+}
+
+/**
+ * Validate JSON using rapidjson parser.
+ * @param text String of JSON
+ */
+bool is_valid_JSON(std::string& text) {
+  rapidjson::Document document;
+  return !document.Parse<0>(text.c_str()).HasParseError();
 }
 
 }  // namespace test

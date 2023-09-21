@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
@@ -11,6 +12,7 @@
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>
+#include <iostream>
 #include <vector>
 
 namespace stan {
@@ -78,9 +80,11 @@ int hmc_static_unit_e_adapt(
   sampler.get_stepsize_adaptation().set_kappa(kappa);
   sampler.get_stepsize_adaptation().set_t0(t0);
 
-  util::run_adaptive_sampler(
-      sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
+  callbacks::structured_writer dummy_metric_writer;
+  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                             num_samples, num_thin, refresh, save_warmup, rng,
+                             interrupt, logger, sample_writer,
+                             diagnostic_writer, dummy_metric_writer);
 
   return error_codes::OK;
 }
