@@ -1,5 +1,5 @@
 #include <stan/callbacks/json_writer.hpp>
-#include <rapidjson/document.h>
+#include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -86,9 +86,10 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
   }
 }
 )json";
-  EXPECT_EQ(expected, ss.str());
-  rapidjson::Document document;
-  ASSERT_FALSE(document.Parse<0>(ss.str().c_str()).HasParseError());
+
+  auto json = ss.str();
+  EXPECT_EQ(expected, json);
+  ASSERT_TRUE(stan::test::is_valid_JSON(json));
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
@@ -147,7 +148,6 @@ TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision2) {
   ss << std::setprecision(2);
   std::string key("key");
-  const int N = 5;
   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
   writer.write(key, x);
   auto out = output_sans_whitespace(ss);
@@ -178,7 +178,6 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_string_special_characters) {
       ss.str());
 }
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision3) {
-  const int N = 5;
   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
   ss.precision(3);
   writer.write("key", x);

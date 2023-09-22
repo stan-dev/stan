@@ -10,7 +10,7 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
 #include <test/unit/services/util.hpp>
-#include <rapidjson/document.h>
+#include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
 // Locally tests can use threads but for jenkins we should just use 1 thread
@@ -90,7 +90,7 @@ TEST_F(ServicesPathfinderGLM, single) {
 
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
 
-  int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
+  stan::services::pathfinder::pathfinder_lbfgs_single(
       model, empty_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
       num_elbo_draws, num_draws, save_iterations, refresh, callback, logger,
@@ -132,8 +132,8 @@ TEST_F(ServicesPathfinderGLM, single) {
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
-  rapidjson::Document document;
-  ASSERT_FALSE(document.Parse<0>(diagnostic_ss.str().c_str()).HasParseError());
+  auto json = diagnostic_ss.str();
+  ASSERT_TRUE(stan::test::is_valid_JSON(json));
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
@@ -166,7 +166,7 @@ TEST_F(ServicesPathfinderGLM, multi) {
         std::make_unique<decltype(init_init_context())>(init_init_context()));
   }
   stan::test::mock_callback callback;
-  int return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
+  stan::services::pathfinder::pathfinder_lbfgs_multi(
       model, single_path_inits, seed, chain, init_radius, history_size,
       init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
       num_iterations, num_elbo_draws, num_draws, num_multi_draws, num_paths,
