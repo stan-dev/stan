@@ -1,12 +1,67 @@
-#ifndef STAN_IO_DESERIALIZER_HPP
-#define STAN_IO_DESERIALIZER_HPP
+#ifndef STAN_IO_OPENCL_DESERIALIZER_HPP
+#define STAN_IO_OPENCL_DESERIALIZER_HPP
 
 #include <stan/math/rev.hpp>
+#include <stan/io/deserializer.hpp>
 
 namespace stan {
 
 namespace io {
 
+namespace internal {
+  template <typename T>
+  auto create_sub_buffer(cl::Buffer& parent_buffer, const std::vector<cl::Event>& events,
+   std::size_t start, std::size_t size) {
+    cl::Buffer dest_buffer(stan::math::opencl_context.context(), CL_MEM_READ_WRITE,
+      size * sizeof(T), nullptr);
+    // Copy from the source buffer (from the given offset) to the destination buffer
+    cl::Event copy_event;
+    try {
+      stan::math::opencl_context.queue().enqueueCopyBuffer(parent_buffer,
+        dest_buffer, sizeof(T) * start, 0, sizeof(T) * size, &events, &copy_event);
+    } catch (const std::exception& e) {
+      std::cout << e.what() << std::endl;
+      throw e;
+    }
+    copy_event.wait();
+    return dest_buffer;
+  }
+
+  template <typename T>
+  auto create_sub_matrix(stan::math::matrix_cl<T>& mat, std::size_t start, std::size_t rows,
+    std::size_t cols) {
+    return stan::math::matrix_cl<T>(create_sub_buffer<T>(mat.buffer(), mat.write_events(),
+      start, rows * cols), rows, cols);
+  }
+  template <typename T>
+  auto create_sub_matrix(stan::math::matrix_cl<T>& mat, std::size_t start, std::size_t size) {
+    return stan::math::matrix_cl<T>(create_sub_buffer<T>(mat.buffer(), mat.write_events(),
+       start, size), size, 1);
+  }
+
+  template <typename T>
+  auto create_sub_matrix(stan::math::var_value<stan::math::matrix_cl<T>>& mat, std::size_t start,
+   std::size_t rows, std::size_t cols) {
+    using matrix_d = stan::math::matrix_cl<T>;
+    using matrix_v = stan::math::var_value<stan::math::matrix_cl<T>>;
+    matrix_v ret(create_sub_matrix(mat.vi_->val_, start, rows, cols));
+    stan::math::reverse_pass_callback([mat, ret]() mutable {
+      mat.adj() += ret.adj();
+    });
+    return ret;
+  }
+  template <typename T>
+  auto create_sub_matrix(stan::math::var_value<stan::math::matrix_cl<T>>& mat, std::size_t start,
+   std::size_t size) {
+   using matrix_v = stan::math::var_value<stan::math::matrix_cl<T>>;
+    matrix_v ret(create_sub_matrix(mat.vi_->val_, start, size));
+    stan::math::reverse_pass_callback([mat, ret]() mutable {
+      mat.adj() += ret.adj();
+    });
+    return ret;
+  }
+
+}
 /**
  * A stream-based reader for integer, scalar, vector, matrix
  * and array data types, with Jacobian calculations.
@@ -28,24 +83,17 @@ namespace io {
  *
  * @tparam T Basic scalar type.
  */
-template <typename T, bool GPU = false>
-class deserializer {
+template <typename T>
+class deserializer<T, true> {
  private:
-  Eigen::Map<const Eigen::Matrix<T, -1, 1>> map_r_;    // map of reals.
-  Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;  // map of integers.
+  using map_r_t = std::conditional_t<is_var<T>::value,
+    stan::math::var_value<stan::math::matrix_cl<double>>, stan::math::matrix_cl<double>>;
+  map_r_t& map_r_;    // map of reals.
+  stan::math::matrix_cl<int> map_i_;  // map of integers.
   size_t r_size_{0};  // size of reals available.
   size_t i_size_{0};  // size of integers available.
   size_t pos_r_{0};   // current position in map of reals.
   size_t pos_i_{0};   // current position in map of integers.
-
-  /**
-   * Return reference to current scalar and increment the internal counter.
-   * @param m amount to move `pos_r_` up.
-   */
-  inline const T& scalar_ptr_increment(size_t m) {
-    pos_r_ += m;
-    return map_r_.coeffRef(pos_r_ - m);
-  }
 
   /**
    * Check there are at least m reals left to read
@@ -75,30 +123,24 @@ class deserializer {
     }
   }
 
-  template <typename S, typename K>
-  using conditional_var_val_t
-      = std::conditional_t<is_var_matrix<S>::value && is_var<T>::value,
-                           return_var_matrix_t<K, S, K>, K>;
-
   template <typename S>
   using is_fp_or_ad = bool_constant<std::is_floating_point<S>::value
                                     || is_autodiff<S>::value>;
 
  public:
-  using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
-  using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
-  using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+  using matrix_t = map_r_t;
+  using vector_t = map_r_t;
+  using row_vector_t = map_r_t;
 
-  using map_matrix_t = Eigen::Map<const matrix_t>;
-  using map_vector_t = Eigen::Map<const vector_t>;
-  using map_row_vector_t = Eigen::Map<const row_vector_t>;
+  using map_matrix_t = map_r_t;
+  using map_vector_t = map_r_t;
+  using map_row_vector_t = map_r_t;
 
-  using var_matrix_t = stan::math::var_value<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>;
+  using var_matrix_t = stan::math::var_value<stan::math::matrix_cl<double>>;
   using var_vector_t
-      = stan::math::var_value<Eigen::Matrix<double, Eigen::Dynamic, 1>>;
+      = stan::math::var_value<stan::math::matrix_cl<double>>;
   using var_row_vector_t
-      = stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>>;
+      = stan::math::var_value<stan::math::matrix_cl<double>>;
 
   /**
    * Construct a variable reader using the specified vectors
@@ -112,12 +154,13 @@ class deserializer {
    * @param data_i Sequence of integer values.
    */
   template <typename RVec, typename IntVec,
-            require_all_vector_like_t<RVec, IntVec>* = nullptr>
-  deserializer(const RVec& data_r, const IntVec& data_i)
-      : map_r_(data_r.data(), data_r.size()),
-        map_i_(data_i.data(), data_i.size()),
+            require_all_matrix_cl_t<IntVec>* = nullptr>
+  deserializer(RVec&& data_r, IntVec&& data_i)
+      : map_r_(data_r),
+        map_i_(data_i),
         r_size_(data_r.size()),
         i_size_(data_i.size()) {}
+
 
   /**
    * Return the number of scalars remaining to be read.
@@ -141,20 +184,7 @@ class deserializer {
   template <typename Ret, require_t<is_fp_or_ad<Ret>>* = nullptr>
   inline auto read() {
     check_r_capacity(1);
-    return map_r_.coeffRef(pos_r_++);
-  }
-
-  /**
-   * Construct a complex variable from the next two reals in the sequence
-   *
-   * @return Next complex value
-   */
-  template <typename Ret, require_complex_t<Ret>* = nullptr>
-  inline auto read() {
-    check_r_capacity(2);
-    auto real = scalar_ptr_increment(1);
-    auto imag = scalar_ptr_increment(1);
-    return std::complex<T>{real, imag};
+    return internal::create_sub_matrix(this->map_r_, pos_r_++, 1);
   }
 
   /**
@@ -165,7 +195,8 @@ class deserializer {
   template <typename Ret, require_integral_t<Ret>* = nullptr>
   inline auto read() {
     check_i_capacity(1);
-    return map_i_.coeffRef(pos_i_++);
+    auto ret = internal::create_sub_matrix(this->map_i_, pos_i_++, 1);
+    return ;
   }
 
   /**
@@ -173,75 +204,11 @@ class deserializer {
    * @tparam Ret The type to return.
    * @param m Size of column vector.
    */
-  template <typename Ret, require_eigen_col_vector_t<Ret>* = nullptr,
-            require_not_vt_complex<Ret>* = nullptr>
+  template <typename Ret>
   inline auto read(Eigen::Index m) {
-    if (unlikely(m == 0)) {
-      return map_vector_t(nullptr, m);
-    } else {
-      check_r_capacity(m);
-      return map_vector_t(&scalar_ptr_increment(m), m);
-    }
-  }
-
-  /**
-   * Return an Eigen column vector of size `m` with inner complex type.
-   * @tparam Ret The type to return.
-   * @param m Size of column vector.
-   */
-  template <typename Ret, require_eigen_col_vector_t<Ret>* = nullptr,
-            require_vt_complex<Ret>* = nullptr>
-  inline auto read(Eigen::Index m) {
-    if (unlikely(m == 0)) {
-      return Ret(map_vector_t(nullptr, m));
-    } else {
-      check_r_capacity(2 * m);
-      Ret ret(m);
-      for (Eigen::Index i = 0; i < m; ++i) {
-        auto real = scalar_ptr_increment(1);
-        auto imag = scalar_ptr_increment(1);
-        ret.coeffRef(i) = std::complex<T>{real, imag};
-      }
-      return ret;
-    }
-  }
-
-  /**
-   * Return an Eigen row vector of size `m`.
-   * @tparam Ret The type to return.
-   * @param m Size of row vector.
-   */
-  template <typename Ret, require_eigen_row_vector_t<Ret>* = nullptr,
-            require_not_vt_complex<Ret>* = nullptr>
-  inline auto read(Eigen::Index m) {
-    if (unlikely(m == 0)) {
-      return map_row_vector_t(nullptr, m);
-    } else {
-      check_r_capacity(m);
-      return map_row_vector_t(&scalar_ptr_increment(m), m);
-    }
-  }
-
-  /**
-   * Return an Eigen row vector of size `m` with inner complex type.
-   * @tparam Ret The type to return.
-   * @param m Size of row vector.
-   */
-  template <typename Ret, require_eigen_row_vector_t<Ret>* = nullptr,
-            require_vt_complex<Ret>* = nullptr>
-  inline auto read(Eigen::Index m) {
-    if (unlikely(m == 0)) {
-      return Ret(map_row_vector_t(nullptr, m));
-    } else {
-      check_r_capacity(2 * m);
-      Ret ret(m);
-      for (Eigen::Index i = 0; i < m; ++i) {
-        auto real = scalar_ptr_increment(1);
-        auto imag = scalar_ptr_increment(1);
-        ret.coeffRef(i) = std::complex<T>{real, imag};
-      }
-      return ret;
-    }
+    check_r_capacity(m);
+    this->pos_r_ += m;
+    return internal::create_sub_matrix(this->map_r_, this->pos_r_ - m, m);
   }
 
   /**
@@ -250,38 +217,12 @@ class deserializer {
    * @param rows The size of the rows of the matrix.
    * @param cols The size of the cols of the matrix.
    */
-  template <typename Ret, require_eigen_matrix_dynamic_t<Ret>* = nullptr,
-            require_not_vt_complex<Ret>* = nullptr>
+  template <typename Ret>
   inline auto read(Eigen::Index rows, Eigen::Index cols) {
-    if (rows == 0 || cols == 0) {
-      return map_matrix_t(nullptr, rows, cols);
-    } else {
-      check_r_capacity(rows * cols);
-      return map_matrix_t(&scalar_ptr_increment(rows * cols), rows, cols);
-    }
-  }
-
-  /**
-   * Return an Eigen matrix of size `(rows, cols)` with complex inner type.
-   * @tparam Ret The type to return.
-   * @param rows The size of the rows of the matrix.
-   * @param cols The size of the cols of the matrix.
-   */
-  template <typename Ret, require_eigen_matrix_dynamic_t<Ret>* = nullptr,
-            require_vt_complex<Ret>* = nullptr>
-  inline auto read(Eigen::Index rows, Eigen::Index cols) {
-    if (rows == 0 || cols == 0) {
-      return Ret(map_matrix_t(nullptr, rows, cols));
-    } else {
-      check_r_capacity(2 * rows * cols);
-      Ret ret(rows, cols);
-      for (Eigen::Index i = 0; i < rows * cols; ++i) {
-        auto real = scalar_ptr_increment(1);
-        auto imag = scalar_ptr_increment(1);
-        ret.coeffRef(i) = std::complex<T>{real, imag};
-      }
-      return ret;
-    }
+    check_r_capacity(rows * cols);
+    const auto mat_size = rows * cols;
+    this->pos_r_ += mat_size;
+    return internal::create_sub_matrix(this->map_r_, this->pos_r_ - mat_size, rows, cols);
   }
 
   /**
@@ -292,7 +233,6 @@ class deserializer {
    * @tparam Sizes A parameter pack of integral types.
    * @param sizes A parameter pack of integral types representing the
    *  dimensions of the `var_value` matrix or vector.
-   */
   template <typename Ret, typename T_ = T, typename... Sizes,
             require_var_t<T_>* = nullptr, require_var_matrix_t<Ret>* = nullptr>
   inline auto read(Sizes... sizes) {
@@ -300,6 +240,7 @@ class deserializer {
     using var_v_t = promote_scalar_t<stan::math::var, value_type_t<Ret>>;
     return stan::math::to_var_value(this->read<var_v_t>(sizes...));
   }
+   */
 
   /**
    * Return an Eigen type when the deserializers inner class is not var.
@@ -309,13 +250,13 @@ class deserializer {
    * @tparam Sizes A parameter pack of integral types.
    * @param sizes A parameter pack of integral types representing the
    *  dimensions of the `var_value` matrix or vector.
-   */
   template <typename Ret, typename T_ = T, typename... Sizes,
             require_not_var_t<T_>* = nullptr,
             require_var_matrix_t<Ret>* = nullptr>
   inline auto read(Sizes... sizes) {
     return this->read<value_type_t<Ret>>(sizes...);
   }
+   */
 
   /**
    * Return an `std::vector`
@@ -346,7 +287,6 @@ class deserializer {
    * @tparam Ret The type to return.
    * @tparam Sizes integral types.
    * @param m The size of the vector.
-   */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr,
             require_same_t<value_type_t<Ret>, T>* = nullptr>
@@ -361,6 +301,7 @@ class deserializer {
       return std::decay_t<Ret>(start_pos, end_pos);
     }
   }
+   */
 
   /**
    * Return the next object transformed to have the specified
@@ -747,12 +688,12 @@ class deserializer {
                                                  Eigen::Index N) {
     if (Jacobian) {
       return stan::math::cholesky_factor_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((N * (N + 1)) / 2
+          this->read<Ret>((N * (N + 1)) / 2
                                                            + (M - N) * N),
           M, N, lp);
     } else {
       return stan::math::cholesky_factor_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((N * (N + 1)) / 2
+          this->read<Ret>((N * (N + 1)) / 2
                                                            + (M - N) * N),
           M, N);
     }
@@ -814,11 +755,11 @@ class deserializer {
     using stan::math::cholesky_corr_constrain;
     if (Jacobian) {
       return cholesky_corr_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((K * (K - 1)) / 2),
+          this->read<Ret>((K * (K - 1)) / 2),
           K, lp);
     } else {
       return cholesky_corr_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((K * (K - 1)) / 2),
+          this->read<Ret>((K * (K - 1)) / 2),
           K);
     }
   }
@@ -878,12 +819,12 @@ class deserializer {
     using stan::math::cov_matrix_constrain;
     if (Jacobian) {
       return cov_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>(k
+          this->read<Ret>(k
                                                            + (k * (k - 1)) / 2),
           k, lp);
     } else {
       return cov_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>(k
+          this->read<Ret>(k
                                                            + (k * (k - 1)) / 2),
           k);
     }
@@ -942,11 +883,11 @@ class deserializer {
     using stan::math::corr_matrix_constrain;
     if (Jacobian) {
       return corr_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
+          this->read<Ret>((k * (k - 1)) / 2),
           k, lp);
     } else {
       return corr_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
+          this->read<Ret>((k * (k - 1)) / 2),
           k);
     }
   }
