@@ -16,7 +16,6 @@
 #include <tbb/parallel_for.h>
 #include <tbb/concurrent_vector.h>
 #include <boost/random/discrete_distribution.hpp>
-#include <boost/iterator.hpp>
 #include <string>
 #include <vector>
 
