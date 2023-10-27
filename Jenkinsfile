@@ -95,6 +95,7 @@ pipeline {
         skipDefaultCheckout()
         preserveStashes(buildCount: 7)
         parallelsAlwaysFailFast()
+        buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30'))
     }
     environment {
         GCC = 'g++'
