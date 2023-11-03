@@ -132,16 +132,11 @@ inline int pathfinder_lbfgs_multi(
   // if any pathfinders failed, we want to remove their empty results
   individual_lp_ratios.erase(
       std::remove_if(individual_lp_ratios.begin(), individual_lp_ratios.end(),
-                     [](const auto& v) {
-                       return v.size() == 0;
-                     }),
+                     [](const auto& v) { return v.size() == 0; }),
       individual_lp_ratios.end());
   individual_samples.erase(
-      std::remove_if(
-          individual_samples.begin(), individual_samples.end(),
-          [](const auto& v) {
-            return v.size() == 0;
-          }),
+      std::remove_if(individual_samples.begin(), individual_samples.end(),
+                     [](const auto& v) { return v.size() == 0; }),
       individual_samples.end());
 
   const auto end_pathfinders_time = std::chrono::steady_clock::now();
