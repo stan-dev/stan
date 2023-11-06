@@ -14,7 +14,6 @@
 #include <stan/services/util/duration_diff.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <tbb/parallel_for.h>
-#include <tbb/concurrent_vector.h>
 #include <boost/random/discrete_distribution.hpp>
 #include <string>
 #include <vector>
@@ -101,12 +100,11 @@ inline int pathfinder_lbfgs_multi(
   model.constrained_param_names(param_names, true, true);
 
   parameter_writer(param_names);
-  tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, 1>>
-      individual_lp_ratios;
-  individual_lp_ratios.reserve(num_paths);
-  tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>>
+  std::vector<Eigen::Array<double, Eigen::Dynamic, 1>> individual_lp_ratios;
+  individual_lp_ratios.resize(num_paths);
+  std::vector<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>>
       individual_samples;
-  individual_samples.reserve(num_paths);
+  individual_samples.resize(num_paths);
   std::atomic<size_t> lp_calls{0};
   tbb::parallel_for(
       tbb::blocked_range<int>(0, num_paths), [&](tbb::blocked_range<int> r) {
@@ -125,13 +123,22 @@ inline int pathfinder_lbfgs_multi(
                          + std::to_string(iter) + " failed.");
             return;
           }
-          individual_lp_ratios.emplace_back(
-              std::move(std::get<1>(pathfinder_ret)));
-          individual_samples.emplace_back(
-              std::move(std::get<2>(pathfinder_ret)));
+          individual_lp_ratios[iter] = std::move(std::get<1>(pathfinder_ret));
+          individual_samples[iter] = std::move(std::get<2>(pathfinder_ret));
           lp_calls += std::get<3>(pathfinder_ret);
         }
       });
+
+  // if any pathfinders failed, we want to remove their empty results
+  individual_lp_ratios.erase(
+      std::remove_if(individual_lp_ratios.begin(), individual_lp_ratios.end(),
+                     [](const auto& v) { return v.size() == 0; }),
+      individual_lp_ratios.end());
+  individual_samples.erase(
+      std::remove_if(individual_samples.begin(), individual_samples.end(),
+                     [](const auto& v) { return v.size() == 0; }),
+      individual_samples.end());
+
   const auto end_pathfinders_time = std::chrono::steady_clock::now();
 
   const double pathfinders_delta_time = stan::services::util::duration_diff(
