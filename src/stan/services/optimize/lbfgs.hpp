@@ -176,14 +176,17 @@ int lbfgs(Model& model, const stan::io::var_context& init,
   }
 
   int return_code;
+  auto error_string = lbfgs.get_code_string(ret);
+
   if (ret >= 0) {
     logger.info("Optimization terminated normally: ");
+    logger.info("  " + error_string);
     return_code = error_codes::OK;
   } else {
     logger.error("Optimization terminated with error: ");
+    logger.error("  " + error_string);
     return_code = error_codes::SOFTWARE;
   }
-  logger.info("  " + lbfgs.get_code_string(ret));
 
   return return_code;
 }
