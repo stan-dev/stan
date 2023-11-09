@@ -96,6 +96,7 @@ pipeline {
         preserveStashes(buildCount: 7)
         parallelsAlwaysFailFast()
         buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30'))
+        disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != "downstream_tests" || env.BRANCH_NAME != "downstream_hotfix")
     }
     environment {
         GCC = 'g++'
@@ -114,19 +115,6 @@ pipeline {
         OPENCL_PLATFORM_ID_GPU = 0
     }
     stages {
-
-        stage('Kill previous builds') {
-            when {
-                not { branch 'develop' }
-                not { branch 'master' }
-                not { branch 'downstream_tests' }
-            }
-            steps {
-                script {
-                    utils.killOldBuilds()
-                }
-            }
-        }
         stage("Clang-format") {
             agent {
                 docker {
