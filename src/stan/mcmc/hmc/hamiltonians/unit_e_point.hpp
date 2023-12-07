@@ -32,7 +32,7 @@ class unit_e_point : public ps_point {
   }
 
   inline std::string metric_type() {
-    return "unit";
+    return "unit_e";
   }
 };
 

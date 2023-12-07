@@ -51,7 +51,7 @@ class diag_e_point : public ps_point {
   }
 
   inline std::string metric_type() {
-    return "diag";
+    return "diag_e";
   }
 };
 
