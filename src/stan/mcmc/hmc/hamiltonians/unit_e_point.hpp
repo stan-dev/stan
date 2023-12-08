@@ -31,9 +31,7 @@ class unit_e_point : public ps_point {
     writer("No free parameters for unit metric");
   }
 
-  inline std::string metric_type() {
-    return "unit_e";
-  }
+  inline std::string metric_type() { return "unit_e"; }
 };
 
 }  // namespace mcmc

@@ -50,9 +50,7 @@ class diag_e_point : public ps_point {
     writer(inv_e_metric_ss.str());
   }
 
-  inline std::string metric_type() {
-    return "diag_e";
-  }
+  inline std::string metric_type() { return "diag_e"; }
 };
 
 }  // namespace mcmc

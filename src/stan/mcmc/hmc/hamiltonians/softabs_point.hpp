@@ -44,9 +44,7 @@ class softabs_point : public ps_point {
     writer("No free parameters for SoftAbs metric");
   }
 
-  inline std::string metric_type() {
-    return "softabs";
-  }
+  inline std::string metric_type() { return "softabs"; }
 };
 
 }  // namespace mcmc
