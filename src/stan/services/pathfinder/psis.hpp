@@ -270,14 +270,7 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
   }
 
   // truncate at max of raw wts (i.e., 0 since max has been subtracted)
-  for (Eigen::Index i = 0; i < llr_weights.size(); ++i) {
-    if (llr_weights.coeff(i) > 0) {
-      llr_weights.coeffRef(i) = 0.0;
-    }
-  }
-  auto max_adj = (llr_weights + max_log_ratio).eval();
-  auto max_adj_exp = max_adj.exp();
-  return max_adj_exp / max_adj_exp.sum();
+  return (llr_weights.array() < 0.0).select(llr_weights, 0.0).exp().eval();
 }
 
 }  // namespace psis
