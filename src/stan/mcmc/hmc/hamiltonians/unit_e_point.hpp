@@ -30,6 +30,8 @@ class unit_e_point : public ps_point {
   inline void write_metric(stan::callbacks::writer& writer) {
     writer("No free parameters for unit metric");
   }
+
+  inline std::string metric_type() { return "unit_e"; }
 };
 
 }  // namespace mcmc

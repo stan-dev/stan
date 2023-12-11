@@ -43,6 +43,8 @@ class softabs_point : public ps_point {
   virtual inline void write_metric(stan::callbacks::writer& writer) {
     writer("No free parameters for SoftAbs metric");
   }
+
+  inline std::string metric_type() { return "softabs"; }
 };
 
 }  // namespace mcmc

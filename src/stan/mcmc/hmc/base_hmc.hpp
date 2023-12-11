@@ -70,6 +70,7 @@ class base_hmc : public base_mcmc {
   void write_sampler_state_struct(callbacks::structured_writer& struct_writer) {
     struct_writer.begin_record();
     struct_writer.write("stepsize", get_nominal_stepsize());
+    struct_writer.write("metric_type", z_.metric_type());
     struct_writer.write("inv_metric", z_.inv_e_metric_);
     struct_writer.end_record();
   }

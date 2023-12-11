@@ -124,6 +124,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
     par_metrics.push_back(ss_metric[i].str());
     ASSERT_TRUE(stan::test::is_valid_JSON(par_metrics[i]));
     EXPECT_EQ(count_matches("stepsize", par_metrics[i]), 1);
+    EXPECT_EQ(count_matches("metric_type", par_metrics[i]), 1);
     EXPECT_EQ(count_matches("inv_metric", par_metrics[i]), 1);
     EXPECT_EQ(count_matches("[", par_metrics[i]), 1);  // single list
   }
