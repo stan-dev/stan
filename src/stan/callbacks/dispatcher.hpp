@@ -20,14 +20,10 @@ namespace callbacks {
  */
 class dispatcher {
  private:
-  // map
   std::map<info_type, std::shared_ptr<structured_writer>> writers_;
 
  public:
-  /**
-   * Default constructor.
-   *
-   */
+  /** default constructor */
   dispatcher() {}
 
   /** copy constructor */
@@ -37,11 +33,8 @@ class dispatcher {
   dispatcher(dispatcher&& other) noexcept
       : writers_(std::move(other.writers_)) {}
 
-  /**
-   * Virtual destructor.
-   */
+  /** virtual destructor */
   virtual ~dispatcher() {}
-
   
   /**
    * Add mapping from info_type to writer
@@ -69,6 +62,20 @@ class dispatcher {
     auto info_type = std::forward<First>(first);
     if (writers_.find(info_type) != writers_.end())
       writers_[info_type]->end_record(std::forward<Rest>(rest)...);
+  }
+
+  template <typename First, typename... Rest>
+  void table_header(First&& first, Rest&&... rest) {
+    auto info_type = std::forward<First>(first);
+    if (writers_.find(info_type) != writers_.end())
+      writers_[info_type]->table_header(std::forward<Rest>(rest)...);
+  }
+
+  template <typename First, typename... Rest>
+  void table_row(First&& first, Rest&&... rest) {
+    auto info_type = std::forward<First>(first);
+    if (writers_.find(info_type) != writers_.end())
+      writers_[info_type]->table_row(std::forward<Rest>(rest)...);
   }
 
 };
