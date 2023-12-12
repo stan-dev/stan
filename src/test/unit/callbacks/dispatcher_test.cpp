@@ -16,23 +16,31 @@ struct deleter_noop {
 class CallbacksDispatcher : public ::testing::Test {
  public:
   CallbacksDispatcher()
-      : ss_json(), ss_csv(),
-        writer_json(std::unique_ptr<std::stringstream, deleter_noop>(&ss_json)),
-        writer_csv(std::unique_ptr<std::stringstream, deleter_noop>(&ss_csv)) {}
+      : ss_metric(), ss_draws_cnstrn(),
+        writer_metric(std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric)),
+        writer_draws_cnstrn(std::unique_ptr<std::stringstream, deleter_noop>(&ss_draws_cnstrn)) {
+  }
 
   void SetUp() {
-    ss_json.str(std::string());
-    ss_json.clear();
-    ss_csv.str(std::string());
-    ss_csv.clear();
+    ss_metric.str(std::string());
+    ss_metric.clear();
+    ss_draws_cnstrn.str(std::string());
+    ss_draws_cnstrn.clear();
+    std::shared_ptr<stan::callbacks::structured_writer> writer_metric_ptr =
+        std::make_shared<stan::callbacks::json_writer<std::stringstream, deleter_noop>>(std::move(writer_metric));
+    std::shared_ptr<stan::callbacks::structured_writer> writer_draws_cnstrn_ptr =
+        std::make_shared<stan::callbacks::csv_writer<std::stringstream, deleter_noop>>(std::move(writer_draws_cnstrn));
+    dp.addWriter(stan::callbacks::info_type::METRIC, std::move(writer_metric_ptr));
+    dp.addWriter(stan::callbacks::info_type::DRAW_CONSTRAINED, std::move(writer_draws_cnstrn_ptr));
   }
 
   void TearDown() {}
 
-  std::stringstream ss_json;
-  std::stringstream ss_csv;
-  stan::callbacks::json_writer<std::stringstream, deleter_noop> writer_json;
-  stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_csv;
+  std::stringstream ss_metric;
+  std::stringstream ss_draws_cnstrn;
+  stan::callbacks::dispatcher  dp;
+  stan::callbacks::json_writer<std::stringstream, deleter_noop> writer_metric;
+  stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_draws_cnstrn;
 };
 
 bool is_whitespace(char c) { return c == ' ' || c == '\n'; }
@@ -43,25 +51,14 @@ std::string output_sans_whitespace(std::stringstream& ss) {
   return out;
 }
 
-TEST_F(CallbacksDispatcher, output_config) {
-  stan::callbacks::dispatcher  dp;
-
-  std::shared_ptr<stan::callbacks::structured_writer> writer_json_ptr =
-      std::make_shared<stan::callbacks::json_writer<std::stringstream, deleter_noop>>(std::move(writer_json));
-  
-  std::shared_ptr<stan::callbacks::structured_writer> writer_csv_ptr =
-      std::make_shared<stan::callbacks::csv_writer<std::stringstream, deleter_noop>>(std::move(writer_csv));
-
-  dp.addWriter(stan::callbacks::info_type::METRIC, std::move(writer_json_ptr));
-  dp.addWriter(stan::callbacks::info_type::DRAW_CONSTRAINED, std::move(writer_csv_ptr));
-
+TEST_F(CallbacksDispatcher, write_metric_draws) {
   dp.begin_record(stan::callbacks::info_type::METRIC);
   dp.write(stan::callbacks::info_type::METRIC, "metric_type", "unit_e");
   //  dp.write(stan::callbacks::info_type::METRIC, "inv_metric", eigen vector, all values 1.0
   dp.end_record(stan::callbacks::info_type::METRIC);
 
-  auto out_json = output_sans_whitespace(ss_json);
-  EXPECT_EQ("{\"metric_type\":\"unit_e\"}", out_json);
+  auto out_metric = output_sans_whitespace(ss_metric);
+  EXPECT_EQ("{\"metric_type\":\"unit_e\"}", out_metric);
 
 
   std::vector<std::string> header = {"mu", "sigma", "theta"};
@@ -69,6 +66,12 @@ TEST_F(CallbacksDispatcher, output_config) {
 
   dp.table_header(stan::callbacks::info_type::DRAW_CONSTRAINED, header);
   dp.table_row(stan::callbacks::info_type::DRAW_CONSTRAINED, values);
-  EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n", ss_csv.str());
+  EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n", ss_draws_cnstrn.str());
+}
+
+TEST_F(CallbacksDispatcher, write_noops) {
+  EXPECT_NO_THROW(dp.begin_record(stan::callbacks::info_type::CONFIG));
+  EXPECT_NO_THROW(dp.end_record(stan::callbacks::info_type::CONFIG));
+  EXPECT_NO_THROW(dp.write(stan::callbacks::info_type::CONFIG, "foo", "bar"));
 }
 
