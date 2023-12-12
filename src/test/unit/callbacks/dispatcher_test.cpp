@@ -61,10 +61,8 @@ TEST_F(CallbacksDispatcher, write_metric_draws) {
   auto out_metric = output_sans_whitespace(ss_metric);
   EXPECT_EQ("{\"metric_type\":\"unit_e\"}", out_metric);
 
-
   std::vector<std::string> header = {"mu", "sigma", "theta"};
   std::vector<double> values = {1, 2, 3};
-
   dp.table_header(stan::callbacks::info_type::DRAW_CONSTRAINED, header);
   dp.table_row(stan::callbacks::info_type::DRAW_CONSTRAINED, values);
   EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n", ss_draws_cnstrn.str());
