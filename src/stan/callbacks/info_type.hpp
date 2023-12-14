@@ -14,7 +14,8 @@ enum class info_type : int {
     METRIC = 6,
     MODEL_METADATA = 7,
     CONFIG = 8,
-    TIMING = 9
+    TIMING = 9,
+    VALID_INIT_PARAMS = 10
 };
 
 }  // namespace callbacks
