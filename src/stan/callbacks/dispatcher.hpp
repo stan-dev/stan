@@ -39,7 +39,7 @@ class dispatcher {
   /**
    * Add mapping from info_type to writer
    */
-  void addWriter(const info_type& info, std::shared_ptr<structured_writer>&& writer) {
+  void add_writer(const info_type& info, std::shared_ptr<structured_writer>&& writer) {
     writers_[info] = writer;
   }
 

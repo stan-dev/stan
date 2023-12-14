@@ -31,8 +31,8 @@ class CallbacksDispatcher : public ::testing::Test {
         = std::make_shared<stan::callbacks::json_writer<std::stringstream, deleter_noop>>(std::move(writer_metric));
     std::shared_ptr<stan::callbacks::structured_writer> writer_draws_cnstrn_ptr
         = std::make_shared<stan::callbacks::csv_writer<std::stringstream, deleter_noop>>(std::move(writer_draws_cnstrn));
-    dp.addWriter(stan::callbacks::info_type::METRIC, std::move(writer_metric_ptr));
-    dp.addWriter(stan::callbacks::info_type::DRAW_CONSTRAINED, std::move(writer_draws_cnstrn_ptr));
+    dp.add_writer(stan::callbacks::info_type::METRIC, std::move(writer_metric_ptr));
+    dp.add_writer(stan::callbacks::info_type::DRAW_CONSTRAINED, std::move(writer_draws_cnstrn_ptr));
   }
 
   void TearDown() {}
