@@ -6,13 +6,6 @@
 #include <gtest/gtest.h>
 #include <string>
 
-struct deleter_noop {
-  template <typename T>
-  constexpr void operator()(T* arg) const {}
-};
-
-
-
 class CallbacksDispatcher : public ::testing::Test {
  public:
   CallbacksDispatcher()
@@ -44,13 +37,6 @@ class CallbacksDispatcher : public ::testing::Test {
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_draws_cnstrn;
 };
 
-bool is_whitespace(char c) { return c == ' ' || c == '\n'; }
-
-std::string output_sans_whitespace(std::stringstream& ss) {
-  auto out = ss.str();
-  out.erase(std::remove_if(out.begin(), out.end(), is_whitespace), out.end());
-  return out;
-}
 
 TEST_F(CallbacksDispatcher, write_metric_draws) {
   dp.begin_record(stan::callbacks::info_type::METRIC);

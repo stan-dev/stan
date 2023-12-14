@@ -3,10 +3,6 @@
 #include <gtest/gtest.h>
 #include <string>
 
-struct deleter_noop {
-  template <typename T>
-  constexpr void operator()(T* arg) const {}
-};
 class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksJsonWriter()
@@ -22,14 +18,6 @@ class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
   std::stringstream ss;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer;
 };
-
-bool is_whitespace(char c) { return c == ' ' || c == '\n'; }
-
-std::string output_sans_whitespace(std::stringstream& ss) {
-  auto out = ss.str();
-  out.erase(std::remove_if(out.begin(), out.end(), is_whitespace), out.end());
-  return out;
-}
 
 TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record) {
   writer.begin_record();

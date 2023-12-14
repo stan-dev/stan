@@ -1,11 +1,8 @@
-#include <gtest/gtest.h>
-#include <boost/lexical_cast.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
+#include <test/unit/util.hpp>
+#include <boost/lexical_cast.hpp>
+#include <gtest/gtest.h>
 
-struct deleter_noop {
-  template <typename T>
-  constexpr void operator()(T* arg) const {}
-};
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()

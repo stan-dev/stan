@@ -14,10 +14,6 @@ auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
 
-struct deleter_noop {
-  template <typename T>
-  constexpr void operator()(T* arg) const {}
-};
 class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDiagEAdaptParMatch()

@@ -141,6 +141,26 @@ std::string paths_to_fname(const std::vector<std::string>& path) {
   return pathstr;
 }
 
+/**
+ * Deleter class for structured writers
+ */
+struct deleter_noop {
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
+};
+
+
+/**
+ * elminitate space and newlines from captured output and messages
+ */
+bool is_whitespace(char c) { return c == ' ' || c == '\n'; }
+
+std::string output_sans_whitespace(std::stringstream& ss) {
+  auto out = ss.str();
+  out.erase(std::remove_if(out.begin(), out.end(), is_whitespace), out.end());
+  return out;
+}
+
 namespace stan {
 namespace test {
 std::streambuf* cout_buf = 0;
@@ -175,7 +195,6 @@ bool is_valid_JSON(std::string& text) {
   rapidjson::Document document;
   return !document.Parse<0>(text.c_str()).HasParseError();
 }
-
 }  // namespace test
 }  // namespace stan
 
