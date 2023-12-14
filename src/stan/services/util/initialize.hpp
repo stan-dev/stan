@@ -2,6 +2,7 @@
 #define STAN_SERVICES_UTIL_INITIALIZE_HPP
 
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/dispatcher.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/random_var_context.hpp>
@@ -16,6 +17,7 @@
 namespace stan {
 namespace services {
 namespace util {
+
 
 /**
  * Returns a valid initial value of the parameters of the model
@@ -65,12 +67,10 @@ namespace util {
  *   std::domain_error)
  * @return valid unconstrained parameters for the model
  */
-template <bool Jacobian = true, typename Model, typename InitContext,
-          typename RNG>
+template <bool Jacobian = true, typename Model, typename InitContext, typename RNG>
 std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
-                               double init_radius, bool print_timing,
-                               stan::callbacks::logger& logger,
-                               stan::callbacks::writer& init_writer) {
+           double init_radius, bool print_timing,
+           stan::callbacks::logger& logger) {
   std::vector<double> unconstrained;
   std::vector<int> disc_vector;
 
@@ -206,7 +206,6 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       logger.info("");
     }
     if (gradient_ok) {
-      init_writer(unconstrained);
       return unconstrained;
     }
   }
@@ -225,6 +224,33 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
   }
   throw std::domain_error("Initialization failed.");
 }
+
+
+template <bool Jacobian = true, typename Model, typename InitContext,
+          typename RNG>
+std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
+                               double init_radius, bool print_timing,
+                               stan::callbacks::logger& logger,
+                               stan::callbacks::writer& init_writer) {
+  std::vector<double> unconstrained = initialize(model, init, rng, init_radius, print_timing, logger);
+  init_writer(unconstrained);
+  return unconstrained;
+}
+
+template <bool Jacobian = true, typename Model, typename InitContext,
+          typename RNG>
+std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
+                               double init_radius, bool print_timing,
+                               stan::callbacks::logger& logger,
+                               stan::callbacks::dispatcher& dispatcher) {
+  std::vector<double> unconstrained = initialize(model, init, rng, init_radius, print_timing, logger);
+  std::vector<std::string> names;
+  model.unconstrained_param_names(names, false, false);
+  dispatcher.table_header(stan::callbacks::info_type::VALID_INIT_PARAMS, names);
+  dispatcher.table_row(stan::callbacks::info_type::VALID_INIT_PARAMS, unconstrained);
+  return unconstrained;
+}
+
 
 }  // namespace util
 }  // namespace services
