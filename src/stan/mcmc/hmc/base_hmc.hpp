@@ -2,8 +2,9 @@
 #define STAN_MCMC_HMC_BASE_HMC_HPP
 
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/dispatcher.hpp>
+#include <stan/callbacks/info_type.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/callbacks/structured_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/random/uniform_01.hpp>
@@ -51,6 +52,7 @@ class base_hmc : public base_mcmc {
 
   /**
    * write elements of mass matrix
+   * @param writer - output StanCSV format
    */
   void write_sampler_metric(callbacks::writer& writer) {
     z_.write_metric(writer);
@@ -58,6 +60,7 @@ class base_hmc : public base_mcmc {
 
   /**
    * write stepsize and elements of mass matrix
+   * @param writer - StanCSV format - as comment
    */
   void write_sampler_state(callbacks::writer& writer) {
     write_sampler_stepsize(writer);
@@ -65,7 +68,8 @@ class base_hmc : public base_mcmc {
   }
 
   /**
-   * write stepsize and elements of mass matrix as a JSON object
+   * write stepsize and elements of mass matrix 
+   * @param writer - structured record (as JSON)
    */
   void write_sampler_state_struct(callbacks::structured_writer& struct_writer) {
     struct_writer.begin_record();
@@ -73,6 +77,17 @@ class base_hmc : public base_mcmc {
     struct_writer.write("inv_metric", z_.inv_e_metric_);
     struct_writer.end_record();
   }
+
+  // /**
+  //  * write stepsize and elements of mass matrix
+  //  * @param dispatcher - send to associated structured writer
+  //  */
+  // void write_metric(callbacks::dispatcher& dispatcher) {
+  //   dispatcher.begin_record(callbacks::info_type::METRIC);
+  //   dispatcher.write(callbacks::info_type::METRIC, "stepsize", get_nominal_stepsize());
+  //   dispatcher.write(callbacks::info_type::METRIC, "inv_metric", z_.inv_e_metric_);
+  //   dispatcher.end_record(callbacks::info_type::METRIC);
+  // }
 
   void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
                                     std::vector<std::string>& names) {
