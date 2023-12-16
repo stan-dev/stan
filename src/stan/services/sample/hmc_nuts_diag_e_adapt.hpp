@@ -12,12 +12,154 @@
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/inv_metric.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <stan/services/util/config_adaptive_sampler.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <vector>
 
 namespace stan {
 namespace services {
 namespace sample {
+
+//***************** dispatcher ****************************
+
+/**
+ * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
+ * with a pre-specified diagonal metric, dispatcher handles outputs.
+ */
+template <class Model>
+int hmc_nuts_diag_e_adapt(
+    Model& model, const stan::io::var_context& init,
+    const stan::io::var_context& init_inv_metric, unsigned int random_seed,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    int num_thin, bool save_warmup, int refresh, double stepsize,
+    double stepsize_jitter, int max_depth, double delta, double gamma,
+    double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
+    unsigned int window, callbacks::interrupt& interrupt,
+    callbacks::logger& logger, callbacks::dispatcher& dispatcher) {
+  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  std::vector<double> cont_vector;
+  Eigen::VectorXd inv_metric;
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   dispatcher);  // save validated init params
+
+    inv_metric = util::read_diag_inv_metric(init_inv_metric,
+                                            model.num_params_r(), logger);
+    util::validate_diag_inv_metric(inv_metric, logger);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
+  stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  util::config_adaptive_sampler(sampler, inv_metric, stepsize, stepsize_jitter,
+                          max_depth, delta, gamma, kappa, t0, num_warmup,
+                          init_buffer, term_buffer, window, logger);
+  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                             num_samples, num_thin, refresh, save_warmup, rng,
+                             interrupt, logger, dispatcher);
+  return error_codes::OK;
+}
+
+/**
+ * Runs HMC with NUTS with adaptation using diagonal Euclidean metric,
+ * with identity matrix as initial inv_metric, dispatcher handles outputs.
+ */
+template <class Model>
+int hmc_nuts_diag_e_adapt(
+    Model& model, const stan::io::var_context& init, unsigned int random_seed,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    int num_thin, bool save_warmup, int refresh, double stepsize,
+    double stepsize_jitter, int max_depth, double delta, double gamma,
+    double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
+    unsigned int window, callbacks::interrupt& interrupt,
+    callbacks::logger& logger, callbacks::dispatcher& dispatcher) {
+  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  std::vector<double> cont_vector;
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   dispatcher);  // save validated init params
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
+
+  stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  Eigen::VectorXd inv_metric =  Eigen::VectorXd::Ones(model.num_params_r());
+  util::config_adaptive_sampler(sampler, inv_metric, stepsize, stepsize_jitter,
+                          max_depth, delta, gamma, kappa, t0, num_warmup,
+                          init_buffer, term_buffer, window, logger);
+  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                             num_samples, num_thin, refresh, save_warmup, rng,
+                             interrupt, logger, dispatcher);
+  return error_codes::OK;
+}
+
+
+/**
+ * Runs multiple chains of HMC with NUTS with adaptation using diagonal
+ * with identity matrix as initial inv_metric, outputs handled by dispatcher.
+ */
+template <class Model, typename InitContextPtr>
+int hmc_nuts_diag_e_adapt(
+    Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
+    unsigned int random_seed, unsigned int init_chain_id, double init_radius,
+    int num_warmup, int num_samples, int num_thin, bool save_warmup,
+    int refresh, double stepsize, double stepsize_jitter, int max_depth,
+    double delta, double gamma, double kappa, double t0,
+    unsigned int init_buffer, unsigned int term_buffer, unsigned int window,
+    callbacks::interrupt& interrupt, callbacks::logger& logger,
+    std::vector<callbacks::dispatcher>& dispatcher) {
+  Eigen::VectorXd unit_e_metric =  Eigen::VectorXd::Ones(model.num_params_r());
+  std::vector<Eigen::VectorXd> inv_metric;
+  inv_metric.reserve(num_chains);
+  for (size_t i = 0; i < num_chains; ++i) {
+    inv_metric.emplace_back(unit_e_metric);
+  }
+  if (num_chains == 1) {
+    return hmc_nuts_diag_e_adapt(
+        model, *init[0], unit_e_metric, random_seed, init_chain_id,
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, interrupt, logger, dispatcher[0]);
+  }
+  return hmc_nuts_diag_e_adapt(
+      model, num_chains, init, inv_metric, random_seed, init_chain_id,
+      init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+      init_buffer, term_buffer, window, interrupt, logger, dispatcher);
+}
+
+/**
+ * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
+ * with a pre-specified diagonal metric, outputs handled by dispatcher.
+ */
+template <class Model, typename InitContextPtr, typename InitInvContextPtr>
+int hmc_nuts_diag_e_adapt(
+    Model& model, size_t num_chains,
+    const std::vector<InitContextPtr>& init,
+    const std::vector<InitInvContextPtr>& init_inv_metric,
+    unsigned int random_seed, unsigned int init_chain_id, double init_radius,
+    int num_warmup, int num_samples, int num_thin, bool save_warmup,
+    int refresh, double stepsize, double stepsize_jitter, int max_depth,
+    double delta, double gamma, double kappa, double t0,
+    unsigned int init_buffer, unsigned int term_buffer, unsigned int window,
+    callbacks::interrupt& interrupt, callbacks::logger& logger,
+    std::vector<callbacks::dispatcher>& dispatcher) {
+  if (num_chains == 1) {
+    return hmc_nuts_diag_e_adapt(
+        model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, interrupt, logger, dispatcher[0]);
+  }
+  return hmc_nuts_diag_e_adapt(
+      model, num_chains, init, init_inv_metric, random_seed, init_chain_id,
+      init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+      init_buffer, term_buffer, window, interrupt, logger, dispatcher);
+}
+
+//***************** end dispatcher ****************************
 
 /**
  * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
@@ -84,20 +226,9 @@ int hmc_nuts_diag_e_adapt(
   }
 
   stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
-
-  sampler.set_metric(inv_metric);
-  sampler.set_nominal_stepsize(stepsize);
-  sampler.set_stepsize_jitter(stepsize_jitter);
-  sampler.set_max_depth(max_depth);
-
-  sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
-  sampler.get_stepsize_adaptation().set_delta(delta);
-  sampler.get_stepsize_adaptation().set_gamma(gamma);
-  sampler.get_stepsize_adaptation().set_kappa(kappa);
-  sampler.get_stepsize_adaptation().set_t0(t0);
-
-  sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
-                            logger);
+  util::config_adaptive_sampler(sampler, inv_metric, stepsize, stepsize_jitter,
+                          max_depth, delta, gamma, kappa, t0, num_warmup,
+                          init_buffer, term_buffer, window, logger);
 
   util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
                              num_samples, num_thin, refresh, save_warmup, rng,
@@ -363,19 +494,9 @@ int hmc_nuts_diag_e_adapt(
       Eigen::VectorXd inv_metric = util::read_diag_inv_metric(
           *init_inv_metric[i], model.num_params_r(), logger);
       util::validate_diag_inv_metric(inv_metric, logger);
-
-      samplers[i].set_metric(inv_metric);
-      samplers[i].set_nominal_stepsize(stepsize);
-      samplers[i].set_stepsize_jitter(stepsize_jitter);
-      samplers[i].set_max_depth(max_depth);
-
-      samplers[i].get_stepsize_adaptation().set_mu(log(10 * stepsize));
-      samplers[i].get_stepsize_adaptation().set_delta(delta);
-      samplers[i].get_stepsize_adaptation().set_gamma(gamma);
-      samplers[i].get_stepsize_adaptation().set_kappa(kappa);
-      samplers[i].get_stepsize_adaptation().set_t0(t0);
-      samplers[i].set_window_params(num_warmup, init_buffer, term_buffer,
-                                    window, logger);
+      util::config_adaptive_sampler(samplers[i], inv_metric, stepsize, stepsize_jitter,
+                                    max_depth, delta, gamma, kappa, t0, num_warmup,
+                                    init_buffer, term_buffer, window, logger);
     }
   } catch (const std::exception& e) {
     logger.error(e.what());

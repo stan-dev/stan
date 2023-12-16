@@ -1,12 +1,14 @@
 #include <stan/services/util/run_adaptive_sampler.hpp>
-#include <gtest/gtest.h>
-#include <test/test-models/good/services/test_lp.hpp>
+
 #include <stan/callbacks/structured_writer.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/services/util/create_rng.hpp>
-#include <test/unit/services/instrumented_callbacks.hpp>
-#include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
+#include <stan/services/util/create_rng.hpp>
+
+#include <test/test-models/good/services/test_lp.hpp>
+#include <test/unit/services/instrumented_callbacks.hpp>
+
+#include <gtest/gtest.h>
 
 class ServicesUtil : public testing::Test {
  public:

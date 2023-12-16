@@ -2,6 +2,8 @@
 #define STAN_SERVICES_UTIL_RUN_ADAPTIVE_SAMPLER_HPP
 
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/dispatcher.hpp>
+#include <stan/callbacks/info_type.hpp>
 #include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
@@ -12,8 +14,94 @@
 #include <vector>
 
 namespace stan {
+
 namespace services {
 namespace util {
+
+
+
+/**
+ * Runs the sampler with adaptation, dispatcher handles outputs
+ */
+template <typename Sampler, typename Model, typename RNG>
+void run_adaptive_sampler(Sampler& sampler, Model& model,
+                          std::vector<double>& cont_vector, int num_warmup,
+                          int num_samples, int num_thin, int refresh,
+                          bool save_warmup, RNG& rng,
+                          callbacks::interrupt& interrupt,
+                          callbacks::logger& logger,
+                          callbacks::dispatcher& dispatcher,
+                          size_t chain_id = 1, size_t num_chains = 1) {
+  Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
+                                          cont_vector.size());
+
+  sampler.engage_adaptation();
+  try {
+    sampler.z().q = cont_params;
+    sampler.init_stepsize(logger);
+  } catch (const std::exception& e) {
+    logger.error("Exception initializing step size.");
+    logger.error(e.what());
+    return;
+  }
+  stan::mcmc::sample s(cont_params, 0, 0);
+
+  // params plus, constrained
+  std::vector<std::string> constrained_names;
+  model.constrained_param_names(constrained_names, true, true);  // all vars
+  size_t num_constrained = constrained_names.size();
+  dispatcher.table_header(callbacks::info_type::DRAW_CONSTRAINED, constrained_names);
+  
+  // params only, unconstrained
+  std::vector<std::string> unconstrained_names;
+  model.unconstrained_param_names(unconstrained_names, false, false);  // params
+  size_t num_unconstrained = unconstrained_names.size();
+  dispatcher.table_header(callbacks::info_type::DRAW_UNCONSTRAINED, unconstrained_names);
+
+  // mcmc - log_prob + accept stat
+  std::vector<std::string> log_prob_names;
+  s.get_sample_param_names(log_prob_names);
+  dispatcher.table_header(callbacks::info_type::LOG_PROB, log_prob_names);
+
+  // nuts-hmc - treedepth etc
+  std::vector<std::string> algo_names;
+  sampler.get_sampler_param_names(algo_names);
+  dispatcher.table_header(callbacks::info_type::ALGORITHM_STATE, algo_names);
+
+  auto start_warm = std::chrono::steady_clock::now();
+  util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
+                             num_thin, refresh, save_warmup, true,
+                             num_constrained, num_unconstrained, dispatcher, s,
+                             model, rng, interrupt, logger, chain_id,
+                             num_chains);
+  auto end_warm = std::chrono::steady_clock::now();
+  double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            end_warm - start_warm)
+                            .count()
+                        / 1000.0;
+
+  dispatcher.begin_record(callbacks::info_type::TIMING);
+  dispatcher.write(callbacks::info_type::TIMING, "warmup", warm_delta_t);
+
+  sampler.disengage_adaptation();
+  sampler.write_metric(dispatcher);
+
+  auto start_sample = std::chrono::steady_clock::now();
+  util::generate_transitions(sampler, num_samples, num_warmup,
+                             num_warmup + num_samples, num_thin, refresh, true,
+                             false, num_constrained, num_unconstrained,
+                             dispatcher, s, model, rng, interrupt, logger,
+                             chain_id, num_chains);
+
+
+  auto end_sample = std::chrono::steady_clock::now();
+  double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
+                              end_sample - start_sample)
+                              .count()
+                          / 1000.0;
+  dispatcher.write(callbacks::info_type::TIMING, "sampling", sample_delta_t);
+  dispatcher.end_record(callbacks::info_type::TIMING);
+}
 
 /**
  * Runs the sampler with adaptation, with writers for the sample,

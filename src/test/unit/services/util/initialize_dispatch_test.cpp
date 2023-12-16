@@ -1,23 +1,17 @@
 #include <stan/services/util/initialize.hpp>
-#include <gtest/gtest.h>
 #include <stan/callbacks/csv_writer.hpp>
 #include <stan/callbacks/dispatcher.hpp>
-#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/structured_writer.hpp>
-#include <test/unit/util.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/stream_logger.hpp>
-#include <sstream>
-#include <test/test-models/good/services/test_lp.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <test/test-models/good/services/test_lp.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
-
-
-auto&& blah = stan::math::init_threadpool_tbb();
-
-static constexpr size_t num_chains = 4;
+#include <test/unit/util.hpp>
+#include <sstream>
+#include <gtest/gtest.h>
 
 class ServicesUtilInitializeDispatcher : public testing::Test {
  public:

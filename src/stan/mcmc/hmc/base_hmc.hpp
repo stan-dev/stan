@@ -78,16 +78,16 @@ class base_hmc : public base_mcmc {
     struct_writer.end_record();
   }
 
-  // /**
-  //  * write stepsize and elements of mass matrix
-  //  * @param dispatcher - send to associated structured writer
-  //  */
-  // void write_metric(callbacks::dispatcher& dispatcher) {
-  //   dispatcher.begin_record(callbacks::info_type::METRIC);
-  //   dispatcher.write(callbacks::info_type::METRIC, "stepsize", get_nominal_stepsize());
-  //   dispatcher.write(callbacks::info_type::METRIC, "inv_metric", z_.inv_e_metric_);
-  //   dispatcher.end_record(callbacks::info_type::METRIC);
-  // }
+  /**
+   * write stepsize and elements of mass matrix
+   * @param dispatcher - send to associated structured writer
+   */
+  void write_metric(callbacks::dispatcher& dispatcher) {
+    dispatcher.begin_record(callbacks::info_type::METRIC);
+    dispatcher.write(callbacks::info_type::METRIC, "stepsize", get_nominal_stepsize());
+    dispatcher.write(callbacks::info_type::METRIC, "inv_metric", z_.inv_e_metric_);
+    dispatcher.end_record(callbacks::info_type::METRIC);
+  }
 
   void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
                                     std::vector<std::string>& names) {
