@@ -18,7 +18,6 @@ public:
       ss_draw_cnstrn(),
       ss_params_uncnstrn(),
       ss_engine(),
-
       model(empty_context, 0, &model_ss),
       rng(stan::services::util::create_rng(0, 1)),
       sampler(model, rng),
@@ -88,11 +87,11 @@ public:
   std::stringstream ss_params_uncnstrn;
   std::stringstream ss_engine;
   std::stringstream ss_metric;
-  stan::callbacks::dispatcher dp;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_draw_cnstrn;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_params_uncnstrn;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_engine;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer_metric;
+  stan::callbacks::dispatcher dp;
 };
 
 TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_defaults) {
@@ -115,5 +114,4 @@ TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_defaults) {
   ASSERT_FALSE(ss_engine.str().empty());
   std::cout << "engine" << std::endl;
   std::cout << ss_engine.str() << std::endl;
-
 }

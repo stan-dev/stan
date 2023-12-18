@@ -100,8 +100,7 @@ template <class Model, class RNG>
 void dispatch_sample(RNG& rng, stan::mcmc::sample& sample,
                      stan::mcmc::base_mcmc& sampler, Model& model,
                      callbacks::logger& logger,
-                     callbacks::dispatcher& dispatcher,
-                     size_t num_constrained, size_t num_unconstrained) {
+                     callbacks::dispatcher& dispatcher) {
 
   std::vector<double> engine_values;
   sample.get_sample_params(engine_values);  // mcmc:  log_prob, accept_stat
@@ -138,8 +137,6 @@ template <class Model, class RNG>
 void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           int start, int finish, int num_thin, int refresh,
                           bool save, bool warmup,
-                          size_t num_constrained,
-                          size_t num_unconstrained,
                           stan::callbacks::dispatcher& dispatcher,
                           stan::mcmc::sample& init_s, Model& model,
                           RNG& base_rng, callbacks::interrupt& callback,
@@ -153,8 +150,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
     }
     init_s = sampler.transition(init_s, logger);
     if (save && ((m % num_thin) == 0)) {
-      dispatch_sample(base_rng, init_s, sampler, model, logger, dispatcher,
-                      num_constrained, num_unconstrained);
+      dispatch_sample(base_rng, init_s, sampler, model, logger, dispatcher);
     }
   }
 }
