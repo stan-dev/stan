@@ -28,7 +28,7 @@ class ServicesUtilInitializeDispatcher : public testing::Test {
     std::shared_ptr<stan::callbacks::structured_writer> csv_valid_inits_ptr
         = std::make_shared<stan::callbacks::csv_writer<std::stringstream,
                                                        deleter_noop>>(std::move(csv_valid_inits));
-    dp.add_writer(stan::callbacks::info_type::VALID_INIT_PARAMS, std::move(csv_valid_inits_ptr));
+    dp.add_writer(stan::callbacks::table_info_type::PARAMS_INITS, std::move(csv_valid_inits_ptr));
   }
 
   void TearDown() {}

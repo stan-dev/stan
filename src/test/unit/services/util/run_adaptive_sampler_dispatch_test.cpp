@@ -17,9 +17,8 @@ public:
   ServicesUtilRunAdaptiveSamplerDispatcher() :
       ss_draw_cnstrn(),
       ss_params_uncnstrn(),
-      ss_engine_state(),
-      ss_log_prob(),
-      ss_metric(),
+      ss_engine(),
+
       model(empty_context, 0, &model_ss),
       rng(stan::services::util::create_rng(0, 1)),
       sampler(model, rng),
@@ -30,38 +29,31 @@ public:
       save_warmup(true),
       writer_draw_cnstrn(std::unique_ptr<std::stringstream, deleter_noop>(&ss_draw_cnstrn)),
       writer_params_uncnstrn(std::unique_ptr<std::stringstream, deleter_noop>(&ss_params_uncnstrn)),
-      writer_engine_state(std::unique_ptr<std::stringstream, deleter_noop>(&ss_engine_state)),
-      writer_log_prob(std::unique_ptr<std::stringstream, deleter_noop>(&ss_log_prob)),
+      writer_engine(std::unique_ptr<std::stringstream, deleter_noop>(&ss_engine)),
       writer_metric(std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric))
   {
     std::shared_ptr<stan::callbacks::structured_writer> writer_draw_cnstrn_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_draw_cnstrn));
-    dp.add_writer(stan::callbacks::info_type::DRAW_CONSTRAINED,
+    dp.add_writer(stan::callbacks::table_info_type::DRAW_CONSTRAIN,
                   std::move(writer_draw_cnstrn_ptr));
 
     std::shared_ptr<stan::callbacks::structured_writer> writer_params_uncnstrn_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_params_uncnstrn));
-    dp.add_writer(stan::callbacks::info_type::PARAMS_UNCONSTRAINED,
+    dp.add_writer(stan::callbacks::table_info_type::PARAMS_UNCNSTRN,
                   std::move(writer_params_uncnstrn_ptr));
 
-    std::shared_ptr<stan::callbacks::structured_writer> writer_engine_state_ptr
+    std::shared_ptr<stan::callbacks::structured_writer> writer_engine_ptr
         = std::make_shared<stan::callbacks::csv_writer<
-          std::stringstream, deleter_noop>>(std::move(writer_engine_state));
-    dp.add_writer(stan::callbacks::info_type::ENGINE_STATE,
-                  std::move(writer_engine_state_ptr));
-
-    std::shared_ptr<stan::callbacks::structured_writer> writer_log_prob_ptr
-        = std::make_shared<stan::callbacks::csv_writer<
-          std::stringstream, deleter_noop>>(std::move(writer_log_prob));
-    dp.add_writer(stan::callbacks::info_type::LOG_PROB,
-                  std::move(writer_log_prob_ptr));
+          std::stringstream, deleter_noop>>(std::move(writer_engine));
+    dp.add_writer(stan::callbacks::table_info_type::DRAW_ENGINE,
+                  std::move(writer_engine_ptr));
 
     std::shared_ptr<stan::callbacks::structured_writer> writer_metric_ptr
         = std::make_shared<stan::callbacks::json_writer<
           std::stringstream, deleter_noop>>(std::move(writer_metric));
-    dp.add_writer(stan::callbacks::info_type::METRIC,
+    dp.add_writer(stan::callbacks::struct_info_type::INV_METRIC,
                   std::move(writer_metric_ptr));
   }
 
@@ -72,11 +64,8 @@ public:
     ss_params_uncnstrn.str(std::string());
     ss_params_uncnstrn.clear();
 
-    ss_engine_state.str(std::string());
-    ss_engine_state.clear();
-
-    ss_log_prob.str(std::string());
-    ss_log_prob.clear();
+    ss_engine.str(std::string());
+    ss_engine.clear();
 
     ss_metric.str(std::string());
     ss_metric.clear();
@@ -97,14 +86,12 @@ public:
 
   std::stringstream ss_draw_cnstrn;
   std::stringstream ss_params_uncnstrn;
-  std::stringstream ss_engine_state;
-  std::stringstream ss_log_prob;
+  std::stringstream ss_engine;
   std::stringstream ss_metric;
   stan::callbacks::dispatcher dp;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_draw_cnstrn;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_params_uncnstrn;
-  stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_engine_state;
-  stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_log_prob;
+  stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_engine;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer_metric;
 };
 
@@ -125,12 +112,8 @@ TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_defaults) {
   std::cout << "params_uncnstrn" << std::endl;
   std::cout << ss_params_uncnstrn.str() << std::endl;
 
-  ASSERT_FALSE(ss_log_prob.str().empty());
-  std::cout << "log_prob" << std::endl;
-  std::cout << ss_log_prob.str() << std::endl;
-
-  ASSERT_FALSE(ss_engine_state.str().empty());
-  std::cout << "engine_state" << std::endl;
-  std::cout << ss_engine_state.str() << std::endl;
+  ASSERT_FALSE(ss_engine.str().empty());
+  std::cout << "engine" << std::endl;
+  std::cout << ss_engine.str() << std::endl;
 
 }

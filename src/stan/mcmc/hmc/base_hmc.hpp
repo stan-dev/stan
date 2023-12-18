@@ -83,10 +83,10 @@ class base_hmc : public base_mcmc {
    * @param dispatcher - send to associated structured writer
    */
   void write_metric(callbacks::dispatcher& dispatcher) {
-    dispatcher.begin_record(callbacks::info_type::METRIC);
-    dispatcher.write(callbacks::info_type::METRIC, "stepsize", get_nominal_stepsize());
-    dispatcher.write(callbacks::info_type::METRIC, "inv_metric", z_.inv_e_metric_);
-    dispatcher.end_record(callbacks::info_type::METRIC);
+    dispatcher.begin_record(callbacks::struct_info_type::INV_METRIC);
+    dispatcher.write(callbacks::struct_info_type::INV_METRIC, "stepsize", get_nominal_stepsize());
+    dispatcher.write(callbacks::struct_info_type::INV_METRIC, "inv_metric", z_.inv_e_metric_);
+    dispatcher.end_record(callbacks::struct_info_type::INV_METRIC);
   }
 
   void get_sampler_diagnostic_names(std::vector<std::string>& model_names,

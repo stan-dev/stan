@@ -103,14 +103,10 @@ void dispatch_sample(RNG& rng, stan::mcmc::sample& sample,
                      callbacks::dispatcher& dispatcher,
                      size_t num_constrained, size_t num_unconstrained) {
 
-  std::vector<double> log_prob_values;
-  sample.get_sample_params(log_prob_values);
-  dispatcher.table_row(callbacks::info_type::LOG_PROB, log_prob_values);
-
-  std::vector<double> algo_values;
-  sampler.get_sampler_params(algo_values);
-  dispatcher.table_row(callbacks::info_type::ENGINE_STATE, algo_values);
-
+  std::vector<double> engine_values;
+  sample.get_sample_params(engine_values);  // mcmc:  log_prob, accept_stat
+  sampler.get_sampler_params(engine_values);  // nuts-specific
+  dispatcher.table_row(callbacks::table_info_type::DRAW_ENGINE, engine_values);
 
   std::vector<double> constrained_values;
   std::vector<int> params_i;
@@ -118,6 +114,8 @@ void dispatch_sample(RNG& rng, stan::mcmc::sample& sample,
   std::vector<double> cont_params(
       sample.cont_params().data(),
       sample.cont_params().data() + sample.cont_params().size());
+
+  dispatcher.table_row(callbacks::table_info_type::PARAMS_UNCNSTRN, cont_params);
   try {
     model.write_array(rng, cont_params, params_i, constrained_values,
                       true, true, &ss_print);
@@ -133,15 +131,8 @@ void dispatch_sample(RNG& rng, stan::mcmc::sample& sample,
 
   // allow missing gq values
   //  dispatcher.table_row_padded(callbacks::info_type::DRAW_CONSTRAINED, constrained_values);
-  dispatcher.table_row(callbacks::info_type::DRAW_CONSTRAINED, constrained_values);
-
-  std::vector<double> unconstrained_values;
-  sampler.get_sampler_diagnostics(unconstrained_values);
-  dispatcher.table_row(callbacks::info_type::PARAMS_UNCONSTRAINED, unconstrained_values);
-
-  // gradiants - sampler diagnostics ???
+  dispatcher.table_row(callbacks::table_info_type::DRAW_CONSTRAIN, constrained_values);
 }
-
 
 template <class Model, class RNG>
 void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
@@ -156,14 +147,11 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           size_t num_chains = 1) {
   for (int m = 0; m < num_iterations; ++m) {
     callback();
-
     if (refresh > 0
         && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
       log_progress(m, start, finish, warmup, chain_id, num_chains, logger);
     }
-
     init_s = sampler.transition(init_s, logger);
-
     if (save && ((m % num_thin) == 0)) {
       dispatch_sample(base_rng, init_s, sampler, model, logger, dispatcher,
                       num_constrained, num_unconstrained);

@@ -10,8 +10,8 @@ enum class table_info_type : int {
     DRAW_CONSTRAIN = 1,
     DRAW_ENGINE = 2,
     PARAMS_INITS = 3,
-    PARAMS_GRADIENTS = 4,
-    PARAMS_UNCNSTRN = 5
+    PARAMS_UNCNSTRN = 4
+    // gradients ?  (expensive - using finite diffs)
 };
 
 enum class struct_info_type : int {

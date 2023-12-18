@@ -246,8 +246,8 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
   std::vector<double> unconstrained = initialize(model, init, rng, init_radius, print_timing, logger);
   std::vector<std::string> names;
   model.unconstrained_param_names(names, false, false);
-  dispatcher.table_header(stan::callbacks::info_type::VALID_INIT_PARAMS, names);
-  dispatcher.table_row(stan::callbacks::info_type::VALID_INIT_PARAMS, unconstrained);
+  dispatcher.table_header(stan::callbacks::table_info_type::PARAMS_INITS, names);
+  dispatcher.table_row(stan::callbacks::table_info_type::PARAMS_INITS, unconstrained);
   return unconstrained;
 }
 

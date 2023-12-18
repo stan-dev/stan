@@ -18,8 +18,6 @@ namespace stan {
 namespace services {
 namespace util {
 
-
-
 /**
  * Runs the sampler with adaptation, dispatcher handles outputs
  */
@@ -52,24 +50,19 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   std::vector<std::string> constrained_names;
   model.constrained_param_names(constrained_names, true, true);  // all vars
   size_t num_constrained = constrained_names.size();
-  dispatcher.table_header(callbacks::info_type::DRAW_CONSTRAINED, constrained_names);
+  dispatcher.table_header(callbacks::table_info_type::DRAW_CONSTRAIN, constrained_names);
   
   // params only, unconstrained
   std::vector<std::string> unconstrained_names;
-  model.unconstrained_param_names(unconstrained_names, false, false);  // params
+  model.unconstrained_param_names(unconstrained_names, false, false);
   size_t num_unconstrained = unconstrained_names.size();
-  dispatcher.table_header(callbacks::info_type::PARAMS_UNCONSTRAINED, unconstrained_names);
-  dispatcher.table_header(callbacks::info_type::PARAMS_GRADIENTS, unconstrained_names);
+  dispatcher.table_header(callbacks::table_info_type::PARAMS_UNCNSTRN, unconstrained_names);
 
   // mcmc - log_prob + accept stat
-  std::vector<std::string> log_prob_names;
-  s.get_sample_param_names(log_prob_names);
-  dispatcher.table_header(callbacks::info_type::LOG_PROB, log_prob_names);
-
-  // nuts-hmc - treedepth etc
-  std::vector<std::string> algo_names;
-  sampler.get_sampler_param_names(algo_names);
-  dispatcher.table_header(callbacks::info_type::ENGINE_STATE, algo_names);
+  std::vector<std::string> engine_names;
+  s.get_sample_param_names(engine_names);
+  sampler.get_sampler_param_names(engine_names);
+  dispatcher.table_header(callbacks::table_info_type::DRAW_ENGINE,engine_names);
 
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
@@ -83,8 +76,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                             .count()
                         / 1000.0;
 
-  dispatcher.begin_record(callbacks::info_type::RUN_TIMING);
-  dispatcher.write(callbacks::info_type::RUN_TIMING, "warmup", warm_delta_t);
+  dispatcher.begin_record(callbacks::struct_info_type::RUN_TIMING);
+  dispatcher.write(callbacks::struct_info_type::RUN_TIMING, "warmup", warm_delta_t);
 
   sampler.disengage_adaptation();
   sampler.write_metric(dispatcher);
@@ -102,8 +95,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                               end_sample - start_sample)
                               .count()
                           / 1000.0;
-  dispatcher.write(callbacks::info_type::RUN_TIMING, "sampling", sample_delta_t);
-  dispatcher.end_record(callbacks::info_type::RUN_TIMING);
+  dispatcher.write(callbacks::struct_info_type::RUN_TIMING, "sampling", sample_delta_t);
+  dispatcher.end_record(callbacks::struct_info_type::RUN_TIMING);
 }
 
 /**
