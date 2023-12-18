@@ -31,6 +31,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::interrupt& interrupt,
                           callbacks::logger& logger,
                           callbacks::dispatcher& dispatcher,
+                          // should there be another dispatcher for warmup draws?
+                          // callbacks::dispatcher& dispather_warmup,
                           size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
@@ -56,7 +58,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   std::vector<std::string> unconstrained_names;
   model.unconstrained_param_names(unconstrained_names, false, false);  // params
   size_t num_unconstrained = unconstrained_names.size();
-  dispatcher.table_header(callbacks::info_type::DRAW_UNCONSTRAINED, unconstrained_names);
+  dispatcher.table_header(callbacks::info_type::PARAMS_UNCONSTRAINED, unconstrained_names);
+  dispatcher.table_header(callbacks::info_type::PARAMS_GRADIENTS, unconstrained_names);
 
   // mcmc - log_prob + accept stat
   std::vector<std::string> log_prob_names;
@@ -66,7 +69,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   // nuts-hmc - treedepth etc
   std::vector<std::string> algo_names;
   sampler.get_sampler_param_names(algo_names);
-  dispatcher.table_header(callbacks::info_type::ALGORITHM_STATE, algo_names);
+  dispatcher.table_header(callbacks::info_type::ENGINE_STATE, algo_names);
 
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
@@ -80,8 +83,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                             .count()
                         / 1000.0;
 
-  dispatcher.begin_record(callbacks::info_type::TIMING);
-  dispatcher.write(callbacks::info_type::TIMING, "warmup", warm_delta_t);
+  dispatcher.begin_record(callbacks::info_type::RUN_TIMING);
+  dispatcher.write(callbacks::info_type::RUN_TIMING, "warmup", warm_delta_t);
 
   sampler.disengage_adaptation();
   sampler.write_metric(dispatcher);
@@ -99,8 +102,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                               end_sample - start_sample)
                               .count()
                           / 1000.0;
-  dispatcher.write(callbacks::info_type::TIMING, "sampling", sample_delta_t);
-  dispatcher.end_record(callbacks::info_type::TIMING);
+  dispatcher.write(callbacks::info_type::RUN_TIMING, "sampling", sample_delta_t);
+  dispatcher.end_record(callbacks::info_type::RUN_TIMING);
 }
 
 /**

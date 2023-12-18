@@ -109,7 +109,7 @@ void dispatch_sample(RNG& rng, stan::mcmc::sample& sample,
 
   std::vector<double> algo_values;
   sampler.get_sampler_params(algo_values);
-  dispatcher.table_row(callbacks::info_type::ALGORITHM_STATE, algo_values);
+  dispatcher.table_row(callbacks::info_type::ENGINE_STATE, algo_values);
 
 
   std::vector<double> constrained_values;
@@ -137,7 +137,9 @@ void dispatch_sample(RNG& rng, stan::mcmc::sample& sample,
 
   std::vector<double> unconstrained_values;
   sampler.get_sampler_diagnostics(unconstrained_values);
-  dispatcher.table_row(callbacks::info_type::DRAW_UNCONSTRAINED, unconstrained_values);
+  dispatcher.table_row(callbacks::info_type::PARAMS_UNCONSTRAINED, unconstrained_values);
+
+  // gradiants - sampler diagnostics ???
 }
 
 

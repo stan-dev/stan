@@ -6,16 +6,16 @@ namespace callbacks {
 
 enum class info_type : int {
   // see design_docs 0032-stan-output-formats
-    LOG_PROB = 1,
-    ALGORITHM_STATE = 2,
-    DRAW_CONSTRAINED = 3,
-    DRAW_UNCONSTRAINED = 4,
-    GRADIENTS = 5,
-    METRIC = 6,
-    MODEL_METADATA = 7,
-    CONFIG = 8,
-    TIMING = 9,
-    VALID_INIT_PARAMS = 10
+    DRAW_CONSTRAINED = 1,
+    ENGINE_STATE = 2,
+    LOG_PROB = 3,
+    METRIC = 4,
+    MODEL_METADATA = 5,
+    PARAMS_UNCONSTRAINED = 6,
+    PARAMS_GRADIENTS = 7,
+    RUN_CONFIG = 8,
+    RUN_TIMING = 9,
+    VALID_INIT_PARAMS = 10,
 };
 
 }  // namespace callbacks
