@@ -65,11 +65,11 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   dispatcher.table_header(callbacks::table_info_type::DRAW_ENGINE,engine_names);
 
   auto start_warm = std::chrono::steady_clock::now();
-  util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
+  util::generate_transitions(sampler,
+                             num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true,
-                             num_constrained, num_unconstrained, dispatcher, s,
-                             model, rng, interrupt, logger, chain_id,
-                             num_chains);
+                             dispatcher, s, model, rng, interrupt, logger,
+                             chain_id, num_chains);
   auto end_warm = std::chrono::steady_clock::now();
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                             end_warm - start_warm)
@@ -83,12 +83,11 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   sampler.write_metric(dispatcher);
 
   auto start_sample = std::chrono::steady_clock::now();
-  util::generate_transitions(sampler, num_samples, num_warmup,
-                             num_warmup + num_samples, num_thin, refresh, true,
-                             false, num_constrained, num_unconstrained,
+  util::generate_transitions(sampler,
+                             num_samples, num_warmup, num_warmup + num_samples,
+                             num_thin, refresh, true, false,
                              dispatcher, s, model, rng, interrupt, logger,
                              chain_id, num_chains);
-
 
   auto end_sample = std::chrono::steady_clock::now();
   double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
