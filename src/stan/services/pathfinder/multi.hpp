@@ -79,10 +79,11 @@ namespace pathfinder {
  * `error_codes::SOFTWARE` for failures
  * @param[in] return_lp Whether single pathfinder should return lp calculations.
  *  If `true`, calculates the joint log probability for each sample.
- *  If `false`, (`num_draws` - `num_elbo_draws`) of the joint log probability calculations will be `NA` and psis resampling will not be performed.
- * @param[in] psis_resampling If `true`, psis resampling is performed over the 
- *  samples returned by all of the individual pathfinders and `num_multi_draws` 
- *  samples are returned. If `false`, no psis resampling is performed 
+ *  If `false`, (`num_draws` - `num_elbo_draws`) of the joint log probability
+ *  calculations will be `NA` and psis resampling will not be performed.
+ * @param[in] psis_resampling If `true`, psis resampling is performed over the
+ *  samples returned by all of the individual pathfinders and `num_multi_draws`
+ *  samples are returned. If `false`, no psis resampling is performed
  *  and (`num_paths` * `num_draws`) samples are returned.
  * @return error_codes::OK if successful
  */
@@ -166,7 +167,7 @@ inline int pathfinder_lbfgs_multi(
   for (auto&& ilpr : individual_lp_ratios) {
     num_returned_samples += ilpr.size();
   }
-  // Rows are individual parameters and columns are samples per iteration  
+  // Rows are individual parameters and columns are samples per iteration
   Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> samples(
       individual_samples[0].rows(), num_returned_samples);
   Eigen::Index filling_start_row = 0;
@@ -188,7 +189,7 @@ inline int pathfinder_lbfgs_multi(
     }
 
     const auto tail_len = std::min(0.2 * num_returned_samples,
-                                  3 * std::sqrt(num_returned_samples));
+                                   3 * std::sqrt(num_returned_samples));
     Eigen::Array<double, Eigen::Dynamic, 1> weight_vals
         = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
     boost::ecuyer1988 rng
@@ -196,11 +197,11 @@ inline int pathfinder_lbfgs_multi(
     boost::variate_generator<
         boost::ecuyer1988&,
         boost::random::discrete_distribution<Eigen::Index, double>>
-        rand_psis_idx(rng,
-                      boost::random::discrete_distribution<Eigen::Index, double>(
-                          boost::iterator_range<double*>(
-                              weight_vals.data(),
-                              weight_vals.data() + weight_vals.size())));
+        rand_psis_idx(
+            rng, boost::random::discrete_distribution<Eigen::Index, double>(
+                     boost::iterator_range<double*>(
+                         weight_vals.data(),
+                         weight_vals.data() + weight_vals.size())));
     for (size_t i = 0; i <= num_multi_draws - 1; ++i) {
       parameter_writer(samples.col(rand_psis_idx()));
     }
