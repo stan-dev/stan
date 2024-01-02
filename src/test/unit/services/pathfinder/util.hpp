@@ -176,6 +176,10 @@ class in_memory_writer : public stan::callbacks::stream_writer {
   void operator()(const EigMat& vals) {
     values_ = vals;
   }
+  template <int R, int C>
+  void operator()(const Eigen::Array<double, R, C>& vals) {
+    values_ = vals.matrix();
+  }
 };
 
 Eigen::Matrix<double, 10, 100> eight_schools_r_answer() {
