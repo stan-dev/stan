@@ -168,12 +168,13 @@ TEST_F(ServicesPathfinderGLM, single_noreturnlp) {
       init, parameter, diagnostics, return_lp);
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
   for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
-    EXPECT_FALSE(std::isnan(param_vals.coeff(1,  num_draws + i))) << "row: " << (num_draws + i);
+    EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws + i)))
+        << "row: " << (num_draws + i);
   }
   for (Eigen::Index i = 0; i < (num_draws - num_elbo_draws); ++i) {
-    EXPECT_TRUE(std::isnan(param_vals.coeff(1, num_elbo_draws + i)))  << "row: " << (num_draws + num_elbo_draws + i);
+    EXPECT_TRUE(std::isnan(param_vals.coeff(1, num_elbo_draws + i)))
+        << "row: " << (num_draws + num_elbo_draws + i);
   }
-
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
@@ -258,8 +259,6 @@ TEST_F(ServicesPathfinderGLM, multi) {
   }
 }
 
-
-
 TEST_F(ServicesPathfinderGLM, multi_noresample) {
   constexpr unsigned int seed = 0;
   constexpr unsigned int chain = 1;
@@ -306,7 +305,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample) {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
   EXPECT_EQ(param_vals.rows(), 10);
-  EXPECT_EQ(param_vals.cols(), 8000);  
+  EXPECT_EQ(param_vals.cols(), 8000);
 }
 
 TEST_F(ServicesPathfinderGLM, multi_noresample_noreturnlp) {
@@ -359,10 +358,11 @@ TEST_F(ServicesPathfinderGLM, multi_noresample_noreturnlp) {
   for (Eigen::Index paths_i = 0; paths_i < num_paths; ++paths_i) {
     // Iterate over each set of results from the single pathfinders
     for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
-      EXPECT_FALSE(std::isnan(param_vals.coeff(1,  num_draws * paths_i + i)));
+      EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws * paths_i + i)));
     }
     for (Eigen::Index i = 0; i < (num_draws - num_elbo_draws); ++i) {
-      EXPECT_TRUE(std::isnan(param_vals.coeff(1, num_draws * paths_i + num_elbo_draws + i)));
+      EXPECT_TRUE(std::isnan(
+          param_vals.coeff(1, num_draws * paths_i + num_elbo_draws + i)));
     }
   }
 }
@@ -417,14 +417,14 @@ TEST_F(ServicesPathfinderGLM, multi_resample_noreturnlp) {
   for (Eigen::Index paths_i = 0; paths_i < num_paths; ++paths_i) {
     // Iterate over each set of results from the single pathfinders
     for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
-      EXPECT_FALSE(std::isnan(param_vals.coeff(1,  num_draws * paths_i + i)));
+      EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws * paths_i + i)));
     }
     for (Eigen::Index i = 0; i < (num_draws - num_elbo_draws); ++i) {
-      EXPECT_TRUE(std::isnan(param_vals.coeff(1, num_draws * paths_i + num_elbo_draws + i)));
+      EXPECT_TRUE(std::isnan(
+          param_vals.coeff(1, num_draws * paths_i + num_elbo_draws + i)));
     }
   }
 }
-
 
 TEST_F(ServicesPathfinderGLM, multi_noresample_returnlp) {
   constexpr unsigned int seed = 0;
@@ -476,7 +476,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample_returnlp) {
   for (Eigen::Index paths_i = 0; paths_i < num_paths; ++paths_i) {
     // Iterate over each set of results from the single pathfinders
     for (Eigen::Index i = 0; i < num_draws; ++i) {
-      EXPECT_FALSE(std::isnan(param_vals.coeff(1,  num_draws * paths_i + i)));
+      EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws * paths_i + i)));
     }
   }
 }
