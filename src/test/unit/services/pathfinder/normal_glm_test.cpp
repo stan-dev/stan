@@ -152,7 +152,7 @@ TEST_F(ServicesPathfinderGLM, single_noreturnlp) {
   constexpr int num_iterations = 400;
   constexpr bool save_iterations = true;
   constexpr int refresh = 1;
-  constexpr bool return_lp = false;
+  constexpr bool calculate_lp = false;
 
   stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;  // = init_init_context();
@@ -165,7 +165,7 @@ TEST_F(ServicesPathfinderGLM, single_noreturnlp) {
       model, empty_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
       num_elbo_draws, num_draws, save_iterations, refresh, callback, logger,
-      init, parameter, diagnostics, return_lp);
+      init, parameter, diagnostics, calculate_lp);
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
   for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
     EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws + i)))
@@ -278,7 +278,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample) {
   constexpr int num_iterations = 220;
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
-  constexpr bool return_lp = true;
+  constexpr bool calculate_lp = true;
   constexpr bool resample = false;
 
   std::unique_ptr<std::ostream> empty_ostream(nullptr);
@@ -299,7 +299,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample) {
       save_iterations, refresh, callback, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
-      diagnostics, return_lp, resample);
+      diagnostics, calculate_lp, resample);
 
   Eigen::MatrixXd param_vals = parameter.values_;
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
@@ -327,7 +327,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample_noreturnlp) {
   constexpr int num_iterations = 220;
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
-  constexpr bool return_lp = false;
+  constexpr bool calculate_lp = false;
   constexpr bool resample = false;
 
   std::unique_ptr<std::ostream> empty_ostream(nullptr);
@@ -348,7 +348,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample_noreturnlp) {
       save_iterations, refresh, callback, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
-      diagnostics, return_lp, resample);
+      diagnostics, calculate_lp, resample);
 
   Eigen::MatrixXd param_vals = parameter.values_;
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
@@ -386,7 +386,7 @@ TEST_F(ServicesPathfinderGLM, multi_resample_noreturnlp) {
   constexpr int num_iterations = 220;
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
-  constexpr bool return_lp = false;
+  constexpr bool calculate_lp = false;
   constexpr bool resample = true;
 
   std::unique_ptr<std::ostream> empty_ostream(nullptr);
@@ -407,7 +407,7 @@ TEST_F(ServicesPathfinderGLM, multi_resample_noreturnlp) {
       save_iterations, refresh, callback, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
-      diagnostics, return_lp, resample);
+      diagnostics, calculate_lp, resample);
 
   Eigen::MatrixXd param_vals = parameter.values_;
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
@@ -445,7 +445,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample_returnlp) {
   constexpr int num_iterations = 220;
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
-  constexpr bool return_lp = true;
+  constexpr bool calculate_lp = true;
   constexpr bool resample = false;
 
   std::unique_ptr<std::ostream> empty_ostream(nullptr);
@@ -466,7 +466,7 @@ TEST_F(ServicesPathfinderGLM, multi_noresample_returnlp) {
       save_iterations, refresh, callback, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
-      diagnostics, return_lp, resample);
+      diagnostics, calculate_lp, resample);
 
   Eigen::MatrixXd param_vals = parameter.values_;
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",

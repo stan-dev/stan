@@ -77,14 +77,14 @@ namespace pathfinder {
  * @param[in,out] parameter_writer output for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values,
  * `error_codes::SOFTWARE` for failures
- * @param[in] return_lp Whether single pathfinder should return lp calculations.
+ * @param[in] calculate_lp Whether single pathfinder should return lp calculations.
  *  If `true`, calculates the joint log probability for each sample.
  *  If `false`, (`num_draws` - `num_elbo_draws`) of the joint log probability
  *  calculations will be `NA` and psis resampling will not be performed.
  * @param[in] psis_resampling If `true`, psis resampling is performed over the
  *  samples returned by all of the individual pathfinders and `num_multi_draws`
- *  samples are returned. If `false`, no psis resampling is performed
- *  and (`num_paths` * `num_draws`) samples are returned.
+ *  samples are written to `parameter_writer`. If `false`, no psis resampling is performed
+ *  and (`num_paths` * `num_draws`) samples are written to `parameter_writer`.
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContext, typename InitWriter,
@@ -101,7 +101,7 @@ inline int pathfinder_lbfgs_multi(
     std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer,
-    bool return_lp = true, bool psis_resample = true) {
+    bool calculate_lp = true, bool psis_resample = true) {
   const auto start_pathfinders_time = std::chrono::steady_clock::now();
   std::vector<std::string> param_names;
   param_names.push_back("lp_approx__");
@@ -126,7 +126,7 @@ inline int pathfinder_lbfgs_multi(
                   num_elbo_draws, num_draws, save_iterations, refresh,
                   interrupt, logger, init_writers[iter],
                   single_path_parameter_writer[iter],
-                  single_path_diagnostic_writer[iter], return_lp);
+                  single_path_diagnostic_writer[iter], calculate_lp);
           if (unlikely(std::get<0>(pathfinder_ret) != error_codes::OK)) {
             logger.error(std::string("Pathfinder iteration: ")
                          + std::to_string(iter) + " failed.");
@@ -178,7 +178,7 @@ inline int pathfinder_lbfgs_multi(
     filling_start_row += individ_num_samples;
   }
   double psis_delta_time = 0;
-  if (psis_resample && return_lp) {
+  if (psis_resample && calculate_lp) {
     Eigen::Array<double, Eigen::Dynamic, 1> lp_ratios(num_returned_samples);
     filling_start_row = 0;
     for (size_t i = 0; i < successful_pathfinders; ++i) {
@@ -216,9 +216,10 @@ inline int pathfinder_lbfgs_multi(
   const auto time_header = std::string("Elapsed Time: ");
   std::string optim_time_str = time_header
                                + std::to_string(pathfinders_delta_time)
-                               + " seconds (Pathfinders)";
+                               + std::string(" seconds") +
+                               ((psis_resample && calculate_lp) ? " (Pathfinders)" : " (Total)");
   parameter_writer(optim_time_str);
-  if (psis_resample && return_lp) {
+  if (psis_resample && calculate_lp) {
     std::string psis_time_str = std::string(time_header.size(), ' ')
                                 + std::to_string(psis_delta_time)
                                 + " seconds (PSIS)";

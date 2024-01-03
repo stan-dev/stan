@@ -208,6 +208,7 @@ generate_matrix(Generator&& variate_generator, const Eigen::Index num_params,
  * @param alpha The approximation of the diagonal hessian
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
+ * @param calculate_lp If true, calculate the log probability of the samples. Else set to `NaN` for each sample.
  * @return A struct with the ELBO estimate along with the samples and log
  * probability ratios.
  */
@@ -218,7 +219,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
                                    const taylor_approx_t& taylor_approx,
                                    size_t num_samples, const EigVec& alpha,
                                    const std::string& iter_msg, Logger&& logger,
-                                   bool return_lp = true) {
+                                   bool calculate_lp = true) {
   boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
   const auto num_params = taylor_approx.x_center.size();
@@ -242,7 +243,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
   Eigen::VectorXd approx_samples_col;
   std::stringstream pathfinder_ss;
   Eigen::Array<double, Eigen::Dynamic, 1> lp_ratio;
-  if (return_lp) {
+  if (calculate_lp) {
     for (Eigen::Index i = 0; i < num_samples; ++i) {
       try {
         approx_samples_col = approx_samples.col(i);
@@ -582,7 +583,7 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] parameter_writer Writer callback for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values
- * @param[in] return_lp Whether single pathfinder should return lp calculations.
+ * @param[in] calculate_lp Whether single pathfinder should return lp calculations.
  *  If `true`, calculates the joint log probability for each sample.
  *  If `false`, (`num_draws` - `num_elbo_draws`) of the joint log probability
  * calculations will be `NA` and psis resampling will not be performed. Setting
@@ -602,7 +603,7 @@ inline auto pathfinder_lbfgs_single(
     int num_elbo_draws, int num_draws, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
-    DiagnosticWriter& diagnostic_writer, bool return_lp = true) {
+    DiagnosticWriter& diagnostic_writer, bool calculate_lp = true) {
   const auto start_pathfinder_time = std::chrono::steady_clock::now();
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
@@ -866,7 +867,7 @@ inline auto pathfinder_lbfgs_single(
     try {
       internal::elbo_est_t est_draws = internal::est_approx_draws<false>(
           lp_fun, constrain_fun, rng, taylor_approx_best, remaining_draws,
-          taylor_approx_best.alpha, path_num, logger, return_lp);
+          taylor_approx_best.alpha, path_num, logger, calculate_lp);
       num_evals += est_draws.fn_calls;
       auto&& new_lp_ratio = est_draws.lp_ratio;
       auto&& lp_draws = est_draws.lp_mat;
@@ -933,7 +934,7 @@ inline auto pathfinder_lbfgs_single(
     }
     lp_ratio = std::move(elbo_best.lp_ratio);
   }
-  parameter_writer(constrained_draws_mat.matrix());
+  parameter_writer(constrained_draws_mat);
   parameter_writer();
   const auto end_pathfinder_time = std::chrono::steady_clock::now();
   const double pathfinder_delta_time = stan::services::util::duration_diff(

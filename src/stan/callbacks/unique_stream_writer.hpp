@@ -97,6 +97,24 @@ class unique_stream_writer final : public writer {
   }
 
   /**
+   * Writes multiple rows and columns of values in csv format.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] values An array of values. The input is expected to have
+   * parameters in the rows and samples in the columns. The array is then
+   * transposed for the output.
+   */
+  void operator()(const Eigen::Array<double, -1, -1>& vals) {
+    if (output_ == nullptr)
+      return;
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                 ", ", "", "", "\n", "", "");
+    *output_ << values.transpose().format(CommaInitFmt);
+  }
+
+  /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
   void operator()() {

@@ -57,6 +57,18 @@ class writer {
    * transposed for the output.
    */
   virtual void operator()(const Eigen::MatrixXd& values) {}
+
+  /**
+   * Writes multiple rows and columns of values in csv format.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] values An array of values. The input is expected to have
+   * parameters in the rows and samples in the columns. The array is then
+   * transposed for the output.
+   */
+  void operator()(const Eigen::Array<double, -1, -1>& vals) {}
 };
 
 }  // namespace callbacks
