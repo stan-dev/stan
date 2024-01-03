@@ -35,6 +35,9 @@ inline double compute_potential_scale_reduction(
     std::vector<const double*> draws, std::vector<size_t> sizes) {
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
+  if (num_draws == 0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
   for (int chain = 1; chain < num_chains; ++chain) {
     num_draws = std::min(num_draws, sizes[chain]);
   }
