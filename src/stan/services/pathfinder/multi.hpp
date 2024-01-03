@@ -77,14 +77,16 @@ namespace pathfinder {
  * @param[in,out] parameter_writer output for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values,
  * `error_codes::SOFTWARE` for failures
- * @param[in] calculate_lp Whether single pathfinder should return lp calculations.
- *  If `true`, calculates the joint log probability for each sample.
- *  If `false`, (`num_draws` - `num_elbo_draws`) of the joint log probability
- *  calculations will be `NA` and psis resampling will not be performed.
+ * @param[in] calculate_lp Whether single pathfinder should return lp
+ * calculations. If `true`, calculates the joint log probability for each
+ * sample. If `false`, (`num_draws` - `num_elbo_draws`) of the joint log
+ * probability calculations will be `NA` and psis resampling will not be
+ * performed.
  * @param[in] psis_resampling If `true`, psis resampling is performed over the
  *  samples returned by all of the individual pathfinders and `num_multi_draws`
- *  samples are written to `parameter_writer`. If `false`, no psis resampling is performed
- *  and (`num_paths` * `num_draws`) samples are written to `parameter_writer`.
+ *  samples are written to `parameter_writer`. If `false`, no psis resampling is
+ * performed and (`num_paths` * `num_draws`) samples are written to
+ * `parameter_writer`.
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContext, typename InitWriter,
@@ -214,10 +216,10 @@ inline int pathfinder_lbfgs_multi(
   }
   parameter_writer();
   const auto time_header = std::string("Elapsed Time: ");
-  std::string optim_time_str = time_header
-                               + std::to_string(pathfinders_delta_time)
-                               + std::string(" seconds") +
-                               ((psis_resample && calculate_lp) ? " (Pathfinders)" : " (Total)");
+  std::string optim_time_str
+      = time_header + std::to_string(pathfinders_delta_time)
+        + std::string(" seconds")
+        + ((psis_resample && calculate_lp) ? " (Pathfinders)" : " (Total)");
   parameter_writer(optim_time_str);
   if (psis_resample && calculate_lp) {
     std::string psis_time_str = std::string(time_header.size(), ' ')

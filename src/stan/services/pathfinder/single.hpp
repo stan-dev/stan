@@ -208,7 +208,8 @@ generate_matrix(Generator&& variate_generator, const Eigen::Index num_params,
  * @param alpha The approximation of the diagonal hessian
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
- * @param calculate_lp If true, calculate the log probability of the samples. Else set to `NaN` for each sample.
+ * @param calculate_lp If true, calculate the log probability of the samples.
+ * Else set to `NaN` for each sample.
  * @return A struct with the ELBO estimate along with the samples and log
  * probability ratios.
  */
@@ -583,11 +584,12 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] parameter_writer Writer callback for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values
- * @param[in] calculate_lp Whether single pathfinder should return lp calculations.
- *  If `true`, calculates the joint log probability for each sample.
- *  If `false`, (`num_draws` - `num_elbo_draws`) of the joint log probability
- * calculations will be `NA` and psis resampling will not be performed. Setting
- * this parameter to `false` will also set all of the lp ratios to `NaN`.
+ * @param[in] calculate_lp Whether single pathfinder should return lp
+ * calculations. If `true`, calculates the joint log probability for each
+ * sample. If `false`, (`num_draws` - `num_elbo_draws`) of the joint log
+ * probability calculations will be `NA` and psis resampling will not be
+ * performed. Setting this parameter to `false` will also set all of the lp
+ * ratios to `NaN`.
  * @return If `ReturnLpSamples` is `true`, returns a tuple of the error code,
  * approximate draws, and a vector of the lp ratio. If `false`, only returns an
  * error code `error_codes::OK` if successful, `error_codes::SOFTWARE`
