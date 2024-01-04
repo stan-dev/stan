@@ -106,7 +106,7 @@ class unique_stream_writer final : public writer {
    * parameters in the rows and samples in the columns. The array is then
    * transposed for the output.
    */
-  void operator()(const Eigen::Array<double, -1, -1>& vals) {
+  void operator()(const Eigen::Array<double, -1, -1>& values) {
     if (output_ == nullptr)
       return;
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
