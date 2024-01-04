@@ -68,7 +68,47 @@ class writer {
    * parameters in the rows and samples in the columns. The array is then
    * transposed for the output.
    */
-  void operator()(const Eigen::Array<double, -1, -1>& vals) {}
+  virtual void operator()(const Eigen::Array<double, -1, -1>& vals) {}
+
+  /**
+   * Writes a set of values in csv format followed by a newline.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] v Values in an Eigen vector
+   */
+  virtual void operator()(const Eigen::Matrix<double, -1, 1>& values) {}
+
+  /**
+   * Writes a set of values in csv format followed by a newline.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] v Values in an Eigen row vector
+   */
+  virtual void operator()(const Eigen::Matrix<double, 1, -1>& values) {}
+
+  /**
+   * Writes a set of values in csv format followed by a newline.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] v Values in an Eigen column array
+   */
+  virtual void operator()(const Eigen::Array<double, -1, 1>& values) {}
+
+  /**
+   * Writes a set of values in csv format followed by a newline.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] v Values in an Eigen row array
+   */
+  virtual void operator()(const Eigen::Array<double, 1, -1>& values) {}
 };
 
 }  // namespace callbacks
