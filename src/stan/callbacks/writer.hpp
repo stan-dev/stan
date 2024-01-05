@@ -87,7 +87,7 @@ class writer {
    * @param[in] v Values in a block representing an Eigen column vector
    */
   virtual void operator()(
-      const Eigen::Block<Eigen::Matrix<double, -1, -1>, -1, 1, true>) {}
+      const Eigen::Block<Eigen::Matrix<double, -1, -1>, -1, 1, true>& values) {}
 
   /**
    * Writes a set of values in csv format followed by a newline.
@@ -98,7 +98,7 @@ class writer {
    * @param[in] v Values in a block representing an Eigen row vector
    */
   virtual void operator()(
-      const Eigen::Block<Eigen::Matrix<double, -1, -1>, 1, -1, true>) {}
+      const Eigen::Block<Eigen::Matrix<double, -1, -1>, 1, -1, true>& values) {}
 };
 
 }  // namespace callbacks
