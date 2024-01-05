@@ -94,16 +94,17 @@ class unique_stream_writer final : public writer {
     const bool is_row_vector = values.rows() == 1 && values.cols() > 1;
     Eigen::IOFormat CommaInitFmt;
     if (is_row_vector) {
-      CommaInitFmt = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                "\n", ", ", "", "", "", "\n");
+      CommaInitFmt
+          = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, "\n",
+                            ", ", "", "", "", "\n");
     } else {
-      CommaInitFmt = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", "", "", "\n", "", "");
+      CommaInitFmt
+          = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ",
+                            "", "", "\n", "", "");
     }
-    
+
     *output_ << values.transpose().format(CommaInitFmt);
   }
-
 
   /**
    * Writes the comment_prefix to the stream followed by a newline.
