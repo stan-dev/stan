@@ -170,13 +170,13 @@ inline int pathfinder_lbfgs_multi(
     num_returned_samples += ilpr.size();
   }
   // Rows are individual parameters and columns are samples per iteration
-  Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> samples(
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> samples(
       individual_samples[0].rows(), num_returned_samples);
   Eigen::Index filling_start_row = 0;
   for (size_t i = 0; i < successful_pathfinders; ++i) {
     const Eigen::Index individ_num_samples = individual_samples[i].cols();
     samples.middleCols(filling_start_row, individ_num_samples)
-        = individual_samples[i];
+        = individual_samples[i].matrix();
     filling_start_row += individ_num_samples;
   }
   double psis_delta_time = 0;
