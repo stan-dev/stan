@@ -135,7 +135,8 @@ class unique_stream_writer final : public writer {
    *
    * @param[in] v Values in a block representing an Eigen column vector
    */
-  virtual void operator()(const Eigen::Block<Eigen::Matrix<double, -1, -1>, -1, 1, true>) {
+  virtual void operator()(
+      const Eigen::Block<Eigen::Matrix<double, -1, -1>, -1, 1, true>) {
     if (output_ == nullptr)
       return;
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
@@ -151,15 +152,14 @@ class unique_stream_writer final : public writer {
    *
    * @param[in] v Values in a block representing an Eigen row vector
    */
-  virtual void operator()(const Eigen::Block<Eigen::Matrix<double, -1, -1>, 1, -1, true>) {
+  virtual void operator()(
+      const Eigen::Block<Eigen::Matrix<double, -1, -1>, 1, -1, true>) {
     if (output_ == nullptr)
       return;
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                  ", ", "", "", "\n", "", "");
     *output_ << values.format(CommaInitFmt);
-
   }
-
 
   /**
    * Writes the comment_prefix to the stream followed by a newline.
