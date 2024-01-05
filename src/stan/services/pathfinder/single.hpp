@@ -881,7 +881,7 @@ inline auto pathfinder_lbfgs_single(
       const auto total_size = elbo_draws.cols() + new_draws.cols();
       constrained_draws_mat
           = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(),
-                                                                 total_size);
+                                                                  total_size);
       Eigen::VectorXd unconstrained_col;
       Eigen::VectorXd approx_samples_constrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
@@ -889,7 +889,8 @@ inline auto pathfinder_lbfgs_single(
         unconstrained_col = elbo_draws.col(i);
         constrained_draws_mat.col(i).tail(num_unconstrained_params)
             = constrain_fun(rng, unconstrained_col,
-                            approx_samples_constrained_col).matrix();
+                            approx_samples_constrained_col)
+                  .matrix();
       }
       for (Eigen::Index i = elbo_draws.cols(), j = 0; i < total_size;
            ++i, ++j) {
@@ -897,7 +898,8 @@ inline auto pathfinder_lbfgs_single(
         unconstrained_col = new_draws.col(j);
         constrained_draws_mat.col(i).tail(num_unconstrained_params)
             = constrain_fun(rng, unconstrained_col,
-                            approx_samples_constrained_col).matrix();
+                            approx_samples_constrained_col)
+                  .matrix();
       }
     } catch (const std::exception& e) {
       std::string err_msg = e.what();
@@ -917,7 +919,8 @@ inline auto pathfinder_lbfgs_single(
         unconstrained_col = elbo_draws.col(i);
         constrained_draws_mat.col(i).tail(num_unconstrained_params)
             = constrain_fun(rng, unconstrained_col,
-                            approx_samples_constrained_col).matrix();
+                            approx_samples_constrained_col)
+                  .matrix();
       }
       lp_ratio = std::move(elbo_best.lp_ratio);
     }
@@ -932,7 +935,8 @@ inline auto pathfinder_lbfgs_single(
       unconstrained_col = elbo_draws.col(i);
       constrained_draws_mat.col(i).tail(num_unconstrained_params)
           = constrain_fun(rng, unconstrained_col,
-                          approx_samples_constrained_col).matrix();
+                          approx_samples_constrained_col)
+                .matrix();
     }
     lp_ratio = std::move(elbo_best.lp_ratio);
   }

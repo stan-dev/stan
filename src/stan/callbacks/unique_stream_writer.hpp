@@ -77,7 +77,7 @@ class unique_stream_writer final : public writer {
       return;
     write_vector(values);
   }
-  
+
   /**
    * Writes a set of values in csv format followed by a newline.
    *

@@ -77,7 +77,6 @@ class writer {
    * @param[in] v Values in an Eigen row vector
    */
   virtual void operator()(const Eigen::Matrix<double, 1, -1>& values) {}
-
 };
 
 }  // namespace callbacks
