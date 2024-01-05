@@ -79,38 +79,6 @@ class unique_stream_writer final : public writer {
   }
 
   /**
-   * Writes a set of values in csv format followed by a newline.
-   *
-   * Note: the precision of the output is determined by the settings
-   *  of the stream on construction.
-   *
-   * @param[in] v Values in an Eigen vector
-   */
-  void operator()(const Eigen::Matrix<double, -1, 1>& values) {
-    if (output_ == nullptr)
-      return;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << values.transpose().format(CommaInitFmt);
-  }
-
-  /**
-   * Writes a set of values in csv format followed by a newline.
-   *
-   * Note: the precision of the output is determined by the settings
-   *  of the stream on construction.
-   *
-   * @param[in] v Values in an Eigen row vector
-   */
-  void operator()(const Eigen::Matrix<double, 1, -1>& values) {
-    if (output_ == nullptr)
-      return;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << values.format(CommaInitFmt);
-  }
-
-  /**
    * Writes multiple rows and columns of values in csv format.
    *
    * Note: the precision of the output is determined by the settings
@@ -120,46 +88,22 @@ class unique_stream_writer final : public writer {
    * parameters in the rows and samples in the columns. The matrix is then
    * transposed for the output.
    */
-  void operator()(const Eigen::Matrix<double, -1, -1>& values) {
+  void operator()(const Eigen::Ref<Eigen::Matrix<double, -1, -1>>& values) {
     if (output_ == nullptr)
       return;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << values.transpose().format(CommaInitFmt);
-  }
-  /**
-   * Writes a set of values in csv format followed by a newline.
-   *
-   * Note: the precision of the output is determined by the settings
-   *  of the stream on construction.
-   *
-   * @param[in] v Values in a block representing an Eigen column vector
-   */
-  virtual void operator()(
-      const Eigen::Block<Eigen::Matrix<double, -1, -1>, -1, 1, true>& values) {
-    if (output_ == nullptr)
-      return;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
+    const bool is_row_vector = values.rows() == 1 && values.cols() > 1;
+    Eigen::IOFormat CommaInitFmt;
+    if (is_row_vector) {
+      CommaInitFmt = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                "\n", ", ", "", "", "", "\n");
+    } else {
+      CommaInitFmt = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                ", ", "", "", "\n", "", "");
+    }
+    
     *output_ << values.transpose().format(CommaInitFmt);
   }
 
-  /**
-   * Writes a set of values in csv format followed by a newline.
-   *
-   * Note: the precision of the output is determined by the settings
-   *  of the stream on construction.
-   *
-   * @param[in] v Values in a block representing an Eigen row vector
-   */
-  virtual void operator()(
-      const Eigen::Block<Eigen::Matrix<double, -1, -1>, 1, -1, true>& values) {
-    if (output_ == nullptr)
-      return;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << values.format(CommaInitFmt);
-  }
 
   /**
    * Writes the comment_prefix to the stream followed by a newline.
