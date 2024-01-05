@@ -91,16 +91,6 @@ class unique_stream_writer final : public writer {
   void operator()(const Eigen::Ref<Eigen::Matrix<double, -1, -1>>& values) {
     if (output_ == nullptr)
       return;
-    const bool is_row_vector = values.rows() == 1 && values.cols() > 1;
-    Eigen::IOFormat CommaInitFmt;
-    if (is_row_vector) {
-      CommaInitFmt = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                "\n", ", ", "", "", "", "\n");
-    } else {
-      CommaInitFmt = Eigen::IOFormat(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", "", "", "\n", "", "");
-    }
-    
     *output_ << values.transpose().format(CommaInitFmt);
   }
 
@@ -126,6 +116,12 @@ class unique_stream_writer final : public writer {
   }
 
  private:
+  /**
+   * Comma formatter for writing Eigen matrices 
+   */
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                            ", ", "", "", "\n", "", "");    
+
   /**
    * Output stream
    */
