@@ -116,10 +116,10 @@ class unique_stream_writer final : public writer {
 
  private:
   /**
-   * Comma formatter for writing Eigen matrices 
+   * Comma formatter for writing Eigen matrices
    */
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                            ", ", "", "", "\n", "", "");    
+                               ", ", "", "", "\n", "", "");
 
   /**
    * Output stream
