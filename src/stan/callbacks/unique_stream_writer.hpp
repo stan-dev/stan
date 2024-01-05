@@ -94,7 +94,6 @@ class unique_stream_writer final : public writer {
     *output_ << values.transpose().format(CommaInitFmt);
   }
 
-
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
