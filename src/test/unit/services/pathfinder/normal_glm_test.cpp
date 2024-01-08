@@ -136,6 +136,47 @@ TEST_F(ServicesPathfinderGLM, single) {
   ASSERT_TRUE(stan::test::is_valid_JSON(json));
 }
 
+TEST_F(ServicesPathfinderGLM, single_noreturnlp) {
+  constexpr unsigned int seed = 3;
+  constexpr unsigned int chain = 1;
+  constexpr double init_radius = 2;
+  constexpr double num_elbo_draws = 80;
+  constexpr double num_draws = 500;
+  constexpr int history_size = 35;
+  constexpr double init_alpha = 1;
+  constexpr double tol_obj = 0;
+  constexpr double tol_rel_obj = 0;
+  constexpr double tol_grad = 0;
+  constexpr double tol_rel_grad = 0;
+  constexpr double tol_param = 0;
+  constexpr int num_iterations = 400;
+  constexpr bool save_iterations = true;
+  constexpr int refresh = 1;
+  constexpr bool calculate_lp = false;
+
+  stan::test::mock_callback callback;
+  stan::io::empty_var_context empty_context;  // = init_init_context();
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
+
+  std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
+
+  stan::services::pathfinder::pathfinder_lbfgs_single(
+      model, empty_context, seed, chain, init_radius, history_size, init_alpha,
+      tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
+      num_elbo_draws, num_draws, save_iterations, refresh, callback, logger,
+      init, parameter, diagnostics, calculate_lp);
+  Eigen::MatrixXd param_vals = std::move(parameter.values_);
+  for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
+    EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws + i)))
+        << "row: " << (num_draws + i);
+  }
+  for (Eigen::Index i = 0; i < (num_draws - num_elbo_draws); ++i) {
+    EXPECT_TRUE(std::isnan(param_vals.coeff(1, num_elbo_draws + i)))
+        << "row: " << (num_draws + num_elbo_draws + i);
+  }
+}
+
 TEST_F(ServicesPathfinderGLM, multi) {
   constexpr unsigned int seed = 0;
   constexpr unsigned int chain = 1;
@@ -215,5 +256,227 @@ TEST_F(ServicesPathfinderGLM, multi) {
   }
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
+  }
+}
+
+TEST_F(ServicesPathfinderGLM, multi_noresample) {
+  constexpr unsigned int seed = 0;
+  constexpr unsigned int chain = 1;
+  constexpr double init_radius = 1;
+  constexpr double num_multi_draws = 100;
+  constexpr int num_paths = 4;
+  constexpr double num_elbo_draws = 1000;
+  // Should return num_paths * num_draws = 8000
+  constexpr double num_draws = 2000;
+  constexpr int history_size = 15;
+  constexpr double init_alpha = 1;
+  constexpr double tol_obj = 0;
+  constexpr double tol_rel_obj = 0;
+  constexpr double tol_grad = 0;
+  constexpr double tol_rel_grad = 0;
+  constexpr double tol_param = 0;
+  constexpr int num_iterations = 220;
+  constexpr bool save_iterations = false;
+  constexpr int refresh = 0;
+  constexpr bool calculate_lp = true;
+  constexpr bool resample = false;
+
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
+  std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>>
+      single_path_diagnostic_writer(num_paths);
+  std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
+  for (int i = 0; i < num_paths; ++i) {
+    single_path_inits.emplace_back(
+        std::make_unique<decltype(init_init_context())>(init_init_context()));
+  }
+  stan::test::mock_callback callback;
+  stan::services::pathfinder::pathfinder_lbfgs_multi(
+      model, single_path_inits, seed, chain, init_radius, history_size,
+      init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+      num_iterations, num_elbo_draws, num_draws, num_multi_draws, num_paths,
+      save_iterations, refresh, callback, logger,
+      std::vector<stan::callbacks::stream_writer>(num_paths, init),
+      single_path_parameter_writer, single_path_diagnostic_writer, parameter,
+      diagnostics, calculate_lp, resample);
+
+  Eigen::MatrixXd param_vals = parameter.values_;
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", "");
+  EXPECT_EQ(param_vals.rows(), 10);
+  EXPECT_EQ(param_vals.cols(), 8000);
+}
+
+TEST_F(ServicesPathfinderGLM, multi_noresample_noreturnlp) {
+  constexpr unsigned int seed = 0;
+  constexpr unsigned int chain = 1;
+  constexpr double init_radius = 1;
+  constexpr double num_multi_draws = 100;
+  constexpr int num_paths = 4;
+  constexpr double num_elbo_draws = 1000;
+  // Should return num_paths * num_draws = 8000
+  constexpr double num_draws = 2000;
+  constexpr int history_size = 15;
+  constexpr double init_alpha = 1;
+  constexpr double tol_obj = 0;
+  constexpr double tol_rel_obj = 0;
+  constexpr double tol_grad = 0;
+  constexpr double tol_rel_grad = 0;
+  constexpr double tol_param = 0;
+  constexpr int num_iterations = 220;
+  constexpr bool save_iterations = false;
+  constexpr int refresh = 0;
+  constexpr bool calculate_lp = false;
+  constexpr bool resample = false;
+
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
+  std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>>
+      single_path_diagnostic_writer(num_paths);
+  std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
+  for (int i = 0; i < num_paths; ++i) {
+    single_path_inits.emplace_back(
+        std::make_unique<decltype(init_init_context())>(init_init_context()));
+  }
+  stan::test::mock_callback callback;
+  stan::services::pathfinder::pathfinder_lbfgs_multi(
+      model, single_path_inits, seed, chain, init_radius, history_size,
+      init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+      num_iterations, num_elbo_draws, num_draws, num_multi_draws, num_paths,
+      save_iterations, refresh, callback, logger,
+      std::vector<stan::callbacks::stream_writer>(num_paths, init),
+      single_path_parameter_writer, single_path_diagnostic_writer, parameter,
+      diagnostics, calculate_lp, resample);
+
+  Eigen::MatrixXd param_vals = parameter.values_;
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", "");
+  EXPECT_EQ(param_vals.rows(), 10);
+  EXPECT_EQ(param_vals.cols(), 8000);
+  for (Eigen::Index paths_i = 0; paths_i < num_paths; ++paths_i) {
+    // Iterate over each set of results from the single pathfinders
+    for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
+      EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws * paths_i + i)));
+    }
+    for (Eigen::Index i = 0; i < (num_draws - num_elbo_draws); ++i) {
+      EXPECT_TRUE(std::isnan(
+          param_vals.coeff(1, num_draws * paths_i + num_elbo_draws + i)));
+    }
+  }
+}
+
+TEST_F(ServicesPathfinderGLM, multi_resample_noreturnlp) {
+  constexpr unsigned int seed = 0;
+  constexpr unsigned int chain = 1;
+  constexpr double init_radius = 1;
+  constexpr double num_multi_draws = 100;
+  constexpr int num_paths = 4;
+  constexpr double num_elbo_draws = 1000;
+  // Should return num_paths * num_draws = 8000
+  constexpr double num_draws = 2000;
+  constexpr int history_size = 15;
+  constexpr double init_alpha = 1;
+  constexpr double tol_obj = 0;
+  constexpr double tol_rel_obj = 0;
+  constexpr double tol_grad = 0;
+  constexpr double tol_rel_grad = 0;
+  constexpr double tol_param = 0;
+  constexpr int num_iterations = 220;
+  constexpr bool save_iterations = false;
+  constexpr int refresh = 0;
+  constexpr bool calculate_lp = false;
+  constexpr bool resample = true;
+
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
+  std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>>
+      single_path_diagnostic_writer(num_paths);
+  std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
+  for (int i = 0; i < num_paths; ++i) {
+    single_path_inits.emplace_back(
+        std::make_unique<decltype(init_init_context())>(init_init_context()));
+  }
+  stan::test::mock_callback callback;
+  stan::services::pathfinder::pathfinder_lbfgs_multi(
+      model, single_path_inits, seed, chain, init_radius, history_size,
+      init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+      num_iterations, num_elbo_draws, num_draws, num_multi_draws, num_paths,
+      save_iterations, refresh, callback, logger,
+      std::vector<stan::callbacks::stream_writer>(num_paths, init),
+      single_path_parameter_writer, single_path_diagnostic_writer, parameter,
+      diagnostics, calculate_lp, resample);
+
+  Eigen::MatrixXd param_vals = parameter.values_;
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", "");
+  EXPECT_EQ(param_vals.rows(), 10);
+  EXPECT_EQ(param_vals.cols(), 8000);
+  for (Eigen::Index paths_i = 0; paths_i < num_paths; ++paths_i) {
+    // Iterate over each set of results from the single pathfinders
+    for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
+      EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws * paths_i + i)));
+    }
+    for (Eigen::Index i = 0; i < (num_draws - num_elbo_draws); ++i) {
+      EXPECT_TRUE(std::isnan(
+          param_vals.coeff(1, num_draws * paths_i + num_elbo_draws + i)));
+    }
+  }
+}
+
+TEST_F(ServicesPathfinderGLM, multi_noresample_returnlp) {
+  constexpr unsigned int seed = 0;
+  constexpr unsigned int chain = 1;
+  constexpr double init_radius = 1;
+  constexpr double num_multi_draws = 100;
+  constexpr int num_paths = 4;
+  constexpr double num_elbo_draws = 1000;
+  // Should return num_paths * num_draws = 8000
+  constexpr double num_draws = 2000;
+  constexpr int history_size = 15;
+  constexpr double init_alpha = 1;
+  constexpr double tol_obj = 0;
+  constexpr double tol_rel_obj = 0;
+  constexpr double tol_grad = 0;
+  constexpr double tol_rel_grad = 0;
+  constexpr double tol_param = 0;
+  constexpr int num_iterations = 220;
+  constexpr bool save_iterations = false;
+  constexpr int refresh = 0;
+  constexpr bool calculate_lp = true;
+  constexpr bool resample = false;
+
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
+  std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>>
+      single_path_diagnostic_writer(num_paths);
+  std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
+  for (int i = 0; i < num_paths; ++i) {
+    single_path_inits.emplace_back(
+        std::make_unique<decltype(init_init_context())>(init_init_context()));
+  }
+  stan::test::mock_callback callback;
+  stan::services::pathfinder::pathfinder_lbfgs_multi(
+      model, single_path_inits, seed, chain, init_radius, history_size,
+      init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+      num_iterations, num_elbo_draws, num_draws, num_multi_draws, num_paths,
+      save_iterations, refresh, callback, logger,
+      std::vector<stan::callbacks::stream_writer>(num_paths, init),
+      single_path_parameter_writer, single_path_diagnostic_writer, parameter,
+      diagnostics, calculate_lp, resample);
+
+  Eigen::MatrixXd param_vals = parameter.values_;
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", "");
+  EXPECT_EQ(param_vals.rows(), 10);
+  EXPECT_EQ(param_vals.cols(), 8000);
+  for (Eigen::Index paths_i = 0; paths_i < num_paths; ++paths_i) {
+    // Iterate over each set of results from the single pathfinders
+    for (Eigen::Index i = 0; i < num_draws; ++i) {
+      EXPECT_FALSE(std::isnan(param_vals.coeff(1, num_draws * paths_i + i)));
+    }
   }
 }

@@ -77,6 +77,16 @@ namespace pathfinder {
  * @param[in,out] parameter_writer output for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values,
  * `error_codes::SOFTWARE` for failures
+ * @param[in] calculate_lp Whether single pathfinder should return lp
+ * calculations. If `true`, calculates the joint log probability for each
+ * sample. If `false`, (`num_draws` - `num_elbo_draws`) of the joint log
+ * probability calculations will be `NA` and psis resampling will not be
+ * performed.
+ * @param[in] psis_resampling If `true`, psis resampling is performed over the
+ *  samples returned by all of the individual pathfinders and `num_multi_draws`
+ *  samples are written to `parameter_writer`. If `false`, no psis resampling is
+ * performed and (`num_paths` * `num_draws`) samples are written to
+ * `parameter_writer`.
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContext, typename InitWriter,
@@ -92,7 +102,8 @@ inline int pathfinder_lbfgs_multi(
     callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
-    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
+    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer,
+    bool calculate_lp = true, bool psis_resample = true) {
   const auto start_pathfinders_time = std::chrono::steady_clock::now();
   std::vector<std::string> param_names;
   param_names.push_back("lp_approx__");
@@ -117,7 +128,7 @@ inline int pathfinder_lbfgs_multi(
                   num_elbo_draws, num_draws, save_iterations, refresh,
                   interrupt, logger, init_writers[iter],
                   single_path_parameter_writer[iter],
-                  single_path_diagnostic_writer[iter]);
+                  single_path_diagnostic_writer[iter], calculate_lp);
           if (unlikely(std::get<0>(pathfinder_ret) != error_codes::OK)) {
             logger.error(std::string("Pathfinder iteration: ")
                          + std::to_string(iter) + " failed.");
@@ -158,53 +169,69 @@ inline int pathfinder_lbfgs_multi(
   for (auto&& ilpr : individual_lp_ratios) {
     num_returned_samples += ilpr.size();
   }
-  Eigen::Array<double, Eigen::Dynamic, 1> lp_ratios(num_returned_samples);
-  Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> samples(
+  // Rows are individual parameters and columns are samples per iteration
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> samples(
       individual_samples[0].rows(), num_returned_samples);
   Eigen::Index filling_start_row = 0;
   for (size_t i = 0; i < successful_pathfinders; ++i) {
-    const Eigen::Index individ_num_samples = individual_lp_ratios[i].size();
-    lp_ratios.segment(filling_start_row, individ_num_samples)
-        = individual_lp_ratios[i];
+    const Eigen::Index individ_num_samples = individual_samples[i].cols();
     samples.middleCols(filling_start_row, individ_num_samples)
-        = individual_samples[i];
+        = individual_samples[i].matrix();
     filling_start_row += individ_num_samples;
   }
-  const auto tail_len = std::min(0.2 * num_returned_samples,
-                                 3 * std::sqrt(num_returned_samples));
-  Eigen::Array<double, Eigen::Dynamic, 1> weight_vals
-      = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
-  boost::ecuyer1988 rng
-      = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
-  boost::variate_generator<
-      boost::ecuyer1988&,
-      boost::random::discrete_distribution<Eigen::Index, double>>
-      rand_psis_idx(rng,
-                    boost::random::discrete_distribution<Eigen::Index, double>(
-                        boost::iterator_range<double*>(
-                            weight_vals.data(),
-                            weight_vals.data() + weight_vals.size())));
-  for (size_t i = 0; i <= num_multi_draws - 1; ++i) {
-    parameter_writer(samples.col(rand_psis_idx()));
+  double psis_delta_time = 0;
+  if (psis_resample && calculate_lp) {
+    Eigen::Array<double, Eigen::Dynamic, 1> lp_ratios(num_returned_samples);
+    filling_start_row = 0;
+    for (size_t i = 0; i < successful_pathfinders; ++i) {
+      const Eigen::Index individ_num_samples = individual_lp_ratios[i].size();
+      lp_ratios.segment(filling_start_row, individ_num_samples)
+          = individual_lp_ratios[i];
+      filling_start_row += individ_num_samples;
+    }
+
+    const auto tail_len = std::min(0.2 * num_returned_samples,
+                                   3 * std::sqrt(num_returned_samples));
+    Eigen::Array<double, Eigen::Dynamic, 1> weight_vals
+        = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
+    boost::ecuyer1988 rng
+        = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
+    boost::variate_generator<
+        boost::ecuyer1988&,
+        boost::random::discrete_distribution<Eigen::Index, double>>
+        rand_psis_idx(
+            rng, boost::random::discrete_distribution<Eigen::Index, double>(
+                     boost::iterator_range<double*>(
+                         weight_vals.data(),
+                         weight_vals.data() + weight_vals.size())));
+    for (size_t i = 0; i <= num_multi_draws - 1; ++i) {
+      parameter_writer(samples.col(rand_psis_idx()));
+    }
+    const auto end_psis_time = std::chrono::steady_clock::now();
+    psis_delta_time
+        = stan::services::util::duration_diff(start_psis_time, end_psis_time);
+
+  } else {
+    parameter_writer(samples);
   }
-  const auto end_psis_time = std::chrono::steady_clock::now();
-  double psis_delta_time
-      = stan::services::util::duration_diff(start_psis_time, end_psis_time);
   parameter_writer();
   const auto time_header = std::string("Elapsed Time: ");
-  std::string optim_time_str = time_header
-                               + std::to_string(pathfinders_delta_time)
-                               + " seconds (Pathfinders)";
+  std::string optim_time_str
+      = time_header + std::to_string(pathfinders_delta_time)
+        + std::string(" seconds")
+        + ((psis_resample && calculate_lp) ? " (Pathfinders)" : " (Total)");
   parameter_writer(optim_time_str);
-  std::string psis_time_str = std::string(time_header.size(), ' ')
-                              + std::to_string(psis_delta_time)
-                              + " seconds (PSIS)";
-  parameter_writer(psis_time_str);
-  std::string total_time_str
-      = std::string(time_header.size(), ' ')
-        + std::to_string(pathfinders_delta_time + psis_delta_time)
-        + " seconds (Total)";
-  parameter_writer(total_time_str);
+  if (psis_resample && calculate_lp) {
+    std::string psis_time_str = std::string(time_header.size(), ' ')
+                                + std::to_string(psis_delta_time)
+                                + " seconds (PSIS)";
+    parameter_writer(psis_time_str);
+    std::string total_time_str
+        = std::string(time_header.size(), ' ')
+          + std::to_string(pathfinders_delta_time + psis_delta_time)
+          + " seconds (Total)";
+    parameter_writer(total_time_str);
+  }
   parameter_writer();
   return 0;
 }

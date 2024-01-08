@@ -88,11 +88,9 @@ class unique_stream_writer final : public writer {
    * parameters in the rows and samples in the columns. The matrix is then
    * transposed for the output.
    */
-  void operator()(const Eigen::MatrixXd& values) {
+  void operator()(const Eigen::Ref<Eigen::Matrix<double, -1, -1>>& values) {
     if (output_ == nullptr)
       return;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
     *output_ << values.transpose().format(CommaInitFmt);
   }
 
@@ -117,6 +115,12 @@ class unique_stream_writer final : public writer {
   }
 
  private:
+  /**
+   * Comma formatter for writing Eigen matrices
+   */
+  Eigen::IOFormat CommaInitFmt{
+      Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "", "", "\n", "", ""};
+
   /**
    * Output stream
    */
