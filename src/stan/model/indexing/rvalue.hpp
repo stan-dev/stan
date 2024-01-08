@@ -503,10 +503,11 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& row_idx,
  * @return Result of indexing matrix.
  */
 template <
-    typename EigMat, typename RowIndexMulti, typename ColIndexMulti,
+    typename EigMat, typename RowMultiIndex, typename ColMultiIndex,
     require_eigen_dense_dynamic_t<EigMat>* = nullptr,
-    require_all_same_t<RowMultiIndex, ColMultiIndex, index_multi>* = nullptr>
-inline auto rvalue(EigMat&& x, const char* name, RowMultiMulti&& row_idx,
+    require_same_t<RowMultiIndex, index_multi>* = nullptr,
+    require_same_t<ColMultiIndex, index_multi>* = nullptr>
+inline auto rvalue(EigMat&& x, const char* name, RowMultiIndex&& row_idx,
                    ColMultiIndex&& col_idx) {
   const Eigen::Index rows = row_idx.ns_.size();
   const Eigen::Index cols = col_idx.ns_.size();
