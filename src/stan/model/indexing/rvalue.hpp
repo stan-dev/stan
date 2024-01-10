@@ -567,6 +567,7 @@ inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
 template <typename EigMat, typename Idx, typename MultiIndex,
           require_eigen_dense_dynamic_t<EigMat>* = nullptr,
           require_not_same_t<std::decay_t<Idx>, index_uni>* = nullptr,
+          require_not_same_t<std::decay_t<Idx>, index_multi>* = nullptr,
           require_same_t<MultiIndex, index_multi>* = nullptr>
 inline auto rvalue(EigMat&& x, const char* name, Idx&& row_idx,
                    MultiIndex&& col_idx) {
