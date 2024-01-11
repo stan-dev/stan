@@ -164,7 +164,7 @@ inline auto rvalue(EigVec&& v, const char* name, MultiIndex&& idx) {
   return stan::math::make_holder(
       [](auto&& v_ref, auto&& idx_inner) {
         Eigen::Map<const Eigen::Array<int, -1, 1>> idx2(idx_inner.ns_.data(),
-                                                  idx_inner.ns_.size());
+                                                        idx_inner.ns_.size());
         return std::forward<decltype(v_ref)>(v_ref)(idx2 - 1);
       },
       std::forward<fwd_t>(stan::math::to_ref(std::forward<EigVec>(v))),
@@ -282,7 +282,8 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& idx) {
         return x_ref((vec_map(idx_inner.ns_.data(), idx_inner.ns_.size()) - 1),
                      Eigen::all);
       },
-      stan::math::to_ref(std::forward<EigMat>(x)), std::forward<MultiIndex>(idx));
+      stan::math::to_ref(std::forward<EigMat>(x)),
+      std::forward<MultiIndex>(idx));
 }
 
 /**
@@ -487,7 +488,8 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& row_idx,
             (vec_map(row_idx_inner.ns_.data(), row_idx_inner.ns_.size()) - 1),
             col_idx.n_ - 1);
       },
-      stan::math::to_ref(std::forward<EigMat>(x)), std::forward<MultiIndex>(row_idx));
+      stan::math::to_ref(std::forward<EigMat>(x)),
+      std::forward<MultiIndex>(row_idx));
 }
 
 /**
