@@ -157,12 +157,13 @@ template <typename EigVec, typename MultiIndex,
           require_same_t<MultiIndex, index_multi>* = nullptr>
 inline auto rvalue(EigVec&& v, const char* name, MultiIndex&& idx) {
   using fwd_t = decltype(stan::math::to_ref(std::forward<EigVec>(v)));
+  const auto v_size = v.size();
   for (auto idx_i : idx.ns_) {
-    math::check_range("vector[multi] indexing", name, v.size(), idx_i);
+    math::check_range("vector[multi] indexing", name, v_size, idx_i);
   }
   return stan::math::make_holder(
-      [name](auto&& v_ref, auto&& idx_inner) {
-        Eigen::Map<Eigen::Array<int, -1, 1>> idx2(idx_inner.ns_.data(),
+      [](auto&& v_ref, auto&& idx_inner) {
+        Eigen::Map<const Eigen::Array<int, -1, 1>> idx2(idx_inner.ns_.data(),
                                                   idx_inner.ns_.size());
         return std::forward<decltype(v_ref)>(v_ref)(idx2 - 1);
       },
@@ -276,12 +277,12 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& idx) {
     math::check_range("matrix[multi] row indexing", name, x.rows(), idx.ns_[i]);
   }
   return stan::math::make_holder(
-      [&idx](auto&& x_ref, auto&& idx_inner) {
-        using vec_map = Eigen::Map<Eigen::Array<int, -1, 1>>;
+      [](auto&& x_ref, auto&& idx_inner) {
+        using vec_map = Eigen::Map<const Eigen::Array<int, -1, 1>>;
         return x_ref((vec_map(idx_inner.ns_.data(), idx_inner.ns_.size()) - 1),
                      Eigen::all);
       },
-      stan::math::to_ref(x), std::forward<MultiIndex>(idx));
+      stan::math::to_ref(std::forward<EigMat>(x)), std::forward<MultiIndex>(idx));
 }
 
 /**
@@ -438,13 +439,14 @@ inline auto rvalue(EigMat&& x, const char* name, index_uni row_idx,
                    MultiIndex&& col_idx) {
   math::check_range("matrix[uni, multi] row indexing", name, x.rows(),
                     row_idx.n_);
+  const auto x_cols = x.cols();
   for (auto idx_i : col_idx.ns_) {
-    math::check_range("matrix[uni, multi] column indexing", name, x.cols(),
+    math::check_range("matrix[uni, multi] column indexing", name, x_cols,
                       idx_i);
   }
   return stan::math::make_holder(
-      [name, row_idx](auto&& x_ref, auto&& col_idx_inner) {
-        using vec_map = Eigen::Map<Eigen::Array<int, -1, 1>>;
+      [row_idx](auto&& x_ref, auto&& col_idx_inner) {
+        using vec_map = Eigen::Map<const Eigen::Array<int, -1, 1>>;
         return x_ref(
             row_idx.n_ - 1,
             (vec_map(col_idx_inner.ns_.data(), col_idx_inner.ns_.size()) - 1));
@@ -474,17 +476,18 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& row_idx,
                    index_uni col_idx) {
   math::check_range("matrix[multi, uni] column indexing", name, x.cols(),
                     col_idx.n_);
+  const auto x_rows = x.rows();
   for (auto idx_i : row_idx.ns_) {
-    math::check_range("matrix[uni, multi] row indexing", name, x.rows(), idx_i);
+    math::check_range("matrix[uni, multi] row indexing", name, x_rows, idx_i);
   }
   return stan::math::make_holder(
-      [name, col_idx](auto&& x_ref, auto&& row_idx_inner) {
-        using vec_map = Eigen::Map<Eigen::Array<int, -1, 1>>;
+      [col_idx](auto&& x_ref, auto&& row_idx_inner) {
+        using vec_map = Eigen::Map<const Eigen::Array<int, -1, 1>>;
         return x_ref(
             (vec_map(row_idx_inner.ns_.data(), row_idx_inner.ns_.size()) - 1),
             col_idx.n_ - 1);
       },
-      stan::math::to_ref(x), std::forward<MultiIndex>(row_idx));
+      stan::math::to_ref(std::forward<EigMat>(x)), std::forward<MultiIndex>(row_idx));
 }
 
 /**
@@ -510,15 +513,17 @@ inline auto rvalue(EigMat&& x, const char* name, RowMultiIndex&& row_idx,
                    ColMultiIndex&& col_idx) {
   const Eigen::Index rows = row_idx.ns_.size();
   const Eigen::Index cols = col_idx.ns_.size();
+  const auto x_rows = x.rows();
+  const auto x_cols = x.cols();
   for (auto idx_i : row_idx.ns_) {
-    math::check_range("matrix[uni, multi] row indexing", name, x.rows(), idx_i);
+    math::check_range("matrix[uni, multi] row indexing", name, x_rows, idx_i);
   }
   for (auto idx_j : col_idx.ns_) {
-    math::check_range("matrix[uni, multi] col indexing", name, x.cols(), idx_j);
+    math::check_range("matrix[uni, multi] col indexing", name, x_cols, idx_j);
   }
   return stan::math::make_holder(
-      [name](auto&& x_ref, auto&& row_idx_inner, auto&& col_idx_inner) {
-        using vec_map = Eigen::Map<Eigen::Array<int, -1, 1>>;
+      [](auto&& x_ref, auto&& row_idx_inner, auto&& col_idx_inner) {
+        using vec_map = Eigen::Map<const Eigen::Array<int, -1, 1>>;
         return x_ref(
             (vec_map(row_idx_inner.ns_.data(), row_idx_inner.ns_.size()) - 1),
             (vec_map(col_idx_inner.ns_.data(), col_idx_inner.ns_.size()) - 1));
@@ -571,13 +576,14 @@ template <typename EigMat, typename Idx, typename MultiIndex,
           require_same_t<MultiIndex, index_multi>* = nullptr>
 inline auto rvalue(EigMat&& x, const char* name, Idx&& row_idx,
                    MultiIndex&& col_idx) {
+  const auto x_cols = x.cols();
   for (auto idx_j : col_idx.ns_) {
-    math::check_range("matrix[..., multi] column indexing", name, x.cols(),
+    math::check_range("matrix[..., multi] column indexing", name, x_cols,
                       idx_j);
   }
   return stan::math::make_holder(
       [name](auto&& x_ref, auto&& row_idx_inner, auto&& col_idx_inner) {
-        using vec_map = Eigen::Map<Eigen::Array<int, -1, 1>>;
+        using vec_map = Eigen::Map<const Eigen::Array<int, -1, 1>>;
         return rvalue(
             x_ref(Eigen::all,
                   (vec_map(col_idx_inner.ns_.data(), col_idx_inner.ns_.size())
