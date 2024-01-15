@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#include <boost/regex>
+#include <boost/regex.hpp>
 
 namespace stan {
 
