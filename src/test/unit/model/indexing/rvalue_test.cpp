@@ -719,7 +719,7 @@ void vector_multi_test() {
   test_out_of_range(v, index_multi(ns));
 }
 
-TEST(ModelIndexing, x) { vector_multi_test<Eigen::VectorXd>(); }
+TEST(ModelIndexing, rvalueVectorMulti) { vector_multi_test<Eigen::VectorXd>(); }
 
 TEST(ModelIndexing, rvalueRowVectorMulti) {
   vector_multi_test<Eigen::RowVectorXd>();
