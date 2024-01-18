@@ -5,6 +5,19 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.34.0 (16 January 2024)
+======================================================================
+
+ - Resolved an issue in Pathfinder's multithreading which lead to non-reproducible results (#3239)
+ - Improved the human-readability of the output of the JSON writer class (#3227)
+ - Resolved various compiler warnings (#3228, #3234)
+ - Added hooks to adaptive sampler methods to write adapted metric to JSON file. (#3230, #3248)
+ - Changed bfgs and lbfgs's error messaging behavior so that the message is not split between stderr and stdout but is entirely sent to stderr. (#3238)
+ - Fixed a bug in the stan opencl assign tests (#3219)
+ - Updated PSIS to not add back the max and return the unnormalized resample ratios for stability (#3243)
+ - Fixed an issue where trying to compute the potential scale reduction factor on an empty set of draws would lead to a crash (#3246)
+ - Added flags to the Pathfinder service functions for turning off resampling and the calculation of the lp for the approximate draws. (#3249)
+
 v2.33.0 (5 September 2023)
 ======================================================================
 

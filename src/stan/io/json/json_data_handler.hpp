@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#include <regex>
+#include <boost/regex.hpp>
 
 namespace stan {
 
@@ -172,8 +172,8 @@ class json_data_handler : public stan::json::json_handler {
    *  and contain only letters, numbers, or an underscore.
    */
   bool valid_varname(const std::string& name) {
-    static const std::regex re("[a-zA-Z][a-zA-Z0-9_]*");
-    return std::regex_match(name, re);
+    static const boost::regex re("[a-zA-Z][a-zA-Z0-9_]*");
+    return boost::regex_match(name, re);
   }
 
   bool is_array_tuples(const std::vector<std::string>& keys) {
