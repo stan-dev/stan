@@ -820,7 +820,7 @@ inline auto pathfinder_lbfgs_single(
         logger.info(lbfgs_ss);
         lbfgs_ss.str("");
       }
-      throw e;
+      throw;
     }
   }
   if (unlikely(save_iterations)) {
