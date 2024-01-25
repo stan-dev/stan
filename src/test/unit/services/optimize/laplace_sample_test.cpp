@@ -133,7 +133,6 @@ TEST_F(ServicesLaplaceSample, hessianOutput) {
   EXPECT_EQ(count_matches("Hessian", hessian_str), 1);
 }
 
-
 TEST_F(ServicesLaplaceSample, noLP) {
   Eigen::VectorXd theta_hat(2);
   theta_hat << 2, 3;
@@ -154,7 +153,6 @@ TEST_F(ServicesLaplaceSample, noLP) {
   std::string samples_str = sample_ss.str();
   EXPECT_EQ(1, count_matches("log_p__", samples_str));
   EXPECT_EQ(draws, count_matches("nan", samples_str));
-
 }
 
 TEST_F(ServicesLaplaceSample, wrongSizeModeError) {
