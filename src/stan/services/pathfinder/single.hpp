@@ -820,7 +820,12 @@ inline auto pathfinder_lbfgs_single(
         logger.info(lbfgs_ss);
         lbfgs_ss.str("");
       }
-      throw;
+      if (ReturnLpSamples) {
+        throw;
+      } else {
+        logger.error(e.what());
+        return error_codes::SOFTWARE;
+      }
     }
   }
   if (unlikely(save_iterations)) {

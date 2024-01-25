@@ -96,7 +96,16 @@ int bfgs(Model& model, const stan::io::var_context& init,
   if (save_iterations) {
     std::vector<double> values;
     std::stringstream msg;
-    model.write_array(rng, cont_vector, disc_vector, values, true, true, &msg);
+    try {
+      model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                        &msg);
+    } catch (const std::exception& e) {
+      if (msg.str().length() > 0) {
+        logger.info(msg);
+      }
+      logger.error(e.what());
+      return error_codes::SOFTWARE;
+    }
     if (msg.str().length() > 0)
       logger.info(msg);
 
@@ -119,7 +128,13 @@ int bfgs(Model& model, const stan::io::var_context& init,
           "  # evals"
           "  Notes ");
 
-    ret = bfgs.step();
+    try {
+      ret = bfgs.step();
+    } catch (const std::exception& e) {
+      logger.error(e.what());
+      return error_codes::SOFTWARE;
+    }
+
     lp = bfgs.logp();
     bfgs.params_r(cont_vector);
 
@@ -150,8 +165,16 @@ int bfgs(Model& model, const stan::io::var_context& init,
     if (save_iterations) {
       std::vector<double> values;
       std::stringstream msg;
-      model.write_array(rng, cont_vector, disc_vector, values, true, true,
-                        &msg);
+      try {
+        model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                          &msg);
+      } catch (const std::exception& e) {
+        if (msg.str().length() > 0) {
+          logger.info(msg);
+        }
+        logger.error(e.what());
+        return error_codes::SOFTWARE;
+      }
       // This if is here to match the pre-refactor behavior
       if (msg.str().length() > 0)
         logger.info(msg);
@@ -164,7 +187,16 @@ int bfgs(Model& model, const stan::io::var_context& init,
   if (!save_iterations) {
     std::vector<double> values;
     std::stringstream msg;
-    model.write_array(rng, cont_vector, disc_vector, values, true, true, &msg);
+    try {
+      model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                        &msg);
+    } catch (const std::exception& e) {
+      if (msg.str().length() > 0) {
+        logger.info(msg);
+      }
+      logger.error(e.what());
+      return error_codes::SOFTWARE;
+    }
     if (msg.str().length() > 0)
       logger.info(msg);
     values.insert(values.begin(), lp);
