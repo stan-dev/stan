@@ -821,10 +821,14 @@ inline auto pathfinder_lbfgs_single(
         lbfgs_ss.str("");
       }
       if (ReturnLpSamples) {
+        // we want to terminate multi-path pathfinder during these unrecoverable
+        // exceptions
         throw;
       } else {
         logger.error(e.what());
-        return error_codes::SOFTWARE;
+        return internal::ret_pathfinder<ReturnLpSamples>(
+            error_codes::SOFTWARE, Eigen::Array<double, Eigen::Dynamic, 1>(0),
+            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(0, 0), 0);
       }
     }
   }
