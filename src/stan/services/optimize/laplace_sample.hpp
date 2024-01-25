@@ -4,6 +4,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/math/rev.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
@@ -17,9 +18,10 @@ namespace internal {
 
 template <bool jacobian, typename Model>
 void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
-                    int draws, unsigned int random_seed, int refresh,
-                    callbacks::interrupt& interrupt, callbacks::logger& logger,
-                    callbacks::writer& sample_writer) {
+                    int draws, bool calculate_lp, unsigned int random_seed,
+                    int refresh, callbacks::interrupt& interrupt,
+                    callbacks::logger& logger, callbacks::writer& sample_writer,
+                    callbacks::structured_writer& hessian_writer) {
   if (draws <= 0) {
     throw std::domain_error("Number of draws must be > 0; found draws = "
                             + std::to_string(draws));
@@ -72,6 +74,13 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   if (refresh > 0 && log_density_msgs.peek() != std::char_traits<char>::eof())
     logger.info(log_density_msgs);
 
+  interrupt();
+  hessian_writer.begin_record();
+  hessian_writer.write("lp_mode", log_p);
+  hessian_writer.write("gradient", grad);
+  hessian_writer.write("Hessian", hessian);
+  hessian_writer.end_record();
+
   // calculate Cholesky factor and inverse
   interrupt();
   if (refresh > 0) {
@@ -109,7 +118,13 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
       logger.info(write_array_msgs);
     // output draw, log_p, log_q
     std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
-    double log_p = log_density_fun(unc_draw).val();
+
+    double log_p;
+    if (calculate_lp) {
+      log_p = log_density_fun(unc_draw).val();
+    } else {
+      log_p = std::numeric_limits<double>::quiet_NaN();
+    }
     draw.insert(draw.begin(), log_p);
     Eigen::VectorXd diff = unc_draw - theta_hat;
     double log_q = diff.transpose() * half_hessian * diff;
@@ -118,6 +133,58 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   }
 }  // namespace internal
 }  // namespace internal
+
+/**
+ * Take the specified number of draws from the Laplace approximation
+ * for the model at the specified unconstrained mode, writing the
+ * draws, unnormalized log density, and unnormalized density of the
+ * approximation to the sample writer and writing messages to the
+ * logger, returning a return code of zero if successful.
+ *
+ * Interrupts are called between compute-intensive operations.  To
+ * turn off all console messages sent to the logger, set refresh to 0.
+ * If an exception is thrown by the model, the return value is
+ * non-zero, and if refresh > 0, its message is given to the logger as
+ * an error.
+ *
+ * @tparam jacobian `true` to include Jacobian adjustment for
+ * constrained parameters
+ * @tparam Model a Stan model
+ * @param[in] model model from which to sample
+ * @param[in] theta_hat unconstrained mode at which to center the
+ * Laplace approximation
+ * @param[in] draws number of draws to generate
+ * @param[in] calculate_lp whether to calculate the log probability of the
+ * approximate draws
+ * @param[in] random_seed seed for generating random numbers in the
+ * Stan program and in sampling
+ * @param[in] refresh period between iterations at which updates are
+ * given, with a value of 0 turning off all messages
+ * @param[in] interrupt callback for interrupting sampling
+ * @param[in,out] logger callback for writing console messages from
+ * sampler and from Stan programs
+ * @param[in,out] sample_writer callback for writing parameter names
+ * and then draws
+ * @param[in,out] hessian_writer callback for writing the log probability,
+ * gradient, and Hessian at the mode for diagnostic purposes
+ * @return a return code, with 0 indicating success
+ */
+template <bool jacobian, typename Model>
+int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
+                   int draws, bool calculate_lp, unsigned int random_seed,
+                   int refresh, callbacks::interrupt& interrupt,
+                   callbacks::logger& logger, callbacks::writer& sample_writer,
+                   callbacks::structured_writer& hessian_writer) {
+  try {
+    internal::laplace_sample<jacobian>(model, theta_hat, draws, calculate_lp,
+                                       random_seed, refresh, interrupt, logger,
+                                       sample_writer, hessian_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
+  return error_codes::OK;
+}
 
 /**
  * Take the specified number of draws from the Laplace approximation
@@ -155,16 +222,12 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
                    int draws, unsigned int random_seed, int refresh,
                    callbacks::interrupt& interrupt, callbacks::logger& logger,
                    callbacks::writer& sample_writer) {
-  try {
-    internal::laplace_sample<jacobian>(model, theta_hat, draws, random_seed,
-                                       refresh, interrupt, logger,
-                                       sample_writer);
-  } catch (const std::exception& e) {
-    logger.error(e.what());
-    return error_codes::CONFIG;
-  }
-  return error_codes::OK;
+  callbacks::structured_writer dummy_hessian_writer;
+  return laplace_sample<jacobian>(model, theta_hat, draws, true, random_seed,
+                                  refresh, interrupt, logger, sample_writer,
+                                  dummy_hessian_writer);
 }
+
 }  // namespace services
 }  // namespace stan
 
