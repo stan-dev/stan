@@ -96,7 +96,7 @@ pipeline {
         preserveStashes(buildCount: 7)
         parallelsAlwaysFailFast()
         buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30'))
-        disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != "downstream_tests" || env.BRANCH_NAME != "downstream_hotfix")
+        disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != "downstream_tests" && env.BRANCH_NAME != "downstream_hotfix")
     }
     environment {
         GCC = 'g++'
