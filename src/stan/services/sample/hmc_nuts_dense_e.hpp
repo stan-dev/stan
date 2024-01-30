@@ -56,7 +56,7 @@ int hmc_nuts_dense_e(Model& model, const stan::io::var_context& init,
                      callbacks::writer& init_writer,
                      callbacks::writer& sample_writer,
                      callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
@@ -73,7 +73,7 @@ int hmc_nuts_dense_e(Model& model, const stan::io::var_context& init,
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::dense_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::dense_e_nuts<Model, stan::rng_t> sampler(model, rng);
 
   sampler.set_metric(inv_metric);
 
@@ -197,11 +197,11 @@ int hmc_nuts_dense_e(Model& model, size_t num_chains,
         stepsize, stepsize_jitter, max_depth, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0]);
   }
-  std::vector<boost::ecuyer1988> rngs;
+  std::vector<stan::rng_t> rngs;
   rngs.reserve(num_chains);
   std::vector<std::vector<double>> cont_vectors;
   cont_vectors.reserve(num_chains);
-  using sample_t = stan::mcmc::dense_e_nuts<Model, boost::ecuyer1988>;
+  using sample_t = stan::mcmc::dense_e_nuts<Model, stan::rng_t>;
   std::vector<sample_t> samplers;
   samplers.reserve(num_chains);
   try {

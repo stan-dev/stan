@@ -194,11 +194,9 @@ inline int pathfinder_lbfgs_multi(
                                    3 * std::sqrt(num_returned_samples));
     Eigen::Array<double, Eigen::Dynamic, 1> weight_vals
         = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
-    boost::ecuyer1988 rng
-        = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
-    boost::variate_generator<
-        boost::ecuyer1988&,
-        boost::random::discrete_distribution<Eigen::Index, double>>
+    stan::rng_t rng = util::create_rng(random_seed, stride_id);
+    boost::variate_generator<stan::rng_t&, boost::random::discrete_distribution<
+                                               Eigen::Index, double>>
         rand_psis_idx(
             rng, boost::random::discrete_distribution<Eigen::Index, double>(
                      boost::iterator_range<double*>(
