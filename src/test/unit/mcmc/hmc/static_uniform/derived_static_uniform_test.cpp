@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 
 TEST(McmcStaticUniform, unit_e_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::unit_e_point z_init(1);
   z_init.q(0) = 1;
@@ -52,7 +52,7 @@ TEST(McmcStaticUniform, unit_e_transition) {
 }
 
 TEST(McmcStaticUniform, diag_e_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::diag_e_point z_init(1);
   z_init.q(0) = 1;
@@ -89,7 +89,7 @@ TEST(McmcStaticUniform, diag_e_transition) {
 }
 
 TEST(McmcStaticUniform, dense_e_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::dense_e_point z_init(1);
   z_init.q(0) = 1;
@@ -126,7 +126,7 @@ TEST(McmcStaticUniform, dense_e_transition) {
 }
 
 TEST(McmcStaticUniform, softabs_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::softabs_point z_init(1);
   z_init.q(0) = 1;
@@ -163,7 +163,7 @@ TEST(McmcStaticUniform, softabs_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_unit_e_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::unit_e_point z_init(1);
   z_init.q(0) = 1;
@@ -200,7 +200,7 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_diag_e_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::diag_e_point z_init(1);
   z_init.q(0) = 1;
@@ -237,7 +237,7 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_dense_e_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::dense_e_point z_init(1);
   z_init.q(0) = 1;
@@ -274,7 +274,7 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_softabs_e_transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::softabs_point z_init(1);
   z_init.q(0) = 1;

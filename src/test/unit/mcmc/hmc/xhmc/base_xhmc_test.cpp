@@ -221,7 +221,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 }
 
 TEST(McmcXHMCBaseXHMC, transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
+  stan::rng_t base_rng(0);
 
   int model_size = 1;
   double init_momentum = 1.5;

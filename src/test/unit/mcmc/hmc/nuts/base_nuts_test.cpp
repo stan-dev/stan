@@ -333,7 +333,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 }
 
 TEST(McmcNutsBaseNuts, transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
+  stan::rng_t base_rng(0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -373,7 +373,7 @@ TEST(McmcNutsBaseNuts, transition) {
 }
 
 TEST(McmcNutsBaseNuts, transition_egde_momenta) {
-  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
+  stan::rng_t base_rng(0);
 
   int model_size = 1;
   double init_momentum = 1.5;

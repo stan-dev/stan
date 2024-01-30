@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 TEST(McmcUnitEXHMC, build_tree) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::unit_e_point z_init(3);
   z_init.q(0) = 1;
@@ -79,7 +79,7 @@ TEST(McmcUnitEXHMC, build_tree) {
 }
 
 TEST(McmcUnitEXHMC, transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::unit_e_point z_init(3);
   z_init.q(0) = 1;

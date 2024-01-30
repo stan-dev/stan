@@ -309,7 +309,7 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 }
 
 TEST(McmcSoftAbsNuts, transition_test) {
-  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::softabs_point z_init(3);
   z_init.q(0) = 1;
