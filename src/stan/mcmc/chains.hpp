@@ -42,6 +42,7 @@ using Eigen::Dynamic;
  *
  * <p><b>Storage Order</b>: Storage is column/last-index major.
  */
+template <typename Unused = void*>
 class chains {
  private:
   std::vector<std::string> param_names_;
