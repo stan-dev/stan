@@ -10,7 +10,6 @@
 #include <stan/services/util/create_rng.hpp>
 
 TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -58,7 +57,6 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
 }
 
 TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;

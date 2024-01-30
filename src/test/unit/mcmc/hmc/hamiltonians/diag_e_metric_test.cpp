@@ -42,7 +42,6 @@ TEST(McmcDiagEMetric, sample_p) {
 }
 
 TEST(McmcDiagEMetric, gradients) {
-
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
 
   stan::mcmc::diag_e_point z(q.size());
@@ -133,7 +132,6 @@ TEST(McmcDiagEMetric, gradients) {
 
 TEST(McmcDiagEMetric, streams) {
   stan::test::capture_std_streams();
-
 
   Eigen::VectorXd q(2);
   q(0) = 5;

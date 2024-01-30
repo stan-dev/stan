@@ -52,8 +52,8 @@ class advi_test : public ::testing::Test {
 
   stan::variational::advi<stan_model, stan::variational::normal_meanfield,
                           stan::rng_t> *advi_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, stan::rng_t>
-      *advi_fullrank_;
+  stan::variational::advi<stan_model, stan::variational::normal_fullrank,
+                          stan::rng_t> *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream message_stream_;
   std::stringstream parameter_stream_;

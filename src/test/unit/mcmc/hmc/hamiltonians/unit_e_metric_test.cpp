@@ -42,7 +42,6 @@ TEST(McmcUnitEMetric, sample_p) {
 }
 
 TEST(McmcUnitEMetric, gradients) {
-
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
 
   stan::mcmc::unit_e_point z(q.size());

@@ -14,7 +14,8 @@ TEST(BaseHamiltonian, update_potential_gradient) {
   funnel_model_namespace::funnel_model model(data_var_context, 0,
                                              &model_output);
 
-  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, stan::rng_t>
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model,
+                               stan::rng_t>
       metric(model);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();

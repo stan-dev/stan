@@ -12,7 +12,6 @@
 #include <sstream>
 
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -60,7 +59,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -146,7 +144,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -194,7 +191,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;

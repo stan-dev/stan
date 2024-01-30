@@ -60,7 +60,6 @@ TEST(McmcDenseEMetric, sample_p) {
 }
 
 TEST(McmcDenseEMetric, gradients) {
-
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
 
   stan::mcmc::dense_e_point z(q.size());
@@ -152,7 +151,6 @@ TEST(McmcDenseEMetric, gradients) {
 
 TEST(McmcDenseEMetric, streams) {
   stan::test::capture_std_streams();
-
 
   Eigen::VectorXd q(2);
   q(0) = 5;

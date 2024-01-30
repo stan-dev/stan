@@ -8,7 +8,6 @@
 #include <iostream>
 #include <stan/services/util/create_rng.hpp>
 
-
 class advi_test : public ::testing::Test {
  public:
   advi_test()
@@ -56,8 +55,8 @@ class advi_test : public ::testing::Test {
 
   stan::variational::advi<stan_model, stan::variational::normal_meanfield,
                           stan::rng_t> *advi_meanfield_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, stan::rng_t>
-      *advi_fullrank_;
+  stan::variational::advi<stan_model, stan::variational::normal_fullrank,
+                          stan::rng_t> *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream log_stream_;
   std::stringstream parameter_stream_;

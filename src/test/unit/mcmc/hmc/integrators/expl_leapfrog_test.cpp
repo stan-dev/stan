@@ -15,7 +15,6 @@
 // namespace
 //************************************************************
 
-
 class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
  public:
   McmcHmcIntegratorsExplLeapfrogF()
@@ -43,12 +42,12 @@ class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
   stan::callbacks::stream_logger logger;
 
   // integrator under test
-  stan::mcmc::expl_leapfrog<
-      stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t> >
+  stan::mcmc::expl_leapfrog<stan::mcmc::unit_e_metric<
+      command_model_namespace::command_model, stan::rng_t> >
       unit_e_integrator;
 
-  stan::mcmc::expl_leapfrog<
-      stan::mcmc::diag_e_metric<command_model_namespace::command_model, stan::rng_t> >
+  stan::mcmc::expl_leapfrog<stan::mcmc::diag_e_metric<
+      command_model_namespace::command_model, stan::rng_t> >
       diag_e_integrator;
 
   // model
@@ -445,8 +444,8 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
 TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
   stan::test::capture_std_streams();
 
-  typedef stan::mcmc::expl_leapfrog<
-      stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t> >
+  typedef stan::mcmc::expl_leapfrog<stan::mcmc::unit_e_metric<
+      command_model_namespace::command_model, stan::rng_t> >
       integrator;
 
   EXPECT_NO_THROW(integrator i);

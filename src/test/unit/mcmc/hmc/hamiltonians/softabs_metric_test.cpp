@@ -57,7 +57,6 @@ TEST(McmcSoftAbs, sample_p) {
 }
 
 TEST(McmcSoftAbs, gradients) {
-
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
 
   stan::mcmc::softabs_point z(q.size());
