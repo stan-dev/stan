@@ -6,9 +6,8 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <stan/services/util/create_rng.hpp>
 
-typedef boost::ecuyer1988 rng_t;
 
 class advi_test : public ::testing::Test {
  public:
@@ -39,10 +38,10 @@ class advi_test : public ::testing::Test {
     diagnostic_stream_.str("");
 
     advi_meanfield_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_meanfield, rng_t>(
+        stan_model, stan::variational::normal_meanfield, stan::rng_t>(
         *model_, cont_params_, base_rng_, 1, 100, 1, 1);
     advi_fullrank_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_fullrank, rng_t>(
+        stan_model, stan::variational::normal_fullrank, stan::rng_t>(
         *model_, cont_params_, base_rng_, 1, 100, 1, 1);
   }
 
@@ -56,8 +55,8 @@ class advi_test : public ::testing::Test {
   std::string err_msg2;
 
   stan::variational::advi<stan_model, stan::variational::normal_meanfield,
-                          rng_t> *advi_meanfield_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
+                          stan::rng_t> *advi_meanfield_;
+  stan::variational::advi<stan_model, stan::variational::normal_fullrank, stan::rng_t>
       *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream log_stream_;
@@ -69,7 +68,7 @@ class advi_test : public ::testing::Test {
 
  private:
   stan_model *model_;
-  rng_t base_rng_;
+  stan::rng_t base_rng_;
   Eigen::VectorXd cont_params_;
 };
 

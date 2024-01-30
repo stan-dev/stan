@@ -10,7 +10,6 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/variational/advi.hpp>
-#include <boost/random/additive_combine.hpp>
 #include <string>
 #include <vector>
 

@@ -1,4 +1,5 @@
 #include <stan/model/log_prob_grad.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <test/test-models/good/model/parameters.hpp>
@@ -20,7 +21,7 @@ class ModelArrayFunctionsRoundtripTest : public testing::Test {
 
   stan::io::empty_var_context context;
   stan_model model;
-  boost::ecuyer1988 rng;
+  stan::rng_t rng;
   std::unique_ptr<stan::io::var_context> inits;
   std::stringstream out;
 

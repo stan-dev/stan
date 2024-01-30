@@ -9,13 +9,12 @@
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <stan/services/util/create_rng.hpp>
 #include <test/unit/util.hpp>
 
 // namespace
 //************************************************************
 
-typedef boost::ecuyer1988 rng_t;
 
 class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
  public:
@@ -45,11 +44,11 @@ class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
 
   // integrator under test
   stan::mcmc::expl_leapfrog<
-      stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
+      stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t> >
       unit_e_integrator;
 
   stan::mcmc::expl_leapfrog<
-      stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t> >
+      stan::mcmc::diag_e_metric<command_model_namespace::command_model, stan::rng_t> >
       diag_e_integrator;
 
   // model
@@ -72,7 +71,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -104,7 +103,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -136,7 +135,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
   EXPECT_NEAR(z.g(0), 1.67264975797776, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -168,7 +167,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -200,7 +199,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -232,7 +231,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -264,7 +263,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -296,7 +295,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -327,7 +326,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -359,7 +358,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -391,7 +390,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -424,7 +423,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   EXPECT_NEAR(z.g(0), 1.27097196280777, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::diag_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -447,7 +446,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
   stan::test::capture_std_streams();
 
   typedef stan::mcmc::expl_leapfrog<
-      stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
+      stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t> >
       integrator;
 
   EXPECT_NO_THROW(integrator i);
