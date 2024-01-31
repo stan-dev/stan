@@ -32,7 +32,6 @@ Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
     int size = rows * cols;
     Eigen::MatrixXd rankMatrix = Eigen::MatrixXd::Zero(rows, cols);
 
-    // Create a vector of pairs (value, original index)
     std::vector<std::pair<double, int>> valueWithIndex(size);
 
     for (int col = 0; col < cols; ++col) {
@@ -68,21 +67,6 @@ Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
         }
         i = j - 1; // Skip over tied elements
     }
-
-
-    // Eigen::MatrixXd mat(3, 3);
-    // mat << 9, 3, 6,
-    //        4, 7, 2,
-    //        5, 2, 8;
-    // // Print the original matrix
-    // std::cout << "Original matrix:\n" << mat << "\n\n";
-    // Eigen::Map<const Eigen::VectorXd> vec(mat.data(), mat.size());
-    // std::cout << "vec:\n" << vec << std::endl;
-    // // Use stan::math::sort_indices_asc to get the sorting indices
-    // std::vector<int> ranks = math::sort_indices_asc(vec);
-    // Eigen::Map<Eigen::VectorXi> eigen_vec(ranks.data(), ranks.size());
-
-    // std::cout << "Sorted indices:\n" << eigen_vec << std::endl;
      return rankMatrix;
 }
 
