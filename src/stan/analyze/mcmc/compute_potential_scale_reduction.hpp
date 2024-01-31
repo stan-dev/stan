@@ -17,17 +17,18 @@
 namespace stan {
 namespace analyze {
 
-inline double median( Eigen::MatrixXd d){
-    auto r { d.reshaped() };
-    std::sort( r.begin(), r.end() );
-    return r.size() % 2 == 0 ?
-        r.segment( (r.size()-2)/2, 2 ).mean() :
-        r( r.size()/2 );
-}
 
-Eigen::MatrixXd rankTransform(const Eigen::MatrixXd& matrix) {
-    int rows = matrix.rows();
-    int cols = matrix.cols();
+/**
+ * Computes normalized average ranks for draws. Transforming them to normal scores using inverse normal transformation and a fractional offset.
+ * Based on paper https://arxiv.org/abs/1903.08008
+ * @param draws stores chains in columns
+ * @return normal scores for average ranks of draws
+ * 
+ */
+
+Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
+    int rows = draws.rows();
+    int cols = draws.cols();
     int size = rows * cols;
     Eigen::MatrixXd rankMatrix = Eigen::MatrixXd::Zero(rows, cols);
 
@@ -37,11 +38,10 @@ Eigen::MatrixXd rankTransform(const Eigen::MatrixXd& matrix) {
     for (int col = 0; col < cols; ++col) {
         for (int row = 0; row < rows; ++row) {
             int index = col * rows + row; // Calculating linear index in column-major order
-            valueWithIndex[index] = {matrix(row, col), index};
+            valueWithIndex[index] = {draws(row, col), index};
         }
     }
 
-    // Sorting the pairs by value
     std::sort(valueWithIndex.begin(), valueWithIndex.end());
 
     // Assigning average ranks
@@ -58,41 +58,51 @@ Eigen::MatrixXd rankTransform(const Eigen::MatrixXd& matrix) {
         }
 
         double avgRank = sumRanks / count;
+        boost::math::normal_distribution<double> dist; // Standard normal distribution
         for (int k = i; k < j; ++k) {
             int index = valueWithIndex[k].second;
             int row = index % rows; // Adjusting row index for column-major order
             int col = index / rows; // Adjusting column index for column-major order
-            rankMatrix(row, col) = (avgRank - 3.0/8.0) / (size - 2.0 * 3.0/8.0 + 1.0);
-            
+            double p = (avgRank - 3.0/8.0) / (size - 2.0 * 3.0/8.0 + 1.0);
+            rankMatrix(row, col) = boost::math::quantile(dist, p);
         }
         i = j - 1; // Skip over tied elements
     }
 
-    auto ndtri = [](double p) {
-      boost::math::normal_distribution<double> dist; // Standard normal distribution
-      return boost::math::quantile(dist, p); // Inverse CDF (quantile function)
-    };
 
-    rankMatrix = rankMatrix.unaryExpr(ndtri);
-    return rankMatrix;
+    // Eigen::MatrixXd mat(3, 3);
+    // mat << 9, 3, 6,
+    //        4, 7, 2,
+    //        5, 2, 8;
+    // // Print the original matrix
+    // std::cout << "Original matrix:\n" << mat << "\n\n";
+    // Eigen::Map<const Eigen::VectorXd> vec(mat.data(), mat.size());
+    // std::cout << "vec:\n" << vec << std::endl;
+    // // Use stan::math::sort_indices_asc to get the sorting indices
+    // std::vector<int> ranks = math::sort_indices_asc(vec);
+    // Eigen::Map<Eigen::VectorXi> eigen_vec(ranks.data(), ranks.size());
+
+    // std::cout << "Sorted indices:\n" << eigen_vec << std::endl;
+     return rankMatrix;
 }
 
- 
-inline double rhat(const Eigen::MatrixXd& draws) {
-  using boost::accumulators::accumulator_set;
-  using boost::accumulators::stats;
-  using boost::accumulators::tag::mean;
-  using boost::accumulators::tag::variance;
 
+/**
+ * Computes square root of marginal posterior variance of the estimand by weigted average of within-chain variance W and between-chain variance B.
+ * 
+ * @param draws stores chains in columns
+ * @return square root of ((N-1)/N)W + B/N
+ * 
+ */
+inline double rhat(const Eigen::MatrixXd& draws) {
   int num_chains = draws.cols();
   int num_draws = draws.rows();
-  std::cout << num_chains << " " << num_draws << std::endl;
   Eigen::VectorXd chain_mean(num_chains);
-  accumulator_set<double, stats<variance>> acc_chain_mean;
+  boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::variance>> acc_chain_mean;
   Eigen::VectorXd chain_var(num_chains);
   double unbiased_var_scale = num_draws / (num_draws - 1.0);
   for (int chain = 0; chain < num_chains; ++chain) {
-    accumulator_set<double, stats<mean, variance>> acc_draw;
+    boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean, boost::accumulators::tag::variance>> acc_draw;
     for (int n = 0; n < num_draws; ++n) {
       acc_draw(draws(n, chain));
     }
@@ -105,7 +115,6 @@ inline double rhat(const Eigen::MatrixXd& draws) {
                        * num_chains / (num_chains - 1);
   double var_within = chain_var.mean();
 
-  // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
   return sqrt((var_between / var_within + num_draws - 1) / num_draws);
 }
 
@@ -128,13 +137,9 @@ inline double rhat(const Eigen::MatrixXd& draws) {
  * @return potential scale reduction for the specified parameter
  */
 
-
 inline double compute_potential_scale_reduction(
     std::vector<const double*> draws, std::vector<size_t> sizes) {
-    std::cout << "DRAWS POINTERS: " << std::endl;
-    for (int i = 0; i < draws.size(); ++i) {
-      std::cout << "Index: " << i << " P: " << draws[i] << " EXPECTED END: " << draws[i] + sizes[i] << std::endl;
-    }
+    
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   if (num_draws == 0) {
@@ -175,15 +180,16 @@ inline double compute_potential_scale_reduction(
 
   Eigen::MatrixXd matrix(num_draws, num_chains);
 
-    // Copy data from arrays to matrix
     for (int col = 0; col < num_chains; ++col) {
         for (int row = 0; row < num_draws; ++row) {
             matrix(row, col) = draws[col][row];
         }
     }
 
-  double rhat_bulk = rhat(rankTransform(matrix));
-  double rhat_tail = rhat(rankTransform((matrix.array() - median(matrix)).abs()));
+  double rhat_bulk = rhat(rank_transform(matrix));
+  double rhat_tail = rhat(rank_transform((matrix.array() - math::quantile(matrix.reshaped() , 0.5)).abs()));
+  
+  std::cout << "bulk, tail: " << rhat_bulk << " " << rhat_tail << std::endl;
   return std::max(rhat_bulk, rhat_tail);
 }
 
