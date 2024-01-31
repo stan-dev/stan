@@ -1,7 +1,7 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <test/unit/util.hpp>
@@ -95,12 +95,12 @@ class random_var_context : public testing::Test {
   random_var_context()
       : empty_context(),
         model(empty_context, 0, static_cast<std::stringstream*>(0)),
-        rng(0),
+        rng(stan::services::util::create_rng(0, 0)),
         throwing_model() {}
 
   stan::io::empty_var_context empty_context;
   stan_model model;
-  boost::ecuyer1988 rng;
+  stan::rng_t rng;
   test::mock_throwing_model_in_write_array throwing_model;
 };
 

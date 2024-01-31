@@ -97,7 +97,7 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   }
   // generate draws
   std::stringstream refresh_msg;
-  boost::ecuyer1988 rng = util::create_rng(random_seed, 0);
+  stan::rng_t rng = util::create_rng(random_seed, 0);
   Eigen::VectorXd draw_vec;  // declare draw_vec, msgs here to avoid re-alloc
   for (int m = 0; m < draws; ++m) {
     interrupt();  // allow interpution each iteration

@@ -3,20 +3,18 @@
 #include <stan/mcmc/hmc/nuts/base_nuts.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <vector>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
-
-typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
 namespace mcmc {
 
-class mock_nuts
-    : public base_nuts<mock_model, mock_hamiltonian, mock_integrator, rng_t> {
+class mock_nuts : public base_nuts<mock_model, mock_hamiltonian,
+                                   mock_integrator, stan::rng_t> {
  public:
-  mock_nuts(const mock_model& m, rng_t& rng)
-      : base_nuts<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m,
-                                                                        rng) {}
+  mock_nuts(const mock_model& m, stan::rng_t& rng)
+      : base_nuts<mock_model, mock_hamiltonian, mock_integrator, stan::rng_t>(
+          m, rng) {}
 
   bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
                          Eigen::VectorXd& p_sharp_plus, Eigen::VectorXd& rho) {
@@ -24,13 +22,13 @@ class mock_nuts
   }
 };
 
-class rho_inspector_mock_nuts
-    : public base_nuts<mock_model, mock_hamiltonian, mock_integrator, rng_t> {
+class rho_inspector_mock_nuts : public base_nuts<mock_model, mock_hamiltonian,
+                                                 mock_integrator, stan::rng_t> {
  public:
   std::vector<double> rho_values;
-  rho_inspector_mock_nuts(const mock_model& m, rng_t& rng)
-      : base_nuts<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m,
-                                                                        rng) {}
+  rho_inspector_mock_nuts(const mock_model& m, stan::rng_t& rng)
+      : base_nuts<mock_model, mock_hamiltonian, mock_integrator, stan::rng_t>(
+          m, rng) {}
 
   bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
                          Eigen::VectorXd& p_sharp_plus, Eigen::VectorXd& rho) {
@@ -40,13 +38,14 @@ class rho_inspector_mock_nuts
 };
 
 class edge_inspector_mock_nuts
-    : public base_nuts<mock_model, mock_hamiltonian, mock_integrator, rng_t> {
+    : public base_nuts<mock_model, mock_hamiltonian, mock_integrator,
+                       stan::rng_t> {
  public:
   std::vector<double> p_sharp_minus_values;
   std::vector<double> p_sharp_plus_values;
-  edge_inspector_mock_nuts(const mock_model& m, rng_t& rng)
-      : base_nuts<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m,
-                                                                        rng) {}
+  edge_inspector_mock_nuts(const mock_model& m, stan::rng_t& rng)
+      : base_nuts<mock_model, mock_hamiltonian, mock_integrator, stan::rng_t>(
+          m, rng) {}
 
   bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
                          Eigen::VectorXd& p_sharp_plus, Eigen::VectorXd& rho) {
@@ -92,18 +91,18 @@ class divergent_hamiltonian : public base_hamiltonian<M, ps_point, BaseRNG> {
 };
 
 class divergent_nuts : public base_nuts<mock_model, divergent_hamiltonian,
-                                        expl_leapfrog, rng_t> {
+                                        expl_leapfrog, stan::rng_t> {
  public:
-  divergent_nuts(const mock_model& m, rng_t& rng)
-      : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog, rng_t>(
-          m, rng) {}
+  divergent_nuts(const mock_model& m, stan::rng_t& rng)
+      : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,
+                  stan::rng_t>(m, rng) {}
 };
 
 }  // namespace mcmc
 }  // namespace stan
 
 TEST(McmcNutsBaseNuts, set_max_depth_test) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -123,7 +122,7 @@ TEST(McmcNutsBaseNuts, set_max_depth_test) {
 }
 
 TEST(McmcNutsBaseNuts, set_max_delta_test) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -138,7 +137,7 @@ TEST(McmcNutsBaseNuts, set_max_delta_test) {
 }
 
 TEST(McmcNutsBaseNuts, build_tree_test) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -199,7 +198,7 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
 }
 
 TEST(McmcNutsBaseNuts, rho_aggregation_test) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -267,7 +266,7 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
 }
 
 TEST(McmcNutsBaseNuts, divergence_test) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -334,7 +333,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 }
 
 TEST(McmcNutsBaseNuts, transition) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng(0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -374,7 +373,7 @@ TEST(McmcNutsBaseNuts, transition) {
 }
 
 TEST(McmcNutsBaseNuts, transition_egde_momenta) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng(0);
 
   int model_size = 1;
   double init_momentum = 1.5;

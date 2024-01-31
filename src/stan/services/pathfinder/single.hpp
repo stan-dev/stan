@@ -221,7 +221,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
                                    size_t num_samples, const EigVec& alpha,
                                    const std::string& iter_msg, Logger&& logger,
                                    bool calculate_lp = true) {
-  boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
+  boost::variate_generator<stan::rng_t&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls = 0;
@@ -607,8 +607,7 @@ inline auto pathfinder_lbfgs_single(
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer, bool calculate_lp = true) {
   const auto start_pathfinder_time = std::chrono::steady_clock::now();
-  boost::ecuyer1988 rng
-      = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
+  stan::rng_t rng = util::create_rng(random_seed, stride_id);
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
 

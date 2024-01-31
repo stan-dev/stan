@@ -63,7 +63,7 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
   util::gq_writer writer(sample_writer, logger, p_names.size());
   writer.write_gq_names(model);
 
-  boost::ecuyer1988 rng = util::create_rng(seed, 1);
+  stan::rng_t rng = util::create_rng(seed, 1);
 
   std::vector<double> unconstrained_params_r;
   std::vector<double> row(draws.cols());
@@ -125,7 +125,7 @@ int standalone_generate(const Model &model, const int num_chains,
   }
   std::vector<util::gq_writer> writers;
   writers.reserve(num_chains);
-  std::vector<boost::ecuyer1988> rngs;
+  std::vector<stan::rng_t> rngs;
   rngs.reserve(num_chains);
   for (int i = 0; i < num_chains; ++i) {
     if (draws[i].size() == 0) {

@@ -10,7 +10,6 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/variational/advi.hpp>
-#include <boost/random/additive_combine.hpp>
 #include <string>
 #include <vector>
 
@@ -60,7 +59,7 @@ int meanfield(Model& model, const stan::io::var_context& init,
               callbacks::writer& diagnostic_writer) {
   util::experimental_message(logger);
 
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
@@ -83,7 +82,7 @@ int meanfield(Model& model, const stan::io::var_context& init,
       = Eigen::Map<Eigen::VectorXd>(&cont_vector[0], cont_vector.size(), 1);
 
   stan::variational::advi<Model, stan::variational::normal_meanfield,
-                          boost::ecuyer1988>
+                          stan::rng_t>
       cmd_advi(model, cont_params, rng, grad_samples, elbo_samples, eval_elbo,
                output_samples);
   cmd_advi.run(eta, adapt_engaged, adapt_iterations, tol_rel_obj,

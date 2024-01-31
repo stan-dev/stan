@@ -2,28 +2,26 @@
 #include <stan/mcmc/hmc/static/base_static_hmc.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
-
-typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
 namespace mcmc {
 
 // Mock Static HMC
 class mock_static_hmc : public base_static_hmc<mock_model, mock_hamiltonian,
-                                               mock_integrator, rng_t> {
+                                               mock_integrator, stan::rng_t> {
  public:
-  mock_static_hmc(const mock_model& m, rng_t& rng)
-      : base_static_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>(
-          m, rng) {}
+  mock_static_hmc(const mock_model& m, stan::rng_t& rng)
+      : base_static_hmc<mock_model, mock_hamiltonian, mock_integrator,
+                        stan::rng_t>(m, rng) {}
 };
 
 }  // namespace mcmc
 }  // namespace stan
 
 TEST(McmcStaticBaseStaticHMC, set_nominal_stepsize) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   std::vector<double> q(5, 1.0);
   std::vector<int> r(2, 2);
@@ -43,7 +41,7 @@ TEST(McmcStaticBaseStaticHMC, set_nominal_stepsize) {
 }
 
 TEST(McmcStaticBaseStaticHMC, set_T) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   std::vector<double> q(5, 1.0);
   std::vector<int> r(2, 2);
@@ -63,7 +61,7 @@ TEST(McmcStaticBaseStaticHMC, set_T) {
 }
 
 TEST(McmcStaticBaseStaticHMC, set_nominal_stepsize_and_T) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   std::vector<double> q(5, 1.0);
   std::vector<int> r(2, 2);
@@ -90,7 +88,7 @@ TEST(McmcStaticBaseStaticHMC, set_nominal_stepsize_and_T) {
 }
 
 TEST(McmcStaticBaseStaticHMC, set_nominal_stepsize_and_L) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   std::vector<double> q(5, 1.0);
   std::vector<int> r(2, 2);

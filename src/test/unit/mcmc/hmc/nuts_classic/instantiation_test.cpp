@@ -6,16 +6,14 @@
 #include <stan/mcmc/hmc/nuts_classic/adapt_unit_e_nuts_classic.hpp>
 #include <stan/mcmc/hmc/nuts_classic/adapt_diag_e_nuts_classic.hpp>
 #include <stan/mcmc/hmc/nuts_classic/adapt_dense_e_nuts_classic.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <fstream>
 
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
-
 TEST(McmcNutsClassic, instantiaton_test) {
-  rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   std::stringstream output;
   stan::callbacks::stream_writer writer(output);
@@ -25,25 +23,27 @@ TEST(McmcNutsClassic, instantiaton_test) {
   stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
-  stan::mcmc::unit_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
+  stan::mcmc::unit_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
+                                  stan::rng_t>
       unit_e_sampler(model, base_rng);
 
-  stan::mcmc::diag_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
+  stan::mcmc::diag_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
+                                  stan::rng_t>
       diag_e_sampler(model, base_rng);
 
   stan::mcmc::dense_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
-                                   rng_t>
+                                   stan::rng_t>
       dense_e_sampler(model, base_rng);
 
   stan::mcmc::adapt_unit_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
-                                        rng_t>
+                                        stan::rng_t>
       adapt_unit_e_sampler(model, base_rng);
 
   stan::mcmc::adapt_diag_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
-                                        rng_t>
+                                        stan::rng_t>
       adapt_diag_e_sampler(model, base_rng);
 
   stan::mcmc::adapt_dense_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
-                                         rng_t>
+                                         stan::rng_t>
       adapt_dense_e_sampler(model, base_rng);
 }

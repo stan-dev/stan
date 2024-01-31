@@ -1,4 +1,5 @@
 #include <stan/services/util/run_sampler.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/io/empty_var_context.hpp>
@@ -73,7 +74,7 @@ class ServicesUtil : public testing::Test {
   stan::io::empty_var_context context;
   stan_model model;
   std::vector<double> cont_vector;
-  boost::ecuyer1988 rng;
+  stan::rng_t rng;
   stan::test::unit::instrumented_interrupt interrupt;
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
   stan::test::unit::instrumented_logger logger;
