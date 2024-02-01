@@ -173,7 +173,6 @@ inline double compute_potential_scale_reduction(
   double rhat_bulk = rhat(rank_transform(matrix));
   double rhat_tail = rhat(rank_transform((matrix.array() - math::quantile(matrix.reshaped() , 0.5)).abs()));
   
-  std::cout << "bulk, tail: " << rhat_bulk << " " << rhat_tail << std::endl;
   return std::max(rhat_bulk, rhat_tail);
 }
 
