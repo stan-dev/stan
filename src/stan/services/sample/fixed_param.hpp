@@ -49,7 +49,7 @@ int fixed_param(Model& model, const stan::io::var_context& init,
                 callbacks::writer& init_writer,
                 callbacks::writer& sample_writer,
                 callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
@@ -134,7 +134,7 @@ int fixed_param(Model& model, const std::size_t num_chains,
                        init_writer[0], sample_writers[0],
                        diagnostic_writers[0]);
   }
-  std::vector<boost::ecuyer1988> rngs;
+  std::vector<stan::rng_t> rngs;
   std::vector<Eigen::VectorXd> cont_vectors;
   std::vector<util::mcmc_writer> writers;
   std::vector<stan::mcmc::sample> samples;

@@ -1,7 +1,6 @@
 #include <stan/mcmc/chains.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
-#include <boost/random/additive_combine.hpp>
 #include <set>
 #include <exception>
 #include <utility>

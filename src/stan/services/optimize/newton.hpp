@@ -44,7 +44,7 @@ int newton(Model& model, const stan::io::var_context& init,
            callbacks::interrupt& interrupt, callbacks::logger& logger,
            callbacks::writer& init_writer,
            callbacks::writer& parameter_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;

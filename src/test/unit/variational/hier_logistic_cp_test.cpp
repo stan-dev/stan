@@ -2,14 +2,13 @@
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
 
-typedef boost::ecuyer1988 rng_t;
 typedef hier_logistic_cp_model_namespace::hier_logistic_cp_model Model_cp;
 
 TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
@@ -27,13 +26,14 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   Model_cp my_model(data_var_context);
 
   // RNG
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(my_model.num_params_r());
 
   // ADVI
-  stan::variational::advi<Model_cp, stan::variational::normal_meanfield, rng_t>
+  stan::variational::advi<Model_cp, stan::variational::normal_meanfield,
+                          stan::rng_t>
       test_advi(my_model, cont_params, base_rng, 10, 100, 100, 1);
 
   stan::callbacks::writer writer;

@@ -1,14 +1,12 @@
 #include <test/test-models/good/variational/eta_should_be_big.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
-
-typedef boost::ecuyer1988 rng_t;
 
 class eta_adapt_big_test : public ::testing::Test {
  public:
@@ -28,11 +26,11 @@ class eta_adapt_big_test : public ::testing::Test {
     log_stream_.str("");
 
     advi_meanfield_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_meanfield, rng_t>(
+        stan_model, stan::variational::normal_meanfield, stan::rng_t>(
         *model_, cont_params_, base_rng_, 1, 100, 100, 1);
 
     advi_fullrank_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_fullrank, rng_t>(
+        stan_model, stan::variational::normal_fullrank, stan::rng_t>(
         *model_, cont_params_, base_rng_, 1, 100, 100, 1);
   }
 
@@ -43,15 +41,15 @@ class eta_adapt_big_test : public ::testing::Test {
   }
 
   stan::variational::advi<stan_model, stan::variational::normal_meanfield,
-                          rng_t> *advi_meanfield_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
-      *advi_fullrank_;
+                          stan::rng_t> *advi_meanfield_;
+  stan::variational::advi<stan_model, stan::variational::normal_fullrank,
+                          stan::rng_t> *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream log_stream_;
   stan::callbacks::stream_logger logger;
 
   stan_model *model_;
-  rng_t base_rng_;
+  stan::rng_t base_rng_;
   Eigen::VectorXd cont_params_;
 };
 

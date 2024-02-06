@@ -192,7 +192,7 @@ TEST_F(ServicesPathfinderEightSchools, single) {
 
   Eigen::MatrixXd r_constrainted_draws_mat(20, 100);
   {
-    auto rng = stan::services::util::create_rng<boost::ecuyer1988>(0123, 0);
+    stan::rng_t rng = stan::services::util::create_rng(0123, 0);
     auto fn = [&model = ServicesPathfinderEightSchools::model](auto&& u) {
       return -model.log_prob_propto_jacobian(u, 0);
     };

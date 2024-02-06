@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -98,6 +99,60 @@ TEST_F(ServicesLaplaceSample, values) {
   }
   double cov = sum12 / draws;
   EXPECT_NEAR(0.8, cov, 0.05);
+}
+
+struct deleter_noop {
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
+};
+
+TEST_F(ServicesLaplaceSample, hessianOutput) {
+  Eigen::VectorXd theta_hat(2);
+  theta_hat << 2, 3;
+  int draws = 10;
+  bool calculate_lp = true;
+  unsigned int seed = 1234;
+  int refresh = 100;
+  std::stringstream sample_ss;
+  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+
+  std::stringstream hessian_ss;
+  stan::callbacks::json_writer<std::stringstream, deleter_noop> hessian_writer{
+      std::unique_ptr<std::stringstream, deleter_noop>(&hessian_ss)};
+
+  int return_code = stan::services::laplace_sample<true>(
+      *model, theta_hat, draws, calculate_lp, seed, refresh, interrupt, logger,
+      sample_writer, hessian_writer);
+  EXPECT_EQ(stan::services::error_codes::OK, return_code);
+
+  std::string hessian_str = hessian_ss.str();
+
+  ASSERT_TRUE(stan::test::is_valid_JSON(hessian_str));
+  EXPECT_EQ(count_matches("lp_mode", hessian_str), 1);
+  EXPECT_EQ(count_matches("gradient", hessian_str), 1);
+  EXPECT_EQ(count_matches("Hessian", hessian_str), 1);
+}
+
+TEST_F(ServicesLaplaceSample, noLP) {
+  Eigen::VectorXd theta_hat(2);
+  theta_hat << 2, 3;
+  unsigned int seed = 1234;
+  int refresh = 100;
+  std::stringstream sample_ss;
+  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::structured_writer dummy_hessian_writer;
+
+  int draws = 11;
+  bool calculate_lp = false;
+
+  int return_code = stan::services::laplace_sample<true>(
+      *model, theta_hat, draws, calculate_lp, seed, refresh, interrupt, logger,
+      sample_writer, dummy_hessian_writer);
+  EXPECT_EQ(stan::services::error_codes::OK, return_code);
+
+  std::string samples_str = sample_ss.str();
+  EXPECT_EQ(1, count_matches("log_p__", samples_str));
+  EXPECT_EQ(draws, count_matches("nan", samples_str));
 }
 
 TEST_F(ServicesLaplaceSample, wrongSizeModeError) {

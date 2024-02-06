@@ -64,7 +64,7 @@ int hmc_static_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
@@ -80,8 +80,7 @@ int hmc_static_diag_e_adapt(
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::adapt_diag_e_static_hmc<Model, boost::ecuyer1988> sampler(model,
-                                                                        rng);
+  stan::mcmc::adapt_diag_e_static_hmc<Model, stan::rng_t> sampler(model, rng);
 
   sampler.set_metric(inv_metric);
   sampler.set_nominal_stepsize_and_T(stepsize, int_time);

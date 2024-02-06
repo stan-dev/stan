@@ -1,16 +1,14 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/xhmc/softabs_xhmc.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <fstream>
 
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
-
 TEST(McmcUnitEXHMC, build_tree) {
-  rng_t base_rng(4839294);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::softabs_point z_init(3);
   z_init.q(0) = 1;
@@ -26,7 +24,7 @@ TEST(McmcUnitEXHMC, build_tree) {
   stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
-  stan::mcmc::softabs_xhmc<gauss3D_model_namespace::gauss3D_model, rng_t>
+  stan::mcmc::softabs_xhmc<gauss3D_model_namespace::gauss3D_model, stan::rng_t>
       sampler(model, base_rng);
 
   sampler.z() = z_init;
@@ -81,7 +79,7 @@ TEST(McmcUnitEXHMC, build_tree) {
 }
 
 TEST(McmcUnitEXHMC, transition) {
-  rng_t base_rng(4839294);
+  stan::rng_t base_rng(4839294);
 
   stan::mcmc::softabs_point z_init(3);
   z_init.q(0) = 1;
@@ -97,7 +95,7 @@ TEST(McmcUnitEXHMC, transition) {
   stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
-  stan::mcmc::softabs_xhmc<gauss3D_model_namespace::gauss3D_model, rng_t>
+  stan::mcmc::softabs_xhmc<gauss3D_model_namespace::gauss3D_model, stan::rng_t>
       sampler(model, base_rng);
 
   sampler.z() = z_init;

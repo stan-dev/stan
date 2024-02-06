@@ -2,20 +2,18 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/xhmc/base_xhmc.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
-
-typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
 namespace mcmc {
 
-class mock_xhmc
-    : public base_xhmc<mock_model, mock_hamiltonian, mock_integrator, rng_t> {
+class mock_xhmc : public base_xhmc<mock_model, mock_hamiltonian,
+                                   mock_integrator, stan::rng_t> {
  public:
-  mock_xhmc(const mock_model& m, rng_t& rng)
-      : base_xhmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m,
-                                                                        rng) {}
+  mock_xhmc(const mock_model& m, stan::rng_t& rng)
+      : base_xhmc<mock_model, mock_hamiltonian, mock_integrator, stan::rng_t>(
+          m, rng) {}
 };
 
 // Mock Hamiltonian
@@ -54,18 +52,18 @@ class divergent_hamiltonian : public base_hamiltonian<M, ps_point, BaseRNG> {
 };
 
 class divergent_xhmc : public base_xhmc<mock_model, divergent_hamiltonian,
-                                        expl_leapfrog, rng_t> {
+                                        expl_leapfrog, stan::rng_t> {
  public:
-  divergent_xhmc(const mock_model& m, rng_t& rng)
-      : base_xhmc<mock_model, divergent_hamiltonian, expl_leapfrog, rng_t>(
-          m, rng) {}
+  divergent_xhmc(const mock_model& m, stan::rng_t& rng)
+      : base_xhmc<mock_model, divergent_hamiltonian, expl_leapfrog,
+                  stan::rng_t>(m, rng) {}
 };
 
 }  // namespace mcmc
 }  // namespace stan
 
 TEST(McmcXHMCBaseXHMC, set_max_depth) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -83,7 +81,7 @@ TEST(McmcXHMCBaseXHMC, set_max_depth) {
 }
 
 TEST(McmcXHMCBaseXHMC, set_max_deltaH) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -98,7 +96,7 @@ TEST(McmcXHMCBaseXHMC, set_max_deltaH) {
 }
 
 TEST(McmcXHMCBaseXHMC, set_x_delta) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -113,7 +111,7 @@ TEST(McmcXHMCBaseXHMC, set_x_delta) {
 }
 
 TEST(McmcXHMCBaseXHMC, build_tree) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -164,7 +162,7 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
 }
 
 TEST(McmcXHMCBaseXHMC, divergence_test) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -223,7 +221,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 }
 
 TEST(McmcXHMCBaseXHMC, transition) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng(0);
 
   int model_size = 1;
   double init_momentum = 1.5;
