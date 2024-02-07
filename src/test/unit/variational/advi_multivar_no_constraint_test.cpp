@@ -1,6 +1,7 @@
 #include <test/test-models/good/variational/multivariate_no_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -11,10 +12,7 @@ typedef multivariate_no_constraint_model_namespace::
     multivariate_no_constraint_model Model;
 
 TEST(advi_test, multivar_no_constraint_fullrank) {
-  // Create mock data_var_context
-  static const std::string DATA = "";
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   // Instantiate model
   Model my_model(dummy_context);
@@ -130,10 +128,7 @@ TEST(advi_test, multivar_no_constraint_fullrank) {
 }
 
 TEST(advi_test, multivar_no_constraint_meanfield) {
-  // Create mock data_var_context
-  static const std::string DATA = "";
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   // Instantiate model
   Model my_model(dummy_context);
