@@ -3,6 +3,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -14,9 +15,9 @@ typedef hier_logistic_cp_model_namespace::hier_logistic_cp_model Model_cp;
 TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   // Create mock data_var_context
   std::fstream data_stream(
-      "src/test/test-models/good/variational/hier_logistic.data.R",
+      "src/test/test-models/good/variational/hier_logistic.data.json",
       std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
+  stan::json::json_data data_var_context(data_stream);
   data_stream.close();
 
   std::stringstream output;

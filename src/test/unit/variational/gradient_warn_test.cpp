@@ -3,6 +3,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <stan/io/json/json_data.hpp>
 
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
@@ -20,9 +21,9 @@ class advi_test : public ::testing::Test {
 
   void SetUp() {
     std::fstream data_stream(
-        "src/test/test-models/good/variational/gradient_warn.data.R",
+        "src/test/test-models/good/variational/gradient_warn.data.json",
         std::fstream::in);
-    stan::io::dump data_var_context(data_stream);
+    stan::json::json_data data_var_context(data_stream);
     data_stream.close();
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);
