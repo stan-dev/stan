@@ -3,7 +3,6 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
-#include <stan/io/dump.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/services/error_codes.hpp>

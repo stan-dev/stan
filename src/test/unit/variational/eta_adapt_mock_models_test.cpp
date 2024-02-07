@@ -1,6 +1,5 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
-#include <stan/io/dump.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
