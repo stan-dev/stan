@@ -141,7 +141,7 @@ TEST(advi_test, univar_with_constraint_fullrank) {
 
 TEST(advi_test, univar_with_constraint_meanfield) {
   stan::io::empty_var_context dummy_context;
-  
+
   // Instantiate model
   Model my_model(dummy_context);
 

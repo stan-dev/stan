@@ -148,8 +148,7 @@ int hmc_static_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  auto dmp
-      = util::create_unit_e_dense_inv_metric(model.num_params_r());
+  auto dmp = util::create_unit_e_dense_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;
 
   return hmc_static_dense_e_adapt(

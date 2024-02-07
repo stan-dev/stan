@@ -16,7 +16,7 @@ class eta_adapt_big_test : public ::testing::Test {
                log_stream_) {}
 
   void SetUp() {
-  stan::io::empty_var_context data_var_context;
+    stan::io::empty_var_context data_var_context;
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());
