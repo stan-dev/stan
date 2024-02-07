@@ -1,6 +1,7 @@
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/io/empty_var_context.hpp>
+#include <stan/io/dump.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/check_adaptation.hpp>
@@ -46,7 +47,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_no_adapt) {
       interrupt, logger, init, parameter, diagnostic);
   EXPECT_EQ(0, return_code);
 
-  stan::io::dump dmp = stan::services::util::create_unit_e_dense_inv_metric(3);
+  auto dmp = stan::services::util::create_unit_e_dense_inv_metric(3);
   stan::io::var_context& inv_metric = dmp;
   std::vector<double> dense_vals = inv_metric.vals_r("inv_metric");
   // check returned Euclidean metric

@@ -121,7 +121,7 @@ int hmc_static_diag_e(Model& model, const stan::io::var_context& init,
                       callbacks::logger& logger, callbacks::writer& init_writer,
                       callbacks::writer& sample_writer,
                       callbacks::writer& diagnostic_writer) {
-  stan::io::dump dmp
+  auto dmp
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;
 
