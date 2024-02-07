@@ -1,7 +1,7 @@
 #include <stan/services/sample/hmc_static_dense_e_adapt.hpp>
 #include <stan/services/sample/hmc_static_dense_e.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/check_adaptation.hpp>
@@ -100,14 +100,17 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_metric_no_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  std::string txt
-      = "inv_metric <- structure(c("
-        " 0.926739, 0.0734898, -0.12395, "
-        " 0.0734898, 0.876038, -0.051543, "
-        " -0.12395, -0.051543, 0.8274 "
-        "), .Dim  = c(3,3))";
+  std::string txt = R"json(
+{
+  "inv_metric": [
+    [0.926739, 0.0734898, -0.12395],
+    [0.0734898, 0.876038, -0.051543],
+    [-0.12395, -0.051543, 0.8274]
+  ]
+}
+)json";
   std::stringstream in(txt);
-  stan::io::dump dump(in);
+  stan::json::json_data dump(in);
   stan::io::var_context& inv_metric = dump;
 
   int return_code = stan::services::sample::hmc_static_dense_e(
@@ -144,14 +147,17 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_metric_skip_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  std::string txt
-      = "inv_metric <- structure(c("
-        " 0.926739, 0.0734898, -0.12395, "
-        " 0.0734898, 0.876038, -0.051543, "
-        " -0.12395, -0.051543, 0.8274 "
-        "), .Dim  = c(3,3))";
+  std::string txt = R"json(
+{
+  "inv_metric": [
+    [0.926739, 0.0734898, -0.12395],
+    [0.0734898, 0.876038, -0.051543],
+    [-0.12395, -0.051543, 0.8274]
+  ]
+}
+)json";
   std::stringstream in(txt);
-  stan::io::dump dump(in);
+  stan::json::json_data dump(in);
   stan::io::var_context& inv_metric = dump;
 
   int return_code = stan::services::sample::hmc_static_dense_e_adapt(
