@@ -18,7 +18,8 @@ TEST(inv_metric, create_diag_sz0) {
 }
 
 TEST(inv_metric, create_diag_sz100) {
-  auto default_metric = stan::services::util::create_unit_e_diag_inv_metric(100);
+  auto default_metric
+      = stan::services::util::create_unit_e_diag_inv_metric(100);
   stan::io::var_context& inv_inv_metric = default_metric;
   std::vector<double> diag_vals = inv_inv_metric.vals_r("inv_metric");
   EXPECT_EQ(100, diag_vals.size());
@@ -52,7 +53,8 @@ TEST(inv_metric, create_dense_sz3) {
 }
 
 TEST(inv_metric, create_dense_sz10) {
-  auto default_metric = stan::services::util::create_unit_e_dense_inv_metric(10);
+  auto default_metric
+      = stan::services::util::create_unit_e_dense_inv_metric(10);
   stan::io::var_context& inv_inv_metric = default_metric;
   std::vector<double> dense_vals = inv_inv_metric.vals_r("inv_metric");
   EXPECT_EQ(100, dense_vals.size());
