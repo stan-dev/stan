@@ -47,8 +47,8 @@ TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, unit_e_no_adapt) {
       interrupt, logger, init, parameter, diagnostic);
   EXPECT_EQ(0, return_code);
 
-  auto dmp = stan::services::util::create_unit_e_diag_inv_metric(3);
-  stan::io::var_context& inv_metric = dmp;
+  auto default_metric = stan::services::util::create_unit_e_diag_inv_metric(3);
+  stan::io::var_context& inv_metric = default_metric;
   std::vector<double> diag_vals = inv_metric.vals_r("inv_metric");
   // check returned Euclidean metric
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
@@ -101,8 +101,7 @@ TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, use_metric_no_adapt) {
 
   std::string txt = R"json({"inv_metric":[0.787405, 0.884987, 1.19869]})json";
   std::stringstream in(txt);
-  stan::json::json_data dump(in);
-  stan::io::var_context& inv_metric = dump;
+  stan::json::json_data inv_metric(in);
 
   int return_code = stan::services::sample::hmc_static_diag_e(
       model, context, inv_metric, random_seed, chain, init_radius, num_warmup,
@@ -140,8 +139,7 @@ TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, use_metric_skip_adapt) {
 
   std::string txt = R"json({"inv_metric":[0.787405, 0.884987, 1.19869]})json";
   std::stringstream in(txt);
-  stan::json::json_data dump(in);
-  stan::io::var_context& inv_metric = dump;
+  stan::json::json_data inv_metric(in);
 
   int return_code = stan::services::sample::hmc_static_diag_e_adapt(
       model, context, inv_metric, random_seed, chain, init_radius, num_warmup,

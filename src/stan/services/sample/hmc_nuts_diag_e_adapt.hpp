@@ -206,10 +206,10 @@ int hmc_nuts_diag_e_adapt(
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
     callbacks::structured_writer& metric_writer) {
-  auto dmp = util::create_unit_e_diag_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
+  auto default_metric
+      = util::create_unit_e_diag_inv_metric(model.num_params_r());
   return hmc_nuts_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer,
@@ -258,11 +258,11 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  auto dmp = util::create_unit_e_diag_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
+  auto default_metric
+      = util::create_unit_e_diag_inv_metric(model.num_params_r());
   callbacks::structured_writer dummy_metric_writer;
   return hmc_nuts_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer,
