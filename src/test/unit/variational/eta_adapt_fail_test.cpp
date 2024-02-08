@@ -1,6 +1,7 @@
 #include <test/test-models/good/variational/eta_should_fail.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
@@ -15,9 +16,7 @@ class eta_should_fail_test : public ::testing::Test {
                log_stream_) {}
 
   void SetUp() {
-    static const std::string DATA = "";
-    std::stringstream data_stream(DATA);
-    stan::io::dump data_var_context(data_stream);
+    stan::io::empty_var_context data_var_context;
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());

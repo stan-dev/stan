@@ -206,11 +206,10 @@ int hmc_nuts_diag_e_adapt(
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
     callbacks::structured_writer& metric_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
   return hmc_nuts_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer,
@@ -259,12 +258,11 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
   callbacks::structured_writer dummy_metric_writer;
   return hmc_nuts_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer,
@@ -543,10 +541,10 @@ int hmc_nuts_diag_e_adapt(
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
     std::vector<MetricWriter>& metric_writer) {
-  std::vector<std::unique_ptr<stan::io::dump>> unit_e_metric;
+  std::vector<std::unique_ptr<stan::io::array_var_context>> unit_e_metric;
   unit_e_metric.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    unit_e_metric.emplace_back(std::make_unique<stan::io::dump>(
+    unit_e_metric.emplace_back(std::make_unique<stan::io::array_var_context>(
         util::create_unit_e_diag_inv_metric(model.num_params_r())));
   }
   if (num_chains == 1) {
@@ -625,10 +623,10 @@ int hmc_nuts_diag_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<std::unique_ptr<stan::io::dump>> unit_e_metric;
+  std::vector<std::unique_ptr<stan::io::array_var_context>> unit_e_metric;
   unit_e_metric.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    unit_e_metric.emplace_back(std::make_unique<stan::io::dump>(
+    unit_e_metric.emplace_back(std::make_unique<stan::io::array_var_context>(
         util::create_unit_e_diag_inv_metric(model.num_params_r())));
   }
   std::vector<stan::callbacks::structured_writer> dummy_metric_writer(

@@ -1,6 +1,7 @@
 #include <test/test-models/good/variational/univariate_with_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/unit/util.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
@@ -12,10 +13,7 @@ typedef univariate_with_constraint_model_namespace::
     univariate_with_constraint_model Model;
 
 TEST(advi_test, univar_with_constraint_fullrank) {
-  // Create mock data_var_context
-  static const std::string DATA = "";
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   // Instantiate model
   Model my_model(dummy_context);
@@ -142,10 +140,7 @@ TEST(advi_test, univar_with_constraint_fullrank) {
 }
 
 TEST(advi_test, univar_with_constraint_meanfield) {
-  // Create mock data_var_context
-  static const std::string DATA = "";
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   // Instantiate model
   Model my_model(dummy_context);
