@@ -27,45 +27,39 @@ namespace analyze {
  */
 
 Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
-  int rows = draws.rows();
-  int cols = draws.cols();
-  int size = rows * cols;
-  Eigen::MatrixXd rankMatrix = Eigen::MatrixXd::Zero(rows, cols);
+  const Eigen::Index rows = draws.rows();
+  const Eigen::Index cols = draws.cols();
+  const Eigen::Index size = rows * cols;
 
-  std::vector<std::pair<double, int>> valueWithIndex(size);
+  std::vector<std::pair<double, int>> value_with_index(size);
 
-  for (int col = 0; col < cols; ++col) {
-    for (int row = 0; row < rows; ++row) {
-      int index
-          = col * rows + row;  // Calculating linear index in column-major order
-      valueWithIndex[index] = {draws(row, col), index};
-    }
+  for (Eigen::Index i = 0; i < size; ++i) {
+    value_with_index[i] = {draws(i), i};
   }
 
-  std::sort(valueWithIndex.begin(), valueWithIndex.end());
+  std::sort(value_with_index.begin(), value_with_index.end());
+
+
+  Eigen::MatrixXd rankMatrix = Eigen::MatrixXd::Zero(rows, cols);
 
   // Assigning average ranks
-  for (int i = 0; i < size; ++i) {
+  for (Eigen::Index i = 0; i < size; ++i) {
     // Handle ties by averaging ranks
-    int j = i;
-    double sumRanks = 0;
-    int count = 0;
+    Eigen::Index j = i+1;
+    double sumRanks = j;
+    Eigen::Index count = 1;
 
-    while (j < size && valueWithIndex[j].first == valueWithIndex[i].first) {
+    while (j < size && value_with_index[j].first == value_with_index[i].first) {
       sumRanks += j + 1;  // Rank starts from 1
       ++j;
       ++count;
     }
-
     double avgRank = sumRanks / count;
-    boost::math::normal_distribution<double>
-        dist;  // Standard normal distribution
-    for (int k = i; k < j; ++k) {
-      int index = valueWithIndex[k].second;
-      int row = index % rows;  // Adjusting row index for column-major order
-      int col = index / rows;  // Adjusting column index for column-major order
+    boost::math::normal_distribution<double> dist; 
+    for (std::size_t k = i; k < j; ++k) {
+      Eigen::Index index = value_with_index[k].second;
       double p = (avgRank - 3.0 / 8.0) / (size - 2.0 * 3.0 / 8.0 + 1.0);
-      rankMatrix(row, col) = boost::math::quantile(dist, p);
+      rankMatrix(index) = boost::math::quantile(dist, p);
     }
     i = j - 1;  // Skip over tied elements
   }
@@ -73,41 +67,28 @@ Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
 }
 
 /**
- * Computes square root of marginal posterior variance of the estimand by
+ * Computes square root of marginal posterior variance of the estimand by the
  * weigted average of within-chain variance W and between-chain variance B.
  *
  * @param draws stores chains in columns
  * @return square root of ((N-1)/N)W + B/N
  *
  */
+
 inline double rhat(const Eigen::MatrixXd& draws) {
-  int num_chains = draws.cols();
-  int num_draws = draws.rows();
+  const Eigen::Index num_chains = draws.cols();
+  const Eigen::Index num_draws = draws.rows();
+
   Eigen::VectorXd chain_mean(num_chains);
-  boost::accumulators::accumulator_set<
-      double, boost::accumulators::stats<boost::accumulators::tag::variance>>
-      acc_chain_mean;
-  Eigen::VectorXd chain_var(num_chains);
-  double unbiased_var_scale = num_draws / (num_draws - 1.0);
-  for (int chain = 0; chain < num_chains; ++chain) {
-    boost::accumulators::accumulator_set<
-        double, boost::accumulators::stats<boost::accumulators::tag::mean,
-                                           boost::accumulators::tag::variance>>
-        acc_draw;
-    for (int n = 0; n < num_draws; ++n) {
-      acc_draw(draws(n, chain));
-    }
-    chain_mean(chain) = boost::accumulators::mean(acc_draw);
-    acc_chain_mean(chain_mean(chain));
-    chain_var(chain)
-        = boost::accumulators::variance(acc_draw) * unbiased_var_scale;
+  chain_mean = draws.colwise().mean();
+  double total_mean = chain_mean.mean();
+  double var_between = num_draws * (chain_mean.array() - total_mean).square().sum() / (num_chains-1);
+  double var_sum = 0;
+  for (Eigen::Index col = 0; col < num_chains; ++col) {
+      var_sum += (draws.col(col).array() - chain_mean(col)).square().sum() / (num_draws - 1);
   }
-
-  double var_between = num_draws * boost::accumulators::variance(acc_chain_mean)
-                       * num_chains / (num_chains - 1);
-  double var_within = chain_var.mean();
-
-  return sqrt((var_between / var_within + num_draws - 1) / num_draws);
+  double var_within = var_sum / num_chains;
+  return sqrt((var_between / var_within + num_draws - 1) / num_draws); 
 }
 
 /**
