@@ -1,6 +1,7 @@
 #include <stan/services/sample/hmc_static_dense_e_adapt.hpp>
 #include <stan/services/sample/hmc_static_dense_e.hpp>
 #include <stan/io/empty_var_context.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/check_adaptation.hpp>
@@ -47,8 +48,8 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, unit_e_no_adapt) {
       interrupt, logger, init, parameter, diagnostic);
   EXPECT_EQ(0, return_code);
 
-  stan::io::dump dmp = stan::services::util::create_unit_e_dense_inv_metric(3);
-  stan::io::var_context& inv_metric = dmp;
+  auto default_metric = stan::services::util::create_unit_e_dense_inv_metric(3);
+  stan::io::var_context& inv_metric = default_metric;
   std::vector<double> dense_vals = inv_metric.vals_r("inv_metric");
   // check returned Euclidean metric
   stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.2);
@@ -99,15 +100,17 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_metric_no_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  std::string txt
-      = "inv_metric <- structure(c("
-        " 0.926739, 0.0734898, -0.12395, "
-        " 0.0734898, 0.876038, -0.051543, "
-        " -0.12395, -0.051543, 0.8274 "
-        "), .Dim  = c(3,3))";
+  std::string txt = R"json(
+{
+  "inv_metric": [
+    [0.926739, 0.0734898, -0.12395],
+    [0.0734898, 0.876038, -0.051543],
+    [-0.12395, -0.051543, 0.8274]
+  ]
+}
+)json";
   std::stringstream in(txt);
-  stan::io::dump dump(in);
-  stan::io::var_context& inv_metric = dump;
+  stan::json::json_data inv_metric(in);
 
   int return_code = stan::services::sample::hmc_static_dense_e(
       model, context, inv_metric, random_seed, chain, init_radius, num_warmup,
@@ -143,15 +146,17 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_metric_skip_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  std::string txt
-      = "inv_metric <- structure(c("
-        " 0.926739, 0.0734898, -0.12395, "
-        " 0.0734898, 0.876038, -0.051543, "
-        " -0.12395, -0.051543, 0.8274 "
-        "), .Dim  = c(3,3))";
+  std::string txt = R"json(
+{
+  "inv_metric": [
+    [0.926739, 0.0734898, -0.12395],
+    [0.0734898, 0.876038, -0.051543],
+    [-0.12395, -0.051543, 0.8274]
+  ]
+}
+)json";
   std::stringstream in(txt);
-  stan::io::dump dump(in);
-  stan::io::var_context& inv_metric = dump;
+  stan::json::json_data inv_metric(in);
 
   int return_code = stan::services::sample::hmc_static_dense_e_adapt(
       model, context, inv_metric, random_seed, chain, init_radius, num_warmup,

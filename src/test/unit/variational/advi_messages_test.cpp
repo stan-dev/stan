@@ -1,6 +1,7 @@
 #include <test/test-models/good/variational/univariate_no_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -22,11 +23,7 @@ class advi_test : public ::testing::Test {
         = "Informational Message: The ELBO at a previous iteration is larger "
           "than the ELBO upon convergence!";
 
-    // Create mock data_var_context
-    static const std::string DATA = "";
-    std::stringstream data_stream(DATA);
-    stan::io::dump data_var_context(data_stream);
-    // data_stream.close();
+    stan::io::empty_var_context data_var_context;
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());

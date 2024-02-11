@@ -1,5 +1,6 @@
 #include <test/test-models/good/variational/hier_logistic.hpp>
 #include <stan/variational/advi.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -19,9 +20,9 @@ class advi_test : public ::testing::Test {
   void SetUp() {
     // Create mock data_var_context
     std::fstream data_stream(
-        "src/test/test-models/good/variational/hier_logistic.data.R",
+        "src/test/test-models/good/variational/hier_logistic.data.json",
         std::fstream::in);
-    stan::io::dump data_var_context(data_stream);
+    stan::json::json_data data_var_context(data_stream);
     data_stream.close();
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);

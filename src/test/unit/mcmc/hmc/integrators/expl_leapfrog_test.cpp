@@ -5,7 +5,7 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
 
-#include <stan/io/dump.hpp>
+#include <stan/io/json/json_data.hpp>
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
@@ -23,10 +23,10 @@ class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
         diag_e_integrator() {}
 
   void SetUp() {
-    static const std::string DATA("mu <- 0.0\ny <- 0\n");
+    static const std::string DATA("{\"mu\":0.0, \"y\":0}");
     std::stringstream data_stream(DATA);
     // setup hamiltonian
-    stan::io::dump data_var_context(data_stream);
+    stan::json::json_data data_var_context(data_stream);
 
     model = new command_model_namespace::command_model(data_var_context);
     debug.str("");
