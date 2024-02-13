@@ -74,9 +74,14 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   writer.write_diagnostic_names(s, sampler, model);
 
   auto start = std::chrono::steady_clock::now();
-  util::generate_transitions(sampler, num_samples, 0, num_samples, num_thin,
-                             refresh, true, false, writer, s, model, rng,
-                             interrupt, logger);
+  try {
+    util::generate_transitions(sampler, num_samples, 0, num_samples, num_thin,
+                               refresh, true, false, writer, s, model, rng,
+                               interrupt, logger);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   auto end = std::chrono::steady_clock::now();
   double sample_delta_t
       = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
@@ -156,27 +161,32 @@ int fixed_param(Model& model, const std::size_t num_chains,
     writers[i].write_diagnostic_names(samples[i], samplers[i], model);
   }
 
-  tbb::parallel_for(
-      tbb::blocked_range<size_t>(0, num_chains, 1),
-      [&samplers, &writers, &samples, &model, &rngs, &interrupt, &logger,
-       num_samples, num_thin, refresh, chain,
-       num_chains](const tbb::blocked_range<size_t>& r) {
-        for (size_t i = r.begin(); i != r.end(); ++i) {
-          auto start = std::chrono::steady_clock::now();
-          util::generate_transitions(samplers[i], num_samples, 0, num_samples,
-                                     num_thin, refresh, true, false, writers[i],
-                                     samples[i], model, rngs[i], interrupt,
-                                     logger, chain + i, num_chains);
-          auto end = std::chrono::steady_clock::now();
-          double sample_delta_t
-              = std::chrono::duration_cast<std::chrono::milliseconds>(end
-                                                                      - start)
-                    .count()
-                / 1000.0;
-          writers[i].write_timing(0.0, sample_delta_t);
-        }
-      },
-      tbb::simple_partitioner());
+  try {
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, num_chains, 1),
+        [&samplers, &writers, &samples, &model, &rngs, &interrupt, &logger,
+         num_samples, num_thin, refresh, chain,
+         num_chains](const tbb::blocked_range<size_t>& r) {
+          for (size_t i = r.begin(); i != r.end(); ++i) {
+            auto start = std::chrono::steady_clock::now();
+            util::generate_transitions(
+                samplers[i], num_samples, 0, num_samples, num_thin, refresh,
+                true, false, writers[i], samples[i], model, rngs[i], interrupt,
+                logger, chain + i, num_chains);
+            auto end = std::chrono::steady_clock::now();
+            double sample_delta_t
+                = std::chrono::duration_cast<std::chrono::milliseconds>(end
+                                                                        - start)
+                      .count()
+                  / 1000.0;
+            writers[i].write_timing(0.0, sample_delta_t);
+          }
+        },
+        tbb::simple_partitioner());
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   return error_codes::OK;
 }
 

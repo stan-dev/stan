@@ -78,10 +78,14 @@ int hmc_static_diag_e(Model& model, const stan::io::var_context& init,
   sampler.set_metric(inv_metric);
   sampler.set_nominal_stepsize_and_T(stepsize, int_time);
   sampler.set_stepsize_jitter(stepsize_jitter);
-
-  util::run_sampler(sampler, model, cont_vector, num_warmup, num_samples,
-                    num_thin, refresh, save_warmup, rng, interrupt, logger,
-                    sample_writer, diagnostic_writer);
+  try {
+    util::run_sampler(sampler, model, cont_vector, num_warmup, num_samples,
+                      num_thin, refresh, save_warmup, rng, interrupt, logger,
+                      sample_writer, diagnostic_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
 
   return error_codes::OK;
 }

@@ -62,7 +62,7 @@ int newton(Model& model, const stan::io::var_context& init,
     lp = model.template log_prob<false, jacobian>(cont_vector, disc_vector,
                                                   &message);
     logger.info(message);
-  } catch (const std::exception& e) {
+  } catch (const std::domain_error& e) {
     logger.info("");
     logger.info(
         "Informational Message: The current"
