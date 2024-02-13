@@ -172,7 +172,6 @@ int bfgs(Model& model, const stan::io::var_context& init,
         parameter_writer(values);
       }
     }
-
   } catch (const std::exception& e) {
     logger.error(e.what());
     return error_codes::SOFTWARE;
