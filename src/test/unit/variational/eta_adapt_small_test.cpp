@@ -21,7 +21,7 @@ class eta_adapt_small_test : public ::testing::Test {
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());
-    base_rng_.seed(727802408);
+    base_rng_.seed(727802409);
     model_stream_.str("");
     log_stream_.str("");
 
@@ -59,11 +59,6 @@ TEST_F(eta_adapt_small_test, eta_should_be_small) {
   stan::variational::normal_fullrank fullrank_init
       = stan::variational::normal_fullrank(cont_params_);
 
-#if BOOST_VERSION >= 106400
   EXPECT_EQ(0.1, advi_meanfield_->adapt_eta(meanfield_init, 1000, logger));
   EXPECT_EQ(0.1, advi_fullrank_->adapt_eta(fullrank_init, 1000, logger));
-#else
-  EXPECT_EQ(0.1, advi_meanfield_->adapt_eta(meanfield_init, 50, logger));
-  EXPECT_EQ(0.1, advi_fullrank_->adapt_eta(fullrank_init, 50, logger));
-#endif
 }

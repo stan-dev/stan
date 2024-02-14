@@ -221,7 +221,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 }
 
 TEST(McmcXHMCBaseXHMC, transition) {
-  stan::rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -245,7 +245,7 @@ TEST(McmcXHMCBaseXHMC, transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_EQ(31.5, s.cont_params()(0));
+  EXPECT_EQ(-31 * init_momentum, s.cont_params()(0));
   EXPECT_EQ(0, s.log_prob());
   EXPECT_EQ(1, s.accept_stat());
   EXPECT_EQ("", debug.str());

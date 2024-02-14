@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 TEST(McmcUnitEXHMC, build_tree) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::softabs_point z_init(3);
   z_init.q(0) = 1;
@@ -58,13 +58,13 @@ TEST(McmcUnitEXHMC, build_tree) {
   EXPECT_FLOAT_EQ(1.5019561, sampler.z().p(1));
   EXPECT_FLOAT_EQ(-1.5019561, sampler.z().p(2));
 
-  EXPECT_FLOAT_EQ(0.8330583, z_propose.q(0));
-  EXPECT_FLOAT_EQ(-0.8330583, z_propose.q(1));
-  EXPECT_FLOAT_EQ(0.8330583, z_propose.q(2));
+  EXPECT_FLOAT_EQ(0.42903179, z_propose.q(0));
+  EXPECT_FLOAT_EQ(-0.42903179, z_propose.q(1));
+  EXPECT_FLOAT_EQ(0.42903179, z_propose.q(2));
 
-  EXPECT_FLOAT_EQ(-1.1836562, z_propose.p(0));
-  EXPECT_FLOAT_EQ(1.1836562, z_propose.p(1));
-  EXPECT_FLOAT_EQ(-1.1836562, z_propose.p(2));
+  EXPECT_FLOAT_EQ(-1.4385087, z_propose.p(0));
+  EXPECT_FLOAT_EQ(1.4385087, z_propose.p(1));
+  EXPECT_FLOAT_EQ(-1.4385087, z_propose.p(2));
 
   EXPECT_EQ(8, n_leapfrog);
   EXPECT_FLOAT_EQ(3.7645235, ave);
@@ -79,7 +79,7 @@ TEST(McmcUnitEXHMC, build_tree) {
 }
 
 TEST(McmcUnitEXHMC, transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(483294, 0);
 
   stan::mcmc::softabs_point z_init(3);
   z_init.q(0) = 1;
@@ -112,7 +112,7 @@ TEST(McmcUnitEXHMC, transition) {
   EXPECT_FLOAT_EQ(-1, s.cont_params()(1));
   EXPECT_FLOAT_EQ(1, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-1.5, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99829924, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.99993229, s.accept_stat());
 
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
