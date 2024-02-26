@@ -89,15 +89,14 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_rank) {
       draws[chain] = &samples(chain)(0);
       sizes[chain] = samples(chain).size();
     }
-    ASSERT_NEAR(rhat(index - 4),
-                stan::analyze::compute_potential_scale_reduction_rank(draws, sizes),
-                1e-4)
+    ASSERT_NEAR(
+        rhat(index - 4),
+        stan::analyze::compute_potential_scale_reduction_rank(draws, sizes),
+        1e-4)
         << "rhat for index: " << index
         << ", parameter: " << chains.param_name(index);
   }
 }
-
-
 
 TEST_F(ComputeRhat, compute_potential_scale_reduction_convenience) {
   std::stringstream out;
@@ -137,7 +136,6 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_convenience) {
   }
 }
 
-
 TEST_F(ComputeRhat, compute_potential_scale_reduction_rank_convenience) {
   std::stringstream out;
   stan::io::stan_csv blocker1
@@ -167,14 +165,14 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_rank_convenience) {
       draws[chain] = &samples(chain)(0);
     }
     size_t size = samples(0).size();
-    ASSERT_NEAR(rhat(index - 4),
-                stan::analyze::compute_potential_scale_reduction_rank(draws, size),
-                1e-4)
+    ASSERT_NEAR(
+        rhat(index - 4),
+        stan::analyze::compute_potential_scale_reduction_rank(draws, size),
+        1e-4)
         << "rhat for index: " << index
         << ", parameter: " << chains.param_name(index);
   }
 }
-
 
 TEST_F(ComputeRhat, chains_compute_split_potential_scale_reduction) {
   std::stringstream out;
@@ -230,8 +228,8 @@ TEST_F(ComputeRhat, chains_compute_split_potential_scale_reduction_rank) {
       1.00381, 1.00283, 1.00188, 1.00225, 1.00335, 1.00133, 1.00209, 1.0109;
 
   for (int index = 4; index < chains.num_params(); index++) {
-    ASSERT_NEAR(rhat(index - 4), chains.split_potential_scale_reduction_rank(index),
-                1e-4)
+    ASSERT_NEAR(rhat(index - 4),
+                chains.split_potential_scale_reduction_rank(index), 1e-4)
         << "rhat for index: " << index
         << ", parameter: " << chains.param_name(index);
   }
@@ -317,10 +315,10 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction_rank) {
       draws[chain] = &samples(chain)(0);
       sizes[chain] = samples(chain).size();
     }
-    ASSERT_NEAR(
-        rhat(index - 4),
-        stan::analyze::compute_split_potential_scale_reduction_rank(draws, sizes),
-        1e-4)
+    ASSERT_NEAR(rhat(index - 4),
+                stan::analyze::compute_split_potential_scale_reduction_rank(
+                    draws, sizes),
+                1e-4)
         << "rhat for index: " << index
         << ", parameter: " << chains.param_name(index);
   }
@@ -357,7 +355,9 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction_convenience) {
     }
     size_t size = samples(0).size();
     std::cout << "RHAT" << std::endl;
-    std::cout << stan::analyze::compute_split_potential_scale_reduction(draws, size) << std::endl;
+    std::cout << stan::analyze::compute_split_potential_scale_reduction(draws,
+                                                                        size)
+              << std::endl;
     ASSERT_NEAR(
         rhat(index - 4),
         stan::analyze::compute_split_potential_scale_reduction(draws, size),
@@ -401,10 +401,10 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction_convenience_rank) {
       draws[chain] = &samples(chain)(0);
     }
     size_t size = samples(0).size();
-    ASSERT_NEAR(
-        rhat(index - 4),
-        stan::analyze::compute_split_potential_scale_reduction_rank(draws, size),
-        1e-4)
+    ASSERT_NEAR(rhat(index - 4),
+                stan::analyze::compute_split_potential_scale_reduction_rank(
+                    draws, size),
+                1e-4)
         << "rhat for index: " << index
         << ", parameter: " << chains.param_name(index);
   }

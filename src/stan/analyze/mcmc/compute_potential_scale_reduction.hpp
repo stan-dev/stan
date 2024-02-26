@@ -93,11 +93,10 @@ inline double rhat(const Eigen::MatrixXd& draws) {
   return sqrt((var_between / var_within + num_draws - 1) / num_draws);
 }
 
-
 /**
- * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
- * parameter across all kept samples. 
- * Based on paper https://arxiv.org/abs/1903.08008
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for
+ * the specified parameter across all kept samples. Based on paper
+ * https://arxiv.org/abs/1903.08008
  *
  * Current implementation assumes draws are stored in contiguous
  * blocks of memory.  Chains are trimmed from the back to match the
@@ -107,8 +106,9 @@ inline double rhat(const Eigen::MatrixXd& draws) {
  * @param sizes stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
-inline double compute_potential_scale_reduction_rank(std::vector<const double*> draws, std::vector<size_t> sizes) {
-int num_chains = sizes.size();
+inline double compute_potential_scale_reduction_rank(
+    std::vector<const double*> draws, std::vector<size_t> sizes) {
+  int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   if (num_draws == 0) {
     return std::numeric_limits<double>::quiet_NaN();
@@ -160,7 +160,6 @@ int num_chains = sizes.size();
 
   return std::max(rhat_bulk, rhat_tail);
 }
-
 
 /**
  * Computes the potential scale reduction (Rhat) for the specified
@@ -230,9 +229,9 @@ inline double compute_potential_scale_reduction(
 }
 
 /**
- * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
- * parameter across all kept samples. 
- * Based on paper https://arxiv.org/abs/1903.08008
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for
+ * the specified parameter across all kept samples. Based on paper
+ * https://arxiv.org/abs/1903.08008
  *
  * See more details in Stan reference manual section "Potential
  * Scale Reduction". http://mc-stan.org/users/documentation
@@ -276,12 +275,11 @@ inline double compute_potential_scale_reduction(
   return compute_potential_scale_reduction(draws, sizes);
 }
 
-
 /**
- * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
- * parameter across all kept samples. 
- * Based on paper https://arxiv.org/abs/1903.08008
- * 
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for
+ * the specified parameter across all kept samples. Based on paper
+ * https://arxiv.org/abs/1903.08008
+ *
  * When the number of total draws N is odd, the (N+1)/2th draw is ignored.
  *
  * See more details in Stan reference manual section "Potential
@@ -344,12 +342,12 @@ inline double compute_split_potential_scale_reduction(
 }
 
 /**
- * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
- * parameter across all kept samples. 
- * Based on paper https://arxiv.org/abs/1903.08008
- * 
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for
+ * the specified parameter across all kept samples. Based on paper
+ * https://arxiv.org/abs/1903.08008
+ *
  * When the number of total draws N is odd, the (N+1)/2th draw is ignored.
- * 
+ *
  * See more details in Stan reference manual section "Potential
  * Scale Reduction". http://mc-stan.org/users/documentation
  *
