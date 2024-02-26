@@ -79,10 +79,15 @@ class gq_writer {
       model.write_array(rng, draw, params_i, values, false, true, &ss);
       if (ss.str().length() > 0)
         logger_.info(ss);
+    } catch (const std::domain_error& e) {
+      if (ss.str().length() > 0)
+        logger_.info(ss);
+      logger_.info(e.what());
     } catch (const std::exception& e) {
       if (ss.str().length() > 0)
         logger_.info(ss);
       logger_.info(e.what());
+      throw;
     }
 
     std::vector<double> gq_values(values.begin() + num_constrained_params_,
@@ -110,11 +115,16 @@ class gq_writer {
       if (ss.str().length() > 0) {
         logger_.info(ss);
       }
-    } catch (const std::exception& e) {
+    } catch (const std::domain_error& e) {
       if (ss.str().length() > 0) {
         logger_.info(ss);
       }
       logger_.info(e.what());
+    } catch (const std::exception& e) {
+      if (ss.str().length() > 0)
+        logger_.info(ss);
+      logger_.info(e.what());
+      throw;
     }
     sample_writer_(values);
   }

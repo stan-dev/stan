@@ -96,7 +96,16 @@ int bfgs(Model& model, const stan::io::var_context& init,
   if (save_iterations) {
     std::vector<double> values;
     std::stringstream msg;
-    model.write_array(rng, cont_vector, disc_vector, values, true, true, &msg);
+    try {
+      model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                        &msg);
+    } catch (const std::exception& e) {
+      if (msg.str().length() > 0) {
+        logger.info(msg);
+      }
+      logger.error(e.what());
+      return error_codes::SOFTWARE;
+    }
     if (msg.str().length() > 0)
       logger.info(msg);
 
@@ -105,66 +114,82 @@ int bfgs(Model& model, const stan::io::var_context& init,
   }
   int ret = 0;
 
-  while (ret == 0) {
-    interrupt();
-    if (refresh > 0
-        && (bfgs.iter_num() == 0 || ((bfgs.iter_num() + 1) % refresh == 0)))
-      logger.info(
-          "    Iter"
-          "      log prob"
-          "        ||dx||"
-          "      ||grad||"
-          "       alpha"
-          "      alpha0"
-          "  # evals"
-          "  Notes ");
+  try {
+    while (ret == 0) {
+      interrupt();
+      if (refresh > 0
+          && (bfgs.iter_num() == 0 || ((bfgs.iter_num() + 1) % refresh == 0)))
+        logger.info(
+            "    Iter"
+            "      log prob"
+            "        ||dx||"
+            "      ||grad||"
+            "       alpha"
+            "      alpha0"
+            "  # evals"
+            "  Notes ");
 
-    ret = bfgs.step();
-    lp = bfgs.logp();
-    bfgs.params_r(cont_vector);
+      ret = bfgs.step();
 
-    if (refresh > 0
-        && (ret != 0 || !bfgs.note().empty() || bfgs.iter_num() == 0
-            || ((bfgs.iter_num() + 1) % refresh == 0))) {
-      std::stringstream msg;
-      msg << " " << std::setw(7) << bfgs.iter_num() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << bfgs.prev_step_size() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << bfgs.curr_g().norm() << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha()
-          << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0()
-          << " ";
-      msg << " " << std::setw(7) << bfgs.grad_evals() << " ";
-      msg << " " << bfgs.note() << " ";
-      logger.info(msg);
-    }
+      lp = bfgs.logp();
+      bfgs.params_r(cont_vector);
 
-    if (bfgs_ss.str().length() > 0) {
-      logger.info(bfgs_ss);
-      bfgs_ss.str("");
-    }
-
-    if (save_iterations) {
-      std::vector<double> values;
-      std::stringstream msg;
-      model.write_array(rng, cont_vector, disc_vector, values, true, true,
-                        &msg);
-      // This if is here to match the pre-refactor behavior
-      if (msg.str().length() > 0)
+      if (refresh > 0
+          && (ret != 0 || !bfgs.note().empty() || bfgs.iter_num() == 0
+              || ((bfgs.iter_num() + 1) % refresh == 0))) {
+        std::stringstream msg;
+        msg << " " << std::setw(7) << bfgs.iter_num() << " ";
+        msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+        msg << " " << std::setw(12) << std::setprecision(6)
+            << bfgs.prev_step_size() << " ";
+        msg << " " << std::setw(12) << std::setprecision(6)
+            << bfgs.curr_g().norm() << " ";
+        msg << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha()
+            << " ";
+        msg << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0()
+            << " ";
+        msg << " " << std::setw(7) << bfgs.grad_evals() << " ";
+        msg << " " << bfgs.note() << " ";
         logger.info(msg);
+      }
 
-      values.insert(values.begin(), lp);
-      parameter_writer(values);
+      if (bfgs_ss.str().length() > 0) {
+        logger.info(bfgs_ss);
+        bfgs_ss.str("");
+      }
+
+      if (save_iterations) {
+        std::vector<double> values;
+        std::stringstream msg;
+        model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                          &msg);
+
+        // This if is here to match the pre-refactor behavior
+        if (msg.str().length() > 0)
+          logger.info(msg);
+
+        values.insert(values.begin(), lp);
+        parameter_writer(values);
+      }
     }
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
   }
 
   if (!save_iterations) {
     std::vector<double> values;
     std::stringstream msg;
-    model.write_array(rng, cont_vector, disc_vector, values, true, true, &msg);
+    try {
+      model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                        &msg);
+    } catch (const std::exception& e) {
+      if (msg.str().length() > 0) {
+        logger.info(msg);
+      }
+      logger.error(e.what());
+      return error_codes::SOFTWARE;
+    }
     if (msg.str().length() > 0)
       logger.info(msg);
     values.insert(values.begin(), lp);

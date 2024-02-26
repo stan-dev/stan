@@ -111,11 +111,16 @@ class mcmc_writer {
           sample.cont_params().data() + sample.cont_params().size());
       model.write_array(rng, cont_params, params_i, model_values, true, true,
                         &ss);
-    } catch (const std::exception& e) {
+    } catch (const std::domain_error& e) {
       if (ss.str().length() > 0)
         logger_.info(ss);
       ss.str("");
       logger_.info(e.what());
+    } catch (const std::exception& e) {
+      if (ss.str().length() > 0)
+        logger_.info(ss);
+      logger_.info(e.what());
+      throw;
     }
     if (ss.str().length() > 0)
       logger_.info(ss);

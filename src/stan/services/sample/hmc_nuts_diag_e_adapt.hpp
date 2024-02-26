@@ -99,11 +99,15 @@ int hmc_nuts_diag_e_adapt(
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
 
-  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
-                             num_samples, num_thin, refresh, save_warmup, rng,
-                             interrupt, logger, sample_writer,
-                             diagnostic_writer, metric_writer);
-
+  try {
+    util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                               num_samples, num_thin, refresh, save_warmup, rng,
+                               interrupt, logger, sample_writer,
+                               diagnostic_writer, metric_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   return error_codes::OK;
 }
 
@@ -379,21 +383,26 @@ int hmc_nuts_diag_e_adapt(
     logger.error(e.what());
     return error_codes::CONFIG;
   }
-  tbb::parallel_for(
-      tbb::blocked_range<size_t>(0, num_chains, 1),
-      [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
-       init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
-       &sample_writer, &cont_vectors, &diagnostic_writer,
-       &metric_writer](const tbb::blocked_range<size_t>& r) {
-        for (size_t i = r.begin(); i != r.end(); ++i) {
-          util::run_adaptive_sampler(
-              samplers[i], model, cont_vectors[i], num_warmup, num_samples,
-              num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
-              sample_writer[i], diagnostic_writer[i], metric_writer[i],
-              init_chain_id + i, num_chains);
-        }
-      },
-      tbb::simple_partitioner());
+  try {
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, num_chains, 1),
+        [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
+         init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
+         &sample_writer, &cont_vectors, &diagnostic_writer,
+         &metric_writer](const tbb::blocked_range<size_t>& r) {
+          for (size_t i = r.begin(); i != r.end(); ++i) {
+            util::run_adaptive_sampler(
+                samplers[i], model, cont_vectors[i], num_warmup, num_samples,
+                num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
+                sample_writer[i], diagnostic_writer[i], metric_writer[i],
+                init_chain_id + i, num_chains);
+          }
+        },
+        tbb::simple_partitioner());
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   return error_codes::OK;
 }
 

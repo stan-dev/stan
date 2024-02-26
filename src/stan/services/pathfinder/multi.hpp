@@ -117,28 +117,33 @@ inline int pathfinder_lbfgs_multi(
       individual_samples;
   individual_samples.resize(num_paths);
   std::atomic<size_t> lp_calls{0};
-  tbb::parallel_for(
-      tbb::blocked_range<int>(0, num_paths), [&](tbb::blocked_range<int> r) {
-        for (int iter = r.begin(); iter < r.end(); ++iter) {
-          auto pathfinder_ret
-              = stan::services::pathfinder::pathfinder_lbfgs_single<true>(
-                  model, *(init[iter]), random_seed, stride_id + iter,
-                  init_radius, history_size, init_alpha, tol_obj, tol_rel_obj,
-                  tol_grad, tol_rel_grad, tol_param, num_iterations,
-                  num_elbo_draws, num_draws, save_iterations, refresh,
-                  interrupt, logger, init_writers[iter],
-                  single_path_parameter_writer[iter],
-                  single_path_diagnostic_writer[iter], calculate_lp);
-          if (unlikely(std::get<0>(pathfinder_ret) != error_codes::OK)) {
-            logger.error(std::string("Pathfinder iteration: ")
-                         + std::to_string(iter) + " failed.");
-            return;
+  try {
+    tbb::parallel_for(
+        tbb::blocked_range<int>(0, num_paths), [&](tbb::blocked_range<int> r) {
+          for (int iter = r.begin(); iter < r.end(); ++iter) {
+            auto pathfinder_ret
+                = stan::services::pathfinder::pathfinder_lbfgs_single<true>(
+                    model, *(init[iter]), random_seed, stride_id + iter,
+                    init_radius, history_size, init_alpha, tol_obj, tol_rel_obj,
+                    tol_grad, tol_rel_grad, tol_param, num_iterations,
+                    num_elbo_draws, num_draws, save_iterations, refresh,
+                    interrupt, logger, init_writers[iter],
+                    single_path_parameter_writer[iter],
+                    single_path_diagnostic_writer[iter], calculate_lp);
+            if (unlikely(std::get<0>(pathfinder_ret) != error_codes::OK)) {
+              logger.error(std::string("Pathfinder iteration: ")
+                           + std::to_string(iter) + " failed.");
+              return;
+            }
+            individual_lp_ratios[iter] = std::move(std::get<1>(pathfinder_ret));
+            individual_samples[iter] = std::move(std::get<2>(pathfinder_ret));
+            lp_calls += std::get<3>(pathfinder_ret);
           }
-          individual_lp_ratios[iter] = std::move(std::get<1>(pathfinder_ret));
-          individual_samples[iter] = std::move(std::get<2>(pathfinder_ret));
-          lp_calls += std::get<3>(pathfinder_ret);
-        }
-      });
+        });
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
 
   // if any pathfinders failed, we want to remove their empty results
   individual_lp_ratios.erase(
@@ -231,7 +236,7 @@ inline int pathfinder_lbfgs_multi(
     parameter_writer(total_time_str);
   }
   parameter_writer();
-  return 0;
+  return error_codes::OK;
 }
 }  // namespace pathfinder
 }  // namespace services

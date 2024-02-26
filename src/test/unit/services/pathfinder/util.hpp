@@ -93,7 +93,11 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void error(const std::string& message) { *log_ << message << "\n"; }
+  virtual void error(const std::string& message) {
+    if (log_ != nullptr) {
+      *log_ << message << "\n";
+    }
+  }
 
   /**
    * Logs an error with error log level.

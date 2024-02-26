@@ -80,10 +80,15 @@ int hmc_static_unit_e_adapt(
   sampler.get_stepsize_adaptation().set_t0(t0);
 
   callbacks::structured_writer dummy_metric_writer;
-  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
-                             num_samples, num_thin, refresh, save_warmup, rng,
-                             interrupt, logger, sample_writer,
-                             diagnostic_writer, dummy_metric_writer);
+  try {
+    util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                               num_samples, num_thin, refresh, save_warmup, rng,
+                               interrupt, logger, sample_writer,
+                               diagnostic_writer, dummy_metric_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
 
   return error_codes::OK;
 }

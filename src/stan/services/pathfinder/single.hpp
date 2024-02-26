@@ -250,7 +250,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
         approx_samples_col = approx_samples.col(i);
         ++lp_fun_calls;
         lp_mat.coeffRef(i, 1) = lp_fun(approx_samples_col, pathfinder_ss);
-      } catch (const std::exception& e) {
+      } catch (const std::domain_error& e) {
         lp_mat.coeffRef(i, 1) = -std::numeric_limits<double>::infinity();
       }
       log_stream(logger, pathfinder_ss, iter_msg);
@@ -530,7 +530,7 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
                               lp_fun, constrain_fun, rng, taylor_appx,
                               num_elbo_draws, alpha, iter_msg, logger),
                           taylor_appx);
-  } catch (const std::exception& e) {
+  } catch (const std::domain_error& e) {
     logger.warn(iter_msg + "ELBO estimation failed "
                 + " with error: " + e.what());
     return std::make_pair(internal::elbo_est_t{}, internal::taylor_approx_t{});
@@ -820,7 +820,16 @@ inline auto pathfinder_lbfgs_single(
         logger.info(lbfgs_ss);
         lbfgs_ss.str("");
       }
-      throw e;
+      if (ReturnLpSamples) {
+        // we want to terminate multi-path pathfinder during these unrecoverable
+        // exceptions
+        throw;
+      } else {
+        logger.error(e.what());
+        return internal::ret_pathfinder<ReturnLpSamples>(
+            error_codes::SOFTWARE, Eigen::Array<double, Eigen::Dynamic, 1>(0),
+            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(0, 0), 0);
+      }
     }
   }
   if (unlikely(save_iterations)) {
@@ -900,7 +909,7 @@ inline auto pathfinder_lbfgs_single(
                             approx_samples_constrained_col)
                   .matrix();
       }
-    } catch (const std::exception& e) {
+    } catch (const std::domain_error& e) {
       std::string err_msg = e.what();
       logger.warn(path_num + "Final sampling approximation failed with error: "
                   + err_msg);

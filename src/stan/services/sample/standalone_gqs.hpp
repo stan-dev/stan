@@ -67,19 +67,23 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
 
   std::vector<double> unconstrained_params_r;
   std::vector<double> row(draws.cols());
-
-  for (size_t i = 0; i < draws.rows(); ++i) {
-    Eigen::Map<Eigen::VectorXd>(&row[0], draws.cols()) = draws.row(i);
-    try {
-      model.unconstrain_array(row, unconstrained_params_r, &msg);
-    } catch (const std::exception &e) {
-      if (msg.str().length() > 0)
-        logger.error(msg);
-      logger.error(e.what());
-      return error_codes::DATAERR;
+  try {
+    for (size_t i = 0; i < draws.rows(); ++i) {
+      Eigen::Map<Eigen::VectorXd>(&row[0], draws.cols()) = draws.row(i);
+      try {
+        model.unconstrain_array(row, unconstrained_params_r, &msg);
+      } catch (const std::exception &e) {
+        if (msg.str().length() > 0)
+          logger.error(msg);
+        logger.error(e.what());
+        return error_codes::DATAERR;
+      }
+      interrupt();  // call out to interrupt and fail
+      writer.write_gq_values(model, rng, unconstrained_params_r);
     }
-    interrupt();  // call out to interrupt and fail
-    writer.write_gq_values(model, rng, unconstrained_params_r);
+  } catch (const std::exception &e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
   }
   return error_codes::OK;
 }
@@ -147,34 +151,40 @@ int standalone_generate(const Model &model, const int num_chains,
     rngs.emplace_back(util::create_rng(seed, i + 1));
   }
   bool error_any = false;
-  tbb::parallel_for(
-      tbb::blocked_range<size_t>(0, num_chains, 1),
-      [&draws, &model, &logger, &interrupt, &writers, &rngs,
-       &error_any](const tbb::blocked_range<size_t> &r) {
-        Eigen::VectorXd unconstrained_params_r(draws[0].cols());
-        Eigen::VectorXd row(draws[0].cols());
-        std::stringstream msg;
-        for (size_t slice_idx = r.begin(); slice_idx != r.end(); ++slice_idx) {
-          for (size_t i = 0; i < draws[slice_idx].rows(); ++i) {
-            if (error_any)
-              return;
-            try {
-              row = draws[slice_idx].row(i);
-              model.unconstrain_array(row, unconstrained_params_r, &msg);
-            } catch (const std::exception &e) {
-              if (msg.str().length() > 0)
-                logger.error(msg);
-              logger.error(e.what());
-              error_any = true;
-              return;
+  try {
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, num_chains, 1),
+        [&draws, &model, &logger, &interrupt, &writers, &rngs,
+         &error_any](const tbb::blocked_range<size_t> &r) {
+          Eigen::VectorXd unconstrained_params_r(draws[0].cols());
+          Eigen::VectorXd row(draws[0].cols());
+          std::stringstream msg;
+          for (size_t slice_idx = r.begin(); slice_idx != r.end();
+               ++slice_idx) {
+            for (size_t i = 0; i < draws[slice_idx].rows(); ++i) {
+              if (error_any)
+                return;
+              try {
+                row = draws[slice_idx].row(i);
+                model.unconstrain_array(row, unconstrained_params_r, &msg);
+              } catch (const std::domain_error &e) {
+                if (msg.str().length() > 0)
+                  logger.error(msg);
+                logger.error(e.what());
+                error_any = true;
+                return;
+              }
+              interrupt();  // call out to interrupt and fail
+              writers[slice_idx].write_gq_values(model, rngs[slice_idx],
+                                                 unconstrained_params_r);
             }
-            interrupt();  // call out to interrupt and fail
-            writers[slice_idx].write_gq_values(model, rngs[slice_idx],
-                                               unconstrained_params_r);
           }
-        }
-      },
-      tbb::simple_partitioner());
+        },
+        tbb::simple_partitioner());
+  } catch (const std::exception &e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   return error_any ? error_codes::DATAERR : error_codes::OK;
 }
 
