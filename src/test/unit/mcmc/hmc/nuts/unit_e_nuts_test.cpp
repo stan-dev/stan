@@ -309,7 +309,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
 }
 
 TEST(McmcUnitENuts, transition_test) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::unit_e_point z_init(3);
   z_init.q(0) = 1;
@@ -338,15 +338,15 @@ TEST(McmcUnitENuts, transition_test) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_EQ(4, sampler.depth_);
-  EXPECT_EQ((2 << 3) - 1, sampler.n_leapfrog_);
+  EXPECT_EQ(5, sampler.depth_);
+  EXPECT_EQ((2 << 4) - 1, sampler.n_leapfrog_);
   EXPECT_FALSE(sampler.divergent_);
 
-  EXPECT_FLOAT_EQ(1.8718261, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.74208695, s.cont_params()(1));
-  EXPECT_FLOAT_EQ(1.5202962, s.cont_params()(2));
-  EXPECT_FLOAT_EQ(-3.1828632, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99604273, s.accept_stat());
+  EXPECT_FLOAT_EQ(-1.7890506, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(1.2320533, s.cont_params()(1));
+  EXPECT_FLOAT_EQ(-0.62397981, s.cont_params()(2));
+  EXPECT_FLOAT_EQ(-2.554004, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99910343, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());

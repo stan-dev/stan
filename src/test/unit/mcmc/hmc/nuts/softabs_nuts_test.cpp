@@ -309,7 +309,7 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 }
 
 TEST(McmcSoftAbsNuts, transition_test) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::softabs_point z_init(3);
   z_init.q(0) = 1;
@@ -338,15 +338,15 @@ TEST(McmcSoftAbsNuts, transition_test) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_EQ(4, sampler.depth_);
-  EXPECT_EQ((2 << 3) - 1, sampler.n_leapfrog_);
+  EXPECT_EQ(5, sampler.depth_);
+  EXPECT_EQ((2 << 4) - 1, sampler.n_leapfrog_);
   EXPECT_FALSE(sampler.divergent_);
 
-  EXPECT_FLOAT_EQ(1.9313564, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.86902142, s.cont_params()(1));
-  EXPECT_FLOAT_EQ(1.6008, s.cont_params()(2));
-  EXPECT_FLOAT_EQ(-3.5239484, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99690288, s.accept_stat());
+  EXPECT_FLOAT_EQ(-1.7373296, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(1.0898665, s.cont_params()(1));
+  EXPECT_FLOAT_EQ(-0.38303182, s.cont_params()(2));
+  EXPECT_FLOAT_EQ(-2.1764181, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9993856, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());

@@ -60,7 +60,7 @@ double newton_step(M& model, std::vector<double>& params_r,
     try {
       f1 = stan::model::log_prob_grad<true, jacobian>(model, new_params_r,
                                                       params_i, gradient);
-    } catch (std::exception& e) {
+    } catch (std::domain_error& e) {
       // FIXME:  this is not a good way to handle a general exception
       f1 = -1e100;
     }

@@ -109,65 +109,80 @@ int lbfgs(Model& model, const stan::io::var_context& init,
   }
   int ret = 0;
 
-  while (ret == 0) {
-    interrupt();
-    if (refresh > 0
-        && (lbfgs.iter_num() == 0 || ((lbfgs.iter_num() + 1) % refresh == 0)))
-      logger.info(
-          "    Iter"
-          "      log prob"
-          "        ||dx||"
-          "      ||grad||"
-          "       alpha"
-          "      alpha0"
-          "  # evals"
-          "  Notes ");
+  try {
+    while (ret == 0) {
+      interrupt();
+      if (refresh > 0
+          && (lbfgs.iter_num() == 0 || ((lbfgs.iter_num() + 1) % refresh == 0)))
+        logger.info(
+            "    Iter"
+            "      log prob"
+            "        ||dx||"
+            "      ||grad||"
+            "       alpha"
+            "      alpha0"
+            "  # evals"
+            "  Notes ");
 
-    ret = lbfgs.step();
-    lp = lbfgs.logp();
-    lbfgs.params_r(cont_vector);
+      ret = lbfgs.step();
 
-    if (refresh > 0
-        && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
-            || ((lbfgs.iter_num() + 1) % refresh == 0))) {
-      std::stringstream msg;
-      msg << " " << std::setw(7) << lbfgs.iter_num() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << lbfgs.prev_step_size() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << lbfgs.curr_g().norm() << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
-          << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
-          << " ";
-      msg << " " << std::setw(7) << lbfgs.grad_evals() << " ";
-      msg << " " << lbfgs.note() << " ";
-      logger.info(msg);
-    }
+      lp = lbfgs.logp();
+      lbfgs.params_r(cont_vector);
 
-    if (lbfgs_ss.str().length() > 0) {
-      logger.info(lbfgs_ss);
-      lbfgs_ss.str("");
-    }
-
-    if (save_iterations) {
-      std::vector<double> values;
-      std::stringstream msg;
-      model.write_array(rng, cont_vector, disc_vector, values, true, true,
-                        &msg);
-      if (msg.str().length() > 0)
+      if (refresh > 0
+          && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
+              || ((lbfgs.iter_num() + 1) % refresh == 0))) {
+        std::stringstream msg;
+        msg << " " << std::setw(7) << lbfgs.iter_num() << " ";
+        msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+        msg << " " << std::setw(12) << std::setprecision(6)
+            << lbfgs.prev_step_size() << " ";
+        msg << " " << std::setw(12) << std::setprecision(6)
+            << lbfgs.curr_g().norm() << " ";
+        msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
+            << " ";
+        msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
+            << " ";
+        msg << " " << std::setw(7) << lbfgs.grad_evals() << " ";
+        msg << " " << lbfgs.note() << " ";
         logger.info(msg);
+      }
 
-      values.insert(values.begin(), lp);
-      parameter_writer(values);
+      if (lbfgs_ss.str().length() > 0) {
+        logger.info(lbfgs_ss);
+        lbfgs_ss.str("");
+      }
+
+      if (save_iterations) {
+        std::vector<double> values;
+        std::stringstream msg;
+        model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                          &msg);
+        if (msg.str().length() > 0)
+          logger.info(msg);
+
+        values.insert(values.begin(), lp);
+        parameter_writer(values);
+      }
     }
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
   }
 
   if (!save_iterations) {
     std::vector<double> values;
     std::stringstream msg;
-    model.write_array(rng, cont_vector, disc_vector, values, true, true, &msg);
+    try {
+      model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                        &msg);
+    } catch (const std::exception& e) {
+      if (msg.str().length() > 0) {
+        logger.info(msg);
+      }
+      logger.error(e.what());
+      return error_codes::SOFTWARE;
+    }
     if (msg.str().length() > 0)
       logger.info(msg);
 

@@ -85,8 +85,13 @@ int meanfield(Model& model, const stan::io::var_context& init,
                           stan::rng_t>
       cmd_advi(model, cont_params, rng, grad_samples, elbo_samples, eval_elbo,
                output_samples);
-  cmd_advi.run(eta, adapt_engaged, adapt_iterations, tol_rel_obj,
-               max_iterations, logger, parameter_writer, diagnostic_writer);
+  try {
+    cmd_advi.run(eta, adapt_engaged, adapt_iterations, tol_rel_obj,
+                 max_iterations, logger, parameter_writer, diagnostic_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
 
   return stan::services::error_codes::OK;
 }

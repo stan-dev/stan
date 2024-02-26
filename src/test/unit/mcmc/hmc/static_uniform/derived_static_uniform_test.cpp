@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 
 TEST(McmcStaticUniform, unit_e_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::unit_e_point z_init(1);
   z_init.q(0) = 1;
@@ -41,9 +41,9 @@ TEST(McmcStaticUniform, unit_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5896972, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.2635686, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9994188, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -52,7 +52,7 @@ TEST(McmcStaticUniform, unit_e_transition) {
 }
 
 TEST(McmcStaticUniform, diag_e_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::diag_e_point z_init(1);
   z_init.q(0) = 1;
@@ -78,9 +78,9 @@ TEST(McmcStaticUniform, diag_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5896972, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.2635686, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9994188, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -89,7 +89,7 @@ TEST(McmcStaticUniform, diag_e_transition) {
 }
 
 TEST(McmcStaticUniform, dense_e_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::dense_e_point z_init(1);
   z_init.q(0) = 1;
@@ -115,9 +115,9 @@ TEST(McmcStaticUniform, dense_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5896972, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.2635686, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9994188, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -126,7 +126,7 @@ TEST(McmcStaticUniform, dense_e_transition) {
 }
 
 TEST(McmcStaticUniform, softabs_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::softabs_point z_init(1);
   z_init.q(0) = 1;
@@ -152,9 +152,9 @@ TEST(McmcStaticUniform, softabs_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.37006485, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.068473995, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9999119, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5338461, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.176342, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9996115, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -163,7 +163,7 @@ TEST(McmcStaticUniform, softabs_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_unit_e_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::unit_e_point z_init(1);
   z_init.q(0) = 1;
@@ -189,9 +189,9 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5896972, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.2635686, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9994188, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -200,7 +200,7 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_diag_e_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::diag_e_point z_init(1);
   z_init.q(0) = 1;
@@ -226,9 +226,9 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5896972, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.2635686, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9994188, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -237,7 +237,7 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_dense_e_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::dense_e_point z_init(1);
   z_init.q(0) = 1;
@@ -263,9 +263,9 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5896972, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.2635686, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9994188, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -274,7 +274,7 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
 }
 
 TEST(McmcStaticUniform, adapt_softabs_e_transition) {
-  stan::rng_t base_rng(4839294);
+  stan::rng_t base_rng = stan::services::util::create_rng(4839294, 0);
 
   stan::mcmc::softabs_point z_init(1);
   z_init.q(0) = 1;
@@ -300,9 +300,9 @@ TEST(McmcStaticUniform, adapt_softabs_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.37006485, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.068473995, s.log_prob());
-  EXPECT_FLOAT_EQ(0.9999119, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.5338461, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-1.176342, s.log_prob());
+  EXPECT_FLOAT_EQ(0.9996115, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
