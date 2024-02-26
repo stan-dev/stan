@@ -121,11 +121,9 @@ int hmc_nuts_diag_e(Model& model, const stan::io::var_context& init,
                     callbacks::writer& init_writer,
                     callbacks::writer& sample_writer,
                     callbacks::writer& diagnostic_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
-
-  return hmc_nuts_diag_e(model, init, unit_e_metric, random_seed, chain,
+  return hmc_nuts_diag_e(model, init, default_metric, random_seed, chain,
                          init_radius, num_warmup, num_samples, num_thin,
                          save_warmup, refresh, stepsize, stepsize_jitter,
                          max_depth, interrupt, logger, init_writer,
@@ -293,10 +291,10 @@ int hmc_nuts_diag_e(Model& model, size_t num_chains,
                            max_depth, interrupt, logger, init_writer[0],
                            sample_writer[0], diagnostic_writer[0]);
   }
-  std::vector<std::unique_ptr<stan::io::dump>> unit_e_metrics;
+  std::vector<std::unique_ptr<stan::io::array_var_context>> unit_e_metrics;
   unit_e_metrics.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    unit_e_metrics.emplace_back(std::make_unique<stan::io::dump>(
+    unit_e_metrics.emplace_back(std::make_unique<stan::io::array_var_context>(
         util::create_unit_e_diag_inv_metric(model.num_params_r())));
   }
   return hmc_nuts_diag_e(model, num_chains, init, unit_e_metrics, random_seed,

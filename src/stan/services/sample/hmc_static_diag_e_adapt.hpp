@@ -146,12 +146,11 @@ int hmc_static_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
 
   return hmc_static_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       int_time, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);

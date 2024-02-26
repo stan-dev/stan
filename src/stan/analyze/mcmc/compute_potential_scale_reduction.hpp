@@ -39,13 +39,12 @@ Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
 
   std::sort(value_with_index.begin(), value_with_index.end());
 
-
   Eigen::MatrixXd rankMatrix = Eigen::MatrixXd::Zero(rows, cols);
 
   // Assigning average ranks
   for (Eigen::Index i = 0; i < size; ++i) {
     // Handle ties by averaging ranks
-    Eigen::Index j = i+1;
+    Eigen::Index j = i + 1;
     double sumRanks = j;
     Eigen::Index count = 1;
 
@@ -55,7 +54,7 @@ Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
       ++count;
     }
     double avgRank = sumRanks / count;
-    boost::math::normal_distribution<double> dist; 
+    boost::math::normal_distribution<double> dist;
     for (std::size_t k = i; k < j; ++k) {
       Eigen::Index index = value_with_index[k].second;
       double p = (avgRank - 3.0 / 8.0) / (size - 2.0 * 3.0 / 8.0 + 1.0);
@@ -82,13 +81,16 @@ inline double rhat(const Eigen::MatrixXd& draws) {
   Eigen::VectorXd chain_mean(num_chains);
   chain_mean = draws.colwise().mean();
   double total_mean = chain_mean.mean();
-  double var_between = num_draws * (chain_mean.array() - total_mean).square().sum() / (num_chains-1);
+  double var_between = num_draws
+                       * (chain_mean.array() - total_mean).square().sum()
+                       / (num_chains - 1);
   double var_sum = 0;
   for (Eigen::Index col = 0; col < num_chains; ++col) {
-      var_sum += (draws.col(col).array() - chain_mean(col)).square().sum() / (num_draws - 1);
+    var_sum += (draws.col(col).array() - chain_mean(col)).square().sum()
+               / (num_draws - 1);
   }
   double var_within = var_sum / num_chains;
-  return sqrt((var_between / var_within + num_draws - 1) / num_draws); 
+  return sqrt((var_between / var_within + num_draws - 1) / num_draws);
 }
 
 

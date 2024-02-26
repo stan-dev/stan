@@ -121,11 +121,10 @@ int hmc_static_diag_e(Model& model, const stan::io::var_context& init,
                       callbacks::logger& logger, callbacks::writer& init_writer,
                       callbacks::writer& sample_writer,
                       callbacks::writer& diagnostic_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
 
-  return hmc_static_diag_e(model, init, unit_e_metric, random_seed, chain,
+  return hmc_static_diag_e(model, init, default_metric, random_seed, chain,
                            init_radius, num_warmup, num_samples, num_thin,
                            save_warmup, refresh, stepsize, stepsize_jitter,
                            int_time, interrupt, logger, init_writer,
