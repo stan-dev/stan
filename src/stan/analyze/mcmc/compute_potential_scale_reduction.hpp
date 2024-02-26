@@ -91,6 +91,75 @@ inline double rhat(const Eigen::MatrixXd& draws) {
   return sqrt((var_between / var_within + num_draws - 1) / num_draws); 
 }
 
+
+/**
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
+ * parameter across all kept samples. 
+ * Based on paper https://arxiv.org/abs/1903.08008
+ *
+ * Current implementation assumes draws are stored in contiguous
+ * blocks of memory.  Chains are trimmed from the back to match the
+ * length of the shortest chain.
+ *
+ * @param draws stores pointers to arrays of chains
+ * @param sizes stores sizes of chains
+ * @return potential scale reduction for the specified parameter
+ */
+inline double compute_potential_scale_reduction_rank(std::vector<const double*> draws, std::vector<size_t> sizes) {
+int num_chains = sizes.size();
+  size_t num_draws = sizes[0];
+  if (num_draws == 0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  for (int chain = 1; chain < num_chains; ++chain) {
+    num_draws = std::min(num_draws, sizes[chain]);
+  }
+
+  // check if chains are constant; all equal to first draw's value
+  bool are_all_const = false;
+  Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
+
+  for (int chain = 0; chain < num_chains; chain++) {
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain], sizes[chain]);
+
+    for (int n = 0; n < num_draws; n++) {
+      if (!std::isfinite(draw(n))) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+    }
+
+    init_draw(chain) = draw(0);
+
+    if (draw.isApproxToConstant(draw(0))) {
+      are_all_const |= true;
+    }
+  }
+
+  if (are_all_const) {
+    // If all chains are constant then return NaN
+    // if they all equal the same constant value
+    if (init_draw.isApproxToConstant(init_draw(0))) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+  }
+
+  Eigen::MatrixXd matrix(num_draws, num_chains);
+
+  for (int col = 0; col < num_chains; ++col) {
+    for (int row = 0; row < num_draws; ++row) {
+      matrix(row, col) = draws[col][row];
+    }
+  }
+
+  double rhat_bulk = rhat(rank_transform(matrix));
+  double rhat_tail = rhat(rank_transform(
+      (matrix.array() - math::quantile(matrix.reshaped(), 0.5)).abs()));
+
+  return std::max(rhat_bulk, rhat_tail);
+}
+
+
 /**
  * Computes the potential scale reduction (Rhat) for the specified
  * parameter across all kept samples.
@@ -155,11 +224,31 @@ inline double compute_potential_scale_reduction(
     }
   }
 
-  double rhat_bulk = rhat(rank_transform(matrix));
-  double rhat_tail = rhat(rank_transform(
-      (matrix.array() - math::quantile(matrix.reshaped(), 0.5)).abs()));
+  return rhat(matrix);
+}
 
-  return std::max(rhat_bulk, rhat_tail);
+/**
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
+ * parameter across all kept samples. 
+ * Based on paper https://arxiv.org/abs/1903.08008
+ *
+ * See more details in Stan reference manual section "Potential
+ * Scale Reduction". http://mc-stan.org/users/documentation
+ *
+ * Current implementation assumes draws are stored in contiguous
+ * blocks of memory.  Chains are trimmed from the back to match the
+ * length of the shortest chain.  Argument size will be broadcast to
+ * same length as draws.
+ *
+ * @param draws stores pointers to arrays of chains
+ * @param size stores sizes of chains
+ * @return potential scale reduction for the specified parameter
+ */
+inline double compute_potential_scale_reduction_rank(
+    std::vector<const double*> draws, size_t size) {
+  int num_chains = draws.size();
+  std::vector<size_t> sizes(num_chains, size);
+  return compute_potential_scale_reduction_rank(draws, sizes);
 }
 
 /**
@@ -183,6 +272,41 @@ inline double compute_potential_scale_reduction(
   int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_potential_scale_reduction(draws, sizes);
+}
+
+
+/**
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
+ * parameter across all kept samples. 
+ * Based on paper https://arxiv.org/abs/1903.08008
+ * 
+ * When the number of total draws N is odd, the (N+1)/2th draw is ignored.
+ *
+ * See more details in Stan reference manual section "Potential
+ * Scale Reduction". http://mc-stan.org/users/documentation
+ *
+ * Current implementation assumes draws are stored in contiguous
+ * blocks of memory.  Chains are trimmed from the back to match the
+ * length of the shortest chain.
+ *
+ * @param draws stores pointers to arrays of chains
+ * @param sizes stores sizes of chains
+ * @return potential scale reduction for the specified parameter
+ */
+inline double compute_split_potential_scale_reduction_rank(
+    std::vector<const double*> draws, std::vector<size_t> sizes) {
+  int num_chains = sizes.size();
+  size_t num_draws = sizes[0];
+  for (int chain = 1; chain < num_chains; ++chain) {
+    num_draws = std::min(num_draws, sizes[chain]);
+  }
+
+  std::vector<const double*> split_draws = split_chains(draws, sizes);
+
+  double half = num_draws / 2.0;
+  std::vector<size_t> half_sizes(2 * num_chains, std::floor(half));
+
+  return compute_potential_scale_reduction_rank(split_draws, half_sizes);
 }
 
 /**
@@ -215,6 +339,32 @@ inline double compute_split_potential_scale_reduction(
   std::vector<size_t> half_sizes(2 * num_chains, std::floor(half));
 
   return compute_potential_scale_reduction(split_draws, half_sizes);
+}
+
+/**
+ * Computes the potential scale reduction (Rhat) using rank based diagnostic for the specified
+ * parameter across all kept samples. 
+ * Based on paper https://arxiv.org/abs/1903.08008
+ * 
+ * When the number of total draws N is odd, the (N+1)/2th draw is ignored.
+ * 
+ * See more details in Stan reference manual section "Potential
+ * Scale Reduction". http://mc-stan.org/users/documentation
+ *
+ * Current implementation assumes draws are stored in contiguous
+ * blocks of memory.  Chains are trimmed from the back to match the
+ * length of the shortest chain.  Argument size will be broadcast to
+ * same length as draws.
+ *
+ * @param draws stores pointers to arrays of chains
+ * @param size stores sizes of chains
+ * @return potential scale reduction for the specified parameter
+ */
+inline double compute_split_potential_scale_reduction_rank(
+    std::vector<const double*> draws, size_t size) {
+  int num_chains = draws.size();
+  std::vector<size_t> sizes(num_chains, size);
+  return compute_split_potential_scale_reduction_rank(draws, sizes);
 }
 
 /**
