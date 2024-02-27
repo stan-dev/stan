@@ -200,10 +200,8 @@ pipeline {
                     tools: [
                         cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
                     ],
-                    blameDisabled: false,
                     qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
                     healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                    referenceJobName: env.BRANCH_NAME
 
                     deleteDir()
                 }
@@ -509,10 +507,8 @@ pipeline {
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
                     clang(id: "pipeline_clang", name: "LLVM/Clang")
                 ],
-                blameDisabled: false,
                 qualityGates: [[threshold: 30, type: 'TOTAL', unstable: true]],
-                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                referenceJobName: env.BRANCH_NAME
+                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH'
             }
         }
         success {
