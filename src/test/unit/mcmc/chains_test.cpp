@@ -875,9 +875,6 @@ TEST_F(McmcChains, blocker_split_potential_scale_reduction) {
   }
 }
 
-
-
-
 TEST_F(McmcChains, blocker_split_potential_scale_reduction_rank) {
   std::stringstream out;
   stan::io::stan_csv blocker1
@@ -898,8 +895,8 @@ TEST_F(McmcChains, blocker_split_potential_scale_reduction_rank) {
       1.00381, 1.00283, 1.00188, 1.00225, 1.00335, 1.00133, 1.00209, 1.0109;
 
   for (int index = 4; index < chains.num_params(); index++) {
-    ASSERT_NEAR(rhat(index - 4), chains.split_potential_scale_reduction_rank(index),
-                1e-4)
+    ASSERT_NEAR(rhat(index - 4),
+                chains.split_potential_scale_reduction_rank(index), 1e-4)
         << "rhat for index: " << index
         << ", parameter: " << chains.param_name(index);
   }
