@@ -192,19 +192,17 @@ pipeline {
             }
             post {
                 always {
-
-                    recordIssues id: "lint_doc_checks",
-                    name: "Linting & Doc checks",
-                    enabledForFailure: true,
-                    aggregatingResults : true,
-                    tools: [
-                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
-                    ],
-                    blameDisabled: false,
-                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                    referenceJobName: env.BRANCH_NAME
-
+                    recordIssues( 
+                        id: "lint_doc_checks",
+                        name: "Linting & Doc checks",
+                        enabledForFailure: true,
+                        aggregatingResults : true,
+                        tools: [
+                            cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
+                        ],
+                        qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                        healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH'
+                    )
                     deleteDir()
                 }
             }
@@ -498,21 +496,21 @@ pipeline {
     post {
         always {
             node("linux") {
-                recordIssues id: "pipeline",
-                name: "Entire pipeline results",
-                enabledForFailure: true,
-                aggregatingResults : false,
-                filters: [
-                    excludeFile('lib/.*')
-                ],
-                tools: [
-                    gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
-                    clang(id: "pipeline_clang", name: "LLVM/Clang")
-                ],
-                blameDisabled: false,
-                qualityGates: [[threshold: 30, type: 'TOTAL', unstable: true]],
-                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                referenceJobName: env.BRANCH_NAME
+                recordIssues( 
+                    id: "pipeline",
+                    name: "Entire pipeline results",
+                    enabledForFailure: true,
+                    aggregatingResults : false,
+                    filters: [
+                        excludeFile('lib/.*')
+                    ],
+                    tools: [
+                        gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
+                        clang(id: "pipeline_clang", name: "LLVM/Clang")
+                    ],
+                    qualityGates: [[threshold: 30, type: 'TOTAL', unstable: true]],
+                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH'
+                )
             }
         }
         success {
