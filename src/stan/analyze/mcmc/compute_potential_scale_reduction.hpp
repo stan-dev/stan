@@ -26,7 +26,7 @@ namespace analyze {
  *
  */
 
-Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
+inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& draws) {
   const Eigen::Index rows = draws.rows();
   const Eigen::Index cols = draws.cols();
   const Eigen::Index size = rows * cols;
@@ -116,7 +116,7 @@ inline double compute_potential_scale_reduction_rank(
   for (int chain = 1; chain < num_chains; ++chain) {
     num_draws = std::min(num_draws, sizes[chain]);
   }
-
+  
   // check if chains are constant; all equal to first draw's value
   bool are_all_const = false;
   Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
