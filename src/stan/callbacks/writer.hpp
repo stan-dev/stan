@@ -56,7 +56,8 @@ class writer {
    * parameters in the rows and samples in the columns. The matrix is then
    * transposed for the output.
    */
-  virtual void operator()(const Eigen::MatrixXd& values) {}
+  virtual void operator()(
+      const Eigen::Ref<Eigen::Matrix<double, -1, -1>>& values) {}
 };
 
 }  // namespace callbacks

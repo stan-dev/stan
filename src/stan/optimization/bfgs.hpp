@@ -309,7 +309,7 @@ class ModelAdaptor {
 
     try {
       f = -log_prob_propto<jacobian>(_model, _x, _params_i, _msgs);
-    } catch (const std::exception &e) {
+    } catch (const std::domain_error &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
       return 1;
@@ -341,7 +341,7 @@ class ModelAdaptor {
 
     try {
       f = -log_prob_grad<true, jacobian>(_model, _x, _params_i, _g, _msgs);
-    } catch (const std::exception &e) {
+    } catch (const std::domain_error &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
       return 1;

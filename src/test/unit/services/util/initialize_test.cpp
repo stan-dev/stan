@@ -1,4 +1,5 @@
 #include <stan/services/util/initialize.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <stan/callbacks/stream_writer.hpp>
@@ -24,7 +25,7 @@ class ServicesUtilInitialize : public testing::Test {
   stan::callbacks::stream_writer message;
   stan::test::unit::instrumented_logger logger;
   stan::test::unit::instrumented_writer init;
-  boost::ecuyer1988 rng;
+  stan::rng_t rng;
 };
 
 TEST_F(ServicesUtilInitialize, radius_zero__print_false) {

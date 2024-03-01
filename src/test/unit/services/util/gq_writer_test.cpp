@@ -35,7 +35,7 @@ TEST_F(ServicesUtilGQWriter, t2) {
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   stan::callbacks::stream_logger logger(logger_ss, logger_ss, logger_ss,
                                         logger_ss, logger_ss);
-  boost::ecuyer1988 rng1 = stan::services::util::create_rng(0, 1);
+  stan::rng_t rng1 = stan::services::util::create_rng(0, 1);
   std::vector<double> draw;
   draw.push_back(-2.345);
   draw.push_back(-6.789);
@@ -50,7 +50,7 @@ TEST_F(ServicesUtilGQWriter, TestExceptions) {
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   stan::callbacks::stream_logger logger(logger_ss, logger_ss, logger_ss,
                                         logger_ss, logger_ss);
-  boost::ecuyer1988 rng1 = stan::services::util::create_rng(0, 1);
+  stan::rng_t rng1 = stan::services::util::create_rng(0, 1);
   std::vector<double> draw;
   draw.push_back(2.345);
   draw.push_back(6.789);

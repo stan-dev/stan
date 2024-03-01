@@ -1,6 +1,7 @@
 #ifndef STAN_IO_JSON_JSON_HANDLER_HPP
 #define STAN_IO_JSON_JSON_HANDLER_HPP
 
+#include <cstdint>
 #include <string>
 
 namespace stan {

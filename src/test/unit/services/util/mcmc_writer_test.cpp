@@ -247,7 +247,7 @@ TEST_F(ServicesUtil, write_sample_names) {
 }
 
 TEST_F(ServicesUtil, write_sample_params) {
-  boost::ecuyer1988 rng = stan::services::util::create_rng(0, 1);
+  stan::rng_t rng = stan::services::util::create_rng(0, 1);
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
   stan::mcmc::sample sample(x, 1, 2);
   mock_sampler sampler;
@@ -314,7 +314,7 @@ TEST_F(ServicesUtil, write_timing) {
 }
 
 TEST_F(ServicesUtil, throwing_model__write_sample_parameters) {
-  boost::ecuyer1988 rng = stan::services::util::create_rng(0, 1);
+  stan::rng_t rng = stan::services::util::create_rng(0, 1);
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
   stan::mcmc::sample sample(x, 1, 2);
   mock_sampler sampler;

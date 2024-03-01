@@ -1,6 +1,5 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
-#include <stan/io/dump.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/model/prob_grad.hpp>
@@ -8,9 +7,6 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <stan/variational/advi.hpp>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
-
-typedef boost::ecuyer1988 rng_t;
 
 // Mock Model
 class mock_model : public stan::model::prob_grad {

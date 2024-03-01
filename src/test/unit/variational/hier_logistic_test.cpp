@@ -1,14 +1,13 @@
 #include <test/test-models/good/variational/hier_logistic.hpp>
 #include <stan/variational/advi.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <stan/services/util/create_rng.hpp>
 #include <stan/callbacks/stream_logger.hpp>
-
-typedef boost::ecuyer1988 rng_t;
 
 class advi_test : public ::testing::Test {
  public:
@@ -21,9 +20,9 @@ class advi_test : public ::testing::Test {
   void SetUp() {
     // Create mock data_var_context
     std::fstream data_stream(
-        "src/test/test-models/good/variational/hier_logistic.data.R",
+        "src/test/test-models/good/variational/hier_logistic.data.json",
         std::fstream::in);
-    stan::io::dump data_var_context(data_stream);
+    stan::json::json_data data_var_context(data_stream);
     data_stream.close();
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);
@@ -38,10 +37,10 @@ class advi_test : public ::testing::Test {
     diagnostic_stream_.str("");
 
     advi_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_meanfield, rng_t>(
+        stan_model, stan::variational::normal_meanfield, stan::rng_t>(
         *model_, cont_params_, base_rng_, 10, 100, 100, 1);
     advi_fullrank_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_fullrank, rng_t>(
+        stan_model, stan::variational::normal_fullrank, stan::rng_t>(
         *model_, cont_params_, base_rng_, 10, 100, 100, 1);
   }
 
@@ -53,9 +52,9 @@ class advi_test : public ::testing::Test {
   }
 
   stan::variational::advi<stan_model, stan::variational::normal_meanfield,
-                          rng_t> *advi_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
-      *advi_fullrank_;
+                          stan::rng_t> *advi_;
+  stan::variational::advi<stan_model, stan::variational::normal_fullrank,
+                          stan::rng_t> *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream message_stream_;
   std::stringstream parameter_stream_;
@@ -67,7 +66,7 @@ class advi_test : public ::testing::Test {
  private:
   stan_model *model_;
   stan_model *model_null_stream_;
-  rng_t base_rng_;
+  stan::rng_t base_rng_;
   Eigen::VectorXd cont_params_;
 };
 

@@ -1,5 +1,5 @@
 #include <string>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
@@ -8,10 +8,8 @@
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
-
 TEST(McmcDenseEMetric, sample_p) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::Matrix2d m(2, 2);
   m(0, 0) = 3.0;
@@ -23,7 +21,7 @@ TEST(McmcDenseEMetric, sample_p) {
 
   stan::mcmc::mock_model model(2);
 
-  stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
+  stan::mcmc::dense_e_metric<stan::mcmc::mock_model, stan::rng_t> metric(model);
   stan::mcmc::dense_e_point z(2);
   z.set_metric(m_inv);
 
@@ -62,8 +60,6 @@ TEST(McmcDenseEMetric, sample_p) {
 }
 
 TEST(McmcDenseEMetric, gradients) {
-  rng_t base_rng(0);
-
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
 
   stan::mcmc::dense_e_point z(q.size());
@@ -79,7 +75,7 @@ TEST(McmcDenseEMetric, gradients) {
   funnel_model_namespace::funnel_model model(data_var_context, 0,
                                              &model_output);
 
-  stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, rng_t>
+  stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, stan::rng_t>
       metric(model);
 
   double epsilon = 1e-6;
@@ -156,8 +152,6 @@ TEST(McmcDenseEMetric, gradients) {
 TEST(McmcDenseEMetric, streams) {
   stan::test::capture_std_streams();
 
-  rng_t base_rng(0);
-
   Eigen::VectorXd q(2);
   q(0) = 5;
   q(1) = 1;
@@ -165,7 +159,8 @@ TEST(McmcDenseEMetric, streams) {
   stan::mcmc::mock_model model(q.size());
 
   // typedef to use within Google Test macros
-  typedef stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> dense_e;
+  typedef stan::mcmc::dense_e_metric<stan::mcmc::mock_model, stan::rng_t>
+      dense_e;
 
   EXPECT_NO_THROW(dense_e metric(model));
 
