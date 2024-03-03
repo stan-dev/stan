@@ -29,8 +29,6 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::interrupt& interrupt,
                           callbacks::logger& logger,
                           callbacks::dispatcher& dispatcher,
-                          // should there be another dispatcher for warmup draws?
-                          // callbacks::dispatcher& dispather_warmup,
                           size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
@@ -44,31 +42,34 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
     logger.error(e.what());
     return;
   }
+  
   stan::mcmc::sample s(cont_params, 0, 0);
 
   // params plus, constrained
   std::vector<std::string> constrained_names;
   model.constrained_param_names(constrained_names, true, true);  // all vars
   size_t num_constrained = constrained_names.size();
-  dispatcher.table_header(callbacks::table_info_type::DRAW_CONSTRAIN, constrained_names);
+  dispatcher.table_header(callbacks::table_info_type::DRAW_WARMUP, constrained_names);
+  dispatcher.table_header(callbacks::table_info_type::DRAW_SAMPLE, constrained_names);
   
   // params only, unconstrained
   std::vector<std::string> unconstrained_names;
   model.unconstrained_param_names(unconstrained_names, false, false);
   size_t num_unconstrained = unconstrained_names.size();
-  dispatcher.table_header(callbacks::table_info_type::PARAMS_UNCNSTRN, unconstrained_names);
+  dispatcher.table_header(callbacks::table_info_type::UPARAMS_WARMUP, unconstrained_names);
+  dispatcher.table_header(callbacks::table_info_type::UPARAMS_SAMPLE, unconstrained_names);
 
   // mcmc - log_prob + accept stat
   std::vector<std::string> engine_names;
   s.get_sample_param_names(engine_names);
   sampler.get_sampler_param_names(engine_names);
-  dispatcher.table_header(callbacks::table_info_type::DRAW_ENGINE,engine_names);
+  dispatcher.table_header(callbacks::table_info_type::ALGO_STATE,engine_names);
 
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler,
                              num_warmup, 0, num_warmup + num_samples,
-                             num_thin, refresh, save_warmup, true,
-                             dispatcher, s, model, rng, interrupt, logger,
+                             num_thin, refresh, true, dispatcher,
+                             s, model, rng, interrupt, logger,
                              chain_id, num_chains);
   auto end_warm = std::chrono::steady_clock::now();
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -85,8 +86,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler,
                              num_samples, num_warmup, num_warmup + num_samples,
-                             num_thin, refresh, true, false,
-                             dispatcher, s, model, rng, interrupt, logger,
+                             num_thin, refresh, false, dispatcher,
+                             s, model, rng, interrupt, logger,
                              chain_id, num_chains);
 
   auto end_sample = std::chrono::steady_clock::now();

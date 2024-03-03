@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/dispatcher.hpp>
+#include <stan/callbacks/info_type.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/random_var_context.hpp>
@@ -246,8 +247,8 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
   std::vector<double> unconstrained = initialize(model, init, rng, init_radius, print_timing, logger);
   std::vector<std::string> names;
   model.unconstrained_param_names(names, false, false);
-  dispatcher.table_header(stan::callbacks::table_info_type::PARAMS_INITS, names);
-  dispatcher.table_row(stan::callbacks::table_info_type::PARAMS_INITS, unconstrained);
+  dispatcher.table_header(stan::callbacks::table_info_type::PARAMS_INIT, names);
+  dispatcher.table_row(stan::callbacks::table_info_type::PARAMS_INIT, unconstrained);
   return unconstrained;
 }
 

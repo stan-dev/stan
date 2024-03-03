@@ -101,11 +101,8 @@ class csv_writer final : public structured_writer {
     } // else illegal
   }
 
-  /**
-   * Writes a row of a data table.
-   * @param values vector of values.
-   */
   void table_row(const std::vector<double>& values) {
+    std::stringstream msg;
     if (has_header_) {
       if (values.size() == num_cols_ && values.size() > 0) {
         auto last = values.end();
@@ -116,9 +113,50 @@ class csv_writer final : public structured_writer {
         }
         write_value(values.back());
         *output_ << std::endl;
-      } // else illegal
-    } // also illegal - header initializes num_cols_
+      }
+    }
   }
+
+
+  // /**
+  //  * Writes a row of a data table.
+  //  * @param values vector of values.
+  //  */
+  // void table_row(const std::vector<double>& values, bool pad = false) {
+  //   std::stringstream msg;
+  //   std::cout << "table_row, num_values: " << values.size() << std::endl;
+  //   if (has_header_) {
+  //     if (values.size() == num_cols_ && values.size() > 0) {
+  //       auto last = values.end();
+  //       --last;
+  //       for (auto it = values.begin(); it != last; ++it) {
+  //         write_value(*it);
+  //         *output_ << ", ";
+  //       }
+  //       write_value(values.back());
+  //       *output_ << std::endl;
+  //     } else if (pad && values.size() > 0) {
+  //       size_t missing = num_cols_ - values.size();
+  //       auto last = values.end();
+  //       for (auto it = values.begin(); it != last; ++it) {
+  //         write_value(*it);
+  //         *output_ << ", ";
+  //       }
+  //       for (auto i = 0; i < missing; ++i) {
+  //         *output_ << "0, ";
+  //       }
+  //       *output_ << "0" << std::endl;
+  //     } else {
+  //       msg << "Output error, expected " << num_cols_
+  //           << " values, got " << values.size() ;
+  //       throw std::domain_error(msg.str());
+  //     }
+  //   } else {
+  //     msg << "Output error, missing header.";
+  //     throw std::domain_error(msg.str());
+  //   }
+  // }
+
 
 };
 

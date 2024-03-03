@@ -36,7 +36,7 @@ int hmc_nuts_diag_e_adapt(
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::dispatcher& dispatcher) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
   std::vector<double> cont_vector;
   Eigen::VectorXd inv_metric;
   try {
@@ -50,7 +50,7 @@ int hmc_nuts_diag_e_adapt(
     logger.error(e.what());
     return error_codes::CONFIG;
   }
-  stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::adapt_diag_e_nuts<Model, stan::rng_t> sampler(model, rng);
   util::config_adaptive_sampler(sampler, inv_metric, stepsize, stepsize_jitter,
                           max_depth, delta, gamma, kappa, t0, num_warmup,
                           init_buffer, term_buffer, window, logger);
@@ -73,7 +73,7 @@ int hmc_nuts_diag_e_adapt(
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::dispatcher& dispatcher) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
   std::vector<double> cont_vector;
   try {
     cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
@@ -83,7 +83,7 @@ int hmc_nuts_diag_e_adapt(
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::adapt_diag_e_nuts<Model, stan::rng_t> sampler(model, rng);
   Eigen::VectorXd inv_metric =  Eigen::VectorXd::Ones(model.num_params_r());
   util::config_adaptive_sampler(sampler, inv_metric, stepsize, stepsize_jitter,
                           max_depth, delta, gamma, kappa, t0, num_warmup,

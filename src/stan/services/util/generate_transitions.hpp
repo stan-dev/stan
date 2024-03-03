@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_UTIL_GENERATE_TRANSITIONS_HPP
 #define STAN_SERVICES_UTIL_GENERATE_TRANSITIONS_HPP
 
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/dispatcher.hpp>
 #include <stan/callbacks/info_type.hpp>
 #include <stan/callbacks/interrupt.hpp>
@@ -12,8 +13,66 @@ namespace stan {
 namespace services {
 namespace util {
 
+void log_progress(int iter, int start, int finish, bool warmup,
+                  size_t chain_id, size_t num_chains,
+                  callbacks::logger& logger) {
+  int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
+  std::stringstream message;
+  if (num_chains != 1) {
+    message << "Chain [" << chain_id << "] ";
+  }
+  message << "Iteration: ";
+  message << std::setw(it_print_width) << iter + 1 + start << " / " << finish;
+  message << " [" << std::setw(3)
+          << static_cast<int>((100.0 * (start + iter + 1)) / finish) << "%] ";
+  message << (warmup ? " (Warmup)" : " (Sampling)");
+  logger.info(message);
+}
+
+template <class Model, class RNG>
+void dispatch_sample(callbacks::dispatcher& dispatcher,
+                     RNG& base_rng,
+                     stan::mcmc::sample& sample,
+                     stan::mcmc::base_mcmc& sampler,
+                     Model& model,
+                     bool warmup,
+                     callbacks::logger& logger) {
+  std::vector<double> engine_values;
+  sample.get_sample_params(engine_values);  // mcmc:  log_prob, accept_stat
+  sampler.get_sampler_params(engine_values);  // nuts-specific
+  dispatcher.table_row(callbacks::table_info_type::ALGO_STATE, engine_values);
+
+  std::vector<double> constrained_values;
+  std::vector<int> params_i;
+  std::stringstream ss_print;
+  std::vector<double> cont_params(
+      sample.cont_params().data(),
+      sample.cont_params().data() + sample.cont_params().size());
+
+  try {
+    model.write_array(base_rng, cont_params, params_i, constrained_values,
+                      true, true, &ss_print);
+  }
+  catch (const std::exception& e) {  // log gq exceptions, continue
+    if (ss_print.str().length() > 0)
+      logger.info(ss_print);
+    ss_print.str("");
+    logger.info(e.what());
+  }
+  if (ss_print.str().length() > 0)
+    logger.info(ss_print);
+
+  if (warmup) {
+    dispatcher.table_row(callbacks::table_info_type::DRAW_WARMUP, constrained_values);
+    dispatcher.table_row(callbacks::table_info_type::UPARAMS_WARMUP, cont_params);
+  } else {
+    dispatcher.table_row(callbacks::table_info_type::DRAW_SAMPLE, constrained_values);
+    dispatcher.table_row(callbacks::table_info_type::UPARAMS_SAMPLE, cont_params);
+  }    
+}
+
 /**
- * Generates MCMC transitions.
+ * Generates MCMC transitions, writes to mcmc_writer
  *
  * @tparam Model model class
  * @tparam RNG random number generator class
@@ -55,18 +114,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
 
     if (refresh > 0
         && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
-      int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
-      std::stringstream message;
-      if (num_chains != 1) {
-        message << "Chain [" << chain_id << "] ";
-      }
-      message << "Iteration: ";
-      message << std::setw(it_print_width) << m + 1 + start << " / " << finish;
-      message << " [" << std::setw(3)
-              << static_cast<int>((100.0 * (start + m + 1)) / finish) << "%] ";
-      message << (warmup ? " (Warmup)" : " (Sampling)");
-
-      logger.info(message);
+      log_progress(m, start, finish, warmup, chain_id, num_chains, logger);
     }
 
     init_s = sampler.transition(init_s, logger);
@@ -78,66 +126,37 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
   }
 }
 
-
-void log_progress(int iter, int start, int finish, bool warmup,
-                  size_t chain_id, size_t num_chains,
-                  callbacks::logger& logger) {
-  int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
-  std::stringstream message;
-  if (num_chains != 1) {
-    message << "Chain [" << chain_id << "] ";
-  }
-  message << "Iteration: ";
-  message << std::setw(it_print_width) << iter + 1 + start << " / " << finish;
-  message << " [" << std::setw(3)
-          << static_cast<int>((100.0 * (start + iter + 1)) / finish) << "%] ";
-  message << (warmup ? " (Warmup)" : " (Sampling)");
-  logger.info(message);
-}
-
-
-template <class Model, class RNG>
-void dispatch_sample(RNG& rng, stan::mcmc::sample& sample,
-                     stan::mcmc::base_mcmc& sampler, Model& model,
-                     callbacks::logger& logger,
-                     callbacks::dispatcher& dispatcher) {
-
-  std::vector<double> engine_values;
-  sample.get_sample_params(engine_values);  // mcmc:  log_prob, accept_stat
-  sampler.get_sampler_params(engine_values);  // nuts-specific
-  dispatcher.table_row(callbacks::table_info_type::DRAW_ENGINE, engine_values);
-
-  std::vector<double> constrained_values;
-  std::vector<int> params_i;
-  std::stringstream ss_print;
-  std::vector<double> cont_params(
-      sample.cont_params().data(),
-      sample.cont_params().data() + sample.cont_params().size());
-
-  dispatcher.table_row(callbacks::table_info_type::PARAMS_UNCNSTRN, cont_params);
-  try {
-    model.write_array(rng, cont_params, params_i, constrained_values,
-                      true, true, &ss_print);
-  }
-  catch (const std::exception& e) {  // log gq exceptions, continue
-    if (ss_print.str().length() > 0)
-      logger.info(ss_print);
-    ss_print.str("");
-    logger.info(e.what());
-  }
-  if (ss_print.str().length() > 0)
-    logger.info(ss_print);
-
-  // allow missing gq values
-  //  dispatcher.table_row_padded(callbacks::info_type::DRAW_CONSTRAINED, constrained_values);
-  dispatcher.table_row(callbacks::table_info_type::DRAW_CONSTRAIN, constrained_values);
-}
-
+/**
+ * Generates MCMC transitions, writes to dispatcher
+ *
+ * @tparam Model model class
+ * @tparam RNG random number generator class
+ * @param[in,out] sampler MCMC sampler used to generate transitions
+ * @param[in] num_iterations number of MCMC transitions
+ * @param[in] start starting iteration number used for printing messages
+ * @param[in] finish end iteration number used for printing messages
+ * @param[in] num_thin when save is true, a draw will be written to the
+ *   mcmc_writer every num_thin iterations
+ * @param[in] refresh number of iterations to print a message. If
+ *   refresh is zero, iteration number messages will not be printed
+ * @param[in] warmup indicates whether these transitions are warmup. Used
+ *   for printing iteration number messages
+ * @param[in,out] dispatcher - sends outputs to appropriate writer
+ * @param[in,out] init_s starts as the initial unconstrained parameter
+ *   values. When the function completes, this will have the final
+ *   iteration's unconstrained parameter values
+ * @param[in] model model
+ * @param[in,out] base_rng random number generator
+ * @param[in,out] callback interrupt callback called once an iteration
+ * @param[in,out] logger logger for messages
+ * @param[in] chain_id The id of the current chain, used in output.
+ * @param[in] num_chains The number of chains used in the program. This
+ *  is used in generate transitions to print out the chain number.
+ */
 template <class Model, class RNG>
 void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           int start, int finish, int num_thin, int refresh,
-                          bool save, bool warmup,
-                          stan::callbacks::dispatcher& dispatcher,
+                          bool warmup, stan::callbacks::dispatcher& dispatcher,
                           stan::mcmc::sample& init_s, Model& model,
                           RNG& base_rng, callbacks::interrupt& callback,
                           callbacks::logger& logger, size_t chain_id = 1,
@@ -149,11 +168,13 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
       log_progress(m, start, finish, warmup, chain_id, num_chains, logger);
     }
     init_s = sampler.transition(init_s, logger);
-    if (save && ((m % num_thin) == 0)) {
-      dispatch_sample(base_rng, init_s, sampler, model, logger, dispatcher);
+    if ((m % num_thin) == 0) {
+      dispatch_sample(dispatcher, base_rng, init_s, sampler, model, warmup, logger);
     }
   }
 }
+
+
 
 
 }  // namespace util
