@@ -174,6 +174,7 @@ class json_writer final : public structured_writer {
     record_depth_++;
     record_element_needs_comma_ = false;
   }
+
   /**
    * Writes "}", final token of a JSON record.
    */

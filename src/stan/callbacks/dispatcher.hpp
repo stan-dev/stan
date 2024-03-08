@@ -117,24 +117,43 @@ class dispatcher {
       it->second->end_record(std::forward<Rest>(rest)...);
     }
   }
-    
+
   template <typename First, typename... Rest>
-  void table_header(First&& first, Rest&&... rest) {
+  void write_flat(First&& first, Rest&&... rest) {
     auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
     auto it = map.find(std::forward<First>(first));
     if (it != map.end()) {
-      it->second->table_header(std::forward<Rest>(rest)...);
+      it->second->write_flat(std::forward<Rest>(rest)...);
     }
   }
 
   template <typename First, typename... Rest>
-  void table_row(First&& first, Rest&&... rest) {
+  void begin_row(First&& first, Rest&&... rest) {
     auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
     auto it = map.find(std::forward<First>(first));
     if (it != map.end()) {
-      it->second->table_row(std::forward<Rest>(rest)...);
+      it->second->begin_row(std::forward<Rest>(rest)...);
     }
   }
+
+  template <typename First, typename... Rest>
+  void write_header(First&& first, Rest&&... rest) {
+    auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
+    auto it = map.find(std::forward<First>(first));
+    if (it != map.end()) {
+      it->second->write_header(std::forward<Rest>(rest)...);
+    }
+  }
+
+  template <typename First, typename... Rest>
+  void begin_header(First&& first, Rest&&... rest) {
+    auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
+    auto it = map.find(std::forward<First>(first));
+    if (it != map.end()) {
+      it->second->begin_header(std::forward<Rest>(rest)...);
+    }
+  }
+    
 
 };
 

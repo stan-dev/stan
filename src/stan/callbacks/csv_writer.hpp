@@ -15,12 +15,12 @@ namespace stan {
 namespace callbacks {
 
 /**
- * The `csv_writer` callback is used output a single CSV table,
- * which consists of a header row, followed by zero or more data rows.
+ * The `csv_writer` callback is used output a single CSV file,
+ * consisting of a header row, data rows, and comment rows.
  * Data rows contain one or more values, either real or integer.
  * The header and all data rows must contain the same number of elements.
- * The writer doesn't try to validate the object's internal structure
- * or object completeness, only syntactic correctness.
+ * Comments are prefixed by "#" and consist of a either a label
+ * or a label, value pair
  *
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
@@ -32,11 +32,34 @@ class csv_writer final : public structured_writer {
   // Output stream
   std::unique_ptr<Stream, Deleter> output_{nullptr};
 
-  // Whether or not header row has been written
-  bool has_header_ = false;
+  // Internal state:  header row, data row, items per row
+  size_t header_size_ = 0;
+  size_t row_size_ = 0;
 
-  size_t num_cols_ = 0;
+  template <typename T>
+  void write_int_like(const std::string& key, T value) {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (row_size_ > 0) {
+      *output_ << std::endl;
+      row_size_ = 0;
+    }
+    *output_ << process_string(key) << " = " << value << std::endl;
+  }
 
+  /**
+   * Writes key as initial element of comment line followed by " = "
+   *
+   * @param[in] key value
+   */
+  void write_key(const std::string& key) {
+    if (row_size_ > 0) {
+      *output_ << std::endl;
+      row_size_ = 0;
+    }
+    *output_ << "# " << process_string(key) << " = ";
+  }
 
   /**
    * Writes a single value.  Corrects capitalization for inf and nans.
@@ -57,10 +80,39 @@ class csv_writer final : public structured_writer {
     }
   }
 
+  /**
+   * Writes a single complex value.
+   *
+   * @param[in] v value
+   */
+  void write_complex_value(std::complex<double> v) {
+    write_value(v.real());
+    *output_ << ", ";
+    write_value(v.imag());
+  }
+
+  /**
+   * Writes the set of comma separated values in an Eigen (row) vector.
+   *
+   * @param[in] v Values in an `Eigen::Vector`
+   */
+  template <typename Derived>
+  void write_eigen_vector(const Eigen::DenseBase<Derived>& v) {
+    *output_ << "# ";
+    if (v.size() > 0) {
+      size_t last = v.size() - 1;
+      for (Eigen::Index i = 0; i < last; ++i) {
+        write_value(v[i]);
+        *output_ << ", ";
+      }
+      write_value(v[last]);
+    }
+    *output_ << std::endl;
+  }
+
  public:
   /**
    * Constructs a no-op csv writer.
-   *
    */
   csv_writer() : output_(nullptr) {}
 
@@ -83,80 +135,395 @@ class csv_writer final : public structured_writer {
   virtual ~csv_writer() {}
 
   /**
-   * Writes a vector of column names for a data table.
-   * @param values vector of strings to write.
+   * Setup header row
    */
-  void table_header(const std::vector<std::string>& values) {
-    if (!has_header_) {
-      if (values.size() > 0) {
-        auto last = values.end();
-        --last;
-        for (auto it = values.begin(); it != last; ++it) {
-          *output_ << process_string(*it) << ", ";
-        }
-        *output_ << process_string(values.back()) << std::endl;
-        has_header_ = true;
-        num_cols_ = values.size();
-      }
-    } // else illegal
-  }
-
-  void table_row(const std::vector<double>& values) {
-    std::stringstream msg;
-    if (has_header_) {
-      if (values.size() == num_cols_ && values.size() > 0) {
-        auto last = values.end();
-        --last;
-        for (auto it = values.begin(); it != last; ++it) {
-          write_value(*it);
-          *output_ << ", ";
-        }
-        write_value(values.back());
-        *output_ << std::endl;
-      }
+  void begin_header() {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (header_size_ != 0) {
+      throw std::domain_error("Error, multiple heaader rows");
+    } else if (row_size_ != 0) {
+      throw std::domain_error("Error, data before header");
     }
   }
 
+  /**
+   * Outputs newline
+   */
+  void end_header() {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (header_size_ > 0) {
+      *output_ << std::endl;
+    }
+  }
 
-  // /**
-  //  * Writes a row of a data table.
-  //  * @param values vector of values.
-  //  */
-  // void table_row(const std::vector<double>& values, bool pad = false) {
-  //   std::stringstream msg;
-  //   std::cout << "table_row, num_values: " << values.size() << std::endl;
-  //   if (has_header_) {
-  //     if (values.size() == num_cols_ && values.size() > 0) {
-  //       auto last = values.end();
-  //       --last;
-  //       for (auto it = values.begin(); it != last; ++it) {
-  //         write_value(*it);
-  //         *output_ << ", ";
-  //       }
-  //       write_value(values.back());
-  //       *output_ << std::endl;
-  //     } else if (pad && values.size() > 0) {
-  //       size_t missing = num_cols_ - values.size();
-  //       auto last = values.end();
-  //       for (auto it = values.begin(); it != last; ++it) {
-  //         write_value(*it);
-  //         *output_ << ", ";
-  //       }
-  //       for (auto i = 0; i < missing; ++i) {
-  //         *output_ << "0, ";
-  //       }
-  //       *output_ << "0" << std::endl;
-  //     } else {
-  //       msg << "Output error, expected " << num_cols_
-  //           << " values, got " << values.size() ;
-  //       throw std::domain_error(msg.str());
-  //     }
-  //   } else {
-  //     msg << "Output error, missing header.";
-  //     throw std::domain_error(msg.str());
-  //   }
-  // }
+  /**
+   * Writes a vector of column names for a data table.
+   * @param values vector of strings to write.
+   */
+  void write_header(const std::vector<std::string>& values) {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (header_size_ > 0) {
+      *output_ << ", ";
+    }
+    if (values.size() > 0) {
+      auto last = values.end();
+      --last;
+      for (auto it = values.begin(); it != last; ++it) {
+        *output_ << process_string(*it) << ", ";
+      }
+      *output_ << process_string(values.back());
+      header_size_ += values.size();
+    }
+  }
 
+  /**
+   * Don't check state; just set up next row.
+   */
+  void begin_row() {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (row_size_ > 0) {
+      *output_ << std::endl;
+      row_size_ = 0;
+    }
+  }
+
+  /**
+   * Output newline, as needed.
+   */
+  void end_row() {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (row_size_ == 0) {  // avoid spurious newlines
+      return;
+    }
+    *output_ << std::endl;
+    row_size_ = 0;
+  }
+
+  /**
+   * Check state, pad output row as needed, output newline, reset state
+   */
+  void end_row_padded() {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (row_size_ == 0) {  // avoid spurious newlines
+      return;
+    }
+    if (row_size_ == header_size_) {
+      *output_ << std::endl;
+    } else if (row_size_ < header_size_) {
+      size_t missing = header_size_ - row_size_;
+      for (auto i = 0; i < missing; ++i) {
+        *output_ << ", 0";
+      }
+      *output_ << std::endl;
+    }
+    row_size_ == 0;
+  }      
+
+  /// write_flat - like write, but no key
+  void write_flat(const std::vector<double>& values) {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (row_size_ > 0) {
+      *output_ << ", ";
+    }
+    auto last = values.end();
+    --last;
+    for (auto it = values.begin(); it != last; ++it) {
+      write_value(*it);
+      *output_ << ", ";
+    }
+    write_value(values.back());
+    row_size_ += values.size();
+  }
+
+  /**
+   * No-op implementation.
+   */
+  void begin_record() {
+      return;
+  }
+
+  /**
+   * Writes "" key\n".
+   * @param[in] key The name of the record.
+   */
+  void begin_record(const std::string& key) {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (row_size_ > 0) {
+      *output_ << std::endl;
+      row_size_ = 0;
+    }
+    *output_ << "# " << process_string(key) << std::endl;
+  }
+
+  /**
+   * No-op implementation.
+   */
+  void end_record() {
+      return;
+  }
+
+  /**
+   * Write a key-value pair to the output stream with a value of null as the
+   * value.
+   * @param key Name of the value pair
+   */
+  void write(const std::string& key) {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (row_size_ > 0) {
+      *output_ << std::endl;
+      row_size_ = 0;
+    }
+    *output_ << "# " << process_string(key) << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a string.
+   * @param key Name of the value pair
+   * @param value string to write.
+   */
+  void write(const std::string& key, const std::string& value) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    *output_ << process_string(value) << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a const char*.
+   * @param key Name of the value pair
+   * @param value pointer to chars to write.
+   */
+  void write(const std::string& key, const char* value) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    *output_ << process_string(value) << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a bool.
+   * @param key Name of the value pair
+   * @param value bool to write.
+   */
+  void write(const std::string& key, bool value) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    *output_ << (value ? "true" : "false") << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is an int.
+   * @param key Name of the value pair
+   * @param value int to write.
+   */
+  void write(const std::string& key, int value) { write_int_like(key, value); }
+
+  /**
+   * Write a key-value pair where the value is an `std::size_t`.
+   * @param key Name of the value pair
+   * @param value `std::size_t` to write.
+   */
+  void write(const std::string& key, std::size_t value) {
+    write_int_like(key, value);
+  }
+
+  /**
+   * Write a key-value pair where the value is an `long long int`.
+   * @param key Name of the value pair
+   * @param value `long long int` to write.
+   */
+  void write(const std::string& key,
+             long long int value  // NOLINT(runtime/int)
+  ) {
+    write_int_like(key, value);
+  }
+
+  /**
+   * Write a key-value pair where the value is an `unsigned int`.
+   * @param key Name of the value pair
+   * @param value `unsigned int` to write.
+   */
+  void write(const std::string& key, unsigned int value) {
+    write_int_like(key, value);
+  }
+
+  /**
+   * Write a key-value pair where the value is a double.
+   * @param key Name of the value pair
+   * @param value double to write.
+   */
+  void write(const std::string& key, double value) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    *output_ << value << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a complex value.
+   * @param key Name of the value pair
+   * @param value complex value to write.
+   */
+  void write(const std::string& key, const std::complex<double>& value) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    write_complex_value(value);
+    *output_ << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  void write(const std::string& key, const std::vector<std::string>& values) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    if (values.size() > 0) {
+      auto last = values.end();
+      --last;
+      for (auto it = values.begin(); it != last; ++it) {
+        *output_ << process_string(*it) << ", ";
+      }
+    }
+    *output_ << values.back() << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  void write(const std::string& key, const std::vector<double>& values) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    if (values.size() > 0) {
+      auto last = values.end();
+      --last;
+      for (auto it = values.begin(); it != last; ++it) {
+        write_value(*it);
+        *output_ << ", ";
+      }
+      write_value(values.back());
+    }
+    *output_ << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  void write(const std::string& key, const std::vector<int>& values) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    if (values.size() > 0) {
+      auto last = values.end();
+      --last;
+      for (auto it = values.begin(); it != last; ++it) {
+        *output_ << *it << ", ";
+      }
+    }
+    *output_ << values.back() << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  void write(const std::string& key,
+             const std::vector<std::complex<double>>& values) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    if (values.size() > 0) {
+      size_t last = values.size() - 1;
+      for (size_t i = 0; i < last; ++i) {
+        write_complex_value(values[i]);
+        *output_ << ", ";
+      }
+      write_complex_value(values[last]);
+    }
+    *output_ << std::endl;
+  }
+
+  /**
+   * Write a key-value pair where the value is an Eigen Vector.
+   * @param key Name of the value pair
+   * @param vec Eigen Vector to write.
+   */
+  void write(const std::string& key, const Eigen::VectorXd& vec) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    write_eigen_vector(vec);
+  }
+
+  /**
+   * Write a key-value pair where the value is an Eigen Vector.
+   * @param key Name of the value pair
+   * @param vec Eigen Vector to write.
+   */
+  void write(const std::string& key, const Eigen::RowVectorXd& vec) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    write_eigen_vector(vec);
+  }
+
+  /**
+   * Write a key-value pair where the value is an Eigen Matrix.
+   * @param key Name of the value pair
+   * @param mat Eigen Matrix to write.
+   */
+  void write(const std::string& key, const Eigen::MatrixXd& mat) {
+    if (output_ == nullptr) {
+      return;
+    }
+    write_key(key);
+    if (mat.rows() > 0) {
+      for (Eigen::Index i = 0; i < mat.rows(); ++i) {
+        write_eigen_vector(mat.row(i));
+      }
+    } else {
+    *output_ << std::endl;
+    }      
+  }
 
 };
 

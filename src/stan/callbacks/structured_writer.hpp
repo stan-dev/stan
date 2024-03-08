@@ -37,6 +37,13 @@ class structured_writer {
   virtual void end_record() {}
 
   /**
+   * CSV header row
+   */
+  virtual void begin_header() {}
+
+
+
+  /**
    * Write a key-value pair to the output stream with a value of null as the
    * value.
    * @param key Name of the value pair
@@ -161,17 +168,6 @@ class structured_writer {
    */
   virtual void write(const std::string& key, const char* value) {}
 
-  /**
-   * Writes a vector of column names for a data table.
-   * @param values vector of strings to write.
-   */
-  virtual void table_header(const std::vector<std::string>& values) {}
-
-  /**
-   * Writes a vector of values as a row of the data table.
-   * @param values vector of strings to write.
-   */
-  virtual void table_row(const std::vector<double>& values) {}
 
 
 
