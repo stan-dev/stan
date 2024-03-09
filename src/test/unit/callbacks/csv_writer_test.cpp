@@ -19,10 +19,9 @@ class StanInterfaceCallbacksCsvWriter : public ::testing::Test {
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer;
 };
 
-TEST_F(StanInterfaceCallbacksCsvWriter, header_value) {
+TEST_F(StanInterfaceCallbacksCsvWriter, header_1_row) {
   std::vector<std::string> header = {"mu", "sigma", "theta"};
   std::vector<double> values = {1, 2, 3};
-  writer.begin_header();
   writer.write_header(header);
   writer.end_header();
   writer.begin_row();
@@ -31,7 +30,7 @@ TEST_F(StanInterfaceCallbacksCsvWriter, header_value) {
   EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n", ss.str());
 }
 
-TEST_F(StanInterfaceCallbacksCsvWriter, header_values) {
+TEST_F(StanInterfaceCallbacksCsvWriter, header_2_rows) {
   std::vector<std::string> header = {"mu", "sigma", "theta"};
   std::vector<double> values = {1, 2, 3};
   writer.begin_header();
@@ -44,6 +43,20 @@ TEST_F(StanInterfaceCallbacksCsvWriter, header_values) {
   writer.write_flat(values);
   writer.end_row();
   EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n1, 2, 3\n", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksCsvWriter, pad_row) {
+  std::vector<std::string> header = {"mu", "sigma", "theta"};
+  std::vector<double> values = {1, 2, 3};
+  writer.begin_header();
+  writer.write_header(header);
+  writer.write_header(header);
+  writer.end_header();
+  writer.begin_row();
+  writer.write_flat(values);
+  writer.pad_row();
+  writer.end_row();
+  EXPECT_EQ("mu, sigma, theta, mu, sigma, theta\n1, 2, 3, 0, 0, 0\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksCsvWriter, header_no_newline) {
@@ -77,7 +90,7 @@ TEST_F(StanInterfaceCallbacksCsvWriter, no_header_no_newline) {
 TEST_F(StanInterfaceCallbacksCsvWriter, no_header) {
   std::vector<double> values = {1, 2, 3};
   writer.write_flat(values);
-  writer.end_row();
+  writer.begin_row();
   EXPECT_EQ("1, 2, 3\n", ss.str());
 }
 

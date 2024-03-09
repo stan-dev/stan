@@ -9,6 +9,7 @@
 #include <utility>
 #include <stan/callbacks/info_type.hpp>
 #include <stan/callbacks/structured_writer.hpp>
+#include <stan/callbacks/table_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 
 namespace stan {
@@ -27,14 +28,14 @@ struct WriterMapAccessor;
 class dispatcher {
 
  private:
-  std::map<table_info_type, std::shared_ptr<structured_writer>> table_writers_;
+  std::map<table_info_type, std::shared_ptr<table_writer>> table_writers_;
   std::map<struct_info_type, std::shared_ptr<structured_writer>> struct_writers_;
   std::map<stream_info_type, std::shared_ptr<writer>> stream_writers_;
   
   auto find_writer_impl(const table_info_type& info) {
     auto it = table_writers_.find(info);
     if (it == table_writers_.end()) {
-      return std::shared_ptr<structured_writer>(nullptr);
+      return std::shared_ptr<table_writer>(nullptr);
     }
     return it->second;
   }
@@ -78,7 +79,7 @@ class dispatcher {
   /**
    * Add mapping from info_type to writer
    */
-  void add_writer(const table_info_type& info, std::shared_ptr<structured_writer>&& writer) {
+  void add_writer(const table_info_type& info, std::shared_ptr<table_writer>&& writer) {
     table_writers_[info] = writer;
   }
 
@@ -90,7 +91,8 @@ class dispatcher {
     stream_writers_[info] = writer;
   }
 
-  
+  // structured information - json  
+
   template <typename First, typename... Rest>
   void write(First&& first, Rest&&... rest) {
     auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
@@ -118,15 +120,8 @@ class dispatcher {
     }
   }
 
-  template <typename First, typename... Rest>
-  void write_flat(First&& first, Rest&&... rest) {
-    auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
-    auto it = map.find(std::forward<First>(first));
-    if (it != map.end()) {
-      it->second->write_flat(std::forward<Rest>(rest)...);
-    }
-  }
-
+  // tabular data
+  
   template <typename First, typename... Rest>
   void begin_row(First&& first, Rest&&... rest) {
     auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
@@ -135,13 +130,31 @@ class dispatcher {
       it->second->begin_row(std::forward<Rest>(rest)...);
     }
   }
-
+  
   template <typename First, typename... Rest>
-  void write_header(First&& first, Rest&&... rest) {
+  void end_row(First&& first, Rest&&... rest) {
     auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
     auto it = map.find(std::forward<First>(first));
     if (it != map.end()) {
-      it->second->write_header(std::forward<Rest>(rest)...);
+      it->second->end_row(std::forward<Rest>(rest)...);
+    }
+  }
+  
+  template <typename First, typename... Rest>
+  void pad_row(First&& first, Rest&&... rest) {
+    auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
+    auto it = map.find(std::forward<First>(first));
+    if (it != map.end()) {
+      it->second->pad_row(std::forward<Rest>(rest)...);
+    }
+  }
+
+  template <typename First, typename... Rest>
+  void write_flat(First&& first, Rest&&... rest) {
+    auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
+    auto it = map.find(std::forward<First>(first));
+    if (it != map.end()) {
+      it->second->write_flat(std::forward<Rest>(rest)...);
     }
   }
 
@@ -153,8 +166,24 @@ class dispatcher {
       it->second->begin_header(std::forward<Rest>(rest)...);
     }
   }
-    
 
+  template <typename First, typename... Rest>
+  void end_header(First&& first, Rest&&... rest) {
+    auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
+    auto it = map.find(std::forward<First>(first));
+    if (it != map.end()) {
+      it->second->end_header(std::forward<Rest>(rest)...);
+    }
+  }
+
+  template <typename First, typename... Rest>
+  void write_header(First&& first, Rest&&... rest) {
+    auto& map = WriterMapAccessor<std::decay_t<First>>::get_map(*this);
+    auto it = map.find(std::forward<First>(first));
+    if (it != map.end()) {
+      it->second->write_header(std::forward<Rest>(rest)...);
+    }
+  }
 };
 
 // specializations of WriterMapAccessor for info type maps

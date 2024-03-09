@@ -2,6 +2,8 @@
 #include <stan/callbacks/dispatcher.hpp>
 #include <stan/callbacks/info_type.hpp>
 #include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
+#include <stan/callbacks/table_writer.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 #include <string>
@@ -26,37 +28,37 @@ class CallbacksDispatcher : public ::testing::Test {
       writer_metric(std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric)),
       writer_timing(std::unique_ptr<std::stringstream, deleter_noop>(&ss_timing)) {
 
-    std::shared_ptr<stan::callbacks::structured_writer> writer_draw_sample_ptr
+    std::shared_ptr<stan::callbacks::table_writer> writer_draw_sample_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_draw_sample));
     dp.add_writer(stan::callbacks::table_info_type::DRAW_SAMPLE,
                   std::move(writer_draw_sample_ptr));
 
-    std::shared_ptr<stan::callbacks::structured_writer> writer_draw_warmup_ptr
+    std::shared_ptr<stan::callbacks::table_writer> writer_draw_warmup_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_draw_warmup));
     dp.add_writer(stan::callbacks::table_info_type::DRAW_WARMUP,
                   std::move(writer_draw_warmup_ptr));
 
-    std::shared_ptr<stan::callbacks::structured_writer> writer_uparams_sample_ptr
+    std::shared_ptr<stan::callbacks::table_writer> writer_uparams_sample_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_uparams_sample));
     dp.add_writer(stan::callbacks::table_info_type::UPARAMS_SAMPLE,
                   std::move(writer_uparams_sample_ptr));
 
-    std::shared_ptr<stan::callbacks::structured_writer> writer_uparams_warmup_ptr
+    std::shared_ptr<stan::callbacks::table_writer> writer_uparams_warmup_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_uparams_warmup));
     dp.add_writer(stan::callbacks::table_info_type::UPARAMS_WARMUP,
                   std::move(writer_uparams_warmup_ptr));
 
-    std::shared_ptr<stan::callbacks::structured_writer> writer_params_init_ptr
+    std::shared_ptr<stan::callbacks::table_writer> writer_params_init_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_params_init));
     dp.add_writer(stan::callbacks::table_info_type::PARAMS_INIT,
                   std::move(writer_params_init_ptr));
 
-    std::shared_ptr<stan::callbacks::structured_writer> writer_algo_ptr
+    std::shared_ptr<stan::callbacks::table_writer> writer_algo_ptr
         = std::make_shared<stan::callbacks::csv_writer<
           std::stringstream, deleter_noop>>(std::move(writer_algo));
     dp.add_writer(stan::callbacks::table_info_type::ALGO_STATE,
@@ -124,19 +126,14 @@ class CallbacksDispatcher : public ::testing::Test {
 
 
 TEST_F(CallbacksDispatcher, write_metric_draw) {
+  Eigen::VectorXd inv_metric =  Eigen::VectorXd::Ones(4);
   dp.begin_record(stan::callbacks::struct_info_type::INV_METRIC);
   dp.write(stan::callbacks::struct_info_type::INV_METRIC, "metric_type", "unit_e");
-  //  dp.write(stan::callbacks::struct_info_type::INV_METRIC, "inv_metric", eigen vector, all values 1.0
+  dp.write(stan::callbacks::struct_info_type::INV_METRIC, "inv_metric", inv_metric);
   dp.end_record(stan::callbacks::struct_info_type::INV_METRIC);
 
   auto out_metric = output_sans_whitespace(ss_metric);
-  EXPECT_EQ("{\"metric_type\":\"unit_e\"}", out_metric);
-
-  std::vector<std::string> header = {"mu", "sigma", "theta"};
-  std::vector<double> values = {1, 2, 3};
-  dp.table_header(stan::callbacks::table_info_type::DRAW_SAMPLE, header);
-  dp.table_row(stan::callbacks::table_info_type::DRAW_SAMPLE, values);
-  EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n", ss_draw_sample.str());
+  EXPECT_EQ("{\"metric_type\":\"unit_e\",\"inv_metric\":[1,1,1,1]}", out_metric);
 }
 
 TEST_F(CallbacksDispatcher, write_noops) {
@@ -147,17 +144,15 @@ TEST_F(CallbacksDispatcher, write_noops) {
   ASSERT_TRUE(ss_draw_sample.str().empty());
 }
 
-TEST_F(CallbacksDispatcher, csv_no_header) {
-  std::vector<double> values = {1, 2, 3};
-  dp.table_row(stan::callbacks::table_info_type::DRAW_SAMPLE, values);
-  ASSERT_TRUE(ss_draw_sample.str().empty());
-}
-
 TEST_F(CallbacksDispatcher, csv_mult_header) {
   std::vector<std::string> header = {"mu", "sigma", "theta"};
   std::vector<double> values = {1, 2, 3};
-  dp.table_header(stan::callbacks::table_info_type::DRAW_SAMPLE, header);
-  dp.table_header(stan::callbacks::table_info_type::DRAW_SAMPLE, header);
-  dp.table_row(stan::callbacks::table_info_type::DRAW_SAMPLE, values);
-  EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n", ss_draw_sample.str());
+  dp.begin_header(stan::callbacks::table_info_type::DRAW_SAMPLE);
+  dp.write_header(stan::callbacks::table_info_type::DRAW_SAMPLE, header);
+  dp.write_header(stan::callbacks::table_info_type::DRAW_SAMPLE, header);
+  dp.end_header(stan::callbacks::table_info_type::DRAW_SAMPLE);
+  dp.begin_row(stan::callbacks::table_info_type::DRAW_SAMPLE);
+  dp.write_flat(stan::callbacks::table_info_type::DRAW_SAMPLE, values);
+  dp.end_row(stan::callbacks::table_info_type::DRAW_SAMPLE);
+  EXPECT_EQ("mu, sigma, theta, mu, sigma, theta\n1, 2, 3\n", ss_draw_sample.str());
 }

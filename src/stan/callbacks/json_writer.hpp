@@ -4,6 +4,7 @@
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/math/prim/meta.hpp>
 #include <stan/callbacks/structured_writer.hpp>
+#include <stan/callbacks/process_string.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
