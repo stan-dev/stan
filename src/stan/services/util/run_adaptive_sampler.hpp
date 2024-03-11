@@ -18,6 +18,40 @@ namespace stan {
 namespace services {
 namespace util {
 
+template <class Model>
+void dispatch_headers(callbacks::dispatcher& dispatcher,
+                      stan::mcmc::sample& sample,
+                      stan::mcmc::base_mcmc& sampler,
+                      Model& model) {
+
+  dispatcher.begin_header(callbacks::table_info_type::ALGO_STATE);
+  dispatcher.begin_header(callbacks::table_info_type::DRAW_WARMUP);
+  dispatcher.begin_header(callbacks::table_info_type::DRAW_SAMPLE);
+  dispatcher.begin_header(callbacks::table_info_type::UPARAMS_WARMUP);
+  dispatcher.begin_header(callbacks::table_info_type::UPARAMS_SAMPLE);
+
+  std::vector<std::string> names;
+  sample.get_sample_param_names(names);  // mcmc:  log_prob, accept_stat
+  sampler.get_sampler_param_names(names);  // nuts-specific
+  dispatcher.write_header(callbacks::table_info_type::ALGO_STATE, names);
+
+  names.clear();
+  model.constrained_param_names(names, true, true);
+  dispatcher.write_header(callbacks::table_info_type::DRAW_WARMUP, names);
+  dispatcher.write_header(callbacks::table_info_type::DRAW_SAMPLE, names);
+
+  names.clear();
+  model.unconstrained_param_names(names, false, false);
+  dispatcher.write_header(callbacks::table_info_type::UPARAMS_WARMUP, names);
+  dispatcher.write_header(callbacks::table_info_type::UPARAMS_SAMPLE, names);
+
+  dispatcher.end_header(callbacks::table_info_type::ALGO_STATE);
+  dispatcher.end_header(callbacks::table_info_type::DRAW_WARMUP);
+  dispatcher.end_header(callbacks::table_info_type::UPARAMS_WARMUP);
+  dispatcher.end_header(callbacks::table_info_type::DRAW_SAMPLE);
+  dispatcher.end_header(callbacks::table_info_type::UPARAMS_SAMPLE);
+}
+
 /**
  * Runs the sampler with adaptation, dispatcher handles outputs
  */
@@ -44,26 +78,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   }
   
   stan::mcmc::sample s(cont_params, 0, 0);
-
-  // params plus, constrained
-  std::vector<std::string> constrained_names;
-  model.constrained_param_names(constrained_names, true, true);  // all vars
-  size_t num_constrained = constrained_names.size();
-  dispatcher.table_header(callbacks::table_info_type::DRAW_WARMUP, constrained_names);
-  dispatcher.table_header(callbacks::table_info_type::DRAW_SAMPLE, constrained_names);
-  
-  // params only, unconstrained
-  std::vector<std::string> unconstrained_names;
-  model.unconstrained_param_names(unconstrained_names, false, false);
-  size_t num_unconstrained = unconstrained_names.size();
-  dispatcher.table_header(callbacks::table_info_type::UPARAMS_WARMUP, unconstrained_names);
-  dispatcher.table_header(callbacks::table_info_type::UPARAMS_SAMPLE, unconstrained_names);
-
-  // mcmc - log_prob + accept stat
-  std::vector<std::string> engine_names;
-  s.get_sample_param_names(engine_names);
-  sampler.get_sampler_param_names(engine_names);
-  dispatcher.table_header(callbacks::table_info_type::ALGO_STATE,engine_names);
+  dispatch_headers(dispatcher, s, sampler, model);
 
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler,
@@ -77,8 +92,6 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                             .count()
                         / 1000.0;
 
-  dispatcher.begin_record(callbacks::struct_info_type::RUN_TIMING);
-  dispatcher.write(callbacks::struct_info_type::RUN_TIMING, "warmup", warm_delta_t);
 
   sampler.disengage_adaptation();
   sampler.write_metric(dispatcher);
@@ -95,6 +108,9 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                               end_sample - start_sample)
                               .count()
                           / 1000.0;
+
+  dispatcher.begin_record(callbacks::struct_info_type::RUN_TIMING);
+  dispatcher.write(callbacks::struct_info_type::RUN_TIMING, "warmup", warm_delta_t);
   dispatcher.write(callbacks::struct_info_type::RUN_TIMING, "sampling", sample_delta_t);
   dispatcher.end_record(callbacks::struct_info_type::RUN_TIMING);
 }

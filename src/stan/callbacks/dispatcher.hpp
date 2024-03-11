@@ -1,7 +1,6 @@
 #ifndef STAN_CALLBACKS_DISPATCHER_HPP
 #define STAN_CALLBACKS_DISPATCHER_HPP
 
-
 #include <iostream>
 #include <memory> // for std::shared_ptr
 #include <map>

@@ -37,10 +37,18 @@ void dispatch_sample(callbacks::dispatcher& dispatcher,
                      Model& model,
                      bool warmup,
                      callbacks::logger& logger) {
+
+  // this is really clunky
+  dispatcher.begin_row(callbacks::table_info_type::ALGO_STATE);
+  dispatcher.begin_row(callbacks::table_info_type::DRAW_WARMUP);
+  dispatcher.begin_row(callbacks::table_info_type::UPARAMS_WARMUP);
+  dispatcher.begin_row(callbacks::table_info_type::DRAW_SAMPLE);
+  dispatcher.begin_row(callbacks::table_info_type::UPARAMS_SAMPLE);
+
   std::vector<double> engine_values;
   sample.get_sample_params(engine_values);  // mcmc:  log_prob, accept_stat
   sampler.get_sampler_params(engine_values);  // nuts-specific
-  dispatcher.table_row(callbacks::table_info_type::ALGO_STATE, engine_values);
+  dispatcher.write_flat(callbacks::table_info_type::ALGO_STATE, engine_values);
 
   std::vector<double> constrained_values;
   std::vector<int> params_i;
@@ -63,12 +71,18 @@ void dispatch_sample(callbacks::dispatcher& dispatcher,
     logger.info(ss_print);
 
   if (warmup) {
-    dispatcher.table_row(callbacks::table_info_type::DRAW_WARMUP, constrained_values);
-    dispatcher.table_row(callbacks::table_info_type::UPARAMS_WARMUP, cont_params);
+    dispatcher.write_flat(callbacks::table_info_type::DRAW_WARMUP, constrained_values);
+    dispatcher.write_flat(callbacks::table_info_type::UPARAMS_WARMUP, cont_params);
   } else {
-    dispatcher.table_row(callbacks::table_info_type::DRAW_SAMPLE, constrained_values);
-    dispatcher.table_row(callbacks::table_info_type::UPARAMS_SAMPLE, cont_params);
+    dispatcher.write_flat(callbacks::table_info_type::DRAW_SAMPLE, constrained_values);
+    dispatcher.write_flat(callbacks::table_info_type::UPARAMS_SAMPLE, cont_params);
   }    
+
+  dispatcher.end_row(callbacks::table_info_type::ALGO_STATE);
+  dispatcher.end_row(callbacks::table_info_type::DRAW_WARMUP);
+  dispatcher.end_row(callbacks::table_info_type::UPARAMS_WARMUP);
+  dispatcher.end_row(callbacks::table_info_type::DRAW_SAMPLE);
+  dispatcher.end_row(callbacks::table_info_type::UPARAMS_SAMPLE);
 }
 
 /**

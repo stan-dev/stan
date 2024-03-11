@@ -36,6 +36,7 @@ class csv_writer final : public table_writer  {
   // Internal state:  header row, data row, items per row
   size_t header_size_ = 0;
   size_t row_size_ = 0;
+  bool wrote_header = false;
 
   /**
    * Writes a single value.  Corrects capitalization for inf and nans.
@@ -128,7 +129,7 @@ class csv_writer final : public table_writer  {
    * Outputs newline
    */
   void end_header() {
-    if (output_ == nullptr) {
+    if (output_ == nullptr ) {
       return;
     }
     if (header_size_ > 0) {

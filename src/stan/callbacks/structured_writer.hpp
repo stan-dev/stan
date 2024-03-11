@@ -183,19 +183,6 @@ class structured_writer {
    * @param value pointer to chars to write.
    */
   virtual void write(const std::string& key, const char* value) {}
-
-
-
-
- protected:
-
-
-
-
-
-
-
-
 };
 
 }  // namespace callbacks

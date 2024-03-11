@@ -10,8 +10,7 @@ namespace callbacks {
 
 /**
  * <code>table_writer</code> is a base class defining the interface
- * for Stan table_writer callbacks. The base class can be used as a
- * no-op implementation.
+ * for tabular data callbacks. It can be used as a no-op implementation.
  */
 class table_writer {
  public:
