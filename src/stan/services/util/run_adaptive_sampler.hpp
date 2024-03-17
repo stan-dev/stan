@@ -24,12 +24,6 @@ void dispatch_headers(callbacks::dispatcher& dispatcher,
                       stan::mcmc::base_mcmc& sampler,
                       Model& model) {
 
-  dispatcher.begin_header(callbacks::table_info_type::ALGO_STATE);
-  dispatcher.begin_header(callbacks::table_info_type::DRAW_WARMUP);
-  dispatcher.begin_header(callbacks::table_info_type::DRAW_SAMPLE);
-  dispatcher.begin_header(callbacks::table_info_type::UPARAMS_WARMUP);
-  dispatcher.begin_header(callbacks::table_info_type::UPARAMS_SAMPLE);
-
   std::vector<std::string> names;
   sample.get_sample_param_names(names);  // mcmc:  log_prob, accept_stat
   sampler.get_sampler_param_names(names);  // nuts-specific
@@ -44,12 +38,6 @@ void dispatch_headers(callbacks::dispatcher& dispatcher,
   model.unconstrained_param_names(names, false, false);
   dispatcher.write_header(callbacks::table_info_type::UPARAMS_WARMUP, names);
   dispatcher.write_header(callbacks::table_info_type::UPARAMS_SAMPLE, names);
-
-  dispatcher.end_header(callbacks::table_info_type::ALGO_STATE);
-  dispatcher.end_header(callbacks::table_info_type::DRAW_WARMUP);
-  dispatcher.end_header(callbacks::table_info_type::UPARAMS_WARMUP);
-  dispatcher.end_header(callbacks::table_info_type::DRAW_SAMPLE);
-  dispatcher.end_header(callbacks::table_info_type::UPARAMS_SAMPLE);
 }
 
 /**

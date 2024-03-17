@@ -147,12 +147,7 @@ TEST_F(CallbacksDispatcher, write_noops) {
 TEST_F(CallbacksDispatcher, csv_mult_header) {
   std::vector<std::string> header = {"mu", "sigma", "theta"};
   std::vector<double> values = {1, 2, 3};
-  dp.begin_header(stan::callbacks::table_info_type::DRAW_SAMPLE);
   dp.write_header(stan::callbacks::table_info_type::DRAW_SAMPLE, header);
-  dp.write_header(stan::callbacks::table_info_type::DRAW_SAMPLE, header);
-  dp.end_header(stan::callbacks::table_info_type::DRAW_SAMPLE);
-  dp.begin_row(stan::callbacks::table_info_type::DRAW_SAMPLE);
   dp.write_flat(stan::callbacks::table_info_type::DRAW_SAMPLE, values);
-  dp.end_row(stan::callbacks::table_info_type::DRAW_SAMPLE);
-  EXPECT_EQ("mu, sigma, theta, mu, sigma, theta\n1, 2, 3\n", ss_draw_sample.str());
+  EXPECT_EQ("mu, sigma, theta\n1, 2, 3\n", ss_draw_sample.str());
 }

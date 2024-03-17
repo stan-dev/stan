@@ -17,11 +17,9 @@ namespace callbacks {
 
 /**
  * The `csv_writer` callback is used output a single CSV file,
- * consisting of a header row, data rows, and comment rows.
+ * consisting of a single header row, and zero or more data rows.
  * Data rows contain one or more values, either real or integer.
  * The header and all data rows must contain the same number of elements.
- * Comments are prefixed by "#" and consist of a either a label
- * or a label, value pair
  *
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
@@ -36,7 +34,6 @@ class csv_writer final : public table_writer  {
   // Internal state:  header row, data row, items per row
   size_t header_size_ = 0;
   bool has_header_ = false;
-  bool has_data_ = false;
 
   /**
    * Writes a single value.  Corrects capitalization for inf and nans.
@@ -122,9 +119,6 @@ class csv_writer final : public table_writer  {
     if (has_header_) {
       throw std::domain_error("Error, multiple heaader rows");
     }
-    if (has_data_) {
-      throw std::domain_error("Error, data before header");
-    }
     if (values.size() == 0) {
       throw std::domain_error("Error, empty header row");
     }
@@ -155,7 +149,6 @@ class csv_writer final : public table_writer  {
           << row_size << " values." << std::endl;
       throw std::domain_error(msg.str());
     }
-    has_data_ = true;
     auto last = values.end();
     --last;
     for (auto it = values.begin(); it != last; ++it) {
@@ -177,7 +170,6 @@ class csv_writer final : public table_writer  {
       throw std::domain_error("Error, data before header");
     }
     size_t row_size = values.size();
-    has_data_ = true;
     if (header_size_ > row_size) {
       auto last = values.end();
       --last;

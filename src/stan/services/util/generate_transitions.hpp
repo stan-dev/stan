@@ -38,13 +38,6 @@ void dispatch_sample(callbacks::dispatcher& dispatcher,
                      bool warmup,
                      callbacks::logger& logger) {
 
-  // this is really clunky
-  dispatcher.begin_row(callbacks::table_info_type::ALGO_STATE);
-  dispatcher.begin_row(callbacks::table_info_type::DRAW_WARMUP);
-  dispatcher.begin_row(callbacks::table_info_type::UPARAMS_WARMUP);
-  dispatcher.begin_row(callbacks::table_info_type::DRAW_SAMPLE);
-  dispatcher.begin_row(callbacks::table_info_type::UPARAMS_SAMPLE);
-
   std::vector<double> engine_values;
   sample.get_sample_params(engine_values);  // mcmc:  log_prob, accept_stat
   sampler.get_sampler_params(engine_values);  // nuts-specific
@@ -77,12 +70,6 @@ void dispatch_sample(callbacks::dispatcher& dispatcher,
     dispatcher.write_flat(callbacks::table_info_type::DRAW_SAMPLE, constrained_values);
     dispatcher.write_flat(callbacks::table_info_type::UPARAMS_SAMPLE, cont_params);
   }    
-
-  dispatcher.end_row(callbacks::table_info_type::ALGO_STATE);
-  dispatcher.end_row(callbacks::table_info_type::DRAW_WARMUP);
-  dispatcher.end_row(callbacks::table_info_type::UPARAMS_WARMUP);
-  dispatcher.end_row(callbacks::table_info_type::DRAW_SAMPLE);
-  dispatcher.end_row(callbacks::table_info_type::UPARAMS_SAMPLE);
 }
 
 /**
