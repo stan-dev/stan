@@ -35,8 +35,8 @@ class csv_writer final : public table_writer  {
 
   // Internal state:  header row, data row, items per row
   size_t header_size_ = 0;
-  size_t row_size_ = 0;
-  bool wrote_header = false;
+  bool has_header_ = false;
+  bool has_data_ = false;
 
   /**
    * Writes a single value.  Corrects capitalization for inf and nans.
@@ -112,32 +112,6 @@ class csv_writer final : public table_writer  {
   virtual ~csv_writer() {}
 
   /**
-   * Setup header row
-   */
-  void begin_header() {
-    if (output_ == nullptr) {
-      return;
-    }
-    if (header_size_ != 0) {
-      throw std::domain_error("Error, multiple heaader rows");
-    } else if (row_size_ != 0) {
-      throw std::domain_error("Error, data before header");
-    }
-  }
-
-  /**
-   * Outputs newline
-   */
-  void end_header() {
-    if (output_ == nullptr ) {
-      return;
-    }
-    if (header_size_ > 0) {
-      *output_ << std::endl;
-    }
-  }
-
-  /**
    * Writes a vector of column names for a data table.
    * @param values vector of strings to write.
    */
@@ -145,76 +119,43 @@ class csv_writer final : public table_writer  {
     if (output_ == nullptr) {
       return;
     }
-    if (header_size_ > 0) {
-      *output_ << ", ";
+    if (has_header_) {
+      throw std::domain_error("Error, multiple heaader rows");
     }
-    if (values.size() > 0) {
-      auto last = values.end();
-      --last;
-      for (auto it = values.begin(); it != last; ++it) {
-        *output_ << process_string(*it) << ", ";
-      }
-      *output_ << process_string(values.back());
-      header_size_ += values.size();
+    if (has_data_) {
+      throw std::domain_error("Error, data before header");
     }
+    if (values.size() == 0) {
+      throw std::domain_error("Error, empty header row");
+    }
+    has_header_ = true;
+    header_size_ = values.size();
+      
+    auto last = values.end();
+    --last;
+    for (auto it = values.begin(); it != last; ++it) {
+      *output_ << process_string(*it) << ", ";
+    }
+    *output_ << process_string(values.back()) << std::endl;
   }
 
-  /**
-   * Don't check state; just set up next row.
-   */
-  void begin_row() {
-    if (output_ == nullptr) {
-      return;
-    }
-    if (row_size_ > 0) {
-      *output_ << std::endl;
-      row_size_ = 0;
-    }
-  }
-
-  /**
-   * Output newline as needed, reset state
-   */
-  void end_row() {
-    if (output_ == nullptr) {
-      return;
-    }
-    if (row_size_ > 0) {
-      *output_ << std::endl;
-      row_size_ = 0;
-    }
-  }
-
-  /**
-   * Check state, pad output row as needed, output newline, reset state
-   */
-  void pad_row() {
-    if (output_ == nullptr) {
-      return;
-    }
-    if (row_size_ == 0) {  // avoid spurious newlines
-      return;
-    }
-    if (row_size_ == header_size_) {
-      *output_ << std::endl;
-    } else if (row_size_ < header_size_) {
-      size_t missing = header_size_ - row_size_;
-      for (auto i = 0; i < missing; ++i) {
-        *output_ << ", 0";
-      }
-      *output_ << std::endl;
-    }
-    row_size_ = 0;
-  }      
 
   /// write_flat - like write, but no key
   void write_flat(const std::vector<double>& values) {
     if (output_ == nullptr) {
       return;
     }
-    if (row_size_ > 0) {
-      *output_ << ", ";
+    if (!has_header_) {
+      throw std::domain_error("Error, data before header");
     }
+    size_t row_size = values.size();
+    if (!(row_size == header_size_)) {
+      std::stringstream msg;
+      msg << "Error, expecting " << header_size_ << " values, but found "
+          << row_size << " values." << std::endl;
+      throw std::domain_error(msg.str());
+    }
+    has_data_ = true;
     auto last = values.end();
     --last;
     for (auto it = values.begin(); it != last; ++it) {
@@ -222,7 +163,37 @@ class csv_writer final : public table_writer  {
       *output_ << ", ";
     }
     write_value(values.back());
-    row_size_ += values.size();
+    *output_ << std::endl;
+  }
+
+  /**
+   * Check state, pad output row as needed, output newline, reset state
+   */
+  void write_flat_padded(const std::vector<double>& values) {
+    if (output_ == nullptr) {
+      return;
+    }
+    if (!has_header_) {
+      throw std::domain_error("Error, data before header");
+    }
+    size_t row_size = values.size();
+    has_data_ = true;
+    if (header_size_ > row_size) {
+      auto last = values.end();
+      --last;
+      for (auto it = values.begin(); it != last; ++it) {
+        write_value(*it);
+        *output_ << ", ";
+      }
+      write_value(values.back());
+      while (row_size < header_size_) {
+        row_size++;
+        *output_ << ", 0";
+      }
+      *output_ << std::endl;
+    } else {
+      write_flat(values);
+    }
   }
 
 };
