@@ -28,8 +28,6 @@ public:
       ss_algo(),
       ss_metric(),
       ss_timing(),
-      ss_table(),
-      ss_json(),
       model(empty_context, 0, &model_ss),
       rng(stan::services::util::create_rng(0, 1)),
       sampler(model, rng),
@@ -44,9 +42,7 @@ public:
       writer_uparams_warmup(std::unique_ptr<std::stringstream, deleter_noop>(&ss_uparams_warmup)),
       writer_algo(std::unique_ptr<std::stringstream, deleter_noop>(&ss_algo)),
       writer_metric(std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric)),
-      writer_timing(std::unique_ptr<std::stringstream, deleter_noop>(&ss_timing)),
-      writer_table(std::unique_ptr<std::stringstream, deleter_noop>(&ss_table)),
-      writer_json(std::unique_ptr<std::stringstream, deleter_noop>(&ss_json))
+      writer_timing(std::unique_ptr<std::stringstream, deleter_noop>(&ss_timing))
   {}
 
   void SetUp() {
@@ -64,13 +60,6 @@ public:
     ss_metric.clear();
     ss_timing.str(std::string());
     ss_timing.clear();
-    ss_table.str(std::string());
-    ss_table.clear();
-    ss_table_sample.str(std::string());
-    ss_table_sample.clear();
-    ss_json.str(std::string());
-    ss_json.clear();
-
   }
 
   void TearDown() {}
@@ -95,9 +84,6 @@ public:
   std::stringstream ss_algo;
   std::stringstream ss_metric;
   std::stringstream ss_timing;
-  std::stringstream ss_table;
-  std::stringstream ss_table_sample;
-  std::stringstream ss_json;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_draw_sample;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_draw_warmup;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_uparams_sample;
@@ -105,8 +91,6 @@ public:
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_algo;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer_metric;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer_timing;
-  stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer_table;
-  stan::callbacks::json_writer<std::stringstream, deleter_noop> writer_json;
 };
 
 TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_separate) {
@@ -212,20 +196,16 @@ TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_some) {
   std::shared_ptr<stan::callbacks::table_writer> writer_uparams_sample_ptr
       = std::make_shared<stan::callbacks::csv_writer<
         std::stringstream, deleter_noop>>(std::move(writer_uparams_sample));
-
-  std::shared_ptr<stan::callbacks::structured_writer> writer_json_ptr
+  std::shared_ptr<stan::callbacks::structured_writer> writer_metric_ptr
       = std::make_shared<stan::callbacks::json_writer<
-        std::stringstream, deleter_noop>>(std::move(writer_json));
+        std::stringstream, deleter_noop>>(std::move(writer_metric));
 
   dp.add_writer(stan::callbacks::table_info_type::DRAW_SAMPLE,
                      std::move(writer_draw_sample_ptr));
   dp.add_writer(stan::callbacks::table_info_type::UPARAMS_SAMPLE,
                      std::move(writer_uparams_sample_ptr));
   dp.add_writer(stan::callbacks::struct_info_type::INV_METRIC,
-                     std::move(writer_json_ptr));
-  dp.add_writer(stan::callbacks::struct_info_type::RUN_TIMING,
-                     std::move(writer_json_ptr));
-
+                std::move(writer_metric_ptr));
 
   Eigen::VectorXd inv_metric =  Eigen::VectorXd::Ones(model.num_params_r());
   double stepsize = 1;
@@ -256,8 +236,8 @@ TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_some) {
 
   ASSERT_FALSE(ss_draw_sample.str().empty());
   ASSERT_FALSE(ss_uparams_sample.str().empty());
-
-  ASSERT_FALSE(ss_json.str().empty());
-  std::cout << "everything json" << std::endl;
-  std::cout << ss_json.str() << std::endl;
+  ASSERT_FALSE(ss_metric.str().empty());
+  ASSERT_TRUE(ss_draw_warmup.str().empty());
+  ASSERT_TRUE(ss_algo.str().empty());
+  ASSERT_TRUE(ss_timing.str().empty());
 }
