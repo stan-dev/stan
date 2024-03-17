@@ -31,11 +31,8 @@ public:
       model(empty_context, 0, &model_ss),
       rng(stan::services::util::create_rng(0, 1)),
       sampler(model, rng),
-      num_warmup(3),
-      num_samples(3),
       num_thin(1),
       refresh(0),
-      save_warmup(true),
       writer_draw_sample(std::unique_ptr<std::stringstream, deleter_noop>(&ss_draw_sample)),
       writer_draw_warmup(std::unique_ptr<std::stringstream, deleter_noop>(&ss_draw_warmup)),
       writer_uparams_sample(std::unique_ptr<std::stringstream, deleter_noop>(&ss_uparams_sample)),
@@ -52,11 +49,8 @@ public:
   stan::rng_t rng;
   stan::test::unit::instrumented_interrupt interrupt;
   stan::test::unit::instrumented_logger logger;
-  int num_warmup;
-  int num_samples;
   int num_thin;
   int refresh;
-  bool save_warmup;
 
   std::stringstream ss_draw_sample;
   std::stringstream ss_draw_warmup;
@@ -124,49 +118,42 @@ TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_separate) {
   unsigned int init_buffer = 10;
   unsigned int term_buffer = 2;
   unsigned int window = 25;
-  num_warmup = 37;
+  int num_warmup = 37;
 
   stan::services::util::config_adaptive_sampler(sampler, inv_metric, stepsize, stepsize_jitter,
                           max_depth, delta, gamma, kappa, t0, num_warmup,
                           init_buffer, term_buffer, window, logger);
 
   std::vector<double> init_params = {1.5, -0.5};
-  num_samples = 10;
-  num_thin = 1;
-  refresh = 0;
-  save_warmup = true;
+  int num_samples = 10;
 
   EXPECT_NO_THROW(stan::services::util::run_adaptive_sampler(
       sampler, model, init_params, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, dp));
+      rng, interrupt, logger, dp));
 
   ASSERT_FALSE(ss_metric.str().empty());
-// std::cout << "metric" << std::endl;
-// std::cout << ss_metric.str() << std::endl;
+  EXPECT_EQ(count_matches("stepsize", ss_metric.str()), 1);
+  EXPECT_EQ(count_matches("inv_metric", ss_metric.str()), 1);
+  EXPECT_EQ(count_matches("warmup", ss_metric.str()), 0);
 
   ASSERT_FALSE(ss_timing.str().empty());
-// std::cout << "timing" << std::endl;
-// std::cout << ss_timing.str() << std::endl;
+  EXPECT_EQ(count_matches("warmup", ss_timing.str()), 1);
+  EXPECT_EQ(count_matches("sampling", ss_timing.str()), 1);
 
   ASSERT_FALSE(ss_draw_warmup.str().empty());
-// std::cout << "warmup" << std::endl;
-// std::cout << ss_draw_warmup.str() << std::endl;
+  EXPECT_EQ(count_matches("\n", ss_draw_warmup.str()), 38);
 
   ASSERT_FALSE(ss_draw_sample.str().empty());
-// std::cout << "sample" << std::endl;
-// std::cout << ss_draw_sample.str() << std::endl;
+  EXPECT_EQ(count_matches("\n", ss_draw_sample.str()), 11);
 
   ASSERT_FALSE(ss_uparams_warmup.str().empty());
-// std::cout << "uparams warmup" << std::endl;
-// std::cout << ss_uparams_warmup.str() << std::endl;
+  EXPECT_EQ(count_matches("\n", ss_uparams_warmup.str()), 38);
 
   ASSERT_FALSE(ss_uparams_sample.str().empty());
-// std::cout << "uparams sample" << std::endl;
-// std::cout << ss_uparams_sample.str() << std::endl;
+  EXPECT_EQ(count_matches("\n", ss_uparams_sample.str()), 11);
 
   ASSERT_FALSE(ss_algo.str().empty());
-// std::cout << "algo" << std::endl;
-// std::cout << ss_algo.str() << std::endl;
+  EXPECT_EQ(count_matches("\n", ss_algo.str()), 48);
 }
 
 TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_some) {
@@ -199,21 +186,19 @@ TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_some) {
   unsigned int init_buffer = 10;
   unsigned int term_buffer = 2;
   unsigned int window = 25;
-  num_warmup = 37;
+  int num_warmup = 37;
 
   stan::services::util::config_adaptive_sampler(sampler, inv_metric, stepsize, stepsize_jitter,
                           max_depth, delta, gamma, kappa, t0, num_warmup,
                           init_buffer, term_buffer, window, logger);
 
   std::vector<double> init_params = {1.5, -0.5};
-  num_samples = 10;
-  num_thin = 1;
-  refresh = 0;
-  save_warmup = true;
+  int num_samples = 10;
+  bool save_warmup = false;
                
   EXPECT_NO_THROW(stan::services::util::run_adaptive_sampler(
       sampler, model, init_params, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, dp));
+      rng, interrupt, logger, dp));
 
   ASSERT_FALSE(ss_draw_sample.str().empty());
   ASSERT_FALSE(ss_uparams_sample.str().empty());
@@ -222,3 +207,4 @@ TEST_F(ServicesUtilRunAdaptiveSamplerDispatcher, run_some) {
   ASSERT_TRUE(ss_algo.str().empty());
   ASSERT_TRUE(ss_timing.str().empty());
 }
+
