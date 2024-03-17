@@ -20,8 +20,6 @@ class StanInterfaceCallbacksCsvWriter : public ::testing::Test {
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer;
 };
 
-// note:  per-test writers needed to test state
-
 TEST_F(StanInterfaceCallbacksCsvWriter, good) {
   std::vector<std::string> header = {"mu", "sigma", "theta"};
   std::vector<double> values = {1, 2, 3};
@@ -55,6 +53,12 @@ TEST_F(StanInterfaceCallbacksCsvWriter, bad_row) {
   EXPECT_THROW(writer.write_flat_padded(values), std::domain_error);
 }
 
+TEST_F(StanInterfaceCallbacksCsvWriter, bad_row_2) {
+  std::vector<std::string> header = {"mu", "sigma", "theta", "zeta"};
+  std::vector<double> values = {1, 2, 3};
+  writer.write_header(header);
+  EXPECT_THROW(writer.write_flat(values), std::domain_error);
+}
 
 TEST_F(StanInterfaceCallbacksCsvWriter, bad_2_header_rows) {
   std::vector<std::string> header = {"mu", "sigma", "theta"};
