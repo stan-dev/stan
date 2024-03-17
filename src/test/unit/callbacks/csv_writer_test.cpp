@@ -8,14 +8,6 @@ class StanInterfaceCallbacksCsvWriter : public ::testing::Test {
   StanInterfaceCallbacksCsvWriter()
       : ss(), writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss)) {}
 
-  void SetUp() {
-    ss.str(std::string());
-    ss.clear();
-  }
-
-  void TearDown() {
-  }
-
   std::stringstream ss;
   stan::callbacks::csv_writer<std::stringstream, deleter_noop> writer;
 };

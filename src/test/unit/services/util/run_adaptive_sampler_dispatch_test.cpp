@@ -45,25 +45,6 @@ public:
       writer_timing(std::unique_ptr<std::stringstream, deleter_noop>(&ss_timing))
   {}
 
-  void SetUp() {
-    ss_draw_sample.str(std::string());
-    ss_draw_sample.clear();
-    ss_draw_warmup.str(std::string());
-    ss_draw_warmup.clear();
-    ss_uparams_sample.str(std::string());
-    ss_uparams_sample.clear();
-    ss_uparams_warmup.str(std::string());
-    ss_uparams_warmup.clear();
-    ss_algo.str(std::string());
-    ss_algo.clear();
-    ss_metric.str(std::string());
-    ss_metric.clear();
-    ss_timing.str(std::string());
-    ss_timing.clear();
-  }
-
-  void TearDown() {}
-
   std::stringstream model_ss;
   stan::io::empty_var_context empty_context;
   stan_model model;
