@@ -82,7 +82,7 @@ namespace pathfinder {
  * sample. If `false`, (`num_draws` - `num_elbo_draws`) of the joint log
  * probability calculations will be `NA` and psis resampling will not be
  * performed.
- * @param[in] psis_resampling If `true`, psis resampling is performed over the
+ * @param[in] psis_resample If `true`, psis resampling is performed over the
  *  samples returned by all of the individual pathfinders and `num_multi_draws`
  *  samples are written to `parameter_writer`. If `false`, no psis resampling is
  * performed and (`num_paths` * `num_draws`) samples are written to
