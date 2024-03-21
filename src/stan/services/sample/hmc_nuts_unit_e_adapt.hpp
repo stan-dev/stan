@@ -272,7 +272,9 @@ int hmc_nuts_unit_e_adapt(
  * @param[in] init An std vector of init var contexts for initialization of each
  * chain.
  * @param[in] random_seed random seed for the random number generator
- * @param[in] chain chain id to advance the pseudo random number generator
+ * @param[in] init_chain_id first chain id. The pseudo random number generator
+ * will advance for each chain by an integer sequence from `init_chain_id` to
+ * `init_chain_id + num_chains - 1`
  * @param[in] init_radius radius to initialize
  * @param[in] num_warmup Number of warmup samples
  * @param[in] num_samples Number of samples

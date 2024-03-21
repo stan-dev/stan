@@ -588,8 +588,6 @@ int hmc_nuts_diag_e_adapt(
  * length as this value.
  * @param[in] init A std vector of init var contexts for initialization of each
  * chain.
- * @param[in] init_inv_metric var context exposing an initial diagonal
- *            inverse Euclidean metric (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance by for each chain by an integer sequence from `init_chain_id` to
