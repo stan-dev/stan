@@ -93,6 +93,12 @@ class base_hmc : public base_mcmc {
   void init_stepsize(callbacks::logger& logger) {
     ps_point z_init(this->z_);
 
+    // step size is meaningless in zero-dimensional space
+    if (this->z_.q.size() == 0) {
+      this->nom_epsilon_ = std::numeric_limits<double>::quiet_NaN();
+      return;
+    }
+
     // Skip initialization for extreme step sizes
     if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7
         || std::isnan(this->nom_epsilon_))

@@ -43,6 +43,8 @@ class dense_e_point : public ps_point {
    */
   inline void write_metric(stan::callbacks::writer& writer) {
     writer("Elements of inverse mass matrix:");
+    if (inv_e_metric_.rows() == 0)
+      writer("");
     for (int i = 0; i < inv_e_metric_.rows(); ++i) {
       std::stringstream inv_e_metric_ss;
       inv_e_metric_ss << inv_e_metric_(i, 0);

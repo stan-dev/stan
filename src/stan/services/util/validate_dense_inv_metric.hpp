@@ -18,8 +18,9 @@ namespace util {
 inline void validate_dense_inv_metric(const Eigen::MatrixXd& inv_metric,
                                       callbacks::logger& logger) {
   try {
-    stan::math::check_pos_definite("check_pos_definite", "inv_metric",
-                                   inv_metric);
+    if (inv_metric.size() > 0)
+      stan::math::check_pos_definite("check_pos_definite", "inv_metric",
+                                     inv_metric);
   } catch (const std::domain_error& e) {
     logger.error("Inverse Euclidean metric not positive definite.");
     throw std::domain_error("Initialization failure");
