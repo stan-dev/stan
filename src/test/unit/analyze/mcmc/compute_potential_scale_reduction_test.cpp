@@ -70,12 +70,19 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_rank) {
   chains.add(blocker2);
 
   Eigen::VectorXd rhat(48);
-  rhat << 1.00067,1.00497,1.00918,1.00055,1.0015,1.00088,1.00776,1.00042,1.00201,0.99956,0.99984,1.00054,1.00403,1.00516,1.00591,1.00627,1.00134,1.00895,1.00079,1.00368,1.00092,1.00133,1.01005,1.00107,1.00151,1.00229,1.0,1.00008,1.00315,1.00277,1.00247,1.00003,1.001,1.01267,1.00011,1.00066,1.00091,1.00237,1.00019,1.00104,1.00341,0.99981,1.00033,0.99967,1.00306,1.00072,1.00191,1.00658;
+  rhat << 1.00067, 1.00497, 1.00918, 1.00055, 1.0015, 1.00088, 1.00776, 1.00042,
+      1.00201, 0.99956, 0.99984, 1.00054, 1.00403, 1.00516, 1.00591, 1.00627,
+      1.00134, 1.00895, 1.00079, 1.00368, 1.00092, 1.00133, 1.01005, 1.00107,
+      1.00151, 1.00229, 1.0, 1.00008, 1.00315, 1.00277, 1.00247, 1.00003, 1.001,
+      1.01267, 1.00011, 1.00066, 1.00091, 1.00237, 1.00019, 1.00104, 1.00341,
+      0.99981, 1.00033, 0.99967, 1.00306, 1.00072, 1.00191, 1.00658;
 
   // Eigen::VectorXd rhat_bulk(48);
-  // rhat_bulk << 1.00067,0.99979,0.99966,1.00055,1.0011,1.00088,1.00032,0.99997,1.00201,0.99956,0.99956,0.9995,1.00292,1.00516,1.00591,0.99975,1.00088,1.00895,1.00079,0.99953,1.00092,1.00044,1.01005,0.9996,1.00151,0.99966,0.99965,0.99963,1.00315,1.00277,1.00247,1.00003,0.99994,1.00116,0.99952,1.0005,1.00091,1.00213,1.00019,0.99977,1.0003,0.99981,1.00003,0.99967,1.00306,1.00072,0.9996,0.99979;
+  // rhat_bulk
+  // << 1.00067,0.99979,0.99966,1.00055,1.0011,1.00088,1.00032,0.99997,1.00201,0.99956,0.99956,0.9995,1.00292,1.00516,1.00591,0.99975,1.00088,1.00895,1.00079,0.99953,1.00092,1.00044,1.01005,0.9996,1.00151,0.99966,0.99965,0.99963,1.00315,1.00277,1.00247,1.00003,0.99994,1.00116,0.99952,1.0005,1.00091,1.00213,1.00019,0.99977,1.0003,0.99981,1.00003,0.99967,1.00306,1.00072,0.9996,0.99979;
   // Eigen::VectorXd rhat_tail(48);
-  // rhat_tail << 1.00063,1.00497,1.00918,0.99965,1.0015,0.99962,1.00776,1.00042,0.99963,0.99951,0.99984,1.00054,1.00403,1.00107,1.00287,1.00627,1.00134,0.99957,0.99997,1.00368,1.00053,1.00133,1.00589,1.00107,1.00031,1.00229,1.0,1.00008,1.0001,1.00116,1.00219,0.99992,1.001,1.01267,1.00011,1.00066,1.00065,1.00237,0.9995,1.00104,1.00341,0.99958,1.00033,0.9996,0.99957,1.00058,1.00191,1.00658;
+  // rhat_tail
+  // << 1.00063,1.00497,1.00918,0.99965,1.0015,0.99962,1.00776,1.00042,0.99963,0.99951,0.99984,1.00054,1.00403,1.00107,1.00287,1.00627,1.00134,0.99957,0.99997,1.00368,1.00053,1.00133,1.00589,1.00107,1.00031,1.00229,1.0,1.00008,1.0001,1.00116,1.00219,0.99992,1.001,1.01267,1.00011,1.00066,1.00065,1.00237,0.9995,1.00104,1.00341,0.99958,1.00033,0.9996,0.99957,1.00058,1.00191,1.00658;
 
   // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface *without* access to chains class
@@ -90,14 +97,17 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_rank) {
       sizes[chain] = samples(chain).size();
     }
 
-    // double [computed_bulk_rhat, computed_tail_rhat] = stan::analyze::compute_potential_scale_reduction_rank(draws, sizes);
+    // double [computed_bulk_rhat, computed_tail_rhat] =
+    // stan::analyze::compute_potential_scale_reduction_rank(draws, sizes);
     // double expected_bulk_rhat = rhat_bulk(index - 4);
     // double expected_tail_rhat = rhat_tail(index - 4);
 
     // ASSERT_NEAR(expected_bulk_rhat, computed_bulk_rhat, 1e-4)
-    //     << "Bulk Rhat mismatch for index: " << index << ", parameter: " << chains.param_name(index);
+    //     << "Bulk Rhat mismatch for index: " << index << ", parameter: " <<
+    //     chains.param_name(index);
     // ASSERT_NEAR(expected_tail_rhat, computed_tail_rhat, 1e-4)
-    //     << "Tail Rhat mismatch for index: " << index << ", parameter: " << chains.param_name(index);
+    //     << "Tail Rhat mismatch for index: " << index << ", parameter: " <<
+    //     chains.param_name(index);
     ASSERT_NEAR(
         rhat(index - 4),
         stan::analyze::compute_potential_scale_reduction_rank(draws, sizes),
@@ -417,7 +427,7 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_constant) {
   Eigen::Matrix<double, 3, 1> draws1;
   draws1 << 1.0, 1.0, 2.0;
   chains.add(draws1);
-  Eigen::Matrix<double, 3,1> draws2;
+  Eigen::Matrix<double, 3, 1> draws2;
   draws2 << 4.0, 4.0, 4.0;
   chains.add(draws2);
 
@@ -458,6 +468,3 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_rank_nan) {
   ASSERT_TRUE(std::isnan(chains.split_potential_scale_reduction_rank(0)))
       << "rhat for index: " << 1 << ", parameter: " << chains.param_name(1);
 }
-
-
-

@@ -74,23 +74,27 @@ inline double rhat(const Eigen::MatrixXd& chains) {
   const Eigen::Index num_chains = chains.cols();
   const Eigen::Index num_draws = chains.rows();
 
-  Eigen::RowVectorXd within_chain_means  = chains.colwise().mean();
+  Eigen::RowVectorXd within_chain_means = chains.colwise().mean();
   double across_chain_mean = within_chain_means.mean();
-  double between_variance = num_draws
-                       * (within_chain_means.array() - across_chain_mean).square().sum()
-                       / (num_chains - 1);
+  double between_variance
+      = num_draws
+        * (within_chain_means.array() - across_chain_mean).square().sum()
+        / (num_chains - 1);
   double within_variance =
-     // Divide each row by chains and get sum of squares for each chain (getting a vector back)
+      // Divide each row by chains and get sum of squares for each chain
+      // (getting a vector back)
       ((chains.rowwise() - within_chain_means)
-      .array()
-      .square()
-      .colwise()
-       // divide each sum of square by num_draws, sum the sum of squares, and divide by num chains
-      .sum() / (num_draws - 1.0))
-      .sum() / num_chains;
-      
-      return sqrt((between_variance / within_variance + num_draws - 1) / num_draws);
+           .array()
+           .square()
+           .colwise()
+           // divide each sum of square by num_draws, sum the sum of squares,
+           // and divide by num chains
+           .sum()
+       / (num_draws - 1.0))
+          .sum()
+      / num_chains;
 
+  return sqrt((between_variance / within_variance + num_draws - 1) / num_draws);
 }
 
 /**
@@ -107,18 +111,19 @@ inline double rhat(const Eigen::MatrixXd& chains) {
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_potential_scale_reduction_rank(
-  const std::vector<const double*>& chain_begins, const std::vector<size_t>& chain_sizes) {
-  std::vector<const double*> nonzero_chain_begins;  
-  std::vector<std::size_t> nonzero_chain_sizes;  
-  for (size_t i = 0; i < chain_sizes.size(); ++i) {  
-    if (chain_sizes[i]) {  
-      nonzero_chain_begins.push_back(chain_begins[i]);  
-      nonzero_chain_sizes.push_back(chain_sizes[i]);  
-    }  
-  }  
-  if (!nonzero_chain_sizes.size()) {  
-    return std::numeric_limits<double>::quiet_NaN();  
-  }  
+    const std::vector<const double*>& chain_begins,
+    const std::vector<size_t>& chain_sizes) {
+  std::vector<const double*> nonzero_chain_begins;
+  std::vector<std::size_t> nonzero_chain_sizes;
+  for (size_t i = 0; i < chain_sizes.size(); ++i) {
+    if (chain_sizes[i]) {
+      nonzero_chain_begins.push_back(chain_begins[i]);
+      nonzero_chain_sizes.push_back(chain_sizes[i]);
+    }
+  }
+  if (!nonzero_chain_sizes.size()) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
   std::size_t num_nonzero_chains = nonzero_chain_sizes.size();
   std::size_t min_num_draws = nonzero_chain_sizes[0];
   for (std::size_t chain = 1; chain < num_nonzero_chains; ++chain) {
@@ -146,7 +151,7 @@ inline double compute_potential_scale_reduction_rank(
       are_all_const |= true;
     }
   }
- if (are_all_const) {
+  if (are_all_const) {
     // If all chains are constant then return NaN
     // if they all equal the same constant value
     if (init_draw.isApproxToConstant(init_draw(0))) {
@@ -156,7 +161,8 @@ inline double compute_potential_scale_reduction_rank(
 
   double rhat_bulk = rhat(rank_transform(draws_matrix));
   double rhat_tail = rhat(rank_transform(
-      (draws_matrix.array() - math::quantile(draws_matrix.reshaped(), 0.5)).abs()));
+      (draws_matrix.array() - math::quantile(draws_matrix.reshaped(), 0.5))
+          .abs()));
 
   // return std::make_pair(rhat_bulk, rhat_tail);
   return std::max(rhat_bulk, rhat_tail);
@@ -178,18 +184,19 @@ inline double compute_potential_scale_reduction_rank(
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_potential_scale_reduction(
-    const std::vector<const double*>& chain_begins, const std::vector<size_t>& chain_sizes) {
-  std::vector<const double*> nonzero_chain_begins;  
-  std::vector<std::size_t> nonzero_chain_sizes;  
-  for (size_t i = 0; i < chain_sizes.size(); ++i) {  
-    if (chain_sizes[i]) {  
-      nonzero_chain_begins.push_back(chain_begins[i]);  
-      nonzero_chain_sizes.push_back(chain_sizes[i]);  
-    }  
-  }  
-  if (!nonzero_chain_sizes.size()) {  
-    return std::numeric_limits<double>::quiet_NaN();  
-  }  
+    const std::vector<const double*>& chain_begins,
+    const std::vector<size_t>& chain_sizes) {
+  std::vector<const double*> nonzero_chain_begins;
+  std::vector<std::size_t> nonzero_chain_sizes;
+  for (size_t i = 0; i < chain_sizes.size(); ++i) {
+    if (chain_sizes[i]) {
+      nonzero_chain_begins.push_back(chain_begins[i]);
+      nonzero_chain_sizes.push_back(chain_sizes[i]);
+    }
+  }
+  if (!nonzero_chain_sizes.size()) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
   std::size_t num_nonzero_chains = nonzero_chain_sizes.size();
   std::size_t min_num_draws = nonzero_chain_sizes[0];
   for (std::size_t chain = 1; chain < num_nonzero_chains; ++chain) {
@@ -217,7 +224,7 @@ inline double compute_potential_scale_reduction(
       are_all_const |= true;
     }
   }
- if (are_all_const) {
+  if (are_all_const) {
     // If all chains are constant then return NaN
     // if they all equal the same constant value
     if (init_draw.isApproxToConstant(init_draw(0))) {
@@ -259,8 +266,8 @@ inline double compute_potential_scale_reduction_rank(
  * See more details in Stan reference manual section "Potential
  * Scale Reduction". http://mc-stan.org/users/documentation
  *
- * Current implementation assumes draws are stored in contiguousdereck lively ii height weight
- * blocks of memory. Chains are trimmed from the back to match the
+ * Current implementation assumes draws are stored in contiguousdereck lively ii
+ * height weight blocks of memory. Chains are trimmed from the back to match the
  * length of the shortest chain. Argument size will be broadcast to
  * same length as draws.
  *
@@ -294,14 +301,16 @@ inline double compute_potential_scale_reduction(
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_split_potential_scale_reduction_rank(
-    const std::vector<const double*>& chain_begins, const std::vector<size_t>& chain_sizes) {
+    const std::vector<const double*>& chain_begins,
+    const std::vector<size_t>& chain_sizes) {
   size_t num_chains = chain_sizes.size();
   size_t num_draws = chain_sizes[0];
   for (size_t chain = 1; chain < num_chains; ++chain) {
     num_draws = std::min(num_draws, chain_sizes[chain]);
   }
 
-  std::vector<const double*> split_draws = split_chains(chain_begins, chain_sizes);
+  std::vector<const double*> split_draws
+      = split_chains(chain_begins, chain_sizes);
 
   size_t half = std::floor(num_draws / 2.0);
   std::vector<size_t> half_sizes(2 * num_chains, half);
@@ -326,14 +335,16 @@ inline double compute_split_potential_scale_reduction_rank(
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_split_potential_scale_reduction(
-    const std::vector<const double*>& chain_begins, const std::vector<size_t>& chain_sizes) {
+    const std::vector<const double*>& chain_begins,
+    const std::vector<size_t>& chain_sizes) {
   size_t num_chains = chain_sizes.size();
   size_t num_draws = chain_sizes[0];
   for (size_t chain = 1; chain < num_chains; ++chain) {
     num_draws = std::min(num_draws, chain_sizes[chain]);
   }
 
-  std::vector<const double*> split_draws = split_chains(chain_begins, chain_sizes);
+  std::vector<const double*> split_draws
+      = split_chains(chain_begins, chain_sizes);
 
   double half = num_draws / 2.0;
   std::vector<size_t> half_sizes(2 * num_chains, std::floor(half));
