@@ -21,7 +21,7 @@ struct deleter_noop {
 class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
  public:
   ServicesSampleHmcNutsUnitEAdaptPar()
-      : ss_metric(num_chains), model(data_context, 0, &model_log) {
+      : model(data_context, 0, &model_log), ss_metric(num_chains) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
