@@ -595,7 +595,7 @@ class chains {
     return split_effective_sample_size(index(name));
   }
 
-  double split_potential_scale_reduction_rank(const int index) const {
+  std::pair<double, double> split_potential_scale_reduction_rank(const int index) const {
     int n_chains = num_chains();
     std::vector<const double*> draws(n_chains);
     std::vector<size_t> sizes(n_chains);
@@ -625,7 +625,7 @@ class chains {
     return analyze::compute_split_potential_scale_reduction(draws, sizes);
   }
 
-  double split_potential_scale_reduction_rank(const std::string& name) const {
+  std::pair<double, double> split_potential_scale_reduction_rank(const std::string& name) const {
     return split_potential_scale_reduction_rank(index(name));
   }
 
