@@ -111,18 +111,20 @@ inline double rhat(const Eigen::MatrixXd& chains) {
  * @return potential scale reduction for the specified parameter
  */
 inline std::pair<double, double> compute_potential_scale_reduction_rank(
-  const std::vector<const double*>& chain_begins, const std::vector<size_t>& chain_sizes) {
-  std::vector<const double*> nonzero_chain_begins;  
-  std::vector<std::size_t> nonzero_chain_sizes;  
-  for (size_t i = 0; i < chain_sizes.size(); ++i) {  
-    if (chain_sizes[i]) {  
-      nonzero_chain_begins.push_back(chain_begins[i]);  
-      nonzero_chain_sizes.push_back(chain_sizes[i]);  
-    }  
-  }  
-  if (!nonzero_chain_sizes.size()) {  
-    return {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
-  }  
+    const std::vector<const double*>& chain_begins,
+    const std::vector<size_t>& chain_sizes) {
+  std::vector<const double*> nonzero_chain_begins;
+  std::vector<std::size_t> nonzero_chain_sizes;
+  for (size_t i = 0; i < chain_sizes.size(); ++i) {
+    if (chain_sizes[i]) {
+      nonzero_chain_begins.push_back(chain_begins[i]);
+      nonzero_chain_sizes.push_back(chain_sizes[i]);
+    }
+  }
+  if (!nonzero_chain_sizes.size()) {
+    return {std::numeric_limits<double>::quiet_NaN(),
+            std::numeric_limits<double>::quiet_NaN()};
+  }
   std::size_t num_nonzero_chains = nonzero_chain_sizes.size();
   std::size_t min_num_draws = nonzero_chain_sizes[0];
   for (std::size_t chain = 1; chain < num_nonzero_chains; ++chain) {
@@ -140,20 +142,21 @@ inline std::pair<double, double> compute_potential_scale_reduction_rank(
 
     for (std::size_t n = 0; n < min_num_draws; n++) {
       if (!std::isfinite(draws(n))) {
-        return {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
+        return {std::numeric_limits<double>::quiet_NaN(),
+                std::numeric_limits<double>::quiet_NaN()};
       }
       draws_matrix(n, chain) = draws(n);
     }
 
     init_draw(chain) = draws(0);
     are_all_const |= !draws.isApproxToConstant(draws(0));
-
   }
   if (are_all_const) {
     // If all chains are constant then return NaN
     // if they all equal the same constant value
     if (init_draw.isApproxToConstant(init_draw(0))) {
-      return {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
+      return {std::numeric_limits<double>::quiet_NaN(),
+              std::numeric_limits<double>::quiet_NaN()};
     }
   }
 
@@ -163,7 +166,7 @@ inline std::pair<double, double> compute_potential_scale_reduction_rank(
           .abs()));
 
   return std::make_pair(rhat_bulk, rhat_tail);
-  //return std::max(rhat_bulk, rhat_tail);
+  // return std::max(rhat_bulk, rhat_tail);
 }
 
 /**
@@ -218,14 +221,13 @@ inline double compute_potential_scale_reduction(
     }
 
     init_draw(chain) = draws(0);
-    
+
     are_all_const |= !draws.isApproxToConstant(draws(0));
   }
   // if they all equal the same constant value
   if (init_draw.isApproxToConstant(init_draw(0))) {
     return std::numeric_limits<double>::quiet_NaN();
   }
-  
 
   return rhat(draws_matrix);
 }
@@ -296,7 +298,8 @@ inline double compute_potential_scale_reduction(
  * @return potential scale reduction for the specified parameter
  */
 inline std::pair<double, double> compute_split_potential_scale_reduction_rank(
-    const std::vector<const double*>& chain_begins, const std::vector<size_t>& chain_sizes) {
+    const std::vector<const double*>& chain_begins,
+    const std::vector<size_t>& chain_sizes) {
   size_t num_chains = chain_sizes.size();
   size_t num_draws = chain_sizes[0];
   for (size_t chain = 1; chain < num_chains; ++chain) {
