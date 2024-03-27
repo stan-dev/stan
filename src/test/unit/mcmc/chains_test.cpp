@@ -874,3 +874,67 @@ TEST_F(McmcChains, blocker_split_potential_scale_reduction) {
               chains.split_potential_scale_reduction(name));
   }
 }
+
+TEST_F(McmcChains, blocker_split_potential_scale_reduction_rank) {
+  std::stringstream out;
+  stan::io::stan_csv blocker1
+      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
+  stan::io::stan_csv blocker2
+      = stan::io::stan_csv_reader::parse(blocker2_stream, &out);
+  EXPECT_EQ("", out.str());
+
+  stan::mcmc::chains<> chains(blocker1);
+  chains.add(blocker2);
+
+  // Eigen::VectorXd rhat(48);
+  // rhat
+  // << 1.0078, 1.0109, 1.00731, 1.00333, 1.00401, 1.00992, 1.00734, 1.00633,
+  //     1.00095, 1.00906, 1.01019, 1.00075, 1.00595, 1.00473, 1.00895, 1.01304,
+  //     1.00166, 1.0074, 1.00236, 1.00588, 1.00414, 1.00303, 1.00976, 1.00295,
+  //     1.00193, 1.0044, 1.00488, 1.00178, 1.01082, 1.0019, 1.00413, 1.01303,
+  //     1.0024, 1.01148, 1.00436, 1.00515, 1.00712, 1.0089, 1.00222, 1.00118,
+  //     1.00381, 1.00283, 1.00188, 1.00225, 1.00335, 1.00133, 1.00209, 1.0109;
+
+  Eigen::VectorXd rhat_bulk(48);
+  rhat_bulk << 1.0078, 1.0109, 0.99919, 1.001, 1.00401, 1.00992, 1.00182,
+      1.00519, 1.00095, 1.00351, 1.00554, 1.00075, 1.00595, 1.00473, 1.00546,
+      1.01304, 1.00166, 1.0074, 1.00178, 1.00588, 1.00406, 1.00129, 1.00976,
+      1.0013, 1.00193, 1.00104, 0.99938, 1.00025, 1.01082, 1.0019, 1.00354,
+      1.0043, 1.00111, 1.00281, 1.00436, 1.00515, 1.00325, 1.0089, 1.00222,
+      1.00118, 1.00191, 1.00283, 1.0003, 1.00216, 1.00335, 1.00133, 1.00023,
+      1.0109;
+  Eigen::VectorXd rhat_tail(48);
+  rhat_tail << 1.00097, 1.00422, 1.00731, 1.00333, 1.00337, 0.99917, 1.00734,
+      1.00633, 1.00074, 1.00906, 1.01019, 1.00074, 1.00447, 1.00383, 1.00895,
+      1.00389, 1.00052, 1.00188, 1.00236, 1.00284, 1.00414, 1.00303, 1.00327,
+      1.00295, 1.00037, 1.0044, 1.00488, 1.00178, 1.00475, 1.00082, 1.00413,
+      1.01303, 1.0024, 1.01148, 1.00098, 1.00078, 1.00712, 1.00595, 1.00124,
+      1.00112, 1.00381, 1.0006, 1.00188, 1.00225, 1.0026, 1.0009, 1.00209,
+      1.00464;
+
+  for (int index = 4; index < chains.num_params(); index++) {
+    double computed_bulk_rhat, computed_tail_rhat;
+    std::tie(computed_bulk_rhat, computed_tail_rhat)
+        = chains.split_potential_scale_reduction_rank(index);
+    double expected_bulk_rhat = rhat_bulk(index - 4);
+    double expected_tail_rhat = rhat_tail(index - 4);
+
+    ASSERT_NEAR(expected_bulk_rhat, computed_bulk_rhat, 1e-4)
+        << "Bulk Rhat mismatch for index: " << index
+        << ", parameter: " << chains.param_name(index);
+    ASSERT_NEAR(expected_tail_rhat, computed_tail_rhat, 1e-4)
+        << "Tail Rhat mismatch for index: " << index
+        << ", parameter: " << chains.param_name(index);
+
+    // ASSERT_NEAR(rhat(index - 4),
+    //             chains.split_potential_scale_reduction_rank(index), 1e-4)
+    //     << "rhat for index: " << index
+    //     << ", parameter: " << chains.param_name(index);
+  }
+
+  for (int index = 0; index < chains.num_params(); index++) {
+    std::string name = chains.param_name(index);
+    ASSERT_EQ(chains.split_potential_scale_reduction_rank(index),
+              chains.split_potential_scale_reduction_rank(name));
+  }
+}
