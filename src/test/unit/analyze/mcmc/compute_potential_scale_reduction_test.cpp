@@ -205,7 +205,8 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_rank_convenience) {
         << "Bulk Rhat mismatch for index: " << index
         << ", parameter: " << chains.param_name(index);
     ASSERT_NEAR(expected_tail_rhat, computed_tail_rhat, 1e-4)
-        << "Tail Rhat mismatch for index: " << index << ", parameter: " << chains.param_name(index);
+        << "Tail Rhat mismatch for index: " << index
+        << ", parameter: " << chains.param_name(index);
   }
 }
 
@@ -473,7 +474,8 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction_convenience_rank) {
 
     double computed_bulk_rhat, computed_tail_rhat;
     std::tie(computed_bulk_rhat, computed_tail_rhat)
-        = stan::analyze::compute_split_potential_scale_reduction_rank(draws, size);
+        = stan::analyze::compute_split_potential_scale_reduction_rank(draws,
+                                                                      size);
     double expected_bulk_rhat = rhat_bulk(index - 4);
     double expected_tail_rhat = rhat_tail(index - 4);
 

@@ -111,20 +111,22 @@ inline double rhat(const Eigen::MatrixXd& chains) {
  * @return potential scale reduction for the specified parameter
  */
 inline std::pair<double, double> compute_potential_scale_reduction_rank(
-  const std::vector<const double*>& chain_begins, const std::vector<size_t>& chain_sizes) {
-  std::vector<const double*> nonzero_chain_begins;  
-  std::vector<std::size_t> nonzero_chain_sizes;  
+    const std::vector<const double*>& chain_begins,
+    const std::vector<size_t>& chain_sizes) {
+  std::vector<const double*> nonzero_chain_begins;
+  std::vector<std::size_t> nonzero_chain_sizes;
   nonzero_chain_begins.reserve(chain_begins.size());
   nonzero_chain_sizes.reserve(chain_sizes.size());
-  for (size_t i = 0; i < chain_sizes.size(); ++i) {  
-    if (chain_sizes[i]) {  
-      nonzero_chain_begins.push_back(chain_begins[i]);  
-      nonzero_chain_sizes.push_back(chain_sizes[i]);  
-    }  
-  }  
-  if (!nonzero_chain_sizes.size()) {  
-    return {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
-  }  
+  for (size_t i = 0; i < chain_sizes.size(); ++i) {
+    if (chain_sizes[i]) {
+      nonzero_chain_begins.push_back(chain_begins[i]);
+      nonzero_chain_sizes.push_back(chain_sizes[i]);
+    }
+  }
+  if (!nonzero_chain_sizes.size()) {
+    return {std::numeric_limits<double>::quiet_NaN(),
+            std::numeric_limits<double>::quiet_NaN()};
+  }
   std::size_t num_nonzero_chains = nonzero_chain_sizes.size();
   std::size_t min_num_draws = nonzero_chain_sizes[0];
   for (std::size_t chain = 1; chain < num_nonzero_chains; ++chain) {
@@ -153,9 +155,9 @@ inline std::pair<double, double> compute_potential_scale_reduction_rank(
   }
   // If all chains are constant then return NaN
   if (are_all_const && init_draw.isApproxToConstant(init_draw(0))) {
-      return {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
-    }
-  
+    return {std::numeric_limits<double>::quiet_NaN(),
+            std::numeric_limits<double>::quiet_NaN()};
+  }
 
   double rhat_bulk = rhat(rank_transform(draws_matrix));
   double rhat_tail = rhat(rank_transform(
