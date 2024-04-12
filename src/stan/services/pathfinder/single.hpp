@@ -935,8 +935,8 @@ inline auto pathfinder_lbfgs_single(
   } else {
     // output only first num_draws from what we computed for ELBO
     constrained_draws_mat
-        = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(
-            names.size(), num_draws);
+        = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(),
+                                                                num_draws);
     Eigen::VectorXd approx_samples_constrained_col;
     Eigen::VectorXd unconstrained_col;
     for (Eigen::Index i = 0; i < num_draws; ++i) {
