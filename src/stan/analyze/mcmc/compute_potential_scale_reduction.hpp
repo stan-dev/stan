@@ -252,7 +252,6 @@ inline double compute_potential_scale_reduction(
   return sqrt((var_between / var_within + num_draws - 1) / num_draws);
 }
 
-
 /**
  * Computes the potential scale reduction (Rhat) using rank based diagnostic for
  * the specified parameter across all kept samples. Based on paper
@@ -298,7 +297,6 @@ inline double compute_potential_scale_reduction(
   std::vector<size_t> sizes(num_chains, size);
   return compute_potential_scale_reduction(draws, sizes);
 }
-
 
 /**
  * Computes the potential scale reduction (Rhat) using rank based diagnostic for
