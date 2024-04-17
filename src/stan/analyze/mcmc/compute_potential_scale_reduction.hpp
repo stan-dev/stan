@@ -175,62 +175,83 @@ inline std::pair<double, double> compute_potential_scale_reduction_rank(
  * Scale Reduction". http://mc-stan.org/users/documentation
  *
  * Current implementation assumes draws are stored in contiguous
- * blocks of memory. Chains are trimmed from the back to match the
+ * blocks of memory.  Chains are trimmed from the back to match the
  * length of the shortest chain.
  *
- * @param chain_begins stores pointers to arrays of chains
- * @param chain_sizes stores sizes of chains
+ * @param draws stores pointers to arrays of chains
+ * @param sizes stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_potential_scale_reduction(
-    const std::vector<const double*>& chain_begins,
-    const std::vector<size_t>& chain_sizes) {
-  std::vector<const double*> nonzero_chain_begins;
-  std::vector<std::size_t> nonzero_chain_sizes;
-  nonzero_chain_begins.reserve(chain_begins.size());
-  nonzero_chain_sizes.reserve(chain_sizes.size());
-  for (size_t i = 0; i < chain_sizes.size(); ++i) {
-    if (chain_sizes[i]) {
-      nonzero_chain_begins.push_back(chain_begins[i]);
-      nonzero_chain_sizes.push_back(chain_sizes[i]);
-    }
-  }
-  if (!nonzero_chain_sizes.size()) {
+    std::vector<const double*> draws, std::vector<size_t> sizes) {
+  int num_chains = sizes.size();
+  size_t num_draws = sizes[0];
+  if (num_draws == 0) {
     return std::numeric_limits<double>::quiet_NaN();
   }
-  std::size_t num_nonzero_chains = nonzero_chain_sizes.size();
-  std::size_t min_num_draws = nonzero_chain_sizes[0];
-  for (std::size_t chain = 1; chain < num_nonzero_chains; ++chain) {
-    min_num_draws = std::min(min_num_draws, nonzero_chain_sizes[chain]);
+  for (int chain = 1; chain < num_chains; ++chain) {
+    num_draws = std::min(num_draws, sizes[chain]);
   }
 
   // check if chains are constant; all equal to first draw's value
   bool are_all_const = false;
-  Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_nonzero_chains);
-  Eigen::MatrixXd draws_matrix(min_num_draws, num_nonzero_chains);
+  Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
 
-  for (std::size_t chain = 0; chain < num_nonzero_chains; chain++) {
-    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draws(
-        nonzero_chain_begins[chain], nonzero_chain_sizes[chain]);
+  for (int chain = 0; chain < num_chains; chain++) {
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain], sizes[chain]);
 
-    for (std::size_t n = 0; n < min_num_draws; n++) {
-      if (!std::isfinite(draws(n))) {
+    for (int n = 0; n < num_draws; n++) {
+      if (!std::isfinite(draw(n))) {
         return std::numeric_limits<double>::quiet_NaN();
       }
-      draws_matrix(n, chain) = draws(n);
     }
 
-    init_draw(chain) = draws(0);
+    init_draw(chain) = draw(0);
 
-    are_all_const |= !draws.isApproxToConstant(draws(0));
-  }
-  // if they all equal the same constant value
-  if (init_draw.isApproxToConstant(init_draw(0))) {
-    return std::numeric_limits<double>::quiet_NaN();
+    if (draw.isApproxToConstant(draw(0))) {
+      are_all_const |= true;
+    }
   }
 
-  return rhat(draws_matrix);
+  if (are_all_const) {
+    // If all chains are constant then return NaN
+    // if they all equal the same constant value
+    if (init_draw.isApproxToConstant(init_draw(0))) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+  }
+
+  using boost::accumulators::accumulator_set;
+  using boost::accumulators::stats;
+  using boost::accumulators::tag::mean;
+  using boost::accumulators::tag::variance;
+
+  Eigen::VectorXd chain_mean(num_chains);
+  accumulator_set<double, stats<variance>> acc_chain_mean;
+  Eigen::VectorXd chain_var(num_chains);
+  double unbiased_var_scale = num_draws / (num_draws - 1.0);
+
+  for (int chain = 0; chain < num_chains; ++chain) {
+    accumulator_set<double, stats<mean, variance>> acc_draw;
+    for (int n = 0; n < num_draws; ++n) {
+      acc_draw(draws[chain][n]);
+    }
+
+    chain_mean(chain) = boost::accumulators::mean(acc_draw);
+    acc_chain_mean(chain_mean(chain));
+    chain_var(chain)
+        = boost::accumulators::variance(acc_draw) * unbiased_var_scale;
+  }
+
+  double var_between = num_draws * boost::accumulators::variance(acc_chain_mean)
+                       * num_chains / (num_chains - 1);
+  double var_within = chain_var.mean();
+
+  // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
+  return sqrt((var_between / var_within + num_draws - 1) / num_draws);
 }
+
 
 /**
  * Computes the potential scale reduction (Rhat) using rank based diagnostic for
@@ -263,19 +284,21 @@ inline std::pair<double, double> compute_potential_scale_reduction_rank(
  * Scale Reduction". http://mc-stan.org/users/documentation
  *
  * Current implementation assumes draws are stored in contiguous
- * blocks of memory. Chains are trimmed from the back to match the
- * length of the shortest chain. Argument size will be broadcast to
+ * blocks of memory.  Chains are trimmed from the back to match the
+ * length of the shortest chain.  Argument size will be broadcast to
  * same length as draws.
  *
- * @param chain_begins stores pointers to arrays of chains
+ * @param draws stores pointers to arrays of chains
  * @param size stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_potential_scale_reduction(
-    const std::vector<const double*>& chain_begins, size_t size) {
-  std::vector<size_t> sizes(chain_begins.size(), size);
-  return compute_potential_scale_reduction(chain_begins, sizes);
+    std::vector<const double*> draws, size_t size) {
+  int num_chains = draws.size();
+  std::vector<size_t> sizes(num_chains, size);
+  return compute_potential_scale_reduction(draws, sizes);
 }
+
 
 /**
  * Computes the potential scale reduction (Rhat) using rank based diagnostic for
@@ -325,21 +348,19 @@ inline std::pair<double, double> compute_split_potential_scale_reduction_rank(
  * blocks of memory.  Chains are trimmed from the back to match the
  * length of the shortest chain.
  *
- * @param chain_begins stores pointers to arrays of chains
- * @param chain_sizes stores sizes of chains
+ * @param draws stores pointers to arrays of chains
+ * @param sizes stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_split_potential_scale_reduction(
-    const std::vector<const double*>& chain_begins,
-    const std::vector<size_t>& chain_sizes) {
-  size_t num_chains = chain_sizes.size();
-  size_t num_draws = chain_sizes[0];
-  for (size_t chain = 1; chain < num_chains; ++chain) {
-    num_draws = std::min(num_draws, chain_sizes[chain]);
+    std::vector<const double*> draws, std::vector<size_t> sizes) {
+  int num_chains = sizes.size();
+  size_t num_draws = sizes[0];
+  for (int chain = 1; chain < num_chains; ++chain) {
+    num_draws = std::min(num_draws, sizes[chain]);
   }
 
-  std::vector<const double*> split_draws
-      = split_chains(chain_begins, chain_sizes);
+  std::vector<const double*> split_draws = split_chains(draws, sizes);
 
   double half = num_draws / 2.0;
   std::vector<size_t> half_sizes(2 * num_chains, std::floor(half));
@@ -386,15 +407,15 @@ inline std::pair<double, double> compute_split_potential_scale_reduction_rank(
  * length of the shortest chain.  Argument size will be broadcast to
  * same length as draws.
  *
- * @param chain_begins stores pointers to arrays of chains
+ * @param draws stores pointers to arrays of chains
  * @param size stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_split_potential_scale_reduction(
-    const std::vector<const double*>& chain_begins, size_t size) {
-  size_t num_chains = chain_begins.size();
+    std::vector<const double*> draws, size_t size) {
+  int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
-  return compute_split_potential_scale_reduction(chain_begins, sizes);
+  return compute_split_potential_scale_reduction(draws, sizes);
 }
 
 }  // namespace analyze
