@@ -933,12 +933,13 @@ inline auto pathfinder_lbfgs_single(
       lp_ratio = std::move(elbo_best.lp_ratio);
     }
   } else {
+    // output only first num_draws from what we computed for ELBO
     constrained_draws_mat
-        = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(
-            names.size(), elbo_draws.cols());
+        = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(),
+                                                                num_draws);
     Eigen::VectorXd approx_samples_constrained_col;
     Eigen::VectorXd unconstrained_col;
-    for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
+    for (Eigen::Index i = 0; i < num_draws; ++i) {
       constrained_draws_mat.col(i).head(2) = elbo_lp_mat.row(i).matrix();
       unconstrained_col = elbo_draws.col(i);
       constrained_draws_mat.col(i).tail(num_unconstrained_params)
@@ -946,7 +947,7 @@ inline auto pathfinder_lbfgs_single(
                           approx_samples_constrained_col)
                 .matrix();
     }
-    lp_ratio = std::move(elbo_best.lp_ratio);
+    lp_ratio = std::move(elbo_best.lp_ratio.head(num_draws));
   }
   parameter_writer(constrained_draws_mat);
   parameter_writer();

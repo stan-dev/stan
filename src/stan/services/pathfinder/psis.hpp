@@ -5,6 +5,8 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/services/error_codes.hpp>
 #include <tbb/parallel_invoke.h>
+#include <iomanip>
+#include <sstream>
 
 namespace stan {
 namespace services {
@@ -261,10 +263,13 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
         llr_weights.coeffRef(idx.coeff(i)) = smoothed.first.coeff(i);
       }
       if (smoothed.second > 0.7) {
-        logger.warn(std::string("Pareto k value (") +
-         std::to_string(smoothed.second) + ") is greater than 0.7."
-         " Importance resampling was not able to improve the approximation,"
-         " which may indicate that the approximation itself is poor.");
+        std::stringstream s;
+        s << "Pareto k value (" << std::setprecision(2) << smoothed.second
+          << ") is greater than 0.7. Importance resampling was not able to "
+          << "improve the approximation, which may indicate that the "
+          << "approximation itself is poor.";
+
+        logger.warn(s.str());
       }
     }
   }
