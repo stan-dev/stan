@@ -184,7 +184,7 @@ inline std::pair<double, double> compute_potential_scale_reduction_rank(
  */
 inline double compute_potential_scale_reduction(
     const std::vector<const double*>& draws, const std::vector<size_t>& sizes) {
-      return compute_potential_scale_reduction_rank(draws, sizes).first;
+  return compute_potential_scale_reduction_rank(draws, sizes).first;
 }
 
 /**

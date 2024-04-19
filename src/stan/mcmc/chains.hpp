@@ -623,7 +623,8 @@ class chains {
       sizes[chain] = n_kept_samples;
     }
 
-    return analyze::compute_split_potential_scale_reduction_rank(draws, sizes).first;
+    return analyze::compute_split_potential_scale_reduction_rank(draws, sizes)
+        .first;
   }
 
   std::pair<double, double> split_potential_scale_reduction_rank(
