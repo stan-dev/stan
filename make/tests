@@ -85,12 +85,15 @@ HEADER_TESTS := $(addsuffix -test,$(call findfiles,src/stan,*.hpp))
 
 ifeq ($(OS),Windows_NT)
   DEV_NULL = nul
+  ifeq ($(IS_UCRT),true)
+    UCRT_NULL_FLAG = -S
+  endif
 else
   DEV_NULL = /dev/null
 endif
 
 %.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.cpp) -O0 -include $^ -o $(DEV_NULL)
+	$(COMPILE.cpp) -O0 -include $^ $(UCRT_NULL_FLAG) -o $(DEV_NULL)
 
 test/dummy.cpp:
 	@mkdir -p test
