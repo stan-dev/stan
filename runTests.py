@@ -80,8 +80,6 @@ def doCommand(command, exit_on_failure=True):
     """Run command as a shell command and report/exit on errors."""
     print("------------------------------------------------------------")
     print("%s" % command)
-    if isWin() and command.startswith("make "):
-        command = command.replace("make ", "mingw32-make ")
     p1 = subprocess.Popen(command, shell=True)
     p1.wait()
     if exit_on_failure and (not (p1.returncode is None) and not (p1.returncode == 0)):
