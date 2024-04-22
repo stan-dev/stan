@@ -623,17 +623,16 @@ class chains {
       sizes[chain] = n_kept_samples;
     }
 
-    return analyze::compute_split_potential_scale_reduction_rank(draws, sizes)
-        .first;
+    return analyze::compute_split_potential_scale_reduction(draws, sizes);
   }
 
   std::pair<double, double> split_potential_scale_reduction_rank(
       const std::string& name) const {
-    return this->split_potential_scale_reduction_rank(index(name));
+    return split_potential_scale_reduction_rank(index(name));
   }
 
   double split_potential_scale_reduction(const std::string& name) const {
-    return this->split_potential_scale_reduction_rank(index(name)).first;
+    return split_potential_scale_reduction(index(name));
   }
 };
 
