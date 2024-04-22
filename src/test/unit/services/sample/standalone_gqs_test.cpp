@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
@@ -19,9 +19,9 @@ class ServicesStandaloneGQ : public ::testing::Test {
 
   void SetUp() {
     std::fstream data_stream(
-        "src/test/test-models/good/services/bernoulli.data.R",
+        "src/test/test-models/good/services/bernoulli.data.json",
         std::fstream::in);
-    stan::io::dump data_var_context(data_stream);
+    stan::json::json_data data_var_context(data_stream);
     data_stream.close();
     model = new stan_model(data_var_context);
   }

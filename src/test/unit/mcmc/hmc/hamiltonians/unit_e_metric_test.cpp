@@ -1,5 +1,5 @@
 #include <string>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
@@ -8,17 +8,15 @@
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
-
 TEST(McmcUnitEMetric, sample_p) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
   q(1) = 1;
 
   stan::mcmc::mock_model model(q.size());
-  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
+  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, stan::rng_t> metric(model);
   stan::mcmc::unit_e_point z(q.size());
 
   int n_samples = 1000;
@@ -44,8 +42,6 @@ TEST(McmcUnitEMetric, sample_p) {
 }
 
 TEST(McmcUnitEMetric, gradients) {
-  rng_t base_rng(0);
-
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
 
   stan::mcmc::unit_e_point z(q.size());
@@ -61,8 +57,8 @@ TEST(McmcUnitEMetric, gradients) {
   funnel_model_namespace::funnel_model model(data_var_context, 0,
                                              &model_output);
 
-  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(
-      model);
+  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, stan::rng_t>
+      metric(model);
 
   double epsilon = 1e-6;
 
@@ -136,7 +132,6 @@ TEST(McmcUnitEMetric, gradients) {
 
 TEST(McmcUnitEMetric, streams) {
   stan::test::capture_std_streams();
-  rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -144,7 +139,7 @@ TEST(McmcUnitEMetric, streams) {
   stan::mcmc::mock_model model(q.size());
 
   // for use in Google Test macros below
-  typedef stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> unit_e;
+  typedef stan::mcmc::unit_e_metric<stan::mcmc::mock_model, stan::rng_t> unit_e;
 
   EXPECT_NO_THROW(unit_e metric(model));
 

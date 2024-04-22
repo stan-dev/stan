@@ -7,7 +7,7 @@
 #include <stan/math/mix.hpp>
 #endif
 #include <stan/model/prob_grad.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -367,8 +367,7 @@ class model_base : public prob_grad {
    * in output
    * @param[in,out] msgs msgs stream to which messages are written
    */
-  virtual void write_array(boost::ecuyer1988& base_rng,
-                           Eigen::VectorXd& params_r,
+  virtual void write_array(stan::rng_t& base_rng, Eigen::VectorXd& params_r,
                            Eigen::VectorXd& params_constrained_r,
                            bool include_tparams = true, bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
@@ -618,8 +617,7 @@ class model_base : public prob_grad {
    * in output
    * @param[in,out] msgs msgs stream to which messages are written
    */
-  virtual void write_array(boost::ecuyer1988& base_rng,
-                           std::vector<double>& params_r,
+  virtual void write_array(stan::rng_t& base_rng, std::vector<double>& params_r,
                            std::vector<int>& params_i,
                            std::vector<double>& params_r_constrained,
                            bool include_tparams = true, bool include_gqs = true,

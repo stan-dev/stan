@@ -13,8 +13,6 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/covariance.hpp>
 #include <boost/accumulators/statistics/variates/covariate.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-#include <boost/random/additive_combine.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -44,7 +42,7 @@ using Eigen::Dynamic;
  *
  * <p><b>Storage Order</b>: Storage is column/last-index major.
  */
-template <class RNG = boost::random::ecuyer1988>
+template <typename Unused = void*>
 class chains {
  private:
   std::vector<std::string> param_names_;

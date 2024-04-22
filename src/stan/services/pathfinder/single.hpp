@@ -221,7 +221,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
                                    size_t num_samples, const EigVec& alpha,
                                    const std::string& iter_msg, Logger&& logger,
                                    bool calculate_lp = true) {
-  boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
+  boost::variate_generator<stan::rng_t&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls = 0;
@@ -250,7 +250,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
         approx_samples_col = approx_samples.col(i);
         ++lp_fun_calls;
         lp_mat.coeffRef(i, 1) = lp_fun(approx_samples_col, pathfinder_ss);
-      } catch (const std::exception& e) {
+      } catch (const std::domain_error& e) {
         lp_mat.coeffRef(i, 1) = -std::numeric_limits<double>::infinity();
       }
       log_stream(logger, pathfinder_ss, iter_msg);
@@ -530,7 +530,7 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
                               lp_fun, constrain_fun, rng, taylor_appx,
                               num_elbo_draws, alpha, iter_msg, logger),
                           taylor_appx);
-  } catch (const std::exception& e) {
+  } catch (const std::domain_error& e) {
     logger.warn(iter_msg + "ELBO estimation failed "
                 + " with error: " + e.what());
     return std::make_pair(internal::elbo_est_t{}, internal::taylor_approx_t{});
@@ -607,8 +607,7 @@ inline auto pathfinder_lbfgs_single(
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer, bool calculate_lp = true) {
   const auto start_pathfinder_time = std::chrono::steady_clock::now();
-  boost::ecuyer1988 rng
-      = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
+  stan::rng_t rng = util::create_rng(random_seed, stride_id);
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
 
@@ -821,7 +820,16 @@ inline auto pathfinder_lbfgs_single(
         logger.info(lbfgs_ss);
         lbfgs_ss.str("");
       }
-      throw e;
+      if (ReturnLpSamples) {
+        // we want to terminate multi-path pathfinder during these unrecoverable
+        // exceptions
+        throw;
+      } else {
+        logger.error(e.what());
+        return internal::ret_pathfinder<ReturnLpSamples>(
+            error_codes::SOFTWARE, Eigen::Array<double, Eigen::Dynamic, 1>(0),
+            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(0, 0), 0);
+      }
     }
   }
   if (unlikely(save_iterations)) {
@@ -901,7 +909,7 @@ inline auto pathfinder_lbfgs_single(
                             approx_samples_constrained_col)
                   .matrix();
       }
-    } catch (const std::exception& e) {
+    } catch (const std::domain_error& e) {
       std::string err_msg = e.what();
       logger.warn(path_num + "Final sampling approximation failed with error: "
                   + err_msg);
@@ -925,12 +933,13 @@ inline auto pathfinder_lbfgs_single(
       lp_ratio = std::move(elbo_best.lp_ratio);
     }
   } else {
+    // output only first num_draws from what we computed for ELBO
     constrained_draws_mat
-        = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(
-            names.size(), elbo_draws.cols());
+        = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(),
+                                                                num_draws);
     Eigen::VectorXd approx_samples_constrained_col;
     Eigen::VectorXd unconstrained_col;
-    for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
+    for (Eigen::Index i = 0; i < num_draws; ++i) {
       constrained_draws_mat.col(i).head(2) = elbo_lp_mat.row(i).matrix();
       unconstrained_col = elbo_draws.col(i);
       constrained_draws_mat.col(i).tail(num_unconstrained_params)
@@ -938,7 +947,7 @@ inline auto pathfinder_lbfgs_single(
                           approx_samples_constrained_col)
                 .matrix();
     }
-    lp_ratio = std::move(elbo_best.lp_ratio);
+    lp_ratio = std::move(elbo_best.lp_ratio.head(num_draws));
   }
   parameter_writer(constrained_draws_mat);
   parameter_writer();

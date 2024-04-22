@@ -5,6 +5,12 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.34.1 (23 January 2024)
+======================================================================
+
+- Fixed a Windows-specific issue with std::regex in JSON file validation (#3251)
+- Added a missing include of `cstdint` (#3255)
+
 v2.34.0 (16 January 2024)
 ======================================================================
 

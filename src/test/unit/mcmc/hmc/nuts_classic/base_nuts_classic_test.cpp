@@ -2,20 +2,19 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts_classic/base_nuts_classic.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
-
-typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
 namespace mcmc {
 
-class mock_nuts_classic : public base_nuts_classic<mock_model, mock_hamiltonian,
-                                                   mock_integrator, rng_t> {
+class mock_nuts_classic
+    : public base_nuts_classic<mock_model, mock_hamiltonian, mock_integrator,
+                               stan::rng_t> {
  public:
-  mock_nuts_classic(const mock_model& m, rng_t& rng)
-      : base_nuts_classic<mock_model, mock_hamiltonian, mock_integrator, rng_t>(
-          m, rng) {}
+  mock_nuts_classic(const mock_model& m, stan::rng_t& rng)
+      : base_nuts_classic<mock_model, mock_hamiltonian, mock_integrator,
+                          stan::rng_t>(m, rng) {}
 
  private:
   bool compute_criterion(ps_point& start, ps_point& finish,
@@ -61,11 +60,11 @@ class divergent_hamiltonian : public base_hamiltonian<M, ps_point, BaseRNG> {
 
 class divergent_nuts_classic
     : public base_nuts_classic<mock_model, divergent_hamiltonian, expl_leapfrog,
-                               rng_t> {
+                               stan::rng_t> {
  public:
-  divergent_nuts_classic(const mock_model& m, rng_t& rng)
+  divergent_nuts_classic(const mock_model& m, stan::rng_t& rng)
       : base_nuts_classic<mock_model, divergent_hamiltonian, expl_leapfrog,
-                          rng_t>(m, rng) {}
+                          stan::rng_t>(m, rng) {}
 
  private:
   bool compute_criterion(ps_point& start, ps_point& finish,
@@ -78,7 +77,7 @@ class divergent_nuts_classic
 }  // namespace stan
 
 TEST(McmcNutsBaseNutsClassic, set_max_depth) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -98,7 +97,7 @@ TEST(McmcNutsBaseNutsClassic, set_max_depth) {
 }
 
 TEST(McmcNutsBaseNuts, set_max_delta) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   Eigen::VectorXd q(2);
   q(0) = 5;
@@ -113,7 +112,7 @@ TEST(McmcNutsBaseNuts, set_max_delta) {
 }
 
 TEST(McmcNutsBaseNutsClassic, build_tree) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
@@ -167,7 +166,7 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
 }
 
 TEST(McmcNutsBaseNutsClassic, slice_criterion) {
-  rng_t base_rng(0);
+  stan::rng_t base_rng = stan::services::util::create_rng(0, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
