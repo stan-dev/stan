@@ -106,8 +106,8 @@ inline double rhat(const Eigen::MatrixXd& chains) {
  * blocks of memory.  Chains are trimmed from the back to match the
  * length of the shortest chain.
  *
- * @param chain_begin stores pointers to arrays of chains
- * @param sizes stores sizes of chains
+ * @param chain_begins stores pointers to arrays of chains
+ * @param chain_sizes stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
 inline std::pair<double, double> compute_potential_scale_reduction_rank(
