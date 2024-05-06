@@ -192,7 +192,7 @@ pipeline {
             }
             post {
                 always {
-                    recordIssues( 
+                    recordIssues(
                         id: "lint_doc_checks",
                         name: "Linting & Doc checks",
                         enabledForFailure: true,
@@ -264,8 +264,8 @@ pipeline {
                                 SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
                                 SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
                                 SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
-                                mingw32-make.exe -f lib/stan_math/make/standalone math-libs
-                                mingw32-make.exe -j${PARALLEL} test-headers
+                                make.exe -f lib/stan_math/make/standalone math-libs
+                                make.exe -j${PARALLEL} test-headers
                             """
                             setupCXX(false, WIN_CXX, stanc3_bin_url())
                             runTestsWin("src/test/unit")
@@ -448,7 +448,7 @@ pipeline {
                                 SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
                                 SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
                                 cd performance-tests-cmdstan/cmdstan
-                                mingw32-make.exe -j${PARALLEL} build
+                                make.exe -j${PARALLEL} build
                                 cd ..
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
@@ -496,7 +496,7 @@ pipeline {
     post {
         always {
             node("linux") {
-                recordIssues( 
+                recordIssues(
                     id: "pipeline",
                     name: "Entire pipeline results",
                     enabledForFailure: true,
