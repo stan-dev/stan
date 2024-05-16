@@ -26,7 +26,7 @@ namespace util {
  * @return an stan::rng_t instance
  */
 inline rng_t create_rng(unsigned int seed, unsigned int chain) {
-  rng_t rng(seed + chain);
+  rng_t rng(seed + chain + 1);
   return rng;
 }
 
