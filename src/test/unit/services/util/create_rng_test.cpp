@@ -28,3 +28,12 @@ TEST(rng, initialize_with_zero) {
   rng2();
   EXPECT_NE(rng1, rng2);
 }
+
+TEST(rng, run_twice_with_minus_one_seed) {
+  stan::rng_t rng1 = stan::services::util::create_rng(-1, 0);
+  EXPECT_EQ(rng1(), rng1());
+}
+TEST(rng, run_twice_with_zero_seed) {
+  stan::rng_t rng1 = stan::services::util::create_rng(0, 0);
+  EXPECT_NE(rng1(), rng1());
+}
