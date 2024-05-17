@@ -26,7 +26,10 @@ namespace util {
  * @return an stan::rng_t instance
  */
 inline rng_t create_rng(unsigned int seed, unsigned int chain) {
-  rng_t rng(seed + chain);
+  // RNG state is 128 bits, but user only provides 64 total bits
+  // Additionally, there are issues if all 128 bits are 0, hence
+  // the 1 as the second argument
+  rng_t rng(0, 1, seed, chain);
   return rng;
 }
 
