@@ -58,13 +58,13 @@ TEST(McmcUnitEXHMC, build_tree) {
   EXPECT_FLOAT_EQ(1.4131583, sampler.z().p(1));
   EXPECT_FLOAT_EQ(-1.4131583, sampler.z().p(2));
 
-  EXPECT_FLOAT_EQ(0.65928948, z_propose.q(0));
-  EXPECT_FLOAT_EQ(-0.65928948, z_propose.q(1));
-  EXPECT_FLOAT_EQ(0.65928948, z_propose.q(2));
+  EXPECT_FLOAT_EQ(0.11940599, z_propose.q(0));
+  EXPECT_FLOAT_EQ(-0.11940599, z_propose.q(1));
+  EXPECT_FLOAT_EQ(0.11940599, z_propose.q(2));
 
-  EXPECT_FLOAT_EQ(-1.2505695, z_propose.p(0));
-  EXPECT_FLOAT_EQ(1.2505695, z_propose.p(1));
-  EXPECT_FLOAT_EQ(-1.2505695, z_propose.p(2));
+  EXPECT_FLOAT_EQ(-1.408289, z_propose.p(0));
+  EXPECT_FLOAT_EQ(1.408289, z_propose.p(1));
+  EXPECT_FLOAT_EQ(-1.408289, z_propose.p(2));
 
   EXPECT_EQ(8, n_leapfrog);
   EXPECT_FLOAT_EQ(4.2207355, ave);
@@ -79,7 +79,7 @@ TEST(McmcUnitEXHMC, build_tree) {
 }
 
 TEST(McmcUnitEXHMC, transition) {
-  stan::rng_t base_rng = stan::services::util::create_rng(483294, 0);
+  stan::rng_t base_rng = stan::services::util::create_rng(4832942, 0);
 
   stan::mcmc::unit_e_point z_init(3);
   z_init.q(0) = 1;
@@ -112,7 +112,7 @@ TEST(McmcUnitEXHMC, transition) {
   EXPECT_FLOAT_EQ(-1, s.cont_params()(1));
   EXPECT_FLOAT_EQ(1, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-1.5, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99994934, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.99870926, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
