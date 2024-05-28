@@ -228,8 +228,8 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     std::stringstream msg;
     msg << "Partial user-specified initialization failed. "
            "Initialization of non user specified parameters "
-           "between (-" << init_radius << ", " << init_radius
-        << ") failed after"
+           "between (-"
+        << init_radius << ", " << init_radius << ") failed after"
         << " " << MAX_INIT_TRIES << " attempts. ";
     logger.error(msg);
     logger.error(
@@ -255,7 +255,6 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
         " Try specifying initial values,"
         " reducing ranges of constrained values,"
         " or reparameterizing the model.");
-
   }
   throw std::domain_error("Initialization failed.");
 }

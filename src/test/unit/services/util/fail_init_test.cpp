@@ -43,8 +43,8 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
   double init_radius = 2;
   bool print_timing = false;
   EXPECT_THROW(
-      stan::services::util::initialize(model, init_context, rng,
-                                       init_radius, print_timing, logger, init),
+      stan::services::util::initialize(model, init_context, rng, init_radius,
+                                       print_timing, logger, init),
       std::domain_error);
   auto blah = logger.return_all_logs();
   for (auto&& m : blah) {
