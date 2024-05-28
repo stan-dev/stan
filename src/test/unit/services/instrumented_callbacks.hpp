@@ -281,10 +281,12 @@ class instrumented_logger : public stan::callbacks::logger {
         count++;
     return count;
   }
-public:
+
+ public:
   std::vector<std::string> return_all_logs() {
     std::vector<std::string> all_logs;
-    all_logs.reserve(debug_.size() + info_.size() + warn_.size() + error_.size() + fatal_.size() + 5);
+    all_logs.reserve(debug_.size() + info_.size() + warn_.size() + error_.size()
+                     + fatal_.size() + 5);
     all_logs.emplace_back("DEBUG");
     all_logs.insert(all_logs.end(), debug_.begin(), debug_.end());
     all_logs.emplace_back("INFO");
