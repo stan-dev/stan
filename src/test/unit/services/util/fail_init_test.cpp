@@ -46,10 +46,12 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
       stan::services::util::initialize(model, init_context, rng,
                                        init_radius, print_timing, logger, init),
       std::domain_error);
-  auto blah = logger.return_all_logs();
-  for (auto&& m : blah) {
+  /* Uncomment to print all logs
+  auto logs = logger.return_all_logs();
+  for (auto&& m : logs) {
     std::cout << m << std::endl;
   }
+  */
   EXPECT_EQ(303, logger.call_count());
   EXPECT_EQ(300, logger.call_count_warn());
   EXPECT_EQ(100, logger.find_warn("throwing within log_prob"));
