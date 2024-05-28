@@ -220,8 +220,8 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     logger.error("User-specified initialization failed.");
     logger.error(
         " Try specifying new initial values,"
-        " use partially specialized initialization,"
-        " reducing ranges of constrained values,"
+        " using partially specialized initialization,"
+        " reducing the range of constrained values,"
         " or reparameterizing the model.");
   } else if (any_initialized) {
     logger.info("");
@@ -234,15 +234,15 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     logger.error(msg);
     logger.error(
         " Try specifying full initial values,"
-        " reducing ranges of constrained values,"
+        " reducing the range of constrained values,"
         " or reparameterizing the model.");
   } else if (is_initialized_with_zero) {
     logger.info("");
     logger.error("Initial values of 0 failed to initialize.");
     logger.error(
         " Try specifying new initial values,"
-        " use partially specialized initialization,"
-        " reducing ranges of constrained values,"
+        " using partially specialized initialization,"
+        " reducing the range of constrained values,"
         " or reparameterizing the model.");
   } else {
     logger.info("");
