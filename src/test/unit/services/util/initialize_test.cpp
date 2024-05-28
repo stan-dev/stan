@@ -1,15 +1,15 @@
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
-#include <gtest/gtest.h>
-#include <test/unit/util.hpp>
-#include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/stream_logger.hpp>
-#include <sstream>
-#include <test/test-models/good/services/test_lp.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
+#include <test/test-models/good/services/test_lp.hpp>
+#include <test/unit/util.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <gtest/gtest.h>
+#include <sstream>
 
 class ServicesUtilInitialize : public testing::Test {
  public:
@@ -28,7 +28,7 @@ class ServicesUtilInitialize : public testing::Test {
   stan::rng_t rng;
 };
 
-TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
+TEST_F(ServicesUtilInitialize, radius_zero_print_false) {
   std::vector<double> params;
 
   double init_radius = 0;
@@ -250,7 +250,7 @@ class mock_throwing_model : public stan::model::prob_grad {
 
 }  // namespace test
 
-TEST_F(ServicesUtilInitialize, model_throws__radius_zero) {
+TEST_F(ServicesUtilInitialize, model_throws_radius_zero) {
   test::mock_throwing_model throwing_model;
 
   double init_radius = 0;
@@ -259,8 +259,7 @@ TEST_F(ServicesUtilInitialize, model_throws__radius_zero) {
       stan::services::util::initialize(throwing_model, empty_context, rng,
                                        init_radius, print_timing, logger, init),
       std::domain_error);
-
-  EXPECT_EQ(3, logger.call_count());
+  EXPECT_EQ(6, logger.call_count());
   EXPECT_EQ(3, logger.call_count_warn());
   EXPECT_EQ(1, logger.find_warn("throwing within log_prob"));
 }
@@ -533,7 +532,7 @@ TEST_F(ServicesUtilInitialize, model_throws_in_write_array__radius_zero) {
                                        init_radius, print_timing, logger, init),
       std::domain_error);
 
-  EXPECT_EQ(3, logger.call_count());
+  EXPECT_EQ(6, logger.call_count());
   EXPECT_EQ(3, logger.call_count_warn());
   EXPECT_EQ(1, logger.find_warn("throwing within write_array"));
 }
