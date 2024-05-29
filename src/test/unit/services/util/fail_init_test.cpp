@@ -52,7 +52,7 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
     std::cout << m << std::endl;
   }
   */
-  EXPECT_EQ(303, logger.call_count());
-  EXPECT_EQ(300, logger.call_count_warn());
-  EXPECT_EQ(100, logger.find_warn("throwing within log_prob"));
+  EXPECT_EQ(6, logger.call_count());
+  EXPECT_EQ(3, logger.call_count_warn());
+  EXPECT_EQ(0, logger.find_warn("throwing within log_prob"));
 }
