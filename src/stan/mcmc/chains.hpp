@@ -13,8 +13,6 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/covariance.hpp>
 #include <boost/accumulators/statistics/variates/covariate.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-#include <boost/random/additive_combine.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -44,7 +42,7 @@ using Eigen::Dynamic;
  *
  * <p><b>Storage Order</b>: Storage is column/last-index major.
  */
-template <class RNG = boost::random::ecuyer1988>
+template <typename Unused = void*>
 class chains {
  private:
   std::vector<std::string> param_names_;
@@ -597,6 +595,22 @@ class chains {
     return split_effective_sample_size(index(name));
   }
 
+  std::pair<double, double> split_potential_scale_reduction_rank(
+      const int index) const {
+    int n_chains = num_chains();
+    std::vector<const double*> draws(n_chains);
+    std::vector<size_t> sizes(n_chains);
+    int n_kept_samples = 0;
+    for (int chain = 0; chain < n_chains; ++chain) {
+      n_kept_samples = num_kept_samples(chain);
+      draws[chain]
+          = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+      sizes[chain] = n_kept_samples;
+    }
+
+    return analyze::compute_split_potential_scale_reduction_rank(draws, sizes);
+  }
+
   double split_potential_scale_reduction(const int index) const {
     int n_chains = num_chains();
     std::vector<const double*> draws(n_chains);
@@ -610,6 +624,11 @@ class chains {
     }
 
     return analyze::compute_split_potential_scale_reduction(draws, sizes);
+  }
+
+  std::pair<double, double> split_potential_scale_reduction_rank(
+      const std::string& name) const {
+    return split_potential_scale_reduction_rank(index(name));
   }
 
   double split_potential_scale_reduction(const std::string& name) const {

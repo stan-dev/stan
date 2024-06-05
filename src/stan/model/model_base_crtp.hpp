@@ -133,7 +133,7 @@ class model_base_crtp : public stan::model::model_base {
                                                                       msgs);
   }
 
-  void write_array(boost::ecuyer1988& rng, Eigen::VectorXd& theta,
+  void write_array(stan::rng_t& rng, Eigen::VectorXd& theta,
                    Eigen::VectorXd& vars, bool include_tparams = true,
                    bool include_gqs = true,
                    std::ostream* msgs = 0) const override {
@@ -202,7 +202,7 @@ class model_base_crtp : public stan::model::model_base {
         theta, theta_i, msgs);
   }
 
-  void write_array(boost::ecuyer1988& rng, std::vector<double>& theta,
+  void write_array(stan::rng_t& rng, std::vector<double>& theta,
                    std::vector<int>& theta_i, std::vector<double>& vars,
                    bool include_tparams = true, bool include_gqs = true,
                    std::ostream* msgs = 0) const override {

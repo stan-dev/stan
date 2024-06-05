@@ -5,6 +5,17 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.35.0 (3 June 2024)
+======================================================================
+
+ - The algorithms no longer catch `std::exception` unconditionally. The Math library uses `std::domain_error` for recoverable errors, and these are the ones which are caught. (#3259)
+ - Allow laplace sampling without evaluating `log_prob` for each draw. (#3261)
+ - Allow laplace sampling to save the Hessian as a diagnostic output. (#3261)
+ - Stan's RNG usages now uses a type definition `stan::rng_t` rather than hard coding a specific Boost RNG. (#3263)
+ - Switched the pRNG used by default in the services and tests to be `boost::mixmax`. Note that this means seeds from previous versions will lead to different numerical results in this version. (#3264)
+ - Add a new ranked R-hat diagnostic from [Vehtari](https://arxiv.org/abs/1903.08008). (#3266)
+ - Fixed an issue where Pathfinder would sometimes return more draws than requested. (#3279)
+
 v2.34.1 (23 January 2024)
 ======================================================================
 

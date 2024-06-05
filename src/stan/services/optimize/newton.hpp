@@ -44,7 +44,7 @@ int newton(Model& model, const stan::io::var_context& init,
            callbacks::interrupt& interrupt, callbacks::logger& logger,
            callbacks::writer& init_writer,
            callbacks::writer& parameter_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
@@ -62,7 +62,7 @@ int newton(Model& model, const stan::io::var_context& init,
     lp = model.template log_prob<false, jacobian>(cont_vector, disc_vector,
                                                   &message);
     logger.info(message);
-  } catch (const std::exception& e) {
+  } catch (const std::domain_error& e) {
     logger.info("");
     logger.info(
         "Informational Message: The current"

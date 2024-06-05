@@ -66,7 +66,7 @@ int hmc_nuts_dense_e_adapt(
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
     callbacks::structured_writer& metric_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<double> cont_vector;
 
@@ -82,7 +82,7 @@ int hmc_nuts_dense_e_adapt(
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::adapt_dense_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::adapt_dense_e_nuts<Model, stan::rng_t> sampler(model, rng);
 
   sampler.set_metric(inv_metric);
 
@@ -98,11 +98,15 @@ int hmc_nuts_dense_e_adapt(
 
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
-
-  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
-                             num_samples, num_thin, refresh, save_warmup, rng,
-                             interrupt, logger, sample_writer,
-                             diagnostic_writer, metric_writer);
+  try {
+    util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                               num_samples, num_thin, refresh, save_warmup, rng,
+                               interrupt, logger, sample_writer,
+                               diagnostic_writer, metric_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
 
   return error_codes::OK;
 }
@@ -206,11 +210,10 @@ int hmc_nuts_dense_e_adapt(
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
     callbacks::structured_writer& metric_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_dense_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
   return hmc_nuts_dense_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer,
@@ -259,12 +262,11 @@ int hmc_nuts_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_dense_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
   callbacks::structured_writer dummy_metric_writer;
   return hmc_nuts_dense_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer,
@@ -347,8 +349,8 @@ int hmc_nuts_dense_e_adapt(
         init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0], metric_writer[0]);
   }
-  using sample_t = stan::mcmc::adapt_dense_e_nuts<Model, boost::ecuyer1988>;
-  std::vector<boost::ecuyer1988> rngs;
+  using sample_t = stan::mcmc::adapt_dense_e_nuts<Model, stan::rng_t>;
+  std::vector<stan::rng_t> rngs;
   rngs.reserve(num_chains);
   std::vector<std::vector<double>> cont_vectors;
   cont_vectors.reserve(num_chains);
@@ -381,21 +383,26 @@ int hmc_nuts_dense_e_adapt(
     logger.error(e.what());
     return error_codes::CONFIG;
   }
-  tbb::parallel_for(
-      tbb::blocked_range<size_t>(0, num_chains, 1),
-      [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
-       init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
-       &sample_writer, &cont_vectors, &diagnostic_writer,
-       &metric_writer](const tbb::blocked_range<size_t>& r) {
-        for (size_t i = r.begin(); i != r.end(); ++i) {
-          util::run_adaptive_sampler(
-              samplers[i], model, cont_vectors[i], num_warmup, num_samples,
-              num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
-              sample_writer[i], diagnostic_writer[i], metric_writer[i],
-              init_chain_id + i, num_chains);
-        }
-      },
-      tbb::simple_partitioner());
+  try {
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, num_chains, 1),
+        [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
+         init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
+         &sample_writer, &cont_vectors, &diagnostic_writer,
+         &metric_writer](const tbb::blocked_range<size_t>& r) {
+          for (size_t i = r.begin(); i != r.end(); ++i) {
+            util::run_adaptive_sampler(
+                samplers[i], model, cont_vectors[i], num_warmup, num_samples,
+                num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
+                sample_writer[i], diagnostic_writer[i], metric_writer[i],
+                init_chain_id + i, num_chains);
+          }
+        },
+        tbb::simple_partitioner());
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   return error_codes::OK;
 }
 
@@ -543,10 +550,10 @@ int hmc_nuts_dense_e_adapt(
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer,
     std::vector<MetricWriter>& metric_writer) {
-  std::vector<std::unique_ptr<stan::io::dump>> unit_e_metric;
+  std::vector<std::unique_ptr<stan::io::array_var_context>> unit_e_metric;
   unit_e_metric.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    unit_e_metric.emplace_back(std::make_unique<stan::io::dump>(
+    unit_e_metric.emplace_back(std::make_unique<stan::io::array_var_context>(
         util::create_unit_e_dense_inv_metric(model.num_params_r())));
   }
   if (num_chains == 1) {
@@ -623,10 +630,10 @@ int hmc_nuts_dense_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  std::vector<std::unique_ptr<stan::io::dump>> unit_e_metric;
+  std::vector<std::unique_ptr<stan::io::array_var_context>> unit_e_metric;
   unit_e_metric.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
-    unit_e_metric.emplace_back(std::make_unique<stan::io::dump>(
+    unit_e_metric.emplace_back(std::make_unique<stan::io::array_var_context>(
         util::create_unit_e_dense_inv_metric(model.num_params_r())));
   }
   std::vector<stan::callbacks::structured_writer> dummy_metric_writer(

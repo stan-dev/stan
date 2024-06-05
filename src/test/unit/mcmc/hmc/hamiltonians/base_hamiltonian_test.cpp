@@ -3,11 +3,9 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
-
-typedef boost::ecuyer1988 rng_t;
 
 TEST(BaseHamiltonian, update_potential_gradient) {
   stan::io::empty_var_context data_var_context;
@@ -16,7 +14,8 @@ TEST(BaseHamiltonian, update_potential_gradient) {
   funnel_model_namespace::funnel_model model(data_var_context, 0,
                                              &model_output);
 
-  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t>
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model,
+                               stan::rng_t>
       metric(model);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();

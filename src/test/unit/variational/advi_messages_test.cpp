@@ -1,14 +1,13 @@
 #include <test/test-models/good/variational/univariate_no_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
-
-typedef boost::ecuyer1988 rng_t;
+#include <stan/services/util/create_rng.hpp>
 
 class advi_test : public ::testing::Test {
  public:
@@ -24,25 +23,21 @@ class advi_test : public ::testing::Test {
         = "Informational Message: The ELBO at a previous iteration is larger "
           "than the ELBO upon convergence!";
 
-    // Create mock data_var_context
-    static const std::string DATA = "";
-    std::stringstream data_stream(DATA);
-    stan::io::dump data_var_context(data_stream);
-    // data_stream.close();
+    stan::io::empty_var_context data_var_context;
 
     model_ = new stan_model(data_var_context, 0, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());
-    base_rng_.seed(3021828106u);
+    base_rng_.seed(3021828109u);
     model_stream_.str("");
     log_stream_.str("");
     parameter_stream_.str("");
     diagnostic_stream_.str("");
 
     advi_meanfield_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_meanfield, rng_t>(
+        stan_model, stan::variational::normal_meanfield, stan::rng_t>(
         *model_, cont_params_, base_rng_, 1, 100, 1, 1);
     advi_fullrank_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_fullrank, rng_t>(
+        stan_model, stan::variational::normal_fullrank, stan::rng_t>(
         *model_, cont_params_, base_rng_, 1, 100, 1, 1);
   }
 
@@ -56,9 +51,9 @@ class advi_test : public ::testing::Test {
   std::string err_msg2;
 
   stan::variational::advi<stan_model, stan::variational::normal_meanfield,
-                          rng_t> *advi_meanfield_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
-      *advi_fullrank_;
+                          stan::rng_t> *advi_meanfield_;
+  stan::variational::advi<stan_model, stan::variational::normal_fullrank,
+                          stan::rng_t> *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream log_stream_;
   std::stringstream parameter_stream_;
@@ -69,7 +64,7 @@ class advi_test : public ::testing::Test {
 
  private:
   stan_model *model_;
-  rng_t base_rng_;
+  stan::rng_t base_rng_;
   Eigen::VectorXd cont_params_;
 };
 

@@ -65,7 +65,7 @@ int hmc_static_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
@@ -82,8 +82,7 @@ int hmc_static_dense_e_adapt(
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::adapt_dense_e_static_hmc<Model, boost::ecuyer1988> sampler(model,
-                                                                         rng);
+  stan::mcmc::adapt_dense_e_static_hmc<Model, stan::rng_t> sampler(model, rng);
 
   sampler.set_metric(inv_metric);
   sampler.set_nominal_stepsize_and_T(stepsize, int_time);
@@ -99,10 +98,15 @@ int hmc_static_dense_e_adapt(
                             logger);
 
   callbacks::structured_writer dummy_metric_writer;
-  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
-                             num_samples, num_thin, refresh, save_warmup, rng,
-                             interrupt, logger, sample_writer,
-                             diagnostic_writer, dummy_metric_writer);
+  try {
+    util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                               num_samples, num_thin, refresh, save_warmup, rng,
+                               interrupt, logger, sample_writer,
+                               diagnostic_writer, dummy_metric_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
 
   return error_codes::OK;
 }
@@ -149,12 +153,11 @@ int hmc_static_dense_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  stan::io::dump dmp
+  auto default_metric
       = util::create_unit_e_dense_inv_metric(model.num_params_r());
-  stan::io::var_context& unit_e_metric = dmp;
 
   return hmc_static_dense_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, default_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       int_time, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);

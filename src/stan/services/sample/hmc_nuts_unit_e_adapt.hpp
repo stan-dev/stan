@@ -59,7 +59,7 @@ int hmc_nuts_unit_e_adapt(
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer,
     callbacks::structured_writer& metric_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
@@ -72,7 +72,7 @@ int hmc_nuts_unit_e_adapt(
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::adapt_unit_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::adapt_unit_e_nuts<Model, stan::rng_t> sampler(model, rng);
   sampler.set_nominal_stepsize(stepsize);
   sampler.set_stepsize_jitter(stepsize_jitter);
   sampler.set_max_depth(max_depth);
@@ -83,11 +83,15 @@ int hmc_nuts_unit_e_adapt(
   sampler.get_stepsize_adaptation().set_kappa(kappa);
   sampler.get_stepsize_adaptation().set_t0(t0);
 
-  util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
-                             num_samples, num_thin, refresh, save_warmup, rng,
-                             interrupt, logger, sample_writer,
-                             diagnostic_writer, metric_writer);
-
+  try {
+    util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                               num_samples, num_thin, refresh, save_warmup, rng,
+                               interrupt, logger, sample_writer,
+                               diagnostic_writer, metric_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   return error_codes::OK;
 }
 
@@ -200,8 +204,8 @@ int hmc_nuts_unit_e_adapt(
         max_depth, delta, gamma, kappa, t0, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0], metric_writer[0]);
   }
-  using sample_t = stan::mcmc::adapt_unit_e_nuts<Model, boost::ecuyer1988>;
-  std::vector<boost::ecuyer1988> rngs;
+  using sample_t = stan::mcmc::adapt_unit_e_nuts<Model, stan::rng_t>;
+  std::vector<stan::rng_t> rngs;
   rngs.reserve(num_chains);
   std::vector<std::vector<double>> cont_vectors;
   cont_vectors.reserve(num_chains);
@@ -228,21 +232,26 @@ int hmc_nuts_unit_e_adapt(
     logger.error(e.what());
     return error_codes::CONFIG;
   }
-  tbb::parallel_for(
-      tbb::blocked_range<size_t>(0, num_chains, 1),
-      [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
-       init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
-       &sample_writer, &cont_vectors, &diagnostic_writer,
-       &metric_writer](const tbb::blocked_range<size_t>& r) {
-        for (size_t i = r.begin(); i != r.end(); ++i) {
-          util::run_adaptive_sampler(
-              samplers[i], model, cont_vectors[i], num_warmup, num_samples,
-              num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
-              sample_writer[i], diagnostic_writer[i], metric_writer[i],
-              init_chain_id + i, num_chains);
-        }
-      },
-      tbb::simple_partitioner());
+  try {
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, num_chains, 1),
+        [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
+         init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
+         &sample_writer, &cont_vectors, &diagnostic_writer,
+         &metric_writer](const tbb::blocked_range<size_t>& r) {
+          for (size_t i = r.begin(); i != r.end(); ++i) {
+            util::run_adaptive_sampler(
+                samplers[i], model, cont_vectors[i], num_warmup, num_samples,
+                num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
+                sample_writer[i], diagnostic_writer[i], metric_writer[i],
+                init_chain_id + i, num_chains);
+          }
+        },
+        tbb::simple_partitioner());
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
   return error_codes::OK;
 }
 
@@ -263,7 +272,9 @@ int hmc_nuts_unit_e_adapt(
  * @param[in] init An std vector of init var contexts for initialization of each
  * chain.
  * @param[in] random_seed random seed for the random number generator
- * @param[in] chain chain id to advance the pseudo random number generator
+ * @param[in] init_chain_id first chain id. The pseudo random number generator
+ * will advance for each chain by an integer sequence from `init_chain_id` to
+ * `init_chain_id + num_chains - 1`
  * @param[in] init_radius radius to initialize
  * @param[in] num_warmup Number of warmup samples
  * @param[in] num_samples Number of samples

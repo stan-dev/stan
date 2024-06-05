@@ -1,4 +1,5 @@
 #include <stan/io/empty_var_context.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
@@ -6,17 +7,11 @@
 
 #include <test/test-models/good/mcmc/hmc/integrators/gauss.hpp>
 
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
-
 #include <gtest/gtest.h>
 
 #include <sstream>
 
-typedef boost::ecuyer1988 rng_t;
-
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
-  rng_t base_rng(0);
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -25,12 +20,12 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
 
   gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
-  stan::mcmc::impl_leapfrog<
-      stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
+  stan::mcmc::impl_leapfrog<stan::mcmc::unit_e_metric<
+      gauss_model_namespace::gauss_model, stan::rng_t> >
       integrator;
 
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(
-      model);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, stan::rng_t>
+      metric(model);
 
   stan::mcmc::unit_e_point z(1);
   z.q(0) = 1;
@@ -64,8 +59,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
-  rng_t base_rng(0);
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -74,12 +67,12 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
 
   gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
-  stan::mcmc::impl_leapfrog<
-      stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
+  stan::mcmc::impl_leapfrog<stan::mcmc::unit_e_metric<
+      gauss_model_namespace::gauss_model, stan::rng_t> >
       integrator;
 
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(
-      model);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, stan::rng_t>
+      metric(model);
 
   // Create a circle of points
   const int n_points = 1000;
@@ -151,8 +144,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
-  rng_t base_rng(0);
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -161,12 +152,12 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
 
   gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
-  stan::mcmc::impl_leapfrog<
-      stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >
+  stan::mcmc::impl_leapfrog<stan::mcmc::softabs_metric<
+      gauss_model_namespace::gauss_model, stan::rng_t> >
       integrator;
 
-  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> metric(
-      model);
+  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, stan::rng_t>
+      metric(model);
 
   stan::mcmc::softabs_point z(1);
   z.q(0) = 1;
@@ -200,8 +191,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
-  rng_t base_rng(0);
-
   stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
@@ -210,12 +199,12 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
 
   gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
-  stan::mcmc::impl_leapfrog<
-      stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >
+  stan::mcmc::impl_leapfrog<stan::mcmc::softabs_metric<
+      gauss_model_namespace::gauss_model, stan::rng_t> >
       integrator;
 
-  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> metric(
-      model);
+  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, stan::rng_t>
+      metric(model);
 
   // Create a circle of points
   const int n_points = 1000;

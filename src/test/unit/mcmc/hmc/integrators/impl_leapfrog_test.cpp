@@ -1,5 +1,6 @@
-#include <stan/io/dump.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
 #include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
@@ -8,16 +9,12 @@
 #include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
 #include <test/unit/util.hpp>
 
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
-
 #include <gtest/gtest.h>
 
 #include <sstream>
 
 // namespace
 //************************************************************
-
-typedef boost::ecuyer1988 rng_t;
 
 class McmcHmcIntegratorsImplLeapfrogF : public testing::Test {
  public:
@@ -27,10 +24,10 @@ class McmcHmcIntegratorsImplLeapfrogF : public testing::Test {
         diag_e_integrator() {}
 
   void SetUp() {
-    static const std::string DATA("mu <- 0.0\ny <- 0\n");
+    static const std::string DATA("{\"mu\":0.0, \"y\":0}");
     std::stringstream data_stream(DATA);
     // setup hamiltonian
-    stan::io::dump data_var_context(data_stream);
+    stan::json::json_data data_var_context(data_stream);
 
     model = new command_model_namespace::command_model(data_var_context);
     debug.str("");
@@ -46,16 +43,16 @@ class McmcHmcIntegratorsImplLeapfrogF : public testing::Test {
   stan::callbacks::stream_logger logger;
 
   // integrator under test
-  stan::mcmc::impl_leapfrog<
-      stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
+  stan::mcmc::impl_leapfrog<stan::mcmc::unit_e_metric<
+      command_model_namespace::command_model, stan::rng_t> >
       unit_e_integrator;
 
-  stan::mcmc::impl_leapfrog<
-      stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t> >
+  stan::mcmc::impl_leapfrog<stan::mcmc::diag_e_metric<
+      command_model_namespace::command_model, stan::rng_t> >
       diag_e_integrator;
 
   stan::mcmc::impl_leapfrog<stan::mcmc::softabs_metric<
-      command_model_namespace::command_model, rng_t> >
+      command_model_namespace::command_model, stan::rng_t> >
       softabs_integrator;
 
   // model
@@ -75,7 +72,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, begin_update_p) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -107,7 +104,8 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_begin_update_p) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::softabs_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                             stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -141,7 +139,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, update_q) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -173,7 +171,8 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_update_q) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::softabs_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                             stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -207,7 +206,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, end_update_p) {
   EXPECT_NEAR(z.g(0), 1.67264975797776, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -239,7 +238,8 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_end_update_p) {
   EXPECT_NEAR(z.g(0), 1.67264975797776, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::softabs_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                             stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -273,7 +273,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_1) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -305,7 +305,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_2) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -337,7 +337,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_3) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -369,7 +369,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_4) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -401,7 +401,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_5) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -432,7 +432,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_6) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -464,7 +464,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_7) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -496,7 +496,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_8) {
   EXPECT_NEAR(z.g(0), 1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -529,7 +529,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_9) {
   EXPECT_NEAR(z.g(0), 1.27097196280777, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::diag_e_metric<command_model_namespace::command_model, stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -561,7 +561,8 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_evolve) {
   EXPECT_NEAR(z.g(0), 1.27097196280777, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::softabs_metric<command_model_namespace::command_model, rng_t>
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                             stan::rng_t>
       hamiltonian(*model);
 
   // setup epsilon
@@ -585,8 +586,8 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_evolve) {
 TEST_F(McmcHmcIntegratorsImplLeapfrogF, streams) {
   stan::test::capture_std_streams();
 
-  typedef stan::mcmc::impl_leapfrog<
-      stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
+  typedef stan::mcmc::impl_leapfrog<stan::mcmc::unit_e_metric<
+      command_model_namespace::command_model, stan::rng_t> >
       integrator;
 
   EXPECT_NO_THROW(integrator i);
@@ -600,7 +601,7 @@ TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_streams) {
   stan::test::capture_std_streams();
 
   typedef stan::mcmc::impl_leapfrog<stan::mcmc::softabs_metric<
-      command_model_namespace::command_model, rng_t> >
+      command_model_namespace::command_model, stan::rng_t> >
       integrator;
 
   EXPECT_NO_THROW(integrator i);

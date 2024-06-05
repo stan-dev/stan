@@ -1,4 +1,5 @@
 #include <stan/services/util/run_adaptive_sampler.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/callbacks/structured_writer.hpp>
@@ -27,12 +28,12 @@ class ServicesUtil : public testing::Test {
   stan::io::empty_var_context context;
   stan_model model;
   std::vector<double> cont_vector;
-  boost::ecuyer1988 rng;
+  stan::rng_t rng;
   stan::test::unit::instrumented_interrupt interrupt;
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
   stan::callbacks::structured_writer dummy_metric_writer;
   stan::test::unit::instrumented_logger logger;
-  stan::mcmc::adapt_unit_e_nuts<stan_model, boost::ecuyer1988> sampler;
+  stan::mcmc::adapt_unit_e_nuts<stan_model, stan::rng_t> sampler;
   int num_warmup, num_samples, num_thin, refresh;
   bool save_warmup;
 };
