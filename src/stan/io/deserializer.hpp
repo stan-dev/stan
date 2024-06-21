@@ -982,6 +982,123 @@ class deserializer {
   }
 
   /**
+   * Return the next object transformed to a matrix with simplexes along the columns
+   *
+   * <p>See <code>stan::math::stochastic_column_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   */
+  template <typename Ret, bool Jacobian, typename LP,
+            require_not_std_vector_t<Ret>* = nullptr,
+            require_matrix_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_column(LP& lp, Eigen::Index rows, Eigen::Index cols) {
+    using stan::math::stochastic_column_constrain;
+    if (Jacobian) {
+      return stochastic_column_constrain(
+          this->read<conditional_var_val_t<Ret, matrix_t>>(rows - 1, cols), lp);
+    } else {
+      return stochastic_column_constrain(
+          this->read<conditional_var_val_t<Ret, matrix_t>>(rows - 1, cols));
+    }
+  }
+
+  /**
+   * Specialization of \ref read_constrain_stochastic_column for `std::vector` return types.
+   *
+   * <p>See <code>stan::math::stochastic_column_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @tparam Sizes A parameter pack of integral types.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param vecsize The size of the return vector.
+   * @param sizes Pack of integrals to use to construct the return's type.
+   * @return Standard vector of matrices transformed to have simplixes along the columns.
+   */
+  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_column(LP& lp, const size_t vecsize,
+                                         Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(
+          this->read_constrain_stochastic_column<value_type_t<Ret>, Jacobian>(
+              lp, sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Return the next object transformed to a matrix with simplexes along the rows
+   *
+   * <p>See <code>stan::math::stochastic_row_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   */
+  template <typename Ret, bool Jacobian, typename LP,
+            require_not_std_vector_t<Ret>* = nullptr,
+            require_matrix_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_row(LP& lp, Eigen::Index rows, Eigen::Index cols) {
+    using stan::math::stochastic_row_constrain;
+    if (Jacobian) {
+      return stochastic_row_constrain(
+          this->read<conditional_var_val_t<Ret, matrix_t>>(rows, cols - 1), lp);
+    } else {
+      return stochastic_row_constrain(
+          this->read<conditional_var_val_t<Ret, matrix_t>>(rows, cols - 1));
+    }
+  }
+
+  /**
+   * Specialization of \ref read_constrain_stochastic_row for `std::vector` return types.
+   *
+   * <p>See <code>stan::math::stochastic_row_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @tparam Sizes A parameter pack of integral types.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param vecsize The size of the return vector.
+   * @param sizes Pack of integrals to use to construct the return's type.
+   * @return Standard vector of matrices transformed to have simplixes along the columns.
+   */
+  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_row(LP& lp, const size_t vecsize,
+                                         Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(
+          this->read_constrain_stochastic_row<value_type_t<Ret>, Jacobian>(
+              lp, sizes...));
+    }
+    return ret;
+  }
+
+
+  /**
    * Read a serialized lower bounded variable and unconstrain it
    *
    * @tparam Ret Type of output
@@ -1301,6 +1418,73 @@ class deserializer {
     }
     return ret;
   }
+
+  /**
+   * Read a serialized column simplex matrix and unconstrain it
+   *
+   * @tparam Ret Type of output
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   * @return Unconstrained matrix
+   */
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_column(size_t rows, size_t cols) {
+    return stan::math::stochastic_column_free(this->read<Ret>(rows, cols));
+  }
+
+  /**
+   * Read serialized column simplex matrices and unconstrain them
+   *
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
+   */
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_column(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_stochastic_column<value_type_t<Ret>>(sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Read a serialized row simplex matrix and unconstrain it
+   *
+   * @tparam Ret Type of output
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   * @return Unconstrained matrix
+   */
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_row(size_t rows, size_t cols) {
+    return stan::math::stochastic_row_free(this->read<Ret>(rows, cols));
+  }
+
+  /**
+   * Read serialized row simplex matrices and unconstrain them
+   *
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
+   */
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_row(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_stochastic_row<value_type_t<Ret>>(sizes...));
+    }
+    return ret;
+  }
+
 };
 
 }  // namespace io
