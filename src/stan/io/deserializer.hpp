@@ -398,12 +398,12 @@ class deserializer_base {
                                                  Eigen::Index N) {
     if (Jacobian) {
       return stan::math::cholesky_factor_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>((N * (N + 1)) / 2
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>((N * (N + 1)) / 2
                                                            + (M - N) * N),
           M, N, lp);
     } else {
       return stan::math::cholesky_factor_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>((N * (N + 1)) / 2
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>((N * (N + 1)) / 2
                                                            + (M - N) * N),
           M, N);
     }
@@ -465,11 +465,11 @@ class deserializer_base {
     using stan::math::cholesky_corr_constrain;
     if (Jacobian) {
       return cholesky_corr_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>((K * (K - 1)) / 2),
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>((K * (K - 1)) / 2),
           K, lp);
     } else {
       return cholesky_corr_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>((K * (K - 1)) / 2),
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>((K * (K - 1)) / 2),
           K);
     }
   }
@@ -529,12 +529,12 @@ class deserializer_base {
     using stan::math::cov_matrix_constrain;
     if (Jacobian) {
       return cov_matrix_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>(k
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>(k
                                                            + (k * (k - 1)) / 2),
           k, lp);
     } else {
       return cov_matrix_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>(k
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>(k
                                                            + (k * (k - 1)) / 2),
           k);
     }
@@ -593,11 +593,11 @@ class deserializer_base {
     using stan::math::corr_matrix_constrain;
     if (Jacobian) {
       return corr_matrix_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>((k * (k - 1)) / 2),
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>((k * (k - 1)) / 2),
           k, lp);
     } else {
       return corr_matrix_constrain(
-          derived().template read<typename Derived::conditional_var_val_t<Ret, typename Derived::vector_t>>((k * (k - 1)) / 2),
+          derived().template read<typename Derived::conditional_var_val_t<Ret, Derived::vector_t>>((k * (k - 1)) / 2),
           k);
     }
   }
@@ -996,7 +996,8 @@ class deserializer<T, void> : public deserializer_base<deserializer<T>> {
       = stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>>;
 
  private:
-  map_vector_t map_r_;    // map of reals.
+  using map_r_t = std::conditional_t<is_var<T>::value, var_matrix_t, map_vector_t>
+  map_r_t map_r_;    // map of reals.
   Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;  // map of integers.
   size_t r_size_{0};  // size of reals available.
   size_t i_size_{0};  // size of integers available.
@@ -1040,7 +1041,6 @@ class deserializer<T, void> : public deserializer_base<deserializer<T>> {
     }
   }
 
- public:
   template <typename S, typename K>
   using conditional_var_val_t
       = std::conditional_t<is_var_matrix<S>::value && is_var<T>::value,
@@ -1049,6 +1049,8 @@ class deserializer<T, void> : public deserializer_base<deserializer<T>> {
   template <typename S>
   using is_fp_or_ad = bool_constant<std::is_floating_point<S>::value
                                     || is_autodiff<S>::value>;
+
+ public:
 
   /**
    * Construct a variable reader using the specified vectors
@@ -1064,11 +1066,18 @@ class deserializer<T, void> : public deserializer_base<deserializer<T>> {
   template <typename RVec, typename IntVec,
             require_all_vector_like_t<RVec, IntVec>* = nullptr>
   deserializer(const RVec& data_r, const IntVec& data_i)
-      : map_r_(data_r.data(), data_r.size()),
+      : map_r_(stan::math::to_var_value(data_r)),
         map_i_(data_i.data(), data_i.size()),
         r_size_(data_r.size()),
         i_size_(data_i.size()) {}
 
+  template <typename RVec, typename IntVec,
+            require_var_matrix_t<RVec>* = nullptr>
+  deserializer(const RVec& data_r, const IntVec& data_i)
+      : map_r_(data_r),
+        map_i_(data_i.data(), data_i.size()),
+        r_size_(data_r.size()),
+        i_size_(data_i.size()) {}
   /**
    * Return the number of scalars remaining to be read.
    *
