@@ -1,11 +1,11 @@
 #ifndef STAN_MODEL_MODEL_BASE_HPP
 #define STAN_MODEL_MODEL_BASE_HPP
 
-#include <stan/io/var_context.hpp>
-#include <stan/math/rev/core.hpp>
 #ifdef STAN_MODEL_FVAR_VAR
 #include <stan/math/mix.hpp>
 #endif
+#include <stan/io/var_context.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <ostream>
