@@ -1,10 +1,10 @@
 #ifndef STAN_MODEL_MODEL_BASE_CRTP_HPP
 #define STAN_MODEL_MODEL_BASE_CRTP_HPP
 
-#include <stan/model/model_base.hpp>
 #ifdef STAN_MODEL_FVAR_VAR
 #include <stan/math/mix.hpp>
 #endif
+#include <stan/model/model_base.hpp>
 #include <iostream>
 #include <utility>
 #include <vector>

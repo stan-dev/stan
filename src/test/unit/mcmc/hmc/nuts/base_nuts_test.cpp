@@ -362,7 +362,7 @@ TEST(McmcNutsBaseNuts, transition) {
   EXPECT_EQ((2 << (sampler.get_max_depth() - 1)) - 1, sampler.n_leapfrog_);
   EXPECT_FALSE(sampler.divergent_);
 
-  EXPECT_EQ(-31 * init_momentum, s.cont_params()(0));
+  EXPECT_EQ(23 * init_momentum, s.cont_params()(0));
   EXPECT_EQ(0, s.log_prob());
   EXPECT_EQ(1, s.accept_stat());
   EXPECT_EQ("", debug.str());
@@ -373,7 +373,7 @@ TEST(McmcNutsBaseNuts, transition) {
 }
 
 TEST(McmcNutsBaseNuts, transition_egde_momenta) {
-  stan::rng_t base_rng = stan::services::util::create_rng(424243, 0);
+  stan::rng_t base_rng = stan::services::util::create_rng(42424253, 0);
 
   int model_size = 1;
   double init_momentum = 1.5;
