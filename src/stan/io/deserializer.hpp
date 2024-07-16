@@ -382,11 +382,8 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LB, typename LP,
             typename... Sizes>
   inline auto read_constrain_lb(const LB& lb, LP& lp, Sizes... sizes) {
-    if (Jacobian) {
-      return stan::math::lb_constrain(this->read<Ret>(sizes...), lb, lp);
-    } else {
-      return stan::math::lb_constrain(this->read<Ret>(sizes...), lb);
-    }
+    return stan::math::lb_constrain<Jacobian>(this->read<Ret>(sizes...), lb,
+                                              lp);
   }
 
   /**
@@ -408,11 +405,8 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename UB, typename LP,
             typename... Sizes>
   inline auto read_constrain_ub(const UB& ub, LP& lp, Sizes... sizes) {
-    if (Jacobian) {
-      return stan::math::ub_constrain(this->read<Ret>(sizes...), ub, lp);
-    } else {
-      return stan::math::ub_constrain(this->read<Ret>(sizes...), ub);
-    }
+    return stan::math::ub_constrain<Jacobian>(this->read<Ret>(sizes...), ub,
+                                              lp);
   }
 
   /**
@@ -437,11 +431,8 @@ class deserializer {
             typename... Sizes>
   inline auto read_constrain_lub(const LB& lb, const UB& ub, LP& lp,
                                  Sizes... sizes) {
-    if (Jacobian) {
-      return stan::math::lub_constrain(this->read<Ret>(sizes...), lb, ub, lp);
-    } else {
-      return stan::math::lub_constrain(this->read<Ret>(sizes...), lb, ub);
-    }
+    return stan::math::lub_constrain<Jacobian>(this->read<Ret>(sizes...), lb,
+                                               ub, lp);
   }
 
   /**
@@ -470,14 +461,8 @@ class deserializer {
   inline auto read_constrain_offset_multiplier(const Offset& offset,
                                                const Mult& multiplier, LP& lp,
                                                Sizes... sizes) {
-    using stan::math::offset_multiplier_constrain;
-    if (Jacobian) {
-      return offset_multiplier_constrain(this->read<Ret>(sizes...), offset,
-                                         multiplier, lp);
-    } else {
-      return offset_multiplier_constrain(this->read<Ret>(sizes...), offset,
-                                         multiplier);
-    }
+    return stan::math::offset_multiplier_constrain<Jacobian>(
+        this->read<Ret>(sizes...), offset, multiplier, lp);
   }
 
   /**
@@ -501,12 +486,8 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   inline auto read_constrain_unit_vector(LP& lp, Sizes... sizes) {
-    using stan::math::unit_vector_constrain;
-    if (Jacobian) {
-      return math::eval(unit_vector_constrain(this->read<Ret>(sizes...), lp));
-    } else {
-      return math::eval(unit_vector_constrain(this->read<Ret>(sizes...)));
-    }
+    return stan::math::eval(stan::math::unit_vector_constrain<Jacobian>(
+        this->read<Ret>(sizes...), lp));
   }
 
   /**
@@ -562,13 +543,9 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr>
   inline auto read_constrain_simplex(LP& lp, size_t size) {
-    using stan::math::simplex_constrain;
     stan::math::check_positive("read_simplex", "size", size);
-    if (Jacobian) {
-      return simplex_constrain(this->read<Ret>(size - 1), lp);
-    } else {
-      return simplex_constrain(this->read<Ret>(size - 1));
-    }
+    return stan::math::simplex_constrain<Jacobian>(this->read<Ret>(size - 1),
+                                                   lp);
   }
 
   /**
@@ -624,12 +601,8 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   inline auto read_constrain_ordered(LP& lp, Sizes... sizes) {
-    using stan::math::ordered_constrain;
-    if (Jacobian) {
-      return ordered_constrain(this->read<Ret>(sizes...), lp);
-    } else {
-      return ordered_constrain(this->read<Ret>(sizes...));
-    }
+    return stan::math::ordered_constrain<Jacobian>(this->read<Ret>(sizes...),
+                                                   lp);
   }
 
   /**
@@ -684,12 +657,8 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   inline auto read_constrain_positive_ordered(LP& lp, Sizes... sizes) {
-    using stan::math::positive_ordered_constrain;
-    if (Jacobian) {
-      return positive_ordered_constrain(this->read<Ret>(sizes...), lp);
-    } else {
-      return positive_ordered_constrain(this->read<Ret>(sizes...));
-    }
+    return stan::math::positive_ordered_constrain<Jacobian>(
+        this->read<Ret>(sizes...), lp);
   }
 
   /**
@@ -745,17 +714,10 @@ class deserializer {
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_cholesky_factor_cov(LP& lp, Eigen::Index M,
                                                  Eigen::Index N) {
-    if (Jacobian) {
-      return stan::math::cholesky_factor_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((N * (N + 1)) / 2
-                                                           + (M - N) * N),
-          M, N, lp);
-    } else {
-      return stan::math::cholesky_factor_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((N * (N + 1)) / 2
-                                                           + (M - N) * N),
-          M, N);
-    }
+    return stan::math::cholesky_factor_constrain<Jacobian>(
+        this->read<conditional_var_val_t<Ret, vector_t>>((N * (N + 1)) / 2
+                                                         + (M - N) * N),
+        M, N, lp);
   }
 
   /**
@@ -811,16 +773,9 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_cholesky_factor_corr(LP& lp, Eigen::Index K) {
-    using stan::math::cholesky_corr_constrain;
-    if (Jacobian) {
-      return cholesky_corr_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((K * (K - 1)) / 2),
-          K, lp);
-    } else {
-      return cholesky_corr_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((K * (K - 1)) / 2),
-          K);
-    }
+    return stan::math::cholesky_corr_constrain<Jacobian>(
+        this->read<conditional_var_val_t<Ret, vector_t>>((K * (K - 1)) / 2), K,
+        lp);
   }
 
   /**
@@ -875,18 +830,9 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_cov_matrix(LP& lp, Eigen::Index k) {
-    using stan::math::cov_matrix_constrain;
-    if (Jacobian) {
-      return cov_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>(k
-                                                           + (k * (k - 1)) / 2),
-          k, lp);
-    } else {
-      return cov_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>(k
-                                                           + (k * (k - 1)) / 2),
-          k);
-    }
+    return stan::math::cov_matrix_constrain<Jacobian>(
+        this->read<conditional_var_val_t<Ret, vector_t>>(k + (k * (k - 1)) / 2),
+        k, lp);
   }
 
   /**
@@ -939,16 +885,9 @@ class deserializer {
             require_not_std_vector_t<Ret>* = nullptr,
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_corr_matrix(LP& lp, Eigen::Index k) {
-    using stan::math::corr_matrix_constrain;
-    if (Jacobian) {
-      return corr_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
-          k, lp);
-    } else {
-      return corr_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
-          k);
-    }
+    return stan::math::corr_matrix_constrain<Jacobian>(
+        this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2), k,
+        lp);
   }
 
   /**
@@ -976,6 +915,118 @@ class deserializer {
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_corr_matrix<value_type_t<Ret>, Jacobian>(
+              lp, sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Return the next object transformed to a matrix with simplexes along the
+   * columns
+   *
+   * <p>See <code>stan::math::stochastic_column_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   */
+  template <typename Ret, bool Jacobian, typename LP,
+            require_not_std_vector_t<Ret>* = nullptr,
+            require_matrix_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_column(LP& lp, Eigen::Index rows,
+                                               Eigen::Index cols) {
+    return stan::math::stochastic_column_constrain<Jacobian>(
+        this->read<conditional_var_val_t<Ret, matrix_t>>(rows - 1, cols), lp);
+  }
+
+  /**
+   * Specialization of \ref read_constrain_stochastic_column for `std::vector`
+   * return types.
+   *
+   * <p>See <code>stan::math::stochastic_column_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @tparam Sizes A parameter pack of integral types.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param vecsize The size of the return vector.
+   * @param sizes Pack of integrals to use to construct the return's type.
+   * @return Standard vector of matrices transformed to have simplixes along the
+   * columns.
+   */
+  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_column(LP& lp, const size_t vecsize,
+                                               Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(
+          this->read_constrain_stochastic_column<value_type_t<Ret>, Jacobian>(
+              lp, sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Return the next object transformed to a matrix with simplexes along the
+   * rows
+   *
+   * <p>See <code>stan::math::stochastic_row_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   */
+  template <typename Ret, bool Jacobian, typename LP,
+            require_not_std_vector_t<Ret>* = nullptr,
+            require_matrix_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_row(LP& lp, Eigen::Index rows,
+                                            Eigen::Index cols) {
+    return stan::math::stochastic_row_constrain<Jacobian>(
+        this->read<conditional_var_val_t<Ret, matrix_t>>(rows, cols - 1), lp);
+  }
+
+  /**
+   * Specialization of \ref read_constrain_stochastic_row for `std::vector`
+   * return types.
+   *
+   * <p>See <code>stan::math::stochastic_row_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @tparam Sizes A parameter pack of integral types.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param vecsize The size of the return vector.
+   * @param sizes Pack of integrals to use to construct the return's type.
+   * @return Standard vector of matrices transformed to have simplixes along the
+   * columns.
+   */
+  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_constrain_stochastic_row(LP& lp, const size_t vecsize,
+                                            Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(
+          this->read_constrain_stochastic_row<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
     }
     return ret;
@@ -1298,6 +1349,73 @@ class deserializer {
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_corr_matrix<value_type_t<Ret>>(sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Read a serialized column simplex matrix and unconstrain it
+   *
+   * @tparam Ret Type of output
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   * @return Unconstrained matrix
+   */
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_column(size_t rows, size_t cols) {
+    return stan::math::stochastic_column_free(this->read<Ret>(rows, cols));
+  }
+
+  /**
+   * Read serialized column simplex matrices and unconstrain them
+   *
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
+   */
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_column(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(
+          read_free_stochastic_column<value_type_t<Ret>>(sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Read a serialized row simplex matrix and unconstrain it
+   *
+   * @tparam Ret Type of output
+   * @param rows Rows of matrix
+   * @param cows Cows of matrix
+   * @return Unconstrained matrix
+   */
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_row(size_t rows, size_t cols) {
+    return stan::math::stochastic_row_free(this->read<Ret>(rows, cols));
+  }
+
+  /**
+   * Read serialized row simplex matrices and unconstrain them
+   *
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
+   */
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_stochastic_row(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_stochastic_row<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
