@@ -50,6 +50,7 @@ class chains {
   Eigen::VectorXi warmup_;
 
 private:
+
     auto prepare_samples_for_analysis(int index) const {
         int n_chains = num_chains();
         std::vector<const double*> draws(n_chains);
@@ -64,7 +65,6 @@ private:
         return std::make_pair(draws, sizes);
     }
 
-public:  
   static double variance(const Eigen::VectorXd& x) {
     double m = x.mean();
     return (x.array() - m).square().sum() / (x.size() - 1);
@@ -215,19 +215,18 @@ public:
     return ac2;
   }
 
-  /**
-   * Return the split potential scale reduction (split R hat)
-   * for the specified parameter.
-   *
-   * Current implementation takes the minimum number of samples
-   * across chains as the number of samples per chain.
-   *
-   * @param VectorXd
-   * @param Dynamic
-   * @param samples
-   *
-   * @return
-   */
+/**
+ * Computes the split potential scale reduction (Rhat).
+ * See more details in Stan reference manual section "Potential
+ * Scale Reduction". http://mc-stan.org/users/documentation
+ *
+ * Current implementation assumes draws are stored in contiguous
+ * blocks of memory.  Chains are trimmed from the back to match the
+ * length of the shortest chain.
+ *
+ * @param samples matrix of vectors of draws from all chains
+ * @return potential scale reduction for the specified parameter
+ */
   double split_potential_scale_reduction(
       const Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>& samples) const {
     int chains = samples.size();
@@ -253,7 +252,6 @@ public:
     double var_between = n * variance(split_chain_mean);
     double var_within = split_chain_var.mean();
 
-    // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
     return sqrt((var_between / var_within + n - 1) / n);
   }
 
@@ -587,6 +585,15 @@ public:
   double split_effective_sample_size(const std::string& name) const {
     return split_effective_sample_size(index(name));
   }
+
+  // std::pair<double, double> split_effective_sample_size_rank(const int index) const {
+  //   auto [draws, sizes] = prepare_samples_for_analysis(index);
+  //   return analyze::compute_split_effective_sample_size_rank(draws, sizes);
+  // }
+
+  // std::pair<double, double> split_effective_sample_size_rank(const std::string& name) const {
+  //   return split_effective_sample_size_rank(index(name));
+  // }
 
   std::pair<double, double> split_potential_scale_reduction_rank(const int index) const {
     auto [draws, sizes] = prepare_samples_for_analysis(index);
