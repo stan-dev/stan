@@ -18,16 +18,17 @@ namespace stan {
 namespace analyze {
 
 /**
- * Computes normalized average ranks for draws. Transforming them to normal
- * scores using inverse normal transformation and a fractional offset. Based on
- * paper https://arxiv.org/abs/1903.08008
+ * Computes normalized average ranks for pooled draws. Normal scores computed
+ * using inverse normal transformation and a fractional offset. Based on paper
+ * https://arxiv.org/abs/1903.08008
+ * 
  * @param chains stores chains in columns
  * @return normal scores for average ranks of draws
  */
 inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {
   const Eigen::Index rows = chains.rows();
   const Eigen::Index cols = chains.cols();
-  const Eigen::Index size = rows * cols;
+  const Eigen::Index size = rows * cols;  
 
   std::vector<std::pair<double, int>> value_with_index(size);
 
@@ -54,7 +55,7 @@ inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {
     double avg_rank = sum_ranks / count;
     boost::math::normal_distribution<double> dist;
     for (std::size_t k = i; k < j; ++k) {
-      double p = (avg_rank - 3.0 / 8.0) / (size - 2.0 * 3.0 / 8.0 + 1.0);
+      double p = (avg_rank - 0.375) / (size + 0.25);
       const Eigen::Index index = value_with_index[k].second;
       rank_matrix(index) = boost::math::quantile(dist, p);
     }
