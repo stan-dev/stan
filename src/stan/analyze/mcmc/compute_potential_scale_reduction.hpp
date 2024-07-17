@@ -28,7 +28,7 @@ namespace analyze {
 inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {
   const Eigen::Index rows = chains.rows();
   const Eigen::Index cols = chains.cols();
-  const Eigen::Index size = rows * cols;  
+  const Eigen::Index size = rows * cols;
 
   std::vector<std::pair<double, int>> value_with_index(size);
 
