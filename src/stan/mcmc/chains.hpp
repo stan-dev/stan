@@ -65,10 +65,6 @@ private:
     }
 
 public:  
-  static double mean(const Eigen::VectorXd& x) {
-    return x.mean();
-  }
-
   static double variance(const Eigen::VectorXd& x) {
     double m = x.mean();
     return (x.array() - m).square().sum() / (x.size() - 1);
