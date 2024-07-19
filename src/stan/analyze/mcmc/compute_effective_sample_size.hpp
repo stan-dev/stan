@@ -31,9 +31,9 @@ namespace analyze {
  */
 inline double compute_effective_sample_size(std::vector<const double*> draws,
                                             std::vector<size_t> sizes) {
-  int num_chains = sizes.size();
+  size_t num_chains = sizes.size();
   size_t num_draws = sizes[0];
-  for (int chain = 1; chain < num_chains; ++chain) {
+  for (size_t chain = 1; chain < num_chains; ++chain) {
     num_draws = std::min(num_draws, sizes[chain]);
   }
 
@@ -45,11 +45,11 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
   bool are_all_const = false;
   Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
 
-  for (int chain_idx = 0; chain_idx < num_chains; chain_idx++) {
+  for (size_t chain_idx = 0; chain_idx < num_chains; chain_idx++) {
     Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
         draws[chain_idx], sizes[chain_idx]);
 
-    for (int n = 0; n < num_draws; n++) {
+    for (size_t n = 0; n < num_draws; n++) {
       if (!std::isfinite(draw(n))) {
         return std::numeric_limits<double>::quiet_NaN();
       }
@@ -70,10 +70,13 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
     }
   }
 
+  // draws are not trimmed for ESS!!!
+  // we now have draws matrix.  can we compute ESS on draws matrix in its own subroutine?
+
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
   Eigen::VectorXd chain_mean(num_chains);
   Eigen::VectorXd chain_var(num_chains);
-  for (int chain = 0; chain < num_chains; ++chain) {
+  for (size_t chain = 0; chain < num_chains; ++chain) {
     Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
         draws[chain], sizes[chain]);
     autocovariance<double>(draw, acov(chain));
@@ -88,7 +91,7 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
   Eigen::VectorXd rho_hat_s(num_draws);
   rho_hat_s.setZero();
   Eigen::VectorXd acov_s(num_chains);
-  for (int chain = 0; chain < num_chains; ++chain)
+  for (size_t chain = 0; chain < num_chains; ++chain)
     acov_s(chain) = acov(chain)(1);
   double rho_hat_even = 1.0;
   rho_hat_s(0) = rho_hat_even;
@@ -101,10 +104,10 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
   // reduces variance in the case of antithetical chains.
   size_t s = 1;
   while (s < (num_draws - 4) && (rho_hat_even + rho_hat_odd) > 0) {
-    for (int chain = 0; chain < num_chains; ++chain)
+    for (size_t chain = 0; chain < num_chains; ++chain)
       acov_s(chain) = acov(chain)(s + 1);
     rho_hat_even = 1 - (mean_var - acov_s.mean()) / var_plus;
-    for (int chain = 0; chain < num_chains; ++chain)
+    for (size_t chain = 0; chain < num_chains; ++chain)
       acov_s(chain) = acov(chain)(s + 2);
     rho_hat_odd = 1 - (mean_var - acov_s.mean()) / var_plus;
     if ((rho_hat_even + rho_hat_odd) >= 0) {
@@ -114,7 +117,7 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
     s += 2;
   }
 
-  int max_s = s;
+  size_t max_s = s;
   // this is used in the improved estimate, which reduces variance
   // in antithetic case -- see tau_hat below
   if (rho_hat_even > 0)
@@ -122,7 +125,7 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
 
   // Convert Geyer's initial positive sequence into an initial
   // monotone sequence
-  for (int s = 1; s <= max_s - 3; s += 2) {
+  for (size_t s = 1; s <= max_s - 3; s += 2) {
     if (rho_hat_s(s + 1) + rho_hat_s(s + 2) > rho_hat_s(s - 1) + rho_hat_s(s)) {
       rho_hat_s(s + 1) = (rho_hat_s(s - 1) + rho_hat_s(s)) / 2;
       rho_hat_s(s + 2) = rho_hat_s(s + 1);
@@ -158,7 +161,7 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
  */
 inline double compute_effective_sample_size(std::vector<const double*> draws,
                                             size_t size) {
-  int num_chains = draws.size();
+  size_t num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_effective_sample_size(draws, sizes);
 }
@@ -184,9 +187,9 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
  */
 inline double compute_split_effective_sample_size(
     std::vector<const double*> draws, std::vector<size_t> sizes) {
-  int num_chains = sizes.size();
+  size_t num_chains = sizes.size();
   size_t num_draws = sizes[0];
-  for (int chain = 1; chain < num_chains; ++chain) {
+  for (size_t chain = 1; chain < num_chains; ++chain) {
     num_draws = std::min(num_draws, sizes[chain]);
   }
 
@@ -220,7 +223,7 @@ inline double compute_split_effective_sample_size(
  */
 inline double compute_split_effective_sample_size(
     std::vector<const double*> draws, size_t size) {
-  int num_chains = draws.size();
+  size_t num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_split_effective_sample_size(draws, sizes);
 }

@@ -49,21 +49,22 @@ class chains {
   Eigen::Matrix<Eigen::MatrixXd, Dynamic, 1> samples_;
   Eigen::VectorXi warmup_;
 
-private:
+  auto prepare_samples_for_analysis(int index) const {
+    int n_chains = num_chains();
+    std::vector<const double*> draws(n_chains);
+    std::vector<size_t> sizes(n_chains);
 
-    auto prepare_samples_for_analysis(int index) const {
-        int n_chains = num_chains();
-        std::vector<const double*> draws(n_chains);
-        std::vector<size_t> sizes(n_chains);
-
-        for (int chain = 0; chain < n_chains; ++chain) {
-            int n_kept_samples = num_kept_samples(chain);
-            draws[chain] = samples_(chain).col(index).bottomRows(n_kept_samples).data();
-            sizes[chain] = n_kept_samples;
-        }
-
-        return std::make_pair(draws, sizes);
+    for (int chain = 0; chain < n_chains; ++chain) {
+      int n_kept_samples = num_kept_samples(chain);
+      draws[chain] = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+      sizes[chain] = n_kept_samples;
     }
+    return std::make_pair(draws, sizes);
+  }
+
+  static double mean(const Eigen::VectorXd& x) {
+    return x.mean();
+  }
 
   static double variance(const Eigen::VectorXd& x) {
     double m = x.mean();
@@ -215,18 +216,19 @@ private:
     return ac2;
   }
 
-/**
- * Computes the split potential scale reduction (Rhat).
- * See more details in Stan reference manual section "Potential
- * Scale Reduction". http://mc-stan.org/users/documentation
- *
- * Current implementation assumes draws are stored in contiguous
- * blocks of memory.  Chains are trimmed from the back to match the
- * length of the shortest chain.
- *
- * @param samples matrix of vectors of draws from all chains
- * @return potential scale reduction for the specified parameter
- */
+  /**
+   * Return the split potential scale reduction (split R hat)
+   * for the specified parameter.
+   *
+   * Current implementation takes the minimum number of samples
+   * across chains as the number of samples per chain.
+   *
+   * @param VectorXd
+   * @param Dynamic
+   * @param samples
+   *
+   * @return
+   */
   double split_potential_scale_reduction(
       const Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>& samples) const {
     int chains = samples.size();
@@ -252,6 +254,7 @@ private:
     double var_between = n * variance(split_chain_mean);
     double var_within = split_chain_var.mean();
 
+    // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
     return sqrt((var_between / var_within + n - 1) / n);
   }
 
@@ -314,8 +317,8 @@ private:
   void add(const int chain, const Eigen::MatrixXd& sample) {
     if (sample.cols() != num_params())
       throw std::invalid_argument(
-          "add(chain, sample): number of columns"
-          " in sample does not match chains");
+				  "add(chain, sample): number of columns"
+				  " in sample does not match chains");
     if (num_chains() == 0 || chain >= num_chains()) {
       int n = num_chains();
 
@@ -345,14 +348,28 @@ private:
     samples_(chain) = new_samples;
   }
 
+
   void add(const Eigen::MatrixXd& sample) {
-    if (sample.rows() == 0)
+    if (!sample.rows())
       return;
-    if (sample.cols() != num_params())
-      throw std::invalid_argument(
-          "add(sample): number of columns in"
-          " sample does not match chains");
-    add(num_chains(), sample);
+    std::stringstream msg;
+    if (sample.cols() != num_params()) {
+      msg << "add(sample): sample size mismatch, expecting " << num_params()
+	  << " columns, found " << sample.cols() << " cols." << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+    if (samples_.size() == 0) {
+	add(num_chains(), sample);
+    } else {
+      const Eigen::MatrixXd& first_matrix = samples_(0); // Access the first matrix
+      if (sample.rows() == first_matrix.rows() && sample.cols() == first_matrix.cols()) {
+	add(num_chains(), sample);
+      } else {
+	msg << "add(sample): sample size mismatch, expecting " << first_matrix.rows()
+	    << " rows, found " << sample.rows() << " rows." << std::endl;
+	throw std::invalid_argument(msg.str());
+      }
+    }
   }
 
   /**
@@ -585,15 +602,6 @@ private:
   double split_effective_sample_size(const std::string& name) const {
     return split_effective_sample_size(index(name));
   }
-
-  // std::pair<double, double> split_effective_sample_size_rank(const int index) const {
-  //   auto [draws, sizes] = prepare_samples_for_analysis(index);
-  //   return analyze::compute_split_effective_sample_size_rank(draws, sizes);
-  // }
-
-  // std::pair<double, double> split_effective_sample_size_rank(const std::string& name) const {
-  //   return split_effective_sample_size_rank(index(name));
-  // }
 
   std::pair<double, double> split_potential_scale_reduction_rank(const int index) const {
     auto [draws, sizes] = prepare_samples_for_analysis(index);
