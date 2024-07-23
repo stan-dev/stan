@@ -24,8 +24,10 @@ class StanIoStanCsvReader : public testing::Test {
     eight_schools_stream.open(
         "src/test/unit/io/test_csv_files/eight_schools.csv");
 
+    bernoulli_thin_stream.open(
+        "src/test/unit/io/test_csv_files/bernoulli_thin.csv");
     bernoulli_warmup_stream.open(
-        "src/test/unit/mcmc/test_csv_files/bernoulli_warmup.csv");
+        "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
     missing_draws_stream.open(
         "src/test/unit/io/test_csv_files/missing_draws.csv");
   }
@@ -41,6 +43,7 @@ class StanIoStanCsvReader : public testing::Test {
     samples1_stream.close();
     epil0_stream.close();
     blocker_nondiag0_stream.close();
+    bernoulli_thin_stream.close();
     bernoulli_warmup_stream.close();
     missing_draws_stream.close();
   }
@@ -52,6 +55,7 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream metadata3_stream, header2_stream;
   std::ifstream eight_schools_stream;
   std::ifstream header3_stream;
+  std::ifstream bernoulli_thin_stream;
   std::ifstream bernoulli_warmup_stream;
   std::ifstream missing_draws_stream;
 };
@@ -564,4 +568,12 @@ TEST_F(StanIoStanCsvReader, missing_data) {
   std::stringstream out;
   missing_draws = stan::io::stan_csv_reader::parse(missing_draws_stream, &out);
   ASSERT_TRUE(boost::algorithm::starts_with(out.str(), "Warning:"));
+}
+
+TEST_F(StanIoStanCsvReader, thinned_data) {
+  stan::io::stan_csv bernoulli_thin;
+  std::stringstream out;
+  bernoulli_thin
+      = stan::io::stan_csv_reader::parse(bernoulli_thin_stream, &out);
+  ASSERT_EQ(1000, bernoulli_thin.samples.rows());
 }

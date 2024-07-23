@@ -383,15 +383,16 @@ class stan_csv_reader {
         *out << "Warning: non-fatal error reading samples" << std::endl;
     }
 
-    int expected_samples = data.metadata.num_samples / data.metadata.thin;
-    if (expected_samples != data.samples.rows()) {
-      std::stringstream msg;
-      msg << ", expecting " << expected_samples << " samples, found "
-          << data.samples.rows();
-      if (out)
-        *out << "Warning: error reading samples" << msg.str() << std::endl;
+    if (data.metadata.thin > 0) {
+      int expected_samples = data.metadata.num_samples / data.metadata.thin;
+      if (expected_samples != data.samples.rows()) {
+        std::stringstream msg;
+        msg << ", expecting " << expected_samples << " samples, found "
+            << data.samples.rows();
+        if (out)
+          *out << "Warning: error reading samples" << msg.str() << std::endl;
+      }
     }
-
     return data;
   }
 };
