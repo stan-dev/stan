@@ -24,8 +24,10 @@ class StanIoStanCsvReader : public testing::Test {
     eight_schools_stream.open(
         "src/test/unit/io/test_csv_files/eight_schools.csv");
 
-    bernoulli_warmup_stream.open("src/test/unit/mcmc/test_csv_files/bernoulli_warmup.csv");
-    missing_draws_stream.open("src/test/unit/io/test_csv_files/missing_draws.csv");
+    bernoulli_warmup_stream.open(
+        "src/test/unit/mcmc/test_csv_files/bernoulli_warmup.csv");
+    missing_draws_stream.open(
+        "src/test/unit/io/test_csv_files/missing_draws.csv");
   }
 
   void TearDown() {
@@ -53,9 +55,6 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream bernoulli_warmup_stream;
   std::ifstream missing_draws_stream;
 };
-
-
-
 
 TEST_F(StanIoStanCsvReader, read_metadata1) {
   stan::io::stan_csv_metadata metadata;
@@ -550,7 +549,8 @@ TEST_F(StanIoStanCsvReader, ParseEightSchools) {
 TEST_F(StanIoStanCsvReader, skip_warmup) {
   stan::io::stan_csv bernoulli_warmup;
   std::stringstream out;
-  bernoulli_warmup = stan::io::stan_csv_reader::parse(bernoulli_warmup_stream, &out);
+  bernoulli_warmup
+      = stan::io::stan_csv_reader::parse(bernoulli_warmup_stream, &out);
   ASSERT_EQ(1000, bernoulli_warmup.samples.rows());
   ASSERT_EQ(1000, bernoulli_warmup.metadata.num_warmup);
   ASSERT_EQ(1000, bernoulli_warmup.metadata.num_samples);
