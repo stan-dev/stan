@@ -25,7 +25,7 @@ class StanIoStanCsvReader : public testing::Test {
         "src/test/unit/io/test_csv_files/eight_schools.csv");
 
     bernoulli_warmup_stream.open(
-        "src/test/unit/mcmc/test_csv_files/bernoulli_warmup.csv");
+        "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
     missing_draws_stream.open(
         "src/test/unit/io/test_csv_files/missing_draws.csv");
   }
