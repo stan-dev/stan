@@ -571,6 +571,7 @@ TEST_F(StanIoStanCsvReader, missing_data) {
 TEST_F(StanIoStanCsvReader, thinned_data) {
   stan::io::stan_csv bernoulli_thin;
   std::stringstream out;
-  bernoulli_thin = stan::io::stan_csv_reader::parse(bernoulli_thin_stream, &out);
+  bernoulli_thin
+      = stan::io::stan_csv_reader::parse(bernoulli_thin_stream, &out);
   ASSERT_EQ(1000, bernoulli_thin.samples.rows());
 }
