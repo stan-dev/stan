@@ -1,5 +1,6 @@
 #include <stan/io/stan_csv_reader.hpp>
 #include <test/unit/util.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
 #include <sstream>
@@ -23,8 +24,8 @@ class StanIoStanCsvReader : public testing::Test {
     eight_schools_stream.open(
         "src/test/unit/io/test_csv_files/eight_schools.csv");
 
-    bernoulli_corrupt_stream.open("src/test/unit/mcmc/test_csv_files/bernoulli_corrupt.csv");
     bernoulli_warmup_stream.open("src/test/unit/mcmc/test_csv_files/bernoulli_warmup.csv");
+    missing_draws_stream.open("src/test/unit/io/test_csv_files/missing_draws.csv");
   }
 
   void TearDown() {
@@ -39,7 +40,7 @@ class StanIoStanCsvReader : public testing::Test {
     epil0_stream.close();
     blocker_nondiag0_stream.close();
     bernoulli_warmup_stream.close();
-    bernoulli_corrupt_stream.close();
+    missing_draws_stream.close();
   }
 
   std::ifstream blocker0_stream, epil0_stream;
@@ -50,7 +51,7 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream eight_schools_stream;
   std::ifstream header3_stream;
   std::ifstream bernoulli_warmup_stream;
-  std::ifstream bernoulli_corrupt_stream;
+  std::ifstream missing_draws_stream;
 };
 
 
@@ -557,7 +558,8 @@ TEST_F(StanIoStanCsvReader, skip_warmup) {
 }
 
 TEST_F(StanIoStanCsvReader, missing_data) {
+  stan::io::stan_csv missing_draws;
   std::stringstream out;
-  EXPECT_THROW(stan::io::stan_csv_reader::parse(bernoulli_corrupt_stream, &out), std::invalid_argument)
-    << "detect csv file which has missing rows";
+  missing_draws = stan::io::stan_csv_reader::parse(missing_draws_stream, &out);
+  ASSERT_TRUE(boost::algorithm::starts_with(out.str(), "Warning:"));
 }

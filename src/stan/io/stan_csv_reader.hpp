@@ -386,10 +386,12 @@ class stan_csv_reader {
     int expected_samples = data.metadata.num_samples / data.metadata.thin;
     if (expected_samples != data.samples.rows()) {
       std::stringstream msg;
-      msg << "Error, expecting " << expected_samples
+      msg << ", expecting " << expected_samples
 	  << " samples, found " << data.samples.rows();
-      throw std::invalid_argument(msg.str());
+      if (out)
+        *out << "Warning: error reading samples" << msg.str() << std::endl;
     }
+
     return data;
   }
 };
