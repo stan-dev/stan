@@ -366,7 +366,7 @@ class stan_csv_reader {
     if (data.metadata.num_warmup > 0 && !data.metadata.save_warmup) {
       std::string line;
       while (in.peek() != '#') {
-	std::getline(in, line);
+        std::getline(in, line);
       }
     }
 
@@ -387,7 +387,7 @@ class stan_csv_reader {
     if (expected_samples != data.samples.rows()) {
       std::stringstream msg;
       msg << ", expecting " << expected_samples
-	  << " samples, found " << data.samples.rows();
+          << " samples, found " << data.samples.rows();
       if (out)
         *out << "Warning: error reading samples" << msg.str() << std::endl;
     }
