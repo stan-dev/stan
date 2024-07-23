@@ -29,8 +29,6 @@ inline void prettify_stan_csv_name(std::string& variable) {
   }
 }
 
-// FIXME: should consolidate with the options from
-// the command line in stan::lang
 struct stan_csv_metadata {
   int stan_version_major;
   int stan_version_minor;
@@ -290,7 +288,6 @@ class stan_csv_reader {
       bool empty_line = (in.peek() == '\n');
 
       std::getline(in, line);
-
       if (empty_line)
         continue;
       if (!line.length())
@@ -365,6 +362,14 @@ class stan_csv_reader {
       throw std::invalid_argument("Error with header of input file in parse");
     }
 
+    // skip warmup draws, if any
+    if (data.metadata.num_warmup > 0 && !data.metadata.save_warmup) {
+      std::string line;
+      while (in.peek() != '#') {
+	std::getline(in, line);
+      }
+    }
+
     if (!read_adaptation(in, data.adaptation, out)) {
       if (out)
         *out << "Warning: non-fatal error reading adaptation data" << std::endl;
@@ -378,6 +383,13 @@ class stan_csv_reader {
         *out << "Warning: non-fatal error reading samples" << std::endl;
     }
 
+    int expected_samples = data.metadata.num_samples / data.metadata.thin;
+    if (expected_samples != data.samples.rows()) {
+      std::stringstream msg;
+      msg << "Error, expecting " << expected_samples
+	  << " samples, found " << data.samples.rows();
+      throw std::invalid_argument(msg.str());
+    }
     return data;
   }
 };

@@ -22,6 +22,9 @@ class StanIoStanCsvReader : public testing::Test {
         "src/test/unit/io/test_csv_files/blocker_nondiag.0.csv");
     eight_schools_stream.open(
         "src/test/unit/io/test_csv_files/eight_schools.csv");
+
+    bernoulli_corrupt_stream.open("src/test/unit/mcmc/test_csv_files/bernoulli_corrupt.csv");
+    bernoulli_warmup_stream.open("src/test/unit/mcmc/test_csv_files/bernoulli_warmup.csv");
   }
 
   void TearDown() {
@@ -33,10 +36,10 @@ class StanIoStanCsvReader : public testing::Test {
     header3_stream.close();
     adaptation1_stream.close();
     samples1_stream.close();
-
     epil0_stream.close();
-
     blocker_nondiag0_stream.close();
+    bernoulli_warmup_stream.close();
+    bernoulli_corrupt_stream.close();
   }
 
   std::ifstream blocker0_stream, epil0_stream;
@@ -46,7 +49,12 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream metadata3_stream, header2_stream;
   std::ifstream eight_schools_stream;
   std::ifstream header3_stream;
+  std::ifstream bernoulli_warmup_stream;
+  std::ifstream bernoulli_corrupt_stream;
 };
+
+
+
 
 TEST_F(StanIoStanCsvReader, read_metadata1) {
   stan::io::stan_csv_metadata metadata;
@@ -536,4 +544,20 @@ TEST_F(StanIoStanCsvReader, ParseEightSchools) {
   EXPECT_FLOAT_EQ(0.063405, eight_schools.timing.sampling);
 
   EXPECT_EQ("", out.str());
+}
+
+TEST_F(StanIoStanCsvReader, skip_warmup) {
+  stan::io::stan_csv bernoulli_warmup;
+  std::stringstream out;
+  bernoulli_warmup = stan::io::stan_csv_reader::parse(bernoulli_warmup_stream, &out);
+  ASSERT_EQ(1000, bernoulli_warmup.samples.rows());
+  ASSERT_EQ(1000, bernoulli_warmup.metadata.num_warmup);
+  ASSERT_EQ(1000, bernoulli_warmup.metadata.num_samples);
+  ASSERT_NE(0, bernoulli_warmup.adaptation.step_size);
+}
+
+TEST_F(StanIoStanCsvReader, missing_data) {
+  std::stringstream out;
+  EXPECT_THROW(stan::io::stan_csv_reader::parse(bernoulli_corrupt_stream, &out), std::invalid_argument)
+    << "detect csv file which has missing rows";
 }
