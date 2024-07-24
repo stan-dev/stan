@@ -10,33 +10,21 @@
 #include <string>
 
 class McmcChains : public testing::Test {
-public:
-  void SetUp() override {
-    blocker1_stream.open("src/test/unit/mcmc/test_csv_files/blocker.1.csv", std::ifstream::in);
-    blocker2_stream.open("src/test/unit/mcmc/test_csv_files/blocker.2.csv", std::ifstream::in);
-    blocker3_stream.open("src/test/unit/mcmc/test_csv_files/blocker.500.csv", std::ifstream::in);
-    epil1_stream.open("src/test/unit/mcmc/test_csv_files/epil.1.csv", std::ifstream::in);
-    epil2_stream.open("src/test/unit/mcmc/test_csv_files/epil.2.csv", std::ifstream::in);
-
-    if (!blocker1_stream || !blocker2_stream || !blocker3_stream || !epil1_stream || !epil2_stream) {
-      FAIL() << "Failed to open one or more test files";
-    }
-
-    blocker1_stream.seekg(0, std::ios::beg);
-    blocker2_stream.seekg(0, std::ios::beg);
-    blocker3_stream.seekg(0, std::ios::beg);
-    epil1_stream.seekg(0, std::ios::beg);
-    epil2_stream.seekg(0, std::ios::beg);
+ public:
+  void SetUp() {
+    blocker1_stream.open("src/test/unit/mcmc/test_csv_files/blocker.1.csv");
+    blocker2_stream.open("src/test/unit/mcmc/test_csv_files/blocker.2.csv");
+    epil1_stream.open("src/test/unit/mcmc/test_csv_files/epil.1.csv");
+    epil2_stream.open("src/test/unit/mcmc/test_csv_files/epil.2.csv");
   }
 
-  void TearDown() override {
+  void TearDown() {
     blocker1_stream.close();
     blocker2_stream.close();
-    blocker3_stream.close();
     epil1_stream.close();
     epil2_stream.close();
   }
-  std::ifstream blocker1_stream, blocker2_stream, blocker3_stream, epil1_stream, epil2_stream;
+  std::ifstream blocker1_stream, blocker2_stream, epil1_stream, epil2_stream;
 };
 
 TEST_F(McmcChains, constructor) {
@@ -44,8 +32,7 @@ TEST_F(McmcChains, constructor) {
   stan::io::stan_csv blocker1
       = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
   EXPECT_EQ("", out.str());
-
-  // add just the CSV header
+  // construct with Eigen::Vector
   stan::mcmc::chains<> chains1(blocker1.header);
   EXPECT_EQ(0, chains1.num_chains());
   EXPECT_EQ(blocker1.header.size(), chains1.num_params());
@@ -62,73 +49,91 @@ TEST_F(McmcChains, constructor) {
   EXPECT_EQ(1000, chains2.num_samples(0));
 }
 
-TEST_F(McmcChains, add2step) {
+TEST_F(McmcChains, add) {
   std::stringstream out;
   stan::io::stan_csv blocker1
       = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
   EXPECT_EQ("", out.str());
+
+  // construct with Eigen::Vector
   stan::mcmc::chains<> chains(blocker1.header);
   EXPECT_EQ(0, chains.num_chains());
   EXPECT_EQ(0, chains.num_samples());
-  EXPECT_NO_THROW(chains.add(blocker1.samples));
-  EXPECT_EQ(1, chains.num_chains());
-  EXPECT_EQ(blocker1.samples.rows(), chains.num_samples());
-  EXPECT_NO_THROW(chains.add(blocker1.samples));
+
+  Eigen::RowVectorXd theta = blocker1.samples.row(0);
+  EXPECT_NO_THROW(chains.add(1, theta))
+      << "adding a single sample to a new chain";
   EXPECT_EQ(2, chains.num_chains());
-  EXPECT_EQ(2 * blocker1.samples.rows(), chains.num_samples());
-}
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(1, chains.num_samples(1));
+  EXPECT_EQ(1, chains.num_samples());
 
-TEST_F(McmcChains, addRowVector) {
-  std::stringstream out;
-  stan::io::stan_csv blocker1
-      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
-  EXPECT_EQ("", out.str());
-  stan::mcmc::chains<> chains(blocker1.header);
-  EXPECT_EQ(0, chains.num_chains());
-  EXPECT_EQ(0, chains.num_samples());
-  EXPECT_NO_THROW(chains.add(blocker1.samples.row(0)));
-}
-
-TEST_F(McmcChains, addFail) {
-  std::stringstream out;
-  stan::io::stan_csv blocker1
-      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
-  EXPECT_EQ("", out.str());
-  stan::mcmc::chains<> chains(blocker1.header);
-  EXPECT_EQ(0, chains.num_chains());
-  EXPECT_EQ(0, chains.num_samples());
-  EXPECT_NO_THROW(chains.add(blocker1.samples));
-  EXPECT_THROW(chains.add(blocker1.samples.row(0)), std::invalid_argument)
-    << "adding new chain, wrong size";
-  EXPECT_EQ(1, chains.num_chains());
-  EXPECT_EQ(blocker1.samples.rows(), chains.num_samples());
-
-  out.str("");
-  stan::io::stan_csv blocker2
-    = stan::io::stan_csv_reader::parse(blocker2_stream, &out);
-  EXPECT_EQ("", out.str());
-  EXPECT_NO_THROW(chains.add(blocker2.samples));
+  theta = blocker1.samples.row(1);
+  EXPECT_NO_THROW(chains.add(1, theta))
+      << "adding a single sample to an existing chain";
   EXPECT_EQ(2, chains.num_chains());
-  EXPECT_EQ(2 * blocker1.samples.rows(), chains.num_samples());
-  out.str("");
-  stan::io::stan_csv blocker_trunc
-    = stan::io::stan_csv_reader::parse(blocker3_stream, &out);
-  EXPECT_EQ("", out.str());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(2, chains.num_samples());
 
-  EXPECT_THROW(chains.add(blocker_trunc.samples), std::invalid_argument)
-    << "adding new chain, wrong size";
+  EXPECT_NO_THROW(chains.add(3, blocker1.samples))
+      << "adding multiple samples to a new chain";
+  EXPECT_EQ(4, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(0, chains.num_samples(2));
+  EXPECT_EQ(1000, chains.num_samples(3));
+  EXPECT_EQ(1002, chains.num_samples());
 
-  EXPECT_EQ(2, chains.num_chains());
-  EXPECT_EQ(2 * blocker1.samples.rows(), chains.num_samples());
+  EXPECT_NO_THROW(chains.add(3, blocker1.samples))
+      << "adding multiple samples to an existing chain";
+  EXPECT_EQ(4, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(0, chains.num_samples(2));
+  EXPECT_EQ(2000, chains.num_samples(3));
+  EXPECT_EQ(2002, chains.num_samples());
+
+  EXPECT_NO_THROW(chains.add(blocker1.samples))
+      << "adding multiple samples, adds new chain";
+  EXPECT_EQ(5, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(0, chains.num_samples(2));
+  EXPECT_EQ(2000, chains.num_samples(3));
+  EXPECT_EQ(1000, chains.num_samples(4));
+  EXPECT_EQ(3002, chains.num_samples());
 
   out.str("");
   stan::io::stan_csv epil1
       = stan::io::stan_csv_reader::parse(epil1_stream, &out);
   EXPECT_EQ("", out.str());
+  theta.resize(epil1.samples.cols());
+  theta = epil1.samples.row(0);
+  EXPECT_THROW(chains.add(1, theta), std::invalid_argument)
+      << "adding mismatched sample to an existing chain";
+  EXPECT_THROW(chains.add(10, theta), std::invalid_argument)
+      << "adding mismatched sample to a new chain";
+  EXPECT_THROW(chains.add(3, epil1.samples), std::invalid_argument)
+      << "adding mismatched samples to an existing chain";
+  EXPECT_THROW(chains.add(10, epil1.samples), std::invalid_argument)
+      << "adding mismatched samples to a new chain";
   EXPECT_THROW(chains.add(epil1), std::invalid_argument)
       << "adding mismatched sample";
-  EXPECT_EQ(2, chains.num_chains());
-  EXPECT_EQ(2 * blocker1.samples.rows(), chains.num_samples());
+
+  EXPECT_EQ(5, chains.num_chains()) << "validate state is identical to before";
+  EXPECT_EQ(0, chains.num_samples(0))
+      << "validate state is identical to before";
+  EXPECT_EQ(2, chains.num_samples(1))
+      << "validate state is identical to before";
+  EXPECT_EQ(0, chains.num_samples(2))
+      << "validate state is identical to before";
+  EXPECT_EQ(2000, chains.num_samples(3))
+      << "validate state is identical to before";
+  EXPECT_EQ(1000, chains.num_samples(4))
+      << "validate state is identical to before";
+  EXPECT_EQ(3002, chains.num_samples())
+      << "validate state is identical to before";
 }
 
 TEST_F(McmcChains, add_adapter) {
@@ -162,8 +167,8 @@ TEST_F(McmcChains, add_adapter) {
 
   EXPECT_NO_THROW(chains.add(samples))
       << "adding multiple samples, adds new chain";
-   EXPECT_EQ(1, chains.num_chains());
-   EXPECT_EQ(1000, chains.num_samples(0));
+  EXPECT_EQ(1, chains.num_chains());
+  EXPECT_EQ(1000, chains.num_samples(0));
 }
 
 TEST_F(McmcChains, blocker1_num_chains) {
@@ -171,7 +176,9 @@ TEST_F(McmcChains, blocker1_num_chains) {
   stan::io::stan_csv blocker1
       = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
   EXPECT_EQ("", out.str());
+
   stan::mcmc::chains<> chains(blocker1);
+
   EXPECT_EQ(1, chains.num_chains());
 }
 
@@ -180,19 +187,10 @@ TEST_F(McmcChains, blocker1_num_samples) {
   stan::io::stan_csv blocker1
       = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
   EXPECT_EQ("", out.str());
-  stan::mcmc::chains<> chains(blocker1);
-  EXPECT_EQ(1, chains.num_chains());
-}
-
-TEST_F(McmcChains, blocker1_samples) {
-  std::stringstream out;
-  stan::io::stan_csv blocker1
-      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
-  EXPECT_EQ("", out.str());
 
   stan::mcmc::chains<> chains(blocker1);
-  Eigen::VectorXd col15 = chains.samples(0, 15);
-  EXPECT_EQ(1000, col15.size());
+
+  EXPECT_EQ(1000, chains.num_samples());
 }
 
 TEST_F(McmcChains, blocker2_num_samples) {
@@ -724,128 +722,117 @@ TEST_F(McmcChains, blocker_central_interval) {
   EXPECT_FLOAT_EQ(interval(0), interval_by_name(0));
   EXPECT_FLOAT_EQ(interval(1), interval_by_name(1));
 }
+TEST_F(McmcChains, blocker_autocorrelation) {
+  std::stringstream out;
+  stan::io::stan_csv blocker1
+      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
+  EXPECT_EQ("", out.str());
 
-// TEST_F(McmcChains, blocker_autocovariance) {
-//   std::stringstream out;
-//   stan::io::stan_csv blocker1
-//       = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
-//   EXPECT_EQ("", out.str());
+  stan::mcmc::chains<> chains(blocker1);
+  Eigen::VectorXd ac;
+  EXPECT_NO_THROW(ac = chains.autocorrelation(0, 5));
 
-//   stan::mcmc::chains<> chains(blocker1);
-//   //  Eigen::VectorXd col15 = chains.samples(0, 15);
-//   //  EXPECT_EQ(1000, col15.size());
-//   Eigen::VectorXd ac;
-//   EXPECT_NO_THROW(ac = chains.autocovariance(0, 15));
+  EXPECT_NEAR(1, ac[0], 0.01);
+  EXPECT_NEAR(0.529912, ac[1], 0.01);
+  EXPECT_NEAR(0.406604, ac[2], 0.01);
+  EXPECT_NEAR(0.371753, ac[3], 0.01);
+  EXPECT_NEAR(0.310224, ac[4], 0.01);
+  EXPECT_NEAR(0.242701, ac[5], 0.01);
+  EXPECT_NEAR(0.156984, ac[6], 0.01);
+  EXPECT_NEAR(0.112109, ac[7], 0.01);
+  EXPECT_NEAR(0.10186, ac[8], 0.01);
+  EXPECT_NEAR(0.111895, ac[9], 0.01);
+  EXPECT_NEAR(0.117979, ac[10], 0.01);
+  EXPECT_NEAR(0.114381, ac[11], 0.01);
+  EXPECT_NEAR(0.102338, ac[12], 0.01);
+  EXPECT_NEAR(0.108705, ac[13], 0.01);
+  EXPECT_NEAR(0.101822, ac[14], 0.01);
+  EXPECT_NEAR(0.100116, ac[15], 0.01);
+  EXPECT_NEAR(0.110643, ac[16], 0.01);
+  EXPECT_NEAR(0.0732924, ac[17], 0.01);
+  EXPECT_NEAR(0.0500377, ac[18], 0.01);
+  EXPECT_NEAR(0.0221466, ac[19], 0.01);
+  EXPECT_NEAR(0.0548695, ac[20], 0.01);
+  EXPECT_NEAR(0.0778131, ac[21], 0.01);
+  EXPECT_NEAR(0.0618869, ac[22], 0.01);
+  EXPECT_NEAR(0.0734811, ac[23], 0.01);
+  EXPECT_NEAR(0.0719091, ac[24], 0.01);
+  EXPECT_NEAR(0.154124, ac[25], 0.01);
+  EXPECT_NEAR(0.170683, ac[26], 0.01);
+  EXPECT_NEAR(0.0960402, ac[27], 0.01);
+  EXPECT_NEAR(0.140461, ac[28], 0.01);
+  EXPECT_NEAR(0.111866, ac[29], 0.01);
+  EXPECT_NEAR(0.112928, ac[30], 0.01);
 
-//   EXPECT_NEAR(0.000150861, ac[0], 0.01);
-//   EXPECT_NEAR(7.99431e-05, ac[1], 0.01);
-//   EXPECT_NEAR(6.13408e-05, ac[2], 0.01);
-//   EXPECT_NEAR(5.60831e-05, ac[3], 0.01);
-//   EXPECT_NEAR(4.68008e-05, ac[4], 0.01);
-//   EXPECT_NEAR(3.66142e-05, ac[5], 0.01);
-//   EXPECT_NEAR(2.36828e-05, ac[6], 0.01);
-//   EXPECT_NEAR(1.69129e-05, ac[7], 0.01);
-//   EXPECT_NEAR(1.53667e-05, ac[8], 0.01);
-//   EXPECT_NEAR(1.68806e-05, ac[9], 0.01);
-//   EXPECT_NEAR(1.77985e-05, ac[10], 0.01);
-//   EXPECT_NEAR(1.72556e-05, ac[11], 0.01);
-//   EXPECT_NEAR(1.54389e-05, ac[12], 0.01);
-//   EXPECT_NEAR(1.63994e-05, ac[13], 0.01);
-//   EXPECT_NEAR(1.53609e-05, ac[14], 0.01);
-//   EXPECT_NEAR(1.51037e-05, ac[15], 0.01);
-//   EXPECT_NEAR(1.66917e-05, ac[16], 0.01);
-//   EXPECT_NEAR(1.1057e-05, ac[17], 0.01);
-//   EXPECT_NEAR(7.54875e-06, ac[18], 0.01);
-//   EXPECT_NEAR(3.34107e-06, ac[19], 0.01);
-//   EXPECT_NEAR(8.27767e-06, ac[20], 0.01);
-//   EXPECT_NEAR(1.1739e-05, ac[21], 0.01);
-//   EXPECT_NEAR(9.33633e-06, ac[22], 0.01);
-//   EXPECT_NEAR(1.10854e-05, ac[23], 0.01);
-//   EXPECT_NEAR(1.08483e-05, ac[24], 0.01);
-//   EXPECT_NEAR(2.32514e-05, ac[25], 0.01);
-//   EXPECT_NEAR(2.57494e-05, ac[26], 0.01);
-//   EXPECT_NEAR(1.44887e-05, ac[27], 0.01);
-//   EXPECT_NEAR(2.11901e-05, ac[28], 0.01);
-//   EXPECT_NEAR(1.68763e-05, ac[29], 0.01);
-//   EXPECT_NEAR(1.70365e-05, ac[30], 0.01);
+  std::string name = chains.param_name(5);
+  Eigen::VectorXd ac_by_name;
+  EXPECT_NO_THROW(ac_by_name = chains.autocorrelation(0, name));
+  ASSERT_EQ(ac.size(), ac_by_name.size());
+  for (int i = 0; i < ac.size(); i++) {
+    EXPECT_FLOAT_EQ(ac(i), ac_by_name(i));
+  }
+}
+TEST_F(McmcChains, blocker_autocovariance) {
+  std::stringstream out;
+  stan::io::stan_csv blocker1
+      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
+  EXPECT_EQ("", out.str());
 
-//   std::string name = chains.param_name(15);
-//   Eigen::VectorXd ac_by_name;
-//   EXPECT_NO_THROW(ac_by_name = chains.autocovariance(0, name));
-//   ASSERT_EQ(ac.size(), ac_by_name.size());
-//   for (int i = 0; i < ac.size(); i++) {
-//     EXPECT_FLOAT_EQ(ac(i), ac_by_name(i));
-//   }
-// }
+  stan::mcmc::chains<> chains(blocker1);
+  Eigen::VectorXd ac;
+  EXPECT_NO_THROW(ac = chains.autocovariance(0, 5));
 
-// TEST_F(McmcChains, blocker_autocorrelation) {
-//   std::stringstream out;
-//   stan::io::stan_csv blocker1
-//       = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
-//   EXPECT_EQ("", out.str());
+  EXPECT_NEAR(0.000150861, ac[0], 0.01);
+  EXPECT_NEAR(7.99431e-05, ac[1], 0.01);
+  EXPECT_NEAR(6.13408e-05, ac[2], 0.01);
+  EXPECT_NEAR(5.60831e-05, ac[3], 0.01);
+  EXPECT_NEAR(4.68008e-05, ac[4], 0.01);
+  EXPECT_NEAR(3.66142e-05, ac[5], 0.01);
+  EXPECT_NEAR(2.36828e-05, ac[6], 0.01);
+  EXPECT_NEAR(1.69129e-05, ac[7], 0.01);
+  EXPECT_NEAR(1.53667e-05, ac[8], 0.01);
+  EXPECT_NEAR(1.68806e-05, ac[9], 0.01);
+  EXPECT_NEAR(1.77985e-05, ac[10], 0.01);
+  EXPECT_NEAR(1.72556e-05, ac[11], 0.01);
+  EXPECT_NEAR(1.54389e-05, ac[12], 0.01);
+  EXPECT_NEAR(1.63994e-05, ac[13], 0.01);
+  EXPECT_NEAR(1.53609e-05, ac[14], 0.01);
+  EXPECT_NEAR(1.51037e-05, ac[15], 0.01);
+  EXPECT_NEAR(1.66917e-05, ac[16], 0.01);
+  EXPECT_NEAR(1.1057e-05, ac[17], 0.01);
+  EXPECT_NEAR(7.54875e-06, ac[18], 0.01);
+  EXPECT_NEAR(3.34107e-06, ac[19], 0.01);
+  EXPECT_NEAR(8.27767e-06, ac[20], 0.01);
+  EXPECT_NEAR(1.1739e-05, ac[21], 0.01);
+  EXPECT_NEAR(9.33633e-06, ac[22], 0.01);
+  EXPECT_NEAR(1.10854e-05, ac[23], 0.01);
+  EXPECT_NEAR(1.08483e-05, ac[24], 0.01);
+  EXPECT_NEAR(2.32514e-05, ac[25], 0.01);
+  EXPECT_NEAR(2.57494e-05, ac[26], 0.01);
+  EXPECT_NEAR(1.44887e-05, ac[27], 0.01);
+  EXPECT_NEAR(2.11901e-05, ac[28], 0.01);
+  EXPECT_NEAR(1.68763e-05, ac[29], 0.01);
+  EXPECT_NEAR(1.70365e-05, ac[30], 0.01);
 
-//   stan::mcmc::chains<> chains(blocker1);
-//   Eigen::VectorXd ac;
-//   EXPECT_NO_THROW(ac = chains.autocorrelation(0, 5));
-
-//   EXPECT_NEAR(1, ac[0], 0.01);
-//   EXPECT_NEAR(0.529912, ac[1], 0.01);
-//   EXPECT_NEAR(0.406604, ac[2], 0.01);
-//   EXPECT_NEAR(0.371753, ac[3], 0.01);
-//   EXPECT_NEAR(0.310224, ac[4], 0.01);
-//   EXPECT_NEAR(0.242701, ac[5], 0.01);
-//   EXPECT_NEAR(0.156984, ac[6], 0.01);
-//   EXPECT_NEAR(0.112109, ac[7], 0.01);
-//   EXPECT_NEAR(0.10186, ac[8], 0.01);
-//   EXPECT_NEAR(0.111895, ac[9], 0.01);
-//   EXPECT_NEAR(0.117979, ac[10], 0.01);
-//   EXPECT_NEAR(0.114381, ac[11], 0.01);
-//   EXPECT_NEAR(0.102338, ac[12], 0.01);
-//   EXPECT_NEAR(0.108705, ac[13], 0.01);
-//   EXPECT_NEAR(0.101822, ac[14], 0.01);
-//   EXPECT_NEAR(0.100116, ac[15], 0.01);
-//   EXPECT_NEAR(0.110643, ac[16], 0.01);
-//   EXPECT_NEAR(0.0732924, ac[17], 0.01);
-//   EXPECT_NEAR(0.0500377, ac[18], 0.01);
-//   EXPECT_NEAR(0.0221466, ac[19], 0.01);
-//   EXPECT_NEAR(0.0548695, ac[20], 0.01);
-//   EXPECT_NEAR(0.0778131, ac[21], 0.01);
-//   EXPECT_NEAR(0.0618869, ac[22], 0.01);
-//   EXPECT_NEAR(0.0734811, ac[23], 0.01);
-//   EXPECT_NEAR(0.0719091, ac[24], 0.01);
-//   EXPECT_NEAR(0.154124, ac[25], 0.01);
-//   EXPECT_NEAR(0.170683, ac[26], 0.01);
-//   EXPECT_NEAR(0.0960402, ac[27], 0.01);
-//   EXPECT_NEAR(0.140461, ac[28], 0.01);
-//   EXPECT_NEAR(0.111866, ac[29], 0.01);
-//   EXPECT_NEAR(0.112928, ac[30], 0.01);
-
-//   std::string name = chains.param_name(5);
-//   Eigen::VectorXd ac_by_name;
-//   EXPECT_NO_THROW(ac_by_name = chains.autocorrelation(0, name));
-//   ASSERT_EQ(ac.size(), ac_by_name.size());
-//   for (int i = 0; i < ac.size(); i++) {
-//     EXPECT_FLOAT_EQ(ac(i), ac_by_name(i));
-//   }
-// }
-
-
-
+  std::string name = chains.param_name(5);
+  Eigen::VectorXd ac_by_name;
+  EXPECT_NO_THROW(ac_by_name = chains.autocovariance(0, name));
+  ASSERT_EQ(ac.size(), ac_by_name.size());
+  for (int i = 0; i < ac.size(); i++) {
+    EXPECT_FLOAT_EQ(ac(i), ac_by_name(i));
+  }
+}
 
 TEST_F(McmcChains, blocker_effective_sample_size) {
   std::stringstream out;
   stan::io::stan_csv blocker1
       = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
-  EXPECT_EQ("", out.str());
   stan::io::stan_csv blocker2
       = stan::io::stan_csv_reader::parse(blocker2_stream, &out);
   EXPECT_EQ("", out.str());
 
   stan::mcmc::chains<> chains(blocker1);
   chains.add(blocker2);
-
-  EXPECT_NO_THROW(chains.effective_sample_size(0))
-      << "calling chains.effective_sample_size(index = 0).";
 
   EXPECT_NO_THROW(chains.effective_sample_size(1))
       << "calling chains.effective_sample_size(index = 1).";
@@ -885,69 +872,5 @@ TEST_F(McmcChains, blocker_split_potential_scale_reduction) {
     std::string name = chains.param_name(index);
     ASSERT_EQ(chains.split_potential_scale_reduction(index),
               chains.split_potential_scale_reduction(name));
-  }
-}
-
-TEST_F(McmcChains, blocker_split_potential_scale_reduction_rank) {
-  std::stringstream out;
-  stan::io::stan_csv blocker1
-      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
-  stan::io::stan_csv blocker2
-      = stan::io::stan_csv_reader::parse(blocker2_stream, &out);
-  EXPECT_EQ("", out.str());
-
-  stan::mcmc::chains<> chains(blocker1);
-  chains.add(blocker2);
-
-  // Eigen::VectorXd rhat(48);
-  // rhat
-  // << 1.0078, 1.0109, 1.00731, 1.00333, 1.00401, 1.00992, 1.00734, 1.00633,
-  //     1.00095, 1.00906, 1.01019, 1.00075, 1.00595, 1.00473, 1.00895, 1.01304,
-  //     1.00166, 1.0074, 1.00236, 1.00588, 1.00414, 1.00303, 1.00976, 1.00295,
-  //     1.00193, 1.0044, 1.00488, 1.00178, 1.01082, 1.0019, 1.00413, 1.01303,
-  //     1.0024, 1.01148, 1.00436, 1.00515, 1.00712, 1.0089, 1.00222, 1.00118,
-  //     1.00381, 1.00283, 1.00188, 1.00225, 1.00335, 1.00133, 1.00209, 1.0109;
-
-  Eigen::VectorXd rhat_bulk(48);
-  rhat_bulk << 1.0078, 1.0109, 0.99919, 1.001, 1.00401, 1.00992, 1.00182,
-      1.00519, 1.00095, 1.00351, 1.00554, 1.00075, 1.00595, 1.00473, 1.00546,
-      1.01304, 1.00166, 1.0074, 1.00178, 1.00588, 1.00406, 1.00129, 1.00976,
-      1.0013, 1.00193, 1.00104, 0.99938, 1.00025, 1.01082, 1.0019, 1.00354,
-      1.0043, 1.00111, 1.00281, 1.00436, 1.00515, 1.00325, 1.0089, 1.00222,
-      1.00118, 1.00191, 1.00283, 1.0003, 1.00216, 1.00335, 1.00133, 1.00023,
-      1.0109;
-  Eigen::VectorXd rhat_tail(48);
-  rhat_tail << 1.00097, 1.00422, 1.00731, 1.00333, 1.00337, 0.99917, 1.00734,
-      1.00633, 1.00074, 1.00906, 1.01019, 1.00074, 1.00447, 1.00383, 1.00895,
-      1.00389, 1.00052, 1.00188, 1.00236, 1.00284, 1.00414, 1.00303, 1.00327,
-      1.00295, 1.00037, 1.0044, 1.00488, 1.00178, 1.00475, 1.00082, 1.00413,
-      1.01303, 1.0024, 1.01148, 1.00098, 1.00078, 1.00712, 1.00595, 1.00124,
-      1.00112, 1.00381, 1.0006, 1.00188, 1.00225, 1.0026, 1.0009, 1.00209,
-      1.00464;
-
-  for (int index = 4; index < chains.num_params(); index++) {
-    double computed_bulk_rhat, computed_tail_rhat;
-    std::tie(computed_bulk_rhat, computed_tail_rhat)
-        = chains.split_potential_scale_reduction_rank(index);
-    double expected_bulk_rhat = rhat_bulk(index - 4);
-    double expected_tail_rhat = rhat_tail(index - 4);
-
-    ASSERT_NEAR(expected_bulk_rhat, computed_bulk_rhat, 1e-4)
-        << "Bulk Rhat mismatch for index: " << index
-        << ", parameter: " << chains.param_name(index);
-    ASSERT_NEAR(expected_tail_rhat, computed_tail_rhat, 1e-4)
-        << "Tail Rhat mismatch for index: " << index
-        << ", parameter: " << chains.param_name(index);
-
-    // ASSERT_NEAR(rhat(index - 4),
-    //             chains.split_potential_scale_reduction_rank(index), 1e-4)
-    //     << "rhat for index: " << index
-    //     << ", parameter: " << chains.param_name(index);
-  }
-
-  for (int index = 0; index < chains.num_params(); index++) {
-    std::string name = chains.param_name(index);
-    ASSERT_EQ(chains.split_potential_scale_reduction_rank(index),
-              chains.split_potential_scale_reduction_rank(name));
   }
 }

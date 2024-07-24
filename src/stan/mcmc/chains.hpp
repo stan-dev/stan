@@ -49,26 +49,13 @@ class chains {
   Eigen::Matrix<Eigen::MatrixXd, Dynamic, 1> samples_;
   Eigen::VectorXi warmup_;
 
-  auto prepare_samples_for_analysis(int index) const {
-    int n_chains = num_chains();
-    std::vector<const double*> draws(n_chains);
-    std::vector<size_t> sizes(n_chains);
-
-    for (int chain = 0; chain < n_chains; ++chain) {
-      int n_kept_samples = num_kept_samples(chain);
-      draws[chain] = samples_(chain).col(index).bottomRows(n_kept_samples).data();
-      sizes[chain] = n_kept_samples;
-    }
-    return std::make_pair(draws, sizes);
-  }
-
   static double mean(const Eigen::VectorXd& x) {
-    return x.mean();
+    return (x.array() / x.size()).sum();
   }
 
   static double variance(const Eigen::VectorXd& x) {
-    double m = x.mean();
-    return (x.array() - m).square().sum() / (x.size() - 1);
+    double m = mean(x);
+    return ((x.array() - m) / std::sqrt((x.size() - 1.0))).square().sum();
   }
 
   static double sd(const Eigen::VectorXd& x) { return std::sqrt(variance(x)); }
@@ -244,15 +231,15 @@ class chains {
     Eigen::VectorXd split_chain_var(2 * chains);
 
     for (int chain = 0; chain < chains; chain++) {
-      split_chain_mean(2 * chain) = samples(chain).topRows(n).mean();
-      split_chain_mean(2 * chain + 1) = samples(chain).bottomRows(n).mean();
+      split_chain_mean(2 * chain) = mean(samples(chain).topRows(n));
+      split_chain_mean(2 * chain + 1) = mean(samples(chain).bottomRows(n));
 
       split_chain_var(2 * chain) = variance(samples(chain).topRows(n));
       split_chain_var(2 * chain + 1) = variance(samples(chain).bottomRows(n));
     }
 
     double var_between = n * variance(split_chain_mean);
-    double var_within = split_chain_var.mean();
+    double var_within = mean(split_chain_var);
 
     // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
     return sqrt((var_between / var_within + n - 1) / n);
@@ -317,8 +304,8 @@ class chains {
   void add(const int chain, const Eigen::MatrixXd& sample) {
     if (sample.cols() != num_params())
       throw std::invalid_argument(
-				  "add(chain, sample): number of columns"
-				  " in sample does not match chains");
+          "add(chain, sample): number of columns"
+          " in sample does not match chains");
     if (num_chains() == 0 || chain >= num_chains()) {
       int n = num_chains();
 
@@ -348,28 +335,14 @@ class chains {
     samples_(chain) = new_samples;
   }
 
-
   void add(const Eigen::MatrixXd& sample) {
-    if (!sample.rows())
+    if (sample.rows() == 0)
       return;
-    std::stringstream msg;
-    if (sample.cols() != num_params()) {
-      msg << "add(sample): sample size mismatch, expecting " << num_params()
-	  << " columns, found " << sample.cols() << " cols." << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-    if (samples_.size() == 0) {
-	add(num_chains(), sample);
-    } else {
-      const Eigen::MatrixXd& first_matrix = samples_(0); // Access the first matrix
-      if (sample.rows() == first_matrix.rows() && sample.cols() == first_matrix.cols()) {
-	add(num_chains(), sample);
-      } else {
-	msg << "add(sample): sample size mismatch, expecting " << first_matrix.rows()
-	    << " rows, found " << sample.rows() << " rows." << std::endl;
-	throw std::invalid_argument(msg.str());
-      }
-    }
+    if (sample.cols() != num_params())
+      throw std::invalid_argument(
+          "add(sample): number of columns in"
+          " sample does not match chains");
+    add(num_chains(), sample);
   }
 
   /**
@@ -434,10 +407,10 @@ class chains {
   }
 
   double mean(const int chain, const int index) const {
-    return samples(chain, index).mean();
+    return mean(samples(chain, index));
   }
 
-  double mean(const int index) const { return samples(index).mean(); }
+  double mean(const int index) const { return mean(samples(index)); }
 
   double mean(const int chain, const std::string& name) const {
     return mean(chain, index(name));
@@ -585,8 +558,18 @@ class chains {
     return autocovariance(chain, index(name));
   }
 
+  // FIXME: reimplement using autocorrelation.
   double effective_sample_size(const int index) const {
-    auto [draws, sizes] = prepare_samples_for_analysis(index);
+    int n_chains = num_chains();
+    std::vector<const double*> draws(n_chains);
+    std::vector<size_t> sizes(n_chains);
+    int n_kept_samples = 0;
+    for (int chain = 0; chain < n_chains; ++chain) {
+      n_kept_samples = num_kept_samples(chain);
+      draws[chain]
+          = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+      sizes[chain] = n_kept_samples;
+    }
     return analyze::compute_effective_sample_size(draws, sizes);
   }
 
@@ -595,7 +578,16 @@ class chains {
   }
 
   double split_effective_sample_size(const int index) const {
-    auto [draws, sizes] = prepare_samples_for_analysis(index);
+    int n_chains = num_chains();
+    std::vector<const double*> draws(n_chains);
+    std::vector<size_t> sizes(n_chains);
+    int n_kept_samples = 0;
+    for (int chain = 0; chain < n_chains; ++chain) {
+      n_kept_samples = num_kept_samples(chain);
+      draws[chain]
+          = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+      sizes[chain] = n_kept_samples;
+    }
     return analyze::compute_split_effective_sample_size(draws, sizes);
   }
 
@@ -603,23 +595,22 @@ class chains {
     return split_effective_sample_size(index(name));
   }
 
-  std::pair<double, double> split_potential_scale_reduction_rank(const int index) const {
-    auto [draws, sizes] = prepare_samples_for_analysis(index);
-    return analyze::compute_split_potential_scale_reduction_rank(draws, sizes);
-  }
-
   double split_potential_scale_reduction(const int index) const {
-    auto [draws, sizes] = prepare_samples_for_analysis(index);
+    int n_chains = num_chains();
+    std::vector<const double*> draws(n_chains);
+    std::vector<size_t> sizes(n_chains);
+    int n_kept_samples = 0;
+    for (int chain = 0; chain < n_chains; ++chain) {
+      n_kept_samples = num_kept_samples(chain);
+      draws[chain]
+          = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+      sizes[chain] = n_kept_samples;
+    }
     return analyze::compute_split_potential_scale_reduction(draws, sizes);
   }
 
   double split_potential_scale_reduction(const std::string& name) const {
     return split_potential_scale_reduction(index(name));
-  }
-
-  std::pair<double, double> split_potential_scale_reduction_rank(
-      const std::string& name) const {
-    return split_potential_scale_reduction_rank(index(name));
   }
 };
 
