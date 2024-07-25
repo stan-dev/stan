@@ -122,8 +122,7 @@ TEST(inv_metric, read_dense_OK) {
 
 TEST(inv_metric, read_dense_sz0) {
   stan::callbacks::logger logger;
-  std::string txt
-    = "inv_metric <- structure(c(), .Dim = c(0,0))";
+  std::string txt = "inv_metric <- structure(c(), .Dim = c(0,0))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
   Eigen::MatrixXd inv_inv_metric
