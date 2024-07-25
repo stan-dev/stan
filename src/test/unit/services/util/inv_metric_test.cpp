@@ -27,14 +27,12 @@ TEST(inv_metric, create_diag_sz100) {
   ASSERT_NEAR(1.0, diag_vals[99], 0.0001);
 }
 
-
 TEST(inv_metric, create_dense_sz0) {
   auto default_metric = stan::services::util::create_unit_e_dense_inv_metric(0);
   stan::io::var_context& inv_inv_metric = default_metric;
   std::vector<double> diag_vals = inv_inv_metric.vals_r("inv_metric");
   EXPECT_EQ(0, diag_vals.size());
 }
-
 
 TEST(inv_metric, create_dense_sz2) {
   auto default_metric = stan::services::util::create_unit_e_dense_inv_metric(2);
