@@ -122,9 +122,12 @@ TEST(inv_metric, read_dense_OK) {
 
 TEST(inv_metric, read_dense_sz0) {
   stan::callbacks::logger logger;
-  stan::io::dump dmp = stan::services::util::create_unit_e_dense_inv_metric(0);
+  std::string txt
+    = "inv_metric <- structure(c(), .Dim = c(0,0))";
+  std::stringstream in(txt);
+  stan::io::dump dump(in);
   Eigen::MatrixXd inv_inv_metric
-      = stan::services::util::read_dense_inv_metric(dmp, 0, logger);
+      = stan::services::util::read_dense_inv_metric(dump, 0, logger);
   EXPECT_EQ(0, inv_inv_metric.size());
   EXPECT_EQ(0, inv_inv_metric.rows());
   EXPECT_EQ(0, inv_inv_metric.cols());
