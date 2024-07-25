@@ -108,7 +108,7 @@ TEST_F(ServicesSampleHMCNutsDenseENoParams, parameter_checks) {
 
     // Expect message at end of warmup
     EXPECT_EQ("Adaptation terminated", strings[0]);
-    
+
     // Expectations of sampler and model variables names.
     ASSERT_EQ(9, parameter_names[0].size());
     EXPECT_EQ("lp__", parameter_names[0][0]);
