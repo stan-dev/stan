@@ -296,8 +296,8 @@ namespace test {
 template <typename Ret, typename DeserializeRead, typename SerializeFree,
           typename... Args, typename... Sizes>
 void serializer_test_impl(DeserializeRead&& deserialize_read,
-                            SerializeFree&& serialize_free,
-                            const std::tuple<Sizes...>& sizes, Args&&... args) {
+                          SerializeFree&& serialize_free,
+                          const std::tuple<Sizes...>& sizes, Args&&... args) {
   double lb = 0.5;
   constexpr size_t theta_size = 100;
   Eigen::VectorXd theta1 = Eigen::VectorXd::Random(theta_size);
@@ -312,7 +312,7 @@ void serializer_test_impl(DeserializeRead&& deserialize_read,
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);
-//  serializer.write_free_lb(lb, vec_ref);
+  //  serializer.write_free_lb(lb, vec_ref);
   serialize_free(serializer, args..., vec_ref);
 
   size_t used1 = theta1.size() - deserializer.available();
@@ -327,15 +327,15 @@ void serializer_test_impl(DeserializeRead&& deserialize_read,
                               theta2.segment(0, used1));
 }
 
-template <typename Ret, template <typename> class Serializer,
-          typename... Args, typename... Sizes>
+template <typename Ret, template <typename> class Serializer, typename... Args,
+          typename... Sizes>
 void serializer_test(const std::tuple<Sizes...>& sizes, Args&&... args) {
-  serializer_test_impl<Ret>(Serializer<Ret>::read(),
-                              Serializer<Ret>::free(), sizes, args...);
+  serializer_test_impl<Ret>(Serializer<Ret>::read(), Serializer<Ret>::free(),
+                            sizes, args...);
 }
 
-}
-}
+}  // namespace test
+}  // namespace stan
 
 template <typename Ret>
 struct LbConstrain {
@@ -376,7 +376,6 @@ struct UbConstrain {
   }
 };
 
-
 TEST(serializer_vectorized, write_free_ub) {
   using stan::test::serializer_test;
   serializer_test<double, UbConstrain>(std::make_tuple(), 0.5);
@@ -405,8 +404,7 @@ struct LubConstrain {
 TEST(serializer_vectorized, write_free_lub) {
   using stan::test::serializer_test;
   serializer_test<double, LubConstrain>(std::make_tuple(), 0.2, 0.5);
-  serializer_test<Eigen::VectorXd, LubConstrain>(std::make_tuple(4), 0.2,
-                                                   0.5);
+  serializer_test<Eigen::VectorXd, LubConstrain>(std::make_tuple(4), 0.2, 0.5);
   serializer_test<std::vector<Eigen::VectorXd>, LubConstrain>(
       std::make_tuple(2, 4), 0.2, 0.5);
   serializer_test<std::vector<std::vector<Eigen::VectorXd>>, LubConstrain>(
@@ -431,12 +429,12 @@ struct OffsetMultConstrain {
 TEST(serializer_vectorized, write_free_offset_multiplier) {
   using stan::test::serializer_test;
   serializer_test<double, OffsetMultConstrain>(std::make_tuple(), 0.2, 0.5);
-  serializer_test<Eigen::VectorXd, OffsetMultConstrain>(std::make_tuple(4),
-                                                          0.2, 0.5);
+  serializer_test<Eigen::VectorXd, OffsetMultConstrain>(std::make_tuple(4), 0.2,
+                                                        0.5);
   serializer_test<std::vector<Eigen::VectorXd>, OffsetMultConstrain>(
       std::make_tuple(2, 4), 0.2, 0.5);
   serializer_test<std::vector<std::vector<Eigen::VectorXd>>,
-                    OffsetMultConstrain>(std::make_tuple(3, 2, 4), 0.2, 0.5);
+                  OffsetMultConstrain>(std::make_tuple(3, 2, 4), 0.2, 0.5);
 }
 
 template <typename Ret, typename... Sizes>
@@ -477,7 +475,6 @@ TEST(serializer_vectorized, write_free_unit_vector) {
                                                                          4);
 }
 
-
 // simplex
 template <typename Ret>
 struct SimplexConstrain {
@@ -498,8 +495,8 @@ TEST(serializer_vectorized, write_free_simplex) {
   serializer_test<Eigen::VectorXd, SimplexConstrain>(std::make_tuple(4));
   serializer_test<std::vector<Eigen::VectorXd>, SimplexConstrain>(
       std::make_tuple(2, 4));
-  serializer_test<std::vector<std::vector<Eigen::VectorXd>>,
-                    SimplexConstrain>(std::make_tuple(3, 2, 4));
+  serializer_test<std::vector<std::vector<Eigen::VectorXd>>, SimplexConstrain>(
+      std::make_tuple(3, 2, 4));
 }
 
 // ordered
@@ -523,8 +520,8 @@ TEST(serializer_vectorized, write_free_ordered) {
   serializer_test<Eigen::VectorXd, OrderedConstrain>(std::make_tuple(4));
   serializer_test<std::vector<Eigen::VectorXd>, OrderedConstrain>(
       std::make_tuple(2, 4));
-  serializer_test<std::vector<std::vector<Eigen::VectorXd>>,
-                    OrderedConstrain>(std::make_tuple(3, 2, 4));
+  serializer_test<std::vector<std::vector<Eigen::VectorXd>>, OrderedConstrain>(
+      std::make_tuple(3, 2, 4));
 }
 
 // positive_ordered
@@ -549,8 +546,7 @@ TEST(serializer_vectorized, write_free_positive_ordered) {
   serializer_test<std::vector<Eigen::VectorXd>, PositiveOrderedConstrain>(
       std::make_tuple(2, 4));
   serializer_test<std::vector<std::vector<Eigen::VectorXd>>,
-                    PositiveOrderedConstrain>(std::make_tuple(3, 2, 4));
-
+                  PositiveOrderedConstrain>(std::make_tuple(3, 2, 4));
 }
 
 // cholesky_factor_cov
@@ -571,19 +567,17 @@ struct CholFacCovConstrain {
 
 TEST(serializer_vectorized, write_free_cholesky_factor_cov) {
   using stan::test::serializer_test;
-  serializer_test<Eigen::MatrixXd, CholFacCovConstrain>(
-      std::make_tuple(4, 3));
+  serializer_test<Eigen::MatrixXd, CholFacCovConstrain>(std::make_tuple(4, 3));
   serializer_test<std::vector<Eigen::MatrixXd>, CholFacCovConstrain>(
       std::make_tuple(2, 4, 3));
   serializer_test<std::vector<std::vector<Eigen::MatrixXd>>,
-                    CholFacCovConstrain>(std::make_tuple(3, 2, 4, 3));
+                  CholFacCovConstrain>(std::make_tuple(3, 2, 4, 3));
 
-  serializer_test<Eigen::MatrixXd, CholFacCovConstrain>(
-      std::make_tuple(2, 2));
+  serializer_test<Eigen::MatrixXd, CholFacCovConstrain>(std::make_tuple(2, 2));
   serializer_test<std::vector<Eigen::MatrixXd>, CholFacCovConstrain>(
       std::make_tuple(2, 2, 2));
   serializer_test<std::vector<std::vector<Eigen::MatrixXd>>,
-                    CholFacCovConstrain>(std::make_tuple(3, 2, 2, 2));
+                  CholFacCovConstrain>(std::make_tuple(3, 2, 2, 2));
 }
 
 // cholesky_factor_corr
@@ -608,7 +602,7 @@ TEST(serializer_vectorized, write_free_cholesky_factor_corr) {
   serializer_test<std::vector<Eigen::MatrixXd>, CholFacCorrConstrain>(
       std::make_tuple(2, 2));
   serializer_test<std::vector<std::vector<Eigen::MatrixXd>>,
-                    CholFacCorrConstrain>(std::make_tuple(3, 2, 2));
+                  CholFacCorrConstrain>(std::make_tuple(3, 2, 2));
 }
 
 // cov_matrix
@@ -655,10 +649,9 @@ TEST(serializer_vectorized, write_free_corr_matrix) {
   serializer_test<Eigen::MatrixXd, CorrMatConstrain>(std::make_tuple(2));
   serializer_test<std::vector<Eigen::MatrixXd>, CorrMatConstrain>(
       std::make_tuple(2, 2));
-  serializer_test<std::vector<std::vector<Eigen::MatrixXd>>,
-                    CorrMatConstrain>(std::make_tuple(3, 2, 2));
+  serializer_test<std::vector<std::vector<Eigen::MatrixXd>>, CorrMatConstrain>(
+      std::make_tuple(3, 2, 2));
 }
-
 
 // stochastic_column
 template <typename Ret>
