@@ -50,37 +50,11 @@ inline double rhat(const Eigen::MatrixXd& chains) {
 }
 
 /**
- * Computes the potential scale reduction (Rhat) using rank based diagnostic for
- * the specified parameter across all samples. Based on paper
- * https://arxiv.org/abs/1903.08008
- *
- * @param chain vector of per-chain samples
- * @param index column index for param of interest
- * @return potential scale reduction for the specified parameter
- */
-inline std::pair<double, double> compute_rank_normalized_rhat(
-  const std::vector<Eigen::MatrixXd>& chains, const int index) {
-  size_t num_chains = chains.size();
-  size_t num_samples = chains[0].rows();
-
-  Eigen::MatrixXd draws_matrix(num_samples, num_chains);
-  for (std::size_t i = 0; i < num_chains; ++i) {
-    draws_matrix.col(i) = chains[i].col(index);
-  }
-  double rhat_bulk = rhat(rank_transform(draws_matrix));
-  double rhat_tail = rhat(rank_transform(
-      (draws_matrix.array() - math::quantile(draws_matrix.reshaped(), 0.5))
-          .abs()));
-
-  return std::make_pair(rhat_bulk, rhat_tail);
-}
-
-/**
  * Computes the split potential scale reduction (split Rhat) using rank based
  * diagnostic for the specified parameter across all samples. Based on paper
  * https://arxiv.org/abs/1903.08008
  *
- * When the number of total draws N is odd, the (N+1)/2th draw is ignored.
+ * When the number of total draws N is odd, the last draw is ignored.
  *
  * See more details in Stan reference manual section "Potential
  * Scale Reduction". http://mc-stan.org/users/documentation
@@ -90,7 +64,7 @@ inline std::pair<double, double> compute_rank_normalized_rhat(
  * @return potential scale reduction for the specified parameter
  */
 inline std::pair<double, double> compute_split_rank_normalized_rhat(
-  const std::vector<Eigen::MatrixXd>& chains, const int index) {
+    const std::vector<Eigen::MatrixXd>& chains, const int index) {
 
   size_t num_chains = chains.size();
   size_t num_samples = chains[0].rows();
@@ -99,8 +73,11 @@ inline std::pair<double, double> compute_split_rank_normalized_rhat(
   Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
   int idx = 0;
   for (std::size_t i = 0; i < num_chains; ++i) {
-    split_draws_matrix.col(idx) = chains[i].col(index).head(half);
-    split_draws_matrix.col(idx+1) = chains[i].col(index).tail(half);
+    Eigen::Map<const Eigen::VectorXd> head_block(chains[i].col(index).data(), half);
+    Eigen::Map<const Eigen::VectorXd> tail_block(chains[i].col(index).data() + half, half);
+    
+    split_draws_matrix.col(idx) = head_block;
+    split_draws_matrix.col(idx + 1) = tail_block;
     idx += 2;
   }
 
@@ -111,6 +88,7 @@ inline std::pair<double, double> compute_split_rank_normalized_rhat(
 
   return std::make_pair(rhat_bulk, rhat_tail);
 }
+
 
 }  // namespace analyze
 }  // namespace stan

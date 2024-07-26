@@ -264,6 +264,20 @@ public:
     return split_rank_normalized_rhat(index(name));
   }
 
+  // std::pair<double, double>
+  // split_rank_normalized_ess(const int index) const {
+  //   if (is_finite_and_varies(index) || num_samples() < 3) {
+  //     return {std::numeric_limits<double>::quiet_NaN(),
+  // 	  std::numeric_limits<double>::quiet_NaN()};
+  //   }
+  //   return analyze::compute_split_rank_normalized_ess(chains_, index);
+  // }
+
+  // std::pair<double, double>
+  // split_rank_normalized_ess(const std::string& name) const {
+  //   return split_rank_normalized_ess(index(name));
+  // }
+
 };
 
 }  // namespace mcmc
