@@ -27,6 +27,13 @@ TEST(inv_metric, create_diag_sz100) {
   ASSERT_NEAR(1.0, diag_vals[99], 0.0001);
 }
 
+TEST(inv_metric, create_dense_sz0) {
+  auto default_metric = stan::services::util::create_unit_e_dense_inv_metric(0);
+  stan::io::var_context& inv_inv_metric = default_metric;
+  std::vector<double> diag_vals = inv_inv_metric.vals_r("inv_metric");
+  EXPECT_EQ(0, diag_vals.size());
+}
+
 TEST(inv_metric, create_dense_sz2) {
   auto default_metric = stan::services::util::create_unit_e_dense_inv_metric(2);
   stan::io::var_context& inv_inv_metric = default_metric;
@@ -118,6 +125,16 @@ TEST(inv_metric, read_dense_OK) {
   ASSERT_NEAR(0.926739, inv_inv_metric(0), 0.000001);
   ASSERT_NEAR(0.0734898, inv_inv_metric(3), 0.000001);
   ASSERT_NEAR(0.8274, inv_inv_metric(8), 0.000001);
+}
+
+TEST(inv_metric, read_dense_sz0) {
+  stan::callbacks::logger logger;
+  auto zero_metric = stan::services::util::create_unit_e_dense_inv_metric(0);
+  Eigen::MatrixXd inv_inv_metric
+      = stan::services::util::read_dense_inv_metric(zero_metric, 0, logger);
+  EXPECT_EQ(0, inv_inv_metric.size());
+  EXPECT_EQ(0, inv_inv_metric.rows());
+  EXPECT_EQ(0, inv_inv_metric.cols());
 }
 
 TEST(inv_metric, read_dense_bad1) {
