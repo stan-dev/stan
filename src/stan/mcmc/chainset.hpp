@@ -3,8 +3,8 @@
 
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim.hpp>
-#include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
-#include <stan/analyze/mcmc/compute_rank_normalized_rhat.hpp>
+#include <stan/analyze/mcmc/split_rank_normalized_ess.hpp>
+#include <stan/analyze/mcmc/split_rank_normalized_rhat.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -135,7 +135,6 @@ public:
   bool is_finite_and_varies(const int index) const {
     Eigen::VectorXd draw_zeros = Eigen::VectorXd::Zero(num_chains());
     for (std::size_t i = 0; i < num_chains(); ++i) {
-      bool identical = true;
       Eigen::VectorXd draws = chains_[i].col(index);
       draw_zeros(i) = draws(0);
       for (int j = 0; j < num_samples(); ++j) {
@@ -146,12 +145,19 @@ public:
 	return false;
       }
     }
-    if (draw_zeros.isApproxToConstant(draw_zeros(0))) {
+    if (num_chains() > 1 && draw_zeros.isApproxToConstant(draw_zeros(0))) {
       return false;
     }
     return true;
   }
 
+  Eigen::VectorXd samples(const int colIndex) const {
+    Eigen::VectorXd result(chains_.size() * num_samples_);
+    for (int i = 0; i < chains_.size(); ++i) {
+      result.segment(i * num_samples_, num_samples_) = chains_[i].col(colIndex);
+    }
+    return result;
+  }
 
   Eigen::VectorXd samples(const int chain, const int index) const {
     if (index < 0 || index >= param_names_.size()
@@ -159,19 +165,6 @@ public:
       throw std::out_of_range("Index out of range");
     }
     return chains_[chain].col(index);
-  }
-
-  Eigen::VectorXd samples(const int index) const {
-    if (index < 0 || index >= param_names_.size()) {
-      throw std::out_of_range("Index out of range");
-    }
-    Eigen::VectorXd s(num_samples_ * num_chains());
-    int start = 0;
-    for (int chain = 0; chain < num_chains(); chain++) {
-      s.middleRows(start, num_samples_) = chains_[chain].col(index);
-      start += num_samples_;
-    }
-    return s;
   }
 
   Eigen::VectorXd samples(const int chain, const std::string& name) const {
@@ -252,7 +245,7 @@ public:
 
   std::pair<double, double>
   split_rank_normalized_rhat(const int index) const {
-    if (is_finite_and_varies(index)) {
+    if (!is_finite_and_varies(index)) {
       return {std::numeric_limits<double>::quiet_NaN(),
 	  std::numeric_limits<double>::quiet_NaN()};
     }
@@ -264,19 +257,19 @@ public:
     return split_rank_normalized_rhat(index(name));
   }
 
-  // std::pair<double, double>
-  // split_rank_normalized_ess(const int index) const {
-  //   if (is_finite_and_varies(index) || num_samples() < 3) {
-  //     return {std::numeric_limits<double>::quiet_NaN(),
-  // 	  std::numeric_limits<double>::quiet_NaN()};
-  //   }
-  //   return analyze::compute_split_rank_normalized_ess(chains_, index);
-  // }
+  std::pair<double, double>
+  split_rank_normalized_ess(const int index) const {
+    if (!is_finite_and_varies(index) || num_samples() < 3) {
+      return {std::numeric_limits<double>::quiet_NaN(),
+  	  std::numeric_limits<double>::quiet_NaN()};
+    }
+    return analyze::compute_split_rank_normalized_ess(chains_, index);
+  }
 
-  // std::pair<double, double>
-  // split_rank_normalized_ess(const std::string& name) const {
-  //   return split_rank_normalized_ess(index(name));
-  // }
+  std::pair<double, double>
+  split_rank_normalized_ess(const std::string& name) const {
+    return split_rank_normalized_ess(index(name));
+  }
 
 };
 

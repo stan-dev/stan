@@ -1,5 +1,5 @@
-#ifndef STAN_ANALYZE_MCMC_COMPUTE_RANK_NORMALIZED_RHAT_HPP
-#define STAN_ANALYZE_MCMC_COMPUTE_RANK_NORMALIZED_RHAT_HPP
+#ifndef STAN_ANALYZE_MCMC_SPLIT_RANK_NORMALIZED_RHAT_HPP
+#define STAN_ANALYZE_MCMC_SPLIT_RANK_NORMALIZED_RHAT_HPP
 
 #include <stan/math/prim.hpp>
 #include <stan/analyze/mcmc/rank_normalization.hpp>
@@ -71,17 +71,18 @@ inline std::pair<double, double> compute_split_rank_normalized_rhat(
   size_t half = std::floor(num_samples / 2.0);
 
   Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
-  int idx = 0;
+  int split_i = 0;
   for (std::size_t i = 0; i < num_chains; ++i) {
     Eigen::Map<const Eigen::VectorXd> head_block(chains[i].col(index).data(), half);
     Eigen::Map<const Eigen::VectorXd> tail_block(chains[i].col(index).data() + half, half);
     
-    split_draws_matrix.col(idx) = head_block;
-    split_draws_matrix.col(idx + 1) = tail_block;
-    idx += 2;
+    split_draws_matrix.col(split_i) = head_block;
+    split_draws_matrix.col(split_i + 1) = tail_block;
+    split_i += 2;
   }
 
   double rhat_bulk = rhat(rank_transform(split_draws_matrix));
+  // zero-center the draws at the median
   double rhat_tail = rhat(rank_transform(
       (split_draws_matrix.array() - math::quantile(split_draws_matrix.reshaped(), 0.5))
           .abs()));

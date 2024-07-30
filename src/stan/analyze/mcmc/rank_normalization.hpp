@@ -23,16 +23,14 @@ inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {
   const Eigen::Index rows = chains.rows();
   const Eigen::Index cols = chains.cols();
   const Eigen::Index size = rows * cols;
-  std::vector<std::pair<double, int>> value_with_index(size);
 
+  std::vector<std::pair<double, int>> value_with_index(size);
   for (Eigen::Index i = 0; i < size; ++i) {
     value_with_index[i] = {chains(i), i};
   }
 
   std::sort(value_with_index.begin(), value_with_index.end());
-
   Eigen::MatrixXd rank_matrix = Eigen::MatrixXd::Zero(rows, cols);
-
   // Assigning average ranks
   for (Eigen::Index i = 0; i < size; ++i) {
     // Handle ties by averaging ranks

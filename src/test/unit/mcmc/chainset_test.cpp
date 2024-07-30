@@ -136,6 +136,8 @@ TEST_F(McmcChains, eight_schools_samples) {
 
 TEST_F(McmcChains, split_rank_normalized_rhat) {
   stan::mcmc::chainset<> chain_1(eight_schools_1);
+  EXPECT_EQ(1, chain_1.num_chains());
+
   Eigen::VectorXd rhat_8_schools_1(17);
   rhat_8_schools_1 << 1.00282459195726, 1.00172909279311,
     std::numeric_limits<double>::quiet_NaN(), 1.00312613700559,
@@ -145,9 +147,22 @@ TEST_F(McmcChains, split_rank_normalized_rhat) {
     1.00264982500571, 1.00652125868145, 1.01205817496918,
     1.00046592605282;
   for (size_t i = 0; i < rhat_8_schools_1.size(); ++i) {
+    auto rhats = chain_1.split_rank_normalized_rhat(i);
     if (!std::isnan(rhat_8_schools_1(i))) {
-	auto rhats = chain_1.split_rank_normalized_rhat(i);
 	EXPECT_NEAR(rhats.first, rhat_8_schools_1(i), 0.03);  // close enough?
     }
+  }
+}
+
+TEST_F(McmcChains, split_rank_normalized_ess) {
+  std::vector<stan::io::stan_csv> eight_schools;
+  eight_schools.push_back(eight_schools_1);
+  eight_schools.push_back(eight_schools_2);
+  stan::mcmc::chainset<> chain_2(eight_schools);
+
+  for (size_t i = 0; i < chain_2.num_params(); ++i) {
+    std::cout << "call ESS " << chain_2.param_names()[i] << std::endl;
+    auto ess = chain_2.split_rank_normalized_ess(i);
+    std::cout << "ess bulk " << ess.first << " ess tail " << ess.second << std::endl;
   }
 }
