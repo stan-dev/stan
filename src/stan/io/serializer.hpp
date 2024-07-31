@@ -492,6 +492,54 @@ class serializer {
       this->write_free_corr_matrix(ret_i);
     }
   }
+
+  /**
+   * Read a serialized column simplex matrix and unconstrain it
+   *
+   * @tparam Mat An Eigen matrix
+   * @param x A column stochastic eigen matrix
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_stochastic_column(Mat&& x) {
+    this->write(stan::math::stochastic_column_free(x));
+  }
+
+  /**
+   * Read serialized column simplex matrices and unconstrain them
+   *
+   * @tparam StdVec A standard vector of Eigen matrices
+   * @param x A vector of column stochastic Eigen matrices
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_stochastic_column(StdVec&& x) {
+    for (auto&& x_i : x) {
+      this->write_free_stochastic_column(x_i);
+    }
+  }
+
+  /**
+   * Read a serialized row simplex matrix and unconstrain it
+   *
+   * @tparam Mat An Eigen matrix
+   * @param x A row stochastic eigen matrix
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_stochastic_row(Mat&& x) {
+    this->write(stan::math::stochastic_row_free(x));
+  }
+
+  /**
+   * Read serialized row simplex matrices and unconstrain them
+   *
+   * @tparam StdVec A standard vector of Eigen matrices
+   * @param x A vector of row stochastic Eigen matrices
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_stochastic_row(StdVec&& x) {
+    for (auto&& x_i : x) {
+      this->write_free_stochastic_row(x_i);
+    }
+  }
 };
 
 }  // namespace io

@@ -90,7 +90,6 @@ TEST_F(StanIoStanCsvReader, read_metadata1) {
 TEST_F(StanIoStanCsvReader, read_metadata3) {
   stan::io::stan_csv_metadata metadata;
 
-
   EXPECT_TRUE(
       stan::io::stan_csv_reader::read_metadata(metadata3_stream, metadata, 0));
 

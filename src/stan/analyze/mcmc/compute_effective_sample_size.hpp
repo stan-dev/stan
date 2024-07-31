@@ -71,7 +71,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
   }
 
   // draws are not trimmed for ESS!!!
-  // we now have draws matrix.  can we compute ESS on draws matrix in its own subroutine?
+  // we now have draws matrix.  can we compute ESS on draws matrix in its own
+  // subroutine?
 
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
   Eigen::VectorXd chain_mean(num_chains);
