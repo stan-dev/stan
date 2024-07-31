@@ -41,15 +41,25 @@ class chainset {
   std::vector<std::string> param_names_;
   std::vector<Eigen::MatrixXd> chains_;
 
+  static size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
+    size_t thinned_samples = stan_csv.metadata.num_samples;
+    if (stan_csv.metadata.thin > 0) {
+      thinned_samples = thinned_samples / stan_csv.metadata.thin;
+    }
+    return thinned_samples;
+  }
+
   static bool is_valid(const stan::io::stan_csv& stan_csv) {
     if (stan_csv.header.empty()) return false;
     if (stan_csv.samples.size() == 0) return false;
-    if (stan_csv.metadata.thin > 0 && stan_csv.samples.rows()
-	!= (stan_csv.metadata.num_samples / stan_csv.metadata.thin))
-	return false;
+    if (stan_csv.samples.rows() != thinned_samples(stan_csv)) return false;
     return true;
   }
     
+  /** 
+   * Process first chain: record header, thinned samples,
+   * add samples to vector chains.
+   */
   void initFromStanCsv(const stan::io::stan_csv& stan_csv) {
     if (!is_valid(stan_csv)) {
       throw std::invalid_argument("Invalid sample");
@@ -58,12 +68,13 @@ class chainset {
       throw std::invalid_argument("Cannot re-initialize chains object");
     }
     param_names_ = stan_csv.header;
-    num_samples_ = stan_csv.metadata.num_samples;
+    num_samples_ = thinned_samples(stan_csv);
     chains_.push_back(stan_csv.samples);
   }
 
-  /** Append another set of sampling draws to chains_
-   *  
+  /**
+   * Process next chain: validate size, shape, column names,
+   * append to vector chains.
    */
   void add(const stan::io::stan_csv& stan_csv) {
     if (!is_valid(stan_csv)) {
@@ -74,8 +85,7 @@ class chainset {
           "Error add(stan_csv): number of columns in"
           " sample does not match first chain");
     }
-    if (stan_csv.metadata.thin > 0 && num_samples_
-	!= (stan_csv.metadata.num_samples / stan_csv.metadata.thin)) {
+    if (thinned_samples(stan_csv) != num_samples_) {
       throw std::invalid_argument(
           "Error add(stan_csv): number of sampling draws in"
           " sample does not match first chain");
@@ -88,12 +98,6 @@ class chainset {
         throw std::invalid_argument(ss.str());
       }
     }
-    if (stan_csv.samples.rows() != num_samples_) {
-        std::stringstream ss;
-        ss << "Error add(stan_csv): expected " << num_samples_
-           << " rows in sample, found" << stan_csv.samples.rows() << " rows.";
-        throw std::invalid_argument(ss.str());
-      }
     chains_.push_back(stan_csv.samples);
   }
 
