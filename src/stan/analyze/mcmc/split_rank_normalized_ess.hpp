@@ -44,7 +44,7 @@ double ess(const Eigen::MatrixXd& chains) {
     chain_mean(i) = chain_col.mean();
     chain_var(i) = cov_col(0) * num_draws / (num_draws - 1);
   }
-  
+
   // compute var_plus, eqn (3)
   double w_chain_var = math::mean(chain_var);  // W (within chain var)
   double var_plus = w_chain_var * (num_draws - 1) / num_draws;  // \hat{var}^{+}
@@ -64,7 +64,7 @@ double ess(const Eigen::MatrixXd& chains) {
   // paired autocorrelation is guaranteed to be positive, monotone and convex
   size_t t = 1;
   while (t < num_draws - 4 && (rho_hat_even + rho_hat_odd > 0)
-	 && !std::isnan(rho_hat_even + rho_hat_odd)) {
+         && !std::isnan(rho_hat_even + rho_hat_odd)) {
     for (size_t i = 0; i < num_chains; ++i) {
       acov_t(i) = acov.col(i)(t + 1);
     }
@@ -132,9 +132,8 @@ inline std::pair<double, double> compute_split_rank_normalized_ess(
     split_i += 2;
   }
   if (!is_finite_and_varies(split_draws_matrix) || num_samples < half) {
-    return  std::make_pair(std::numeric_limits<double>::quiet_NaN(),
-			   std::numeric_limits<double>::quiet_NaN());
-
+    return std::make_pair(std::numeric_limits<double>::quiet_NaN(),
+                          std::numeric_limits<double>::quiet_NaN());
   }
 
   double ess_bulk = ess(rank_transform(split_draws_matrix));
@@ -147,7 +146,6 @@ inline std::pair<double, double> compute_split_rank_normalized_ess(
                          >= math::quantile(split_draws_matrix.reshaped(), 0.95))
                             .cast<double>();
   double ess_tail_95 = ess(q95);
-
 
   double ess_tail;
   if (std::isnan(ess_tail_05)) {
