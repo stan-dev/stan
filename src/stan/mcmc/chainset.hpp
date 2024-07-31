@@ -136,7 +136,6 @@ class chainset {
     return -1;
   }
 
-
   Eigen::VectorXd samples(const int colIndex) const {
     Eigen::VectorXd result(chains_.size() * num_samples_);
     for (int i = 0; i < chains_.size(); ++i) {

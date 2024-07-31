@@ -83,9 +83,8 @@ inline std::pair<double, double> compute_split_rank_normalized_rhat(
     split_i += 2;
   }
   if (!is_finite_and_varies(split_draws_matrix)) {
-    return  std::make_pair(std::numeric_limits<double>::quiet_NaN(),
-			   std::numeric_limits<double>::quiet_NaN());
-
+    return std::make_pair(std::numeric_limits<double>::quiet_NaN(),
+                          std::numeric_limits<double>::quiet_NaN());
   }
 
   double rhat_bulk = rhat(rank_transform(split_draws_matrix));
