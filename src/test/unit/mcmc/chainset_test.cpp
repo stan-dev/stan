@@ -197,8 +197,9 @@ TEST_F(McmcChains, split_rank_normalized_ess) {
   ess_8_schools_tail << 733, 395, 640, 386, 845, 564, 742, 646, 563, 71;
 
   for (size_t i = 0; i < 10; ++i) {
+    //    std::cout << chain_2.param_names()[i + 7] << std::endl;
     auto ess = chain_2.split_rank_normalized_ess(i + 7);
-    EXPECT_NEAR(ess.first, std::round(ess_8_schools_bulk(i)), 5);
+    EXPECT_NEAR(ess.first, ess_8_schools_bulk(i), 5);
     EXPECT_NEAR(ess.second, ess_8_schools_tail(i), 5);
   }
 }

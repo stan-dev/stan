@@ -136,27 +136,6 @@ class chainset {
     return -1;
   }
 
-  // checks that sample values across all chains are finite and non-identical
-  // run this check before calculating between-chain, w/in chain
-  // variance, correlation, and covariance.
-  bool is_finite_and_varies(const int index) const {
-    Eigen::VectorXd draw_zeros = Eigen::VectorXd::Zero(num_chains());
-    for (std::size_t i = 0; i < num_chains(); ++i) {
-      Eigen::VectorXd draws = chains_[i].col(index);
-      draw_zeros(i) = draws(0);
-      for (int j = 0; j < num_samples(); ++j) {
-        if (!std::isfinite(draws(j)))
-          return false;
-      }
-      if (draws.isApproxToConstant(draws(0))) {
-        return false;
-      }
-    }
-    if (num_chains() > 1 && draw_zeros.isApproxToConstant(draw_zeros(0))) {
-      return false;
-    }
-    return true;
-  }
 
   Eigen::VectorXd samples(const int colIndex) const {
     Eigen::VectorXd result(chains_.size() * num_samples_);
@@ -254,10 +233,6 @@ class chainset {
   // }
 
   std::pair<double, double> split_rank_normalized_rhat(const int index) const {
-    if (!is_finite_and_varies(index)) {
-      return {std::numeric_limits<double>::quiet_NaN(),
-              std::numeric_limits<double>::quiet_NaN()};
-    }
     return analyze::compute_split_rank_normalized_rhat(chains_, index);
   }
 
@@ -267,10 +242,6 @@ class chainset {
   }
 
   std::pair<double, double> split_rank_normalized_ess(const int index) const {
-    if (!is_finite_and_varies(index) || num_samples() < 3) {
-      return {std::numeric_limits<double>::quiet_NaN(),
-              std::numeric_limits<double>::quiet_NaN()};
-    }
     return analyze::compute_split_rank_normalized_ess(chains_, index);
   }
 

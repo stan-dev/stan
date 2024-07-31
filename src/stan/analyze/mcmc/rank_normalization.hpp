@@ -16,7 +16,7 @@ namespace analyze {
  * using inverse normal transformation and a fractional offset. Based on paper
  * https://arxiv.org/abs/1903.08008
  *
- * @param chains stores chains in columns
+ * @param chains matrix of draws, one column per chain
  * @return normal scores for average ranks of draws
  */
 inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {

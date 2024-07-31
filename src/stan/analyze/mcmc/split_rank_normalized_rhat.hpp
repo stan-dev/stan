@@ -2,6 +2,7 @@
 #define STAN_ANALYZE_MCMC_SPLIT_RANK_NORMALIZED_RHAT_HPP
 
 #include <stan/math/prim.hpp>
+#include <stan/analyze/mcmc/check_chains.hpp>
 #include <stan/analyze/mcmc/rank_normalization.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
@@ -80,6 +81,11 @@ inline std::pair<double, double> compute_split_rank_normalized_rhat(
     split_draws_matrix.col(split_i) = head_block;
     split_draws_matrix.col(split_i + 1) = tail_block;
     split_i += 2;
+  }
+  if (!is_finite_and_varies(split_draws_matrix)) {
+    return  std::make_pair(std::numeric_limits<double>::quiet_NaN(),
+			   std::numeric_limits<double>::quiet_NaN());
+
   }
 
   double rhat_bulk = rhat(rank_transform(split_draws_matrix));
