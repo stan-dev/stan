@@ -41,4 +41,3 @@ inline bool is_finite_and_varies(const Eigen::MatrixXd chains) {
 }  // namespace stan
 
 #endif
-
