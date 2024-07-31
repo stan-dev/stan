@@ -1,0 +1,161 @@
+#ifndef STAN_ANALYZE_MCMC_SPLIT_RANK_NORMALIZED_ESS_HPP
+#define STAN_ANALYZE_MCMC_SPLIT_RANK_NORMALIZED_ESS_HPP
+
+#include <stan/math/prim.hpp>
+#include <stan/analyze/mcmc/rank_normalization.hpp>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
+#include <algorithm>
+#include <cmath>
+#include <vector>
+#include <limits>
+#include <iostream>
+
+namespace stan {
+namespace analyze {
+
+/**
+ * Computes the effective sample size (ESS) for the specified
+ * parameter across all chains.  The number of draws per chain must be > 3,
+ * and the values across all draws must be finite and not constant.
+ * The value returned is the minimum of ESS and (sample_sz * log10(sample_sz).
+ * Sample autocovariance is computed using Stan math library implmentation.
+ * See https://arxiv.org/abs/1903.08008, section 3.2 for discussion.
+ *
+ * @param chains matrix of draws across all chains
+ * @return effective sample size for the specified parameter
+ */
+double ess(const Eigen::MatrixXd& chains) {
+  int num_draws = chains.rows();
+  int num_chains = chains.cols();
+
+  Eigen::MatrixXd acov(num_draws, num_chains);
+  Eigen::VectorXd chain_mean(num_chains);
+  Eigen::VectorXd chain_var(num_chains);
+
+  // compute the per-chain autocorrelation
+  for (size_t i = 0; i < num_chains; ++i) {
+    Eigen::Map<const Eigen::VectorXd> chain_col(chains.col(i).data(), num_draws);
+    Eigen::Map<Eigen::VectorXd> cov_col(acov.col(i).data(), num_draws);
+    stan::math::autocovariance<double>(chain_col, cov_col);
+    chain_mean(i) = chain_col.mean();
+    chain_var(i) = cov_col(0) * num_draws / (num_draws - 1);
+  }
+
+  // compute var_plus, eqn (3)
+  double mean_var = math::mean(chain_var);  // W (within chain var)
+  double var_plus = mean_var * (num_draws - 1) / num_draws; // \hat{var}^{+}
+  if (num_chains > 1) {
+    var_plus += math::variance(chain_mean); // B (between chain var)
+  }
+  if (std::isnan(var_plus)) {   // infinite covariance, fail politely
+      return std::numeric_limits<double>::quiet_NaN();
+  }
+  
+  // Geyer's initial positive sequence, eqn (11)
+  Eigen::VectorXd rho_hat_t = Eigen::VectorXd::Zero(num_draws);
+  Eigen::VectorXd acov_t(num_chains);
+  double rho_hat_even = 1.0;
+  rho_hat_t(0) = rho_hat_even;  // lag 0
+  double rho_hat_odd = 1 - (mean_var - acov.row(1).mean()) / var_plus;
+  rho_hat_t(1) = rho_hat_odd;  // lag 1
+
+
+  // compute autocorrelation at lag t for pair (t, t+1)
+  // paired autocorrelation is guaranteed to be positive, monotone and convex 
+  size_t t = 1;
+  while (t < num_draws - 4 && (rho_hat_even + rho_hat_odd > 0)) {
+    for (size_t i = 0; i < num_chains; ++i) {
+      acov_t(i) = acov.col(i)(t + 1);
+    }
+    rho_hat_even = 1 - (mean_var - acov_t.mean()) / var_plus;
+    for (size_t i = 0; i < num_chains; ++i) {
+      acov_t(i) = acov.col(i)(t + 2);
+    }
+    rho_hat_odd = 1 - (mean_var - acov_t.mean()) / var_plus;
+    if ((rho_hat_even + rho_hat_odd) >= 0) {
+      rho_hat_t(t + 1) = rho_hat_even;
+      rho_hat_t(t + 2) = rho_hat_odd;
+    }
+    t += 2;
+  }
+
+  auto max_t = t;  // max lag, used for truncation
+  //  see discussion p. 8, par "In extreme antithetic cases, " 
+  if (rho_hat_even > 0) {
+    rho_hat_t(max_t + 1) = rho_hat_even;  
+  }
+
+  // convert initial positive sequence into an initial monotone sequence
+  for (size_t i = 1; i <= max_t - 3; i += 2) {
+    if (rho_hat_t(i + 1) + rho_hat_t(i + 2) > rho_hat_t(i - 1) + rho_hat_t(i)) {
+      rho_hat_t(i + 1) = (rho_hat_t(i - 1) + rho_hat_t(i)) / 2;
+      rho_hat_t(i + 2) = rho_hat_t(i + 1);
+    }
+  }
+
+  double num_samples = num_chains * num_draws;
+  //  eqn (13): Geyer's truncation rule, w/ modification
+  double tau_hat = -1 + 2 * rho_hat_t.head(max_t).sum() + rho_hat_t(max_t + 1);
+
+  // safety check for negative values and with max ess equal to ess*log10(ess)
+  tau_hat = std::max(tau_hat, 1/std::log10(num_samples));
+  return (num_samples / tau_hat);
+}
+
+/**
+ * Computes the split effective sample size (split ESS) using rank based
+ * diagnostic for the specified parameter across all samples. Based on paper
+ * https://arxiv.org/abs/1903.08008
+ *
+ * When the number of total draws N is odd, the last draw is ignored.
+ *
+ * See more details in Stan reference manual section "Potential
+ * Scale Reduction". http://mc-stan.org/users/documentation
+
+ * @param samples matrix of per-chain samples, num_iters X chain
+ * @param index column index for param of interest
+ * @return potential scale reduction for the specified parameter
+ */
+inline std::pair<double, double> compute_split_rank_normalized_ess(
+    const std::vector<Eigen::MatrixXd>& chains, const int index) {
+
+  size_t num_chains = chains.size();
+  size_t num_samples = chains[0].rows();
+  size_t half = std::floor(num_samples / 2.0);
+
+  Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
+  int split_i = 0;
+  for (std::size_t i = 0; i < num_chains; ++i) {
+    Eigen::Map<const Eigen::VectorXd> head_block(chains[i].col(index).data(), half);
+    Eigen::Map<const Eigen::VectorXd> tail_block(chains[i].col(index).data() + half, half);
+    
+    split_draws_matrix.col(split_i) = head_block;
+    split_draws_matrix.col(split_i + 1) = tail_block;
+    split_i += 2;
+  }
+  double ess_bulk = ess(rank_transform(split_draws_matrix));
+
+  Eigen::MatrixXd q05
+    = (split_draws_matrix.array() <= math::quantile(split_draws_matrix.reshaped(), 0.05)).cast<double>();
+  double ess_tail_05 = ess(q05);
+  Eigen::MatrixXd q95
+    = (split_draws_matrix.array() >= math::quantile(split_draws_matrix.reshaped(), 0.95)).cast<double>();
+  double ess_tail_95 = ess(q95);
+
+  double ess_tail;
+  if (!std::isnan(ess_tail_05) && !std::isnan(ess_tail_95)) {
+    ess_tail = std::min(ess_tail_05, ess_tail_95);
+  } else {
+    ess_tail = ess_bulk;
+  }
+  return std::make_pair(ess_bulk, ess_tail);
+}
+
+
+}  // namespace analyze
+}  // namespace stan
+
+#endif
