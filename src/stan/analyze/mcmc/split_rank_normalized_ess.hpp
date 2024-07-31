@@ -37,7 +37,8 @@ double ess(const Eigen::MatrixXd& chains) {
 
   // compute the per-chain autocorrelation
   for (size_t i = 0; i < num_chains; ++i) {
-    Eigen::Map<const Eigen::VectorXd> chain_col(chains.col(i).data(), num_draws);
+    Eigen::Map<const Eigen::VectorXd> chain_col(chains.col(i).data(),
+                                                num_draws);
     Eigen::Map<Eigen::VectorXd> cov_col(acov.col(i).data(), num_draws);
     stan::math::autocovariance<double>(chain_col, cov_col);
     chain_mean(i) = chain_col.mean();
@@ -46,14 +47,14 @@ double ess(const Eigen::MatrixXd& chains) {
 
   // compute var_plus, eqn (3)
   double mean_var = math::mean(chain_var);  // W (within chain var)
-  double var_plus = mean_var * (num_draws - 1) / num_draws; // \hat{var}^{+}
+  double var_plus = mean_var * (num_draws - 1) / num_draws;  // \hat{var}^{+}
   if (num_chains > 1) {
-    var_plus += math::variance(chain_mean); // B (between chain var)
+    var_plus += math::variance(chain_mean);  // B (between chain var)
   }
-  if (std::isnan(var_plus)) {   // infinite covariance, fail politely
-      return std::numeric_limits<double>::quiet_NaN();
+  if (std::isnan(var_plus)) {  // infinite covariance, fail politely
+    return std::numeric_limits<double>::quiet_NaN();
   }
-  
+
   // Geyer's initial positive sequence, eqn (11)
   Eigen::VectorXd rho_hat_t = Eigen::VectorXd::Zero(num_draws);
   Eigen::VectorXd acov_t(num_chains);
@@ -62,9 +63,8 @@ double ess(const Eigen::MatrixXd& chains) {
   double rho_hat_odd = 1 - (mean_var - acov.row(1).mean()) / var_plus;
   rho_hat_t(1) = rho_hat_odd;  // lag 1
 
-
   // compute autocorrelation at lag t for pair (t, t+1)
-  // paired autocorrelation is guaranteed to be positive, monotone and convex 
+  // paired autocorrelation is guaranteed to be positive, monotone and convex
   size_t t = 1;
   while (t < num_draws - 4 && (rho_hat_even + rho_hat_odd > 0)) {
     for (size_t i = 0; i < num_chains; ++i) {
@@ -83,9 +83,9 @@ double ess(const Eigen::MatrixXd& chains) {
   }
 
   auto max_t = t;  // max lag, used for truncation
-  //  see discussion p. 8, par "In extreme antithetic cases, " 
+  //  see discussion p. 8, par "In extreme antithetic cases, "
   if (rho_hat_even > 0) {
-    rho_hat_t(max_t + 1) = rho_hat_even;  
+    rho_hat_t(max_t + 1) = rho_hat_even;
   }
 
   // convert initial positive sequence into an initial monotone sequence
@@ -101,7 +101,7 @@ double ess(const Eigen::MatrixXd& chains) {
   double tau_hat = -1 + 2 * rho_hat_t.head(max_t).sum() + rho_hat_t(max_t + 1);
 
   // safety check for negative values and with max ess equal to ess*log10(ess)
-  tau_hat = std::max(tau_hat, 1/std::log10(num_samples));
+  tau_hat = std::max(tau_hat, 1 / std::log10(num_samples));
   return (num_samples / tau_hat);
 }
 
@@ -121,7 +121,6 @@ double ess(const Eigen::MatrixXd& chains) {
  */
 inline std::pair<double, double> compute_split_rank_normalized_ess(
     const std::vector<Eigen::MatrixXd>& chains, const int index) {
-
   size_t num_chains = chains.size();
   size_t num_samples = chains[0].rows();
   size_t half = std::floor(num_samples / 2.0);
@@ -129,20 +128,24 @@ inline std::pair<double, double> compute_split_rank_normalized_ess(
   Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
   int split_i = 0;
   for (std::size_t i = 0; i < num_chains; ++i) {
-    Eigen::Map<const Eigen::VectorXd> head_block(chains[i].col(index).data(), half);
-    Eigen::Map<const Eigen::VectorXd> tail_block(chains[i].col(index).data() + half, half);
-    
+    Eigen::Map<const Eigen::VectorXd> head_block(chains[i].col(index).data(),
+                                                 half);
+    Eigen::Map<const Eigen::VectorXd> tail_block(
+        chains[i].col(index).data() + half, half);
+
     split_draws_matrix.col(split_i) = head_block;
     split_draws_matrix.col(split_i + 1) = tail_block;
     split_i += 2;
   }
   double ess_bulk = ess(rank_transform(split_draws_matrix));
 
-  Eigen::MatrixXd q05
-    = (split_draws_matrix.array() <= math::quantile(split_draws_matrix.reshaped(), 0.05)).cast<double>();
+  Eigen::MatrixXd q05 = (split_draws_matrix.array()
+                         <= math::quantile(split_draws_matrix.reshaped(), 0.05))
+                            .cast<double>();
   double ess_tail_05 = ess(q05);
-  Eigen::MatrixXd q95
-    = (split_draws_matrix.array() >= math::quantile(split_draws_matrix.reshaped(), 0.95)).cast<double>();
+  Eigen::MatrixXd q95 = (split_draws_matrix.array()
+                         >= math::quantile(split_draws_matrix.reshaped(), 0.95))
+                            .cast<double>();
   double ess_tail_95 = ess(q95);
 
   double ess_tail;
@@ -153,7 +156,6 @@ inline std::pair<double, double> compute_split_rank_normalized_ess(
   }
   return std::make_pair(ess_bulk, ess_tail);
 }
-
 
 }  // namespace analyze
 }  // namespace stan

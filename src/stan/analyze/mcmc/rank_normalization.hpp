@@ -15,7 +15,7 @@ namespace analyze {
  * Computes normalized average ranks for pooled draws. Normal scores computed
  * using inverse normal transformation and a fractional offset. Based on paper
  * https://arxiv.org/abs/1903.08008
- * 
+ *
  * @param chains stores chains in columns
  * @return normal scores for average ranks of draws
  */
