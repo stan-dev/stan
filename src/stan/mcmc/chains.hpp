@@ -558,7 +558,6 @@ class chains {
     return autocovariance(chain, index(name));
   }
 
-  // FIXME: reimplement using autocorrelation.
   double effective_sample_size(const int index) const {
     int n_chains = num_chains();
     std::vector<const double*> draws(n_chains);
