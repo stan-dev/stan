@@ -336,7 +336,8 @@ TEST(deserializer, read_constrain_sum_to_zero_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = 0.0;
-  auto reference = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta));
+  auto reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta));
   auto y = deserializer.read_constrain_sum_to_zero<var_vector_t, false>(
       lp, theta.size() + 1);
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));

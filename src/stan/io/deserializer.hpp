@@ -1218,7 +1218,7 @@ class deserializer {
     return ret;
   }
 
-    /**
+  /**
    * Read a serialized sum_to_zero vector and unconstrain it
    *
    * @tparam Ret Type of output

@@ -498,7 +498,6 @@ TEST(serializer_vectorized, write_free_simplex) {
       std::make_tuple(3, 2, 4));
 }
 
-
 // sum_to_zero
 template <typename Ret>
 struct SumToZeroConstrain {
@@ -519,8 +518,8 @@ TEST(serializer_vectorized, write_free_sum_to_zero) {
   serializer_test<Eigen::VectorXd, SumToZeroConstrain>(std::make_tuple(4));
   serializer_test<std::vector<Eigen::VectorXd>, SumToZeroConstrain>(
       std::make_tuple(2, 4));
-  serializer_test<std::vector<std::vector<Eigen::VectorXd>>, SumToZeroConstrain>(
-      std::make_tuple(3, 2, 4));
+  serializer_test<std::vector<std::vector<Eigen::VectorXd>>,
+                  SumToZeroConstrain>(std::make_tuple(3, 2, 4));
 }
 
 // ordered
