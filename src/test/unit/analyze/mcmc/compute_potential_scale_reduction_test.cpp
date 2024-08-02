@@ -132,7 +132,6 @@ TEST_F(ComputeRhat, chains_compute_split_potential_scale_reduction) {
   }
 }
 
-
 TEST_F(ComputeRhat, compute_split_potential_scale_reduction) {
   std::stringstream out;
   stan::io::stan_csv blocker1
@@ -175,7 +174,6 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction) {
   }
 }
 
-
 TEST_F(ComputeRhat, compute_split_potential_scale_reduction_convenience) {
   std::stringstream out;
   stan::io::stan_csv blocker1
@@ -215,7 +213,6 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction_convenience) {
   }
 }
 
-
 TEST_F(ComputeRhat, compute_potential_scale_reduction_constant) {
   std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
@@ -227,7 +224,6 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_constant) {
       << "rhat for index: " << 1 << ", parameter: " << chains.param_name(1);
 }
 
-
 TEST_F(ComputeRhat, compute_potential_scale_reduction_nan) {
   std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
@@ -238,4 +234,3 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_nan) {
   ASSERT_TRUE(std::isnan(chains.split_potential_scale_reduction(0)))
       << "rhat for index: " << 1 << ", parameter: " << chains.param_name(1);
 }
-
