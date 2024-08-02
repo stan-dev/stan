@@ -1,6 +1,7 @@
 #ifndef STAN_ANALYZE_MCMC_SPLIT_CHAINS_HPP
 #define STAN_ANALYZE_MCMC_SPLIT_CHAINS_HPP
 
+#include <stan/math/prim.hpp>
 #include <cmath>
 #include <vector>
 #include <algorithm>
