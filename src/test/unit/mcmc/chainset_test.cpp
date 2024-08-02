@@ -249,6 +249,8 @@ TEST_F(McmcChains, summary_stats) {
   s8_q5 << -0.46, -0.39, -3.04, -8.90, -3.31, -7.58, -5.84, 0.10, -4.15, 2.08;
   s8_q95 << 17.01, 30.47, 19.25, 19.02, 18.72, 14.49, 16.04, 25.77, 22.71,
       18.74;
+  Eigen::VectorXd probs(3);
+  probs << 0.05, 0.5, 0.95;
 
   for (size_t i = 0; i < 10; ++i) {
     auto mean = chain_2.mean(i + 7);
@@ -263,5 +265,32 @@ TEST_F(McmcChains, summary_stats) {
     EXPECT_NEAR(q_5, s8_q5(i), 0.5);
     auto q_95 = chain_2.quantile(i + 7, 0.95);
     EXPECT_NEAR(q_95, s8_q95(i), 0.5);
+    auto qs_5_50_95 = chain_2.quantiles(i + 7, probs);
+    EXPECT_EQ(3, qs_5_50_95.size());
+    EXPECT_NEAR(qs_5_50_95(0), s8_q5(i), 0.5);
+    EXPECT_NEAR(qs_5_50_95(1), s8_median(i), 0.05);
+    EXPECT_NEAR(qs_5_50_95(2), s8_q95(i), 0.5);
+  }
+}
+
+TEST_F(McmcChains, mcse) {
+  std::vector<stan::io::stan_csv> eight_schools;
+  eight_schools.push_back(eight_schools_1);
+  eight_schools.push_back(eight_schools_2);
+  stan::mcmc::chainset<> chain_2(eight_schools);
+  EXPECT_EQ(2, chain_2.num_chains());
+
+  // test against R implementation in pkg posterior
+  Eigen::VectorXd s8_mcse_mean(10), s8_mcse_sd(10);
+  s8_mcse_mean << 0.288379, 0.4741815, 0.2741001, 0.3294614, 0.2473758,
+    0.2665048, 0.2701363, 0.4740092, 0.3621771, 0.3832464;
+  s8_mcse_sd << 0.1841825, 0.2854258, 0.192332, 0.2919369, 0.2478025,
+    0.2207478, 0.2308452, 0.2522107, 0.2946896, 0.3184745;
+
+  for (size_t i = 0; i < 10; ++i) {
+    auto mcse_mean = chain_2.mcse_mean(i + 7);
+    EXPECT_NEAR(mcse_mean, s8_mcse_mean(i), 0.5);
+    auto mcse_sd = chain_2.mcse_sd(i + 7);
+    EXPECT_NEAR(mcse_sd, s8_mcse_sd(i), 0.7);
   }
 }

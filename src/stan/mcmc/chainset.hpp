@@ -258,12 +258,14 @@ class chainset {
     return mcse_mean(index(name));
   }
 
+  // translated from R package posterior
   double mcse_sd(const int index) const {
     Eigen::MatrixXd s = samples(index);
     Eigen::MatrixXd s2 = s.array().square();
     double ess_s = analyze::split_rank_normalized_ess(s).first;
     double ess_s2 = analyze::split_rank_normalized_ess(s2).first;
-    return std::min(ess_s, ess_s2);
+    double ess_sd = std::min(ess_s, ess_s2);
+    return sd(index) * std::sqrt(std::exp(1) * std::pow(1 - 1 / ess_sd, ess_sd - 1) - 1);
   }
 
   double mcse_sd(const std::string& name) const { return mcse_sd(index(name)); }
