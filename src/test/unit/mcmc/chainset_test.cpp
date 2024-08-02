@@ -46,8 +46,8 @@ class McmcChains : public testing::Test {
     if (!bernoulli_500_stream || !bernoulli_corrupt_stream
         || !bernoulli_default_stream || !bernoulli_thin_stream
         || !bernoulli_warmup_stream || !bernoulli_zeta_stream
-	|| !eight_schools_1_stream || !eight_schools_2_stream
-	|| !eight_schools_5iters_1_stream || !eight_schools_5iters_2_stream) {
+        || !eight_schools_1_stream || !eight_schools_2_stream
+        || !eight_schools_5iters_1_stream || !eight_schools_5iters_2_stream) {
       FAIL() << "Failed to open one or more test files";
     }
     bernoulli_500_stream.seekg(0, std::ios::beg);
@@ -99,15 +99,13 @@ class McmcChains : public testing::Test {
   std::stringstream out;
 
   std::ifstream bernoulli_500_stream, bernoulli_corrupt_stream,
-    bernoulli_default_stream, bernoulli_thin_stream,
-    bernoulli_warmup_stream, bernoulli_zeta_stream,
-    eight_schools_1_stream, eight_schools_2_stream,
-    eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
+      bernoulli_default_stream, bernoulli_thin_stream, bernoulli_warmup_stream,
+      bernoulli_zeta_stream, eight_schools_1_stream, eight_schools_2_stream,
+      eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
 
   stan::io::stan_csv bernoulli_500, bernoulli_corrupt, bernoulli_default,
-    bernoulli_thin, bernoulli_warmup, bernoulli_zeta,
-    eight_schools_1, eight_schools_2,
-    eight_schools_5iters_1, eight_schools_5iters_2;
+      bernoulli_thin, bernoulli_warmup, bernoulli_zeta, eight_schools_1,
+      eight_schools_2, eight_schools_5iters_1, eight_schools_5iters_2;
 };
 
 TEST_F(McmcChains, constructor) {
@@ -242,13 +240,15 @@ TEST_F(McmcChains, summary_stats) {
   EXPECT_EQ(2, chain_2.num_chains());
 
   // test against R implementation in pkg posterior (via cmdstanr)
-  Eigen::VectorXd s8_mean(10), s8_median(10), s8_sd(10), s8_mad(10), s8_q5(10), s8_q95(10);
+  Eigen::VectorXd s8_mean(10), s8_median(10), s8_sd(10), s8_mad(10), s8_q5(10),
+      s8_q95(10);
   s8_mean << 7.95, 12.54, 7.82, 5.33, 7.09, 4.12, 5.72, 11.65, 8.80, 8.26;
   s8_median << 8.00, 11.27, 7.39, 5.44, 6.64, 4.54, 5.93, 11.38, 8.28, 7.05;
   s8_sd << 5.48, 9.57, 6.85, 8.39, 6.91, 6.57, 6.85, 7.76, 8.40, 5.53;
   s8_mad << 5.49, 8.79, 6.39, 7.38, 5.98, 6.25, 6.59, 7.79, 7.59, 4.66;
   s8_q5 << -0.46, -0.39, -3.04, -8.90, -3.31, -7.58, -5.84, 0.10, -4.15, 2.08;
-  s8_q95 << 17.01, 30.47, 19.25, 19.02, 18.72, 14.49, 16.04, 25.77, 22.71, 18.74;
+  s8_q95 << 17.01, 30.47, 19.25, 19.02, 18.72, 14.49, 16.04, 25.77, 22.71,
+      18.74;
 
   for (size_t i = 0; i < 10; ++i) {
     auto mean = chain_2.mean(i + 7);
