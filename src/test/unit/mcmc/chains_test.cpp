@@ -840,4 +840,3 @@ TEST_F(McmcChains, blocker_effective_sample_size) {
   EXPECT_NO_THROW(chains.effective_sample_size(chains.param_name(1)))
       << "calling chains.effective_sample_size(chains.param_name(index = 1))";
 }
-
