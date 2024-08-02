@@ -136,10 +136,10 @@ class chainset {
     return -1;
   }
 
-  Eigen::VectorXd samples(const int colIndex) const {
-    Eigen::VectorXd result(chains_.size() * num_samples_);
+  Eigen::MatrixXd samples(const int colIndex) const {
+    Eigen::MatrixXd result(num_samples(), chains_.size());
     for (int i = 0; i < chains_.size(); ++i) {
-      result.segment(i * num_samples_, num_samples_) = chains_[i].col(colIndex);
+      result.col(i) = chains_[i].col(colIndex);
     }
     return result;
   }
@@ -156,83 +156,79 @@ class chainset {
     return samples(chain, index(name));
   }
 
-  Eigen::VectorXd samples(const std::string& name) const {
+  Eigen::MatrixXd samples(const std::string& name) const {
     return samples(index(name));
   }
 
-  // double mean(const int index) const { return samples(index).mean(); }
+  double mean(const int index) const { return samples(index).mean(); }
 
-  // double mean(const std::string& name) const { return mean(index(name)); }
+  double mean(const std::string& name) const { return mean(index(name)); }
 
-  // double sd(const int index) const { return sd(samples(index)); }
+  double sd(const int index) const {
+    return std::sqrt(variance(index));
+  }
 
-  // double sd(const std::string& name) const { return sd(index(name)); }
+  double sd(const std::string& name) const { return sd(index(name)); }
 
-  // double variance(const int index) const { return variance(samples(index)); }
+  double variance(const int index) const {
+    Eigen::MatrixXd samples = samples(chains_, index);
+    return (samples.array() - samples.mean()).square().sum() / (samples.size() - 1);
+  }    
 
-  // double variance(const std::string& name) const {
-  //   return variance(index(name));
-  // }
+  double variance(const std::string& name) const {
+    return variance(index(name));
+  }
 
-  // double covariance(const int index1, const int index2) const {
-  //   return covariance(samples(index1), samples(index2));
-  // }
+  double max_abs_deviation(const int index) const {
+    Eigen::VectorXd samples = samples(chains_, index);
+    return (samples.array() - samples.mean()).abs().maxCoeff();
+  }    
 
-  // double covariance(const std::string& name1, const std::string& name2) const
-  // {
-  //   return covariance(index(name1), index(name2));
-  // }
+  double max_abs_deviation(const std::string& name) const {
+    return max_abs_deviation(index(name));
+  }
 
-  // double correlation(const int index1, const int index2) const {
-  //   return correlation(samples(index1), samples(index2));
-  // }
+  double quantile(const int index, const double prob) {
+    // Ensure the probability is within [0, 1]
+    if (prob < 0.0 || prob > 1.0) {
+        throw std::out_of_range("Probability must be between 0 and 1.");
+    }
+    Eigen::MatrixXd samples = samples(chains_, index);
+    std::vector<double> sorted(samples.data(),
+				       samples.data() + samples.size());
+    std::sort(sorted.begin(), sorted.end());
+    size_t idx = static_cast<size_t>(prob * (sorted.size() - 1));
+    return sorted[idx];
+  }  
 
-  // double correlation(const std::string& name1, const std::string& name2)
-  // const {
-  //   return correlation(index(name1), index(name2));
-  // }
+  double quantile(const std::string& name, const double prob) const {
+    return quantile(index(name), prob);
+  }
 
-  // double quantile(const int index, const double prob) const {
-  //   return quantile(samples(index), prob);
-  // }
+  Eigen::VectorXd quantiles(const int index, const Eigen::VectorXd& probs) const {
+    // Ensure the probability is within [0, 1]
+    if (probs.minCoeff() < 0.0 || probs.maxCoeff() > 1.0) {
+        throw std::out_of_range("Probabilities must be between 0 and 1.");
+    }
+    Eigen::MatrixXd samples = samples(chains_, index);
+    std::vector<double> sorted(samples.data(),
+				       samples.data() + samples.size());
+    std::sort(sorted.begin(), sorted.end());
+    Eigen::VectorXd quantiles(probs.size());
+    for (size_t i = 0; i < probs.size(); ++i) {
+      size_t idx = static_cast<size_t>(probs[i] * (sorted.size() - 1));
+      quantiles[i] = sorted[idx];
+    }
+    return quantiles;
+  }
 
-  // double quantile(const std::string& name, const double prob) const {
-  //   return quantile(index(name), prob);
-  // }
-
-  // Eigen::VectorXd quantiles(int index, const Eigen::VectorXd& probs) const {
-  //   return quantiles(samples(index), probs);
-  // }
-
-  // Eigen::VectorXd quantiles(const std::string& name,
-  //                           const Eigen::VectorXd& probs) const {
-  //   return quantiles(index(name), probs);
-  // }
-
-  // Eigen::Vector2d central_interval(int index, double prob) const {
-  //   double low_prob = (1 - prob) / 2;
-  //   double high_prob = 1 - low_prob;
-
-  //   Eigen::Vector2d interval;
-  //   interval << quantile(index, low_prob), quantile(index, high_prob);
-  //   return interval;
-  // }
-
-  // Eigen::Vector2d central_interval(const std::string& name, double prob)
-  // const {
-  //   return central_interval(index(name), prob);
-  // }
-
-  // Eigen::VectorXd autocorrelation(int chain, const std::string& name) const {
-  //   return autocorrelation(chain, index(name));
-  // }
-
-  // Eigen::VectorXd autocovariance(int chain, const std::string& name) const {
-  //   return autocovariance(chain, index(name));
-  // }
+  Eigen::VectorXd quantiles(const std::string& name,
+                            const Eigen::VectorXd& probs) const {
+    return quantiles(index(name), probs);
+  }
 
   std::pair<double, double> split_rank_normalized_rhat(const int index) const {
-    return analyze::compute_split_rank_normalized_rhat(chains_, index);
+    return analyze::split_rank_normalized_rhat(samples(index));
   }
 
   std::pair<double, double> split_rank_normalized_rhat(
@@ -241,12 +237,33 @@ class chainset {
   }
 
   std::pair<double, double> split_rank_normalized_ess(const int index) const {
-    return analyze::compute_split_rank_normalized_ess(chains_, index);
+    return analyze::split_rank_normalized_ess(samples(index));
   }
 
   std::pair<double, double> split_rank_normalized_ess(
       const std::string& name) const {
     return split_rank_normalized_ess(index(name));
+  }
+
+  double mcse_mean(const int index) const {
+    double ess_bulk = analyze::split_rank_normalized_ess(samples(index)).first;
+    return sd(index) / std::sqrt(ess_bulk);
+  }
+
+  double mcse_mean(const std::string& name) const {
+    return mcse_mean(index(name));
+  }
+
+  double mcse_sd(const int index) const {
+    Eigen::MatrixXd s = samples(index);
+    Eigen::MatrixXd s2 = s.array().square();
+    double ess_s = analyze::split_rank_normalized_ess(s).first;
+    double ess_s2 = analyze::split_rank_normalized_ess(s2).first;
+    return std::min(ess_s, ess_s2);
+  }
+
+  double mcse_sd(const std::string& name) const {
+    return mcse_sd(index(name));
   }
 };
 

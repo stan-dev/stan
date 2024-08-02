@@ -4,6 +4,7 @@
 #include <stan/math/prim.hpp>
 #include <stan/analyze/mcmc/check_chains.hpp>
 #include <stan/analyze/mcmc/rank_normalization.hpp>
+#include <stan/analyze/mcmc/split_chains.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -52,7 +53,7 @@ inline double rhat(const Eigen::MatrixXd& chains) {
 
 /**
  * Computes the split potential scale reduction (split Rhat) using rank based
- * diagnostic for the specified parameter across all samples. Based on paper
+ * diagnostic for a set of per-chain draws. Based on paper
  * https://arxiv.org/abs/1903.08008
  *
  * When the number of total draws N is odd, the last draw is ignored.
@@ -60,40 +61,22 @@ inline double rhat(const Eigen::MatrixXd& chains) {
  * See more details in Stan reference manual section "Potential
  * Scale Reduction". http://mc-stan.org/users/documentation
 
- * @param chain vector of per-chain samples
- * @param index column index for param of interest
+ * @param chains matrix of per-chain samples, num_iters X chain
  * @return potential scale reduction for the specified parameter
  */
-inline std::pair<double, double> compute_split_rank_normalized_rhat(
-    const std::vector<Eigen::MatrixXd>& chains, const int index) {
-  size_t num_chains = chains.size();
-  size_t num_samples = chains[0].rows();
-  size_t half = std::floor(num_samples / 2.0);
-
-  Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
-  int split_i = 0;
-  for (std::size_t i = 0; i < num_chains; ++i) {
-    Eigen::Map<const Eigen::VectorXd> head_block(chains[i].col(index).data(),
-                                                 half);
-    Eigen::Map<const Eigen::VectorXd> tail_block(
-        chains[i].col(index).data() + half, half);
-
-    split_draws_matrix.col(split_i) = head_block;
-    split_draws_matrix.col(split_i + 1) = tail_block;
-    split_i += 2;
-  }
+inline std::pair<double, double>
+split_rank_normalized_rhat(const Eigen::MatrixXd& chains) {
+  Eigen::MatrixXd split_draws_matrix = split_chains(chains);
   if (!is_finite_and_varies(split_draws_matrix)) {
     return std::make_pair(std::numeric_limits<double>::quiet_NaN(),
                           std::numeric_limits<double>::quiet_NaN());
   }
-
   double rhat_bulk = rhat(rank_transform(split_draws_matrix));
   // zero-center the draws at the median
   double rhat_tail = rhat(
       rank_transform((split_draws_matrix.array()
                       - math::quantile(split_draws_matrix.reshaped(), 0.5))
                          .abs()));
-
   return std::make_pair(rhat_bulk, rhat_tail);
 }
 

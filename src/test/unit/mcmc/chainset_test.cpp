@@ -157,7 +157,7 @@ TEST_F(McmcChains, eight_schools_samples) {
   Eigen::VectorXd mu_1 = chain_2.samples(0, "mu");
   Eigen::VectorXd mu_2 = chain_2.samples(1, "mu");
   EXPECT_EQ(mu_1.size(), mu_2.size());
-  Eigen::VectorXd mu_all = chain_2.samples("mu");
+  Eigen::MatrixXd mu_all = chain_2.samples("mu");
   EXPECT_EQ(mu_1.size() + mu_2.size(), mu_all.size());
 }
 

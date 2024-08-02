@@ -241,7 +241,6 @@ class chains {
     double var_between = n * variance(split_chain_mean);
     double var_within = mean(split_chain_var);
 
-    // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
     return sqrt((var_between / var_within + n - 1) / n);
   }
 
