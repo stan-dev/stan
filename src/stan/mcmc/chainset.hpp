@@ -136,24 +136,12 @@ class chainset {
     return -1;
   }
 
-  Eigen::MatrixXd samples(const int colIndex) const {
+  Eigen::MatrixXd samples(const int index) const {
     Eigen::MatrixXd result(num_samples(), chains_.size());
     for (int i = 0; i < chains_.size(); ++i) {
-      result.col(i) = chains_[i].col(colIndex);
+      result.col(i) = chains_[i].col(index);
     }
     return result;
-  }
-
-  Eigen::VectorXd samples(const int chain, const int index) const {
-    if (index < 0 || index >= param_names_.size() || chain < 0
-        || chain >= num_chains()) {
-      throw std::out_of_range("Index out of range");
-    }
-    return chains_[chain].col(index);
-  }
-
-  Eigen::VectorXd samples(const int chain, const std::string& name) const {
-    return samples(chain, index(name));
   }
 
   Eigen::MatrixXd samples(const std::string& name) const {
@@ -164,38 +152,38 @@ class chainset {
 
   double mean(const std::string& name) const { return mean(index(name)); }
 
-  double sd(const int index) const {
-    return std::sqrt(variance(index));
-  }
-
-  double sd(const std::string& name) const { return sd(index(name)); }
-
   double variance(const int index) const {
-    Eigen::MatrixXd samples = samples(chains_, index);
-    return (samples.array() - samples.mean()).square().sum() / (samples.size() - 1);
+    Eigen::MatrixXd draws = samples(index);
+    return (draws.array() - draws.mean()).square().sum() / (draws.size() - 1);
   }    
 
   double variance(const std::string& name) const {
     return variance(index(name));
   }
 
+  double sd(const int index) const {
+    return std::sqrt(variance(index));
+  }
+
+  double sd(const std::string& name) const { return sd(index(name)); }
+
   double max_abs_deviation(const int index) const {
-    Eigen::VectorXd samples = samples(chains_, index);
-    return (samples.array() - samples.mean()).abs().maxCoeff();
+    Eigen::MatrixXd draws = samples(index);
+    return (samples(index).array() - mean(index)).abs().maxCoeff();
   }    
 
   double max_abs_deviation(const std::string& name) const {
     return max_abs_deviation(index(name));
   }
 
-  double quantile(const int index, const double prob) {
+  double quantile(const int index, const double prob) const {
     // Ensure the probability is within [0, 1]
     if (prob < 0.0 || prob > 1.0) {
         throw std::out_of_range("Probability must be between 0 and 1.");
     }
-    Eigen::MatrixXd samples = samples(chains_, index);
-    std::vector<double> sorted(samples.data(),
-				       samples.data() + samples.size());
+    Eigen::MatrixXd draws = samples(index);
+    std::vector<double> sorted(draws.data(),
+				       draws.data() + draws.size());
     std::sort(sorted.begin(), sorted.end());
     size_t idx = static_cast<size_t>(prob * (sorted.size() - 1));
     return sorted[idx];
@@ -205,14 +193,22 @@ class chainset {
     return quantile(index(name), prob);
   }
 
+  double median(const int index) const {
+    return quantile(index, .50);
+  }
+
+  double median(const std::string& name) const {
+    return median(index(name));
+  }
+
   Eigen::VectorXd quantiles(const int index, const Eigen::VectorXd& probs) const {
     // Ensure the probability is within [0, 1]
     if (probs.minCoeff() < 0.0 || probs.maxCoeff() > 1.0) {
         throw std::out_of_range("Probabilities must be between 0 and 1.");
     }
-    Eigen::MatrixXd samples = samples(chains_, index);
-    std::vector<double> sorted(samples.data(),
-				       samples.data() + samples.size());
+    Eigen::MatrixXd draws = samples(index);
+    std::vector<double> sorted(draws.data(),
+				       draws.data() + draws.size());
     std::sort(sorted.begin(), sorted.end());
     Eigen::VectorXd quantiles(probs.size());
     for (size_t i = 0; i < probs.size(); ++i) {
