@@ -155,7 +155,7 @@ class chainset {
   double variance(const int index) const {
     Eigen::MatrixXd draws = samples(index);
     return (draws.array() - draws.mean()).square().sum() / (draws.size() - 1);
-  }    
+  }
 
   double variance(const std::string& name) const {
     return variance(index(name));
@@ -168,7 +168,7 @@ class chainset {
   double max_abs_deviation(const int index) const {
     Eigen::MatrixXd draws = samples(index);
     return (samples(index).array() - mean(index)).abs().maxCoeff();
-  }    
+  }
 
   double max_abs_deviation(const std::string& name) const {
     return max_abs_deviation(index(name));
@@ -180,8 +180,7 @@ class chainset {
       throw std::out_of_range("Probability must be between 0 and 1.");
     }
     Eigen::MatrixXd draws = samples(index);
-    std::vector<double> sorted(draws.data(),
-				       draws.data() + draws.size());
+    std::vector<double> sorted(draws.data(), draws.data() + draws.size());
     std::sort(sorted.begin(), sorted.end());
     size_t idx = static_cast<size_t>(prob * (sorted.size() - 1));
     return sorted[idx];
@@ -191,13 +190,9 @@ class chainset {
     return quantile(index(name), prob);
   }
 
-  double median(const int index) const {
-    return quantile(index, .50);
-  }
+  double median(const int index) const { return quantile(index, .50); }
 
-  double median(const std::string& name) const {
-    return median(index(name));
-  }
+  double median(const std::string& name) const { return median(index(name)); }
 
   Eigen::VectorXd quantiles(const int index,
                             const Eigen::VectorXd& probs) const {
@@ -206,8 +201,7 @@ class chainset {
       throw std::out_of_range("Probabilities must be between 0 and 1.");
     }
     Eigen::MatrixXd draws = samples(index);
-    std::vector<double> sorted(draws.data(),
-				       draws.data() + draws.size());
+    std::vector<double> sorted(draws.data(), draws.data() + draws.size());
     std::sort(sorted.begin(), sorted.end());
     Eigen::VectorXd quantiles(probs.size());
     for (size_t i = 0; i < probs.size(); ++i) {
