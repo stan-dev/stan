@@ -164,16 +164,15 @@ class chainset {
 
   double mean(const std::string& name) const { return mean(index(name)); }
 
-  double sd(const int index) const {
-    return std::sqrt(variance(index));
-  }
+  double sd(const int index) const { return std::sqrt(variance(index)); }
 
   double sd(const std::string& name) const { return sd(index(name)); }
 
   double variance(const int index) const {
     Eigen::MatrixXd samples = samples(chains_, index);
-    return (samples.array() - samples.mean()).square().sum() / (samples.size() - 1);
-  }    
+    return (samples.array() - samples.mean()).square().sum()
+           / (samples.size() - 1);
+  }
 
   double variance(const std::string& name) const {
     return variance(index(name));
@@ -182,7 +181,7 @@ class chainset {
   double max_abs_deviation(const int index) const {
     Eigen::VectorXd samples = samples(chains_, index);
     return (samples.array() - samples.mean()).abs().maxCoeff();
-  }    
+  }
 
   double max_abs_deviation(const std::string& name) const {
     return max_abs_deviation(index(name));
@@ -191,28 +190,27 @@ class chainset {
   double quantile(const int index, const double prob) {
     // Ensure the probability is within [0, 1]
     if (prob < 0.0 || prob > 1.0) {
-        throw std::out_of_range("Probability must be between 0 and 1.");
+      throw std::out_of_range("Probability must be between 0 and 1.");
     }
     Eigen::MatrixXd samples = samples(chains_, index);
-    std::vector<double> sorted(samples.data(),
-				       samples.data() + samples.size());
+    std::vector<double> sorted(samples.data(), samples.data() + samples.size());
     std::sort(sorted.begin(), sorted.end());
     size_t idx = static_cast<size_t>(prob * (sorted.size() - 1));
     return sorted[idx];
-  }  
+  }
 
   double quantile(const std::string& name, const double prob) const {
     return quantile(index(name), prob);
   }
 
-  Eigen::VectorXd quantiles(const int index, const Eigen::VectorXd& probs) const {
+  Eigen::VectorXd quantiles(const int index,
+                            const Eigen::VectorXd& probs) const {
     // Ensure the probability is within [0, 1]
     if (probs.minCoeff() < 0.0 || probs.maxCoeff() > 1.0) {
-        throw std::out_of_range("Probabilities must be between 0 and 1.");
+      throw std::out_of_range("Probabilities must be between 0 and 1.");
     }
     Eigen::MatrixXd samples = samples(chains_, index);
-    std::vector<double> sorted(samples.data(),
-				       samples.data() + samples.size());
+    std::vector<double> sorted(samples.data(), samples.data() + samples.size());
     std::sort(sorted.begin(), sorted.end());
     Eigen::VectorXd quantiles(probs.size());
     for (size_t i = 0; i < probs.size(); ++i) {
@@ -262,9 +260,7 @@ class chainset {
     return std::min(ess_s, ess_s2);
   }
 
-  double mcse_sd(const std::string& name) const {
-    return mcse_sd(index(name));
-  }
+  double mcse_sd(const std::string& name) const { return mcse_sd(index(name)); }
 };
 
 }  // namespace mcmc

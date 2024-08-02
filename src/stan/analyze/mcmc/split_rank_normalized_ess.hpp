@@ -113,8 +113,8 @@ double ess(const Eigen::MatrixXd& chains) {
  * @param chains matrix of per-chain draws, num_iters X chain
  * @return potential scale reduction
  */
-inline std::pair<double, double>
-split_rank_normalized_ess(const Eigen::MatrixXd& chains) {
+inline std::pair<double, double> split_rank_normalized_ess(
+    const Eigen::MatrixXd& chains) {
   Eigen::MatrixXd split_draws_matrix = split_chains(chains);
   if (!is_finite_and_varies(split_draws_matrix)
       || split_draws_matrix.rows() < 4) {
