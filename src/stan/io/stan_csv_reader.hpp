@@ -363,7 +363,9 @@ class stan_csv_reader {
     }
 
     // skip warmup draws, if any
-    if (data.metadata.num_warmup > 0 && !data.metadata.save_warmup) {
+    if (data.metadata.algorithm != "fixed_param"
+	&& data.metadata.num_warmup > 0
+	&& data.metadata.save_warmup) {
       std::string line;
       while (in.peek() != '#') {
         std::getline(in, line);
