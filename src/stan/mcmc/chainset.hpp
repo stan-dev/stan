@@ -261,7 +261,8 @@ class chainset {
     double ess_s = analyze::split_rank_normalized_ess(s).first;
     double ess_s2 = analyze::split_rank_normalized_ess(s2).first;
     double ess_sd = std::min(ess_s, ess_s2);
-    return sd(index) * std::sqrt(std::exp(1) * std::pow(1 - 1 / ess_sd, ess_sd - 1) - 1);
+    return sd(index)
+           * std::sqrt(std::exp(1) * std::pow(1 - 1 / ess_sd, ess_sd - 1) - 1);
   }
 
   double mcse_sd(const std::string& name) const { return mcse_sd(index(name)); }
