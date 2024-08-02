@@ -165,9 +165,28 @@ class chainset {
 
   double sd(const std::string& name) const { return sd(index(name)); }
 
+  double median(const int index) const {
+    Eigen::MatrixXd draws = samples(index);
+    std::vector<double> sorted(draws.data(),
+				       draws.data() + draws.size());
+    std::sort(sorted.begin(), sorted.end());
+    size_t idx = static_cast<size_t>(0.5 * (sorted.size() - 1));
+    return sorted[idx];
+  }
+
+  double median(const std::string& name) const {
+    return median(index(name));
+  }
+
   double max_abs_deviation(const int index) const {
     Eigen::MatrixXd draws = samples(index);
-    return (samples(index).array() - mean(index)).abs().maxCoeff();
+    auto center = median(index);
+    Eigen::MatrixXd abs_dev = (draws.array() - center).abs();
+    std::vector<double> sorted(abs_dev.data(),
+				       abs_dev.data() + abs_dev.size());
+    std::sort(sorted.begin(), sorted.end());
+    size_t idx = static_cast<size_t>(0.5 * (sorted.size() - 1));
+    return 1.4826 * sorted[idx];
   }    
 
   double max_abs_deviation(const std::string& name) const {
@@ -189,14 +208,6 @@ class chainset {
 
   double quantile(const std::string& name, const double prob) const {
     return quantile(index(name), prob);
-  }
-
-  double median(const int index) const {
-    return quantile(index, .50);
-  }
-
-  double median(const std::string& name) const {
-    return median(index(name));
   }
 
   Eigen::VectorXd quantiles(const int index,

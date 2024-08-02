@@ -253,9 +253,15 @@ TEST_F(McmcChains, summary_stats) {
   for (size_t i = 0; i < 10; ++i) {
     auto mean = chain_2.mean(i + 7);
     EXPECT_NEAR(mean, s8_mean(i), 0.05);
+    auto median = chain_2.median(i + 7);
+    EXPECT_NEAR(median, s8_median(i), 0.05);
     auto sd = chain_2.sd(i + 7);
     EXPECT_NEAR(sd, s8_sd(i), 0.05);
-    //    auto mad = chain_2.mad(i + 7);
-    //    EXPECT_NEAR(mad, s8_mad(i), 0.05);
+    auto mad = chain_2.max_abs_deviation(i + 7);
+    EXPECT_NEAR(mad, s8_mad(i), 0.05);
+    auto q_5 = chain_2.quantile(i + 7, 0.05);
+    EXPECT_NEAR(q_5, s8_q5(i), 0.5);
+    auto q_95 = chain_2.quantile(i + 7, 0.95);
+    EXPECT_NEAR(q_95, s8_q95(i), 0.5);
   }
 }
