@@ -162,6 +162,10 @@ class stan_csv_reader {
       } else if (name.compare("num_warmup") == 0) {
         std::stringstream(value) >> metadata.num_warmup;
       } else if (name.compare("save_warmup") == 0) {
+	// cmdstan args can be "true" and "false", was "1", "0"
+	if (value.compare("true") == 0) {
+	  value = "1";
+	}
         std::stringstream(value) >> metadata.save_warmup;
       } else if (name.compare("thin") == 0) {
         std::stringstream(value) >> metadata.thin;
@@ -363,7 +367,8 @@ class stan_csv_reader {
     }
 
     // skip warmup draws, if any
-    if (data.metadata.num_warmup > 0 && !data.metadata.save_warmup) {
+    if (data.metadata.algorithm != "fixed_param" && data.metadata.num_warmup > 0
+	&& data.metadata.save_warmup) {
       std::string line;
       while (in.peek() != '#') {
         std::getline(in, line);
