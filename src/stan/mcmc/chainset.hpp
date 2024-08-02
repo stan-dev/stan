@@ -161,9 +161,7 @@ class chainset {
     return variance(index(name));
   }
 
-  double sd(const int index) const {
-    return std::sqrt(variance(index));
-  }
+  double sd(const int index) const { return std::sqrt(variance(index)); }
 
   double sd(const std::string& name) const { return sd(index(name)); }
 
@@ -179,7 +177,7 @@ class chainset {
   double quantile(const int index, const double prob) const {
     // Ensure the probability is within [0, 1]
     if (prob < 0.0 || prob > 1.0) {
-        throw std::out_of_range("Probability must be between 0 and 1.");
+      throw std::out_of_range("Probability must be between 0 and 1.");
     }
     Eigen::MatrixXd draws = samples(index);
     std::vector<double> sorted(draws.data(),
@@ -187,7 +185,7 @@ class chainset {
     std::sort(sorted.begin(), sorted.end());
     size_t idx = static_cast<size_t>(prob * (sorted.size() - 1));
     return sorted[idx];
-  }  
+  }
 
   double quantile(const std::string& name, const double prob) const {
     return quantile(index(name), prob);
@@ -201,10 +199,11 @@ class chainset {
     return median(index(name));
   }
 
-  Eigen::VectorXd quantiles(const int index, const Eigen::VectorXd& probs) const {
+  Eigen::VectorXd quantiles(const int index,
+                            const Eigen::VectorXd& probs) const {
     // Ensure the probability is within [0, 1]
     if (probs.minCoeff() < 0.0 || probs.maxCoeff() > 1.0) {
-        throw std::out_of_range("Probabilities must be between 0 and 1.");
+      throw std::out_of_range("Probabilities must be between 0 and 1.");
     }
     Eigen::MatrixXd draws = samples(index);
     std::vector<double> sorted(draws.data(),
@@ -258,9 +257,7 @@ class chainset {
     return std::min(ess_s, ess_s2);
   }
 
-  double mcse_sd(const std::string& name) const {
-    return mcse_sd(index(name));
-  }
+  double mcse_sd(const std::string& name) const { return mcse_sd(index(name)); }
 };
 
 }  // namespace mcmc

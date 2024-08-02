@@ -16,8 +16,8 @@ namespace analyze {
  * @param index matrix column for parameter of interest
  * @return samples matrix, shape  (num_iters/2, num_chains*2)
  */
-inline Eigen::MatrixXd
-split_chains(const std::vector<Eigen::MatrixXd>& chains, const int index) {
+inline Eigen::MatrixXd split_chains(const std::vector<Eigen::MatrixXd>& chains,
+                                    const int index) {
   size_t num_chains = chains.size();
   size_t num_samples = chains[0].rows();
   size_t half = std::floor(num_samples / 2.0);
@@ -44,8 +44,7 @@ split_chains(const std::vector<Eigen::MatrixXd>& chains, const int index) {
  * @param samples matrix of per-chain samples, shape (num_iters, num_chains)
  * @return samples matrix reshaped as (num_iters/2, num_chains*2)
  */
-inline Eigen::MatrixXd
-split_chains(const Eigen::MatrixXd& samples) {
+inline Eigen::MatrixXd split_chains(const Eigen::MatrixXd& samples) {
   size_t num_chains = samples.cols();
   size_t num_samples = samples.rows();
   size_t half = std::floor(num_samples / 2.0);
@@ -53,10 +52,9 @@ split_chains(const Eigen::MatrixXd& samples) {
   Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
   int split_i = 0;
   for (std::size_t i = 0; i < num_chains; ++i) {
-    Eigen::Map<const Eigen::VectorXd> head_block(samples.col(i).data(),
+    Eigen::Map<const Eigen::VectorXd> head_block(samples.col(i).data(), half);
+    Eigen::Map<const Eigen::VectorXd> tail_block(samples.col(i).data() + half,
                                                  half);
-    Eigen::Map<const Eigen::VectorXd> tail_block(
-        samples.col(i).data() + half, half);
 
     split_draws_matrix.col(split_i) = head_block;
     split_draws_matrix.col(split_i + 1) = tail_block;
@@ -64,7 +62,6 @@ split_chains(const Eigen::MatrixXd& samples) {
   }
   return split_draws_matrix;
 }
-
 
 /**
  * Splits each chain into two chains of equal length.  When the
