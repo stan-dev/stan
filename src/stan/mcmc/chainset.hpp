@@ -142,7 +142,6 @@ class chainset {
    */
   const std::vector<std::string>& param_names() const { return param_names_; }
 
-
   /**
    * Get name of parameter at specified column index.
    * Throws exception if index is out of bounds.
@@ -153,9 +152,9 @@ class chainset {
   const std::string& param_name(int index) const {
     if (index < 0 || index >= param_names_.size()) {
       std::stringstream ss;
-      ss << "Bad index " << index
-	 << ", should be between 0 and " << (param_names_.size() - 1);
-        throw std::invalid_argument(ss.str());
+      ss << "Bad index " << index << ", should be between 0 and "
+         << (param_names_.size() - 1);
+      throw std::invalid_argument(ss.str());
     }
     return param_names_[index];
   }
@@ -189,9 +188,9 @@ class chainset {
     Eigen::MatrixXd result(num_samples(), chains_.size());
     if (index < 0 || index >= param_names_.size()) {
       std::stringstream ss;
-      ss << "Bad index " << index
-	 << ", should be between 0 and " << (param_names_.size() - 1);
-        throw std::invalid_argument(ss.str());
+      ss << "Bad index " << index << ", should be between 0 and "
+         << (param_names_.size() - 1);
+      throw std::invalid_argument(ss.str());
     }
     for (int i = 0; i < chains_.size(); ++i) {
       result.col(i) = chains_[i].col(index);
@@ -291,7 +290,7 @@ class chainset {
   /**
    * Compute maximum absolute deviation (mad) for specified parameter.
    *
-   * Follows R implementation:  constant * median(abs(x - center)) 
+   * Follows R implementation:  constant * median(abs(x - center))
    * where the value of center is median(x) and the constant is 1.4826,
    * a scale factor for asymptotically normal consistency: `1/qnorm(3/4)`.
    * (R stats version 3.6.2)
@@ -312,7 +311,7 @@ class chainset {
   /**
    * Compute maximum absolute deviation (mad) for specified parameter.
    *
-   * Follows R implementation:  constant * median(abs(x - center)) 
+   * Follows R implementation:  constant * median(abs(x - center))
    * where the value of center is median(x) and the constant is 1.4826,
    * a scale factor for asymptotically normal consistency: `1/qnorm(3/4)`.
    * (R stats version 3.6.2)
@@ -401,7 +400,6 @@ class chainset {
                             const Eigen::VectorXd& probs) const {
     return quantiles(index(name), probs);
   }
-
 
   /**
    * Computes the split potential scale reduction (split Rhat) using rank based
