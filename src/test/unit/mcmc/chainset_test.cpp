@@ -165,6 +165,9 @@ TEST_F(McmcChains, paramNameIndex) {
     EXPECT_EQ(eight_schools_1.header[i], chains_csv.param_name(i));
     EXPECT_EQ(i, chains_csv.index(eight_schools_1.header[i]));
   }
+  EXPECT_THROW(chains_csv.param_name(-5000), std::invalid_argument);
+  EXPECT_THROW(chains_csv.param_name(5000), std::invalid_argument);
+  EXPECT_THROW(chains_csv.index("foo"), std::invalid_argument);
 }
 
 TEST_F(McmcChains, eight_schools_samples) {
@@ -174,6 +177,11 @@ TEST_F(McmcChains, eight_schools_samples) {
   stan::mcmc::chainset<> chain_2(eight_schools);
   Eigen::MatrixXd mu_all = chain_2.samples("mu");
   EXPECT_EQ(chain_2.num_chains() * chain_2.num_samples(), mu_all.size());
+  mu_all = chain_2.samples(7);
+  EXPECT_EQ(chain_2.num_chains() * chain_2.num_samples(), mu_all.size());
+
+  EXPECT_THROW(chain_2.samples(5000), std::invalid_argument);
+  EXPECT_THROW(chain_2.samples("foo"), std::invalid_argument);
 }
 
 TEST_F(McmcChains, split_rank_normalized_rhat) {
