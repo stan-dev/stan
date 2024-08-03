@@ -303,21 +303,20 @@ TEST_F(McmcChains, mcse) {
   }
 }
 
-
 TEST_F(McmcChains, const_fail) {
   std::ifstream bernoulli_const_1_stream, bernoulli_const_2_stream;
   stan::io::stan_csv bernoulli_const_1, bernoulli_const_2;
   bernoulli_const_1_stream.open(
-        "src/test/unit/mcmc/test_csv_files/bernoulli_const_1.csv",
-        std::ifstream::in);
+      "src/test/unit/mcmc/test_csv_files/bernoulli_const_1.csv",
+      std::ifstream::in);
   bernoulli_const_1
-        = stan::io::stan_csv_reader::parse(bernoulli_const_1_stream, &out);
+      = stan::io::stan_csv_reader::parse(bernoulli_const_1_stream, &out);
   bernoulli_const_1_stream.close();
   bernoulli_const_2_stream.open(
-        "src/test/unit/mcmc/test_csv_files/bernoulli_const_2.csv",
-        std::ifstream::in);
+      "src/test/unit/mcmc/test_csv_files/bernoulli_const_2.csv",
+      std::ifstream::in);
   bernoulli_const_2
-        = stan::io::stan_csv_reader::parse(bernoulli_const_2_stream, &out);
+      = stan::io::stan_csv_reader::parse(bernoulli_const_2_stream, &out);
   bernoulli_const_2_stream.close();
   std::vector<stan::io::stan_csv> bernoulli_const;
   bernoulli_const.push_back(bernoulli_const_1);
