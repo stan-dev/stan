@@ -19,7 +19,7 @@ namespace analyze {
 
 /**
  * Computes square root of marginal posterior variance of the estimand by the
- * weigted average of within-chain variance W and between-chain variance B.
+ * weighted average of within-chain variance W and between-chain variance B.
  *
  * @param chains stores chains in columns
  * @return square root of ((N-1)/N)W + B/N
