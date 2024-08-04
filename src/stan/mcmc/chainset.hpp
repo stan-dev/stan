@@ -366,7 +366,7 @@ class chainset {
    * Throws exception if any probability is not between 0 and 1.
    *
    * @param index parameter index
-   * @param prob vector of probabilities
+   * @param probs vector of probabilities
    * @return vector of parameter values for quantiles
    */
   Eigen::VectorXd quantiles(const int index,
@@ -393,7 +393,7 @@ class chainset {
    * Throws exception if any probability is not between 0 and 1.
    *
    * @param name parameter name
-   * @param prob vector of probabilities
+   * @param probs vector of probabilities
    * @return vector of parameter values for quantiles
    */
   Eigen::VectorXd quantiles(const std::string& name,
