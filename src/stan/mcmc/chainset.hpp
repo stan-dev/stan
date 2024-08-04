@@ -118,53 +118,159 @@ class chainset {
     }
   }
 
+  /**
+   * Report number of chains in chainset.
+   * @return chainset size.
+   */
   inline int num_chains() const { return chains_.size(); }
 
+  /**
+   * Report number of parameters per chain.
+   * @return size of parameter names vector.
+   */
   inline int num_params() const { return param_names_.size(); }
 
+  /**
+   * Report number of samples (draws) per chain.
+   * @return rows per chain
+   */
   inline int num_samples() const { return num_samples_; }
 
+  /**
+   * Get parameter names.
+   * @return vector of parameter names.
+   */
   const std::vector<std::string>& param_names() const { return param_names_; }
 
-  const std::string& param_name(int j) const { return param_names_[j]; }
-
-  int index(const std::string& name) const {
-    auto it = std::find(param_names_.begin(), param_names_.end(), name);
-    if (it != param_names_.end()) {
-      return std::distance(param_names_.begin(), it);
+  /**
+   * Get name of parameter at specified column index.
+   * Throws exception if index is out of bounds.
+   *
+   * @param index column index
+   * @return parameter name
+   */
+  const std::string& param_name(int index) const {
+    if (index < 0 || index >= param_names_.size()) {
+      std::stringstream ss;
+      ss << "Bad index " << index << ", should be between 0 and "
+         << (param_names_.size() - 1);
+      throw std::invalid_argument(ss.str());
     }
-    return -1;
+    return param_names_[index];
   }
 
+  /**
+   * Get column index for specified parameter name.
+   * Throws exception if name not found.
+   *
+   * @param name parameter name
+   * @return column index
+   */
+  int index(const std::string& name) const {
+    auto it = std::find(param_names_.begin(), param_names_.end(), name);
+    if (it == param_names_.end()) {
+      std::stringstream ss;
+      ss << "Unknown parameter name " << name;
+      throw std::invalid_argument(ss.str());
+    }
+    return std::distance(param_names_.begin(), it);
+  }
+
+  /**
+   * Assemble samples (draws) from specified column index across all chains
+   * into a matrix of samples X chain.
+   * Throws exception if column index is out of bounds.
+   *
+   * @param index column index
+   * @return matrix of draws across all chains
+   */
   Eigen::MatrixXd samples(const int index) const {
     Eigen::MatrixXd result(num_samples(), chains_.size());
+    if (index < 0 || index >= param_names_.size()) {
+      std::stringstream ss;
+      ss << "Bad index " << index << ", should be between 0 and "
+         << (param_names_.size() - 1);
+      throw std::invalid_argument(ss.str());
+    }
     for (int i = 0; i < chains_.size(); ++i) {
       result.col(i) = chains_[i].col(index);
     }
     return result;
   }
 
+  /**
+   * Assemble samples (draws) from specified parameter name across all chains
+   * into a matrix of samples X chain.
+   * Throws exception if parameter name is not found.
+   *
+   * @param name parameter name
+   * @return matrix of draws across all chains
+   */
   Eigen::MatrixXd samples(const std::string& name) const {
     return samples(index(name));
   }
 
+  /**
+   * Compute mean value for specified parameter across all chains.
+   *
+   * @param index parameter index
+   * @return mean parameter value
+   */
   double mean(const int index) const { return samples(index).mean(); }
 
+  /**
+   * Compute mean value for specified parameter across all chains.
+   *
+   * @param name parameter name
+   * @return mean parameter value
+   */
   double mean(const std::string& name) const { return mean(index(name)); }
 
+  /**
+   * Compute sample variance for specified parameter across all chains.
+   * 1 / (N - 1) * sum((theta_n - mean(theta))^2)
+   *
+   * @param index parameter index
+   * @return sample variance
+   */
   double variance(const int index) const {
     Eigen::MatrixXd draws = samples(index);
     return (draws.array() - draws.mean()).square().sum() / (draws.size() - 1);
   }
 
+  /**
+   * Compute sample variance for specified parameter across all chains.
+   * 1 / (N - 1) * sum((theta_n - mean(theta))^2)
+   *
+   * @param name parameter name
+   * @return sample variance
+   */
   double variance(const std::string& name) const {
     return variance(index(name));
   }
 
+  /**
+   * Compute standard deviation for specified parameter across all chains.
+   *
+   * @param index parameter index
+   * @return sample sd
+   */
   double sd(const int index) const { return std::sqrt(variance(index)); }
 
+  /**
+   * Compute standard deviation for specified parameter across all chains.
+   *
+   * @param name parameter name
+   * @return sample sd
+   */
   double sd(const std::string& name) const { return sd(index(name)); }
 
+  /**
+   * Compute median value of specified parameter across all chains.
+   *
+   * @param index parameter index
+   * @return median
+   */
   double median(const int index) const {
     Eigen::MatrixXd draws = samples(index);
     std::vector<double> sorted(draws.data(), draws.data() + draws.size());
@@ -173,8 +279,25 @@ class chainset {
     return sorted[idx];
   }
 
+  /**
+   * Compute median value of specified parameter across all chains.
+   *
+   * @param name parameter name
+   * @return median
+   */
   double median(const std::string& name) const { return median(index(name)); }
 
+  /**
+   * Compute maximum absolute deviation (mad) for specified parameter.
+   *
+   * Follows R implementation:  constant * median(abs(x - center))
+   * where the value of center is median(x) and the constant is 1.4826,
+   * a scale factor for asymptotically normal consistency: `1/qnorm(3/4)`.
+   * (R stats version 3.6.2)
+   *
+   * @param index parameter index
+   * @return sample mad
+   */
   double max_abs_deviation(const int index) const {
     Eigen::MatrixXd draws = samples(index);
     auto center = median(index);
@@ -185,10 +308,31 @@ class chainset {
     return 1.4826 * sorted[idx];
   }
 
+  /**
+   * Compute maximum absolute deviation (mad) for specified parameter.
+   *
+   * Follows R implementation:  constant * median(abs(x - center))
+   * where the value of center is median(x) and the constant is 1.4826,
+   * a scale factor for asymptotically normal consistency: `1/qnorm(3/4)`.
+   * (R stats version 3.6.2)
+   *
+   * @param name parameter name
+   * @return sample mad
+   */
   double max_abs_deviation(const std::string& name) const {
     return max_abs_deviation(index(name));
   }
 
+  /**
+   * Compute the quantile value of the specified parameter
+   * at the specified probability.
+   *
+   * Throws exception if specified probability is not between 0 and 1.
+   *
+   * @param index parameter index
+   * @param prob probability
+   * @return parameter value at quantile
+   */
   double quantile(const int index, const double prob) const {
     // Ensure the probability is within [0, 1]
     if (prob < 0.0 || prob > 1.0) {
@@ -201,10 +345,30 @@ class chainset {
     return sorted[idx];
   }
 
+  /**
+   * Compute the quantile value of the specified parameter
+   * at the specified probability.
+   *
+   * Throws exception if specified probability is not between 0 and 1.
+   *
+   * @param name parameter name
+   * @param prob probability
+   * @return parameter value at quantile
+   */
   double quantile(const std::string& name, const double prob) const {
     return quantile(index(name), prob);
   }
 
+  /**
+   * Compute the quantile values of the specified parameter
+   * for a set of specified probabilities.
+   *
+   * Throws exception if any probability is not between 0 and 1.
+   *
+   * @param index parameter index
+   * @param probs vector of probabilities
+   * @return vector of parameter values for quantiles
+   */
   Eigen::VectorXd quantiles(const int index,
                             const Eigen::VectorXd& probs) const {
     // Ensure the probability is within [0, 1]
@@ -222,39 +386,106 @@ class chainset {
     return quantiles;
   }
 
+  /**
+   * Compute the quantile values of the specified parameter
+   * for a set of specified probabilities.
+   *
+   * Throws exception if any probability is not between 0 and 1.
+   *
+   * @param name parameter name
+   * @param probs vector of probabilities
+   * @return vector of parameter values for quantiles
+   */
   Eigen::VectorXd quantiles(const std::string& name,
                             const Eigen::VectorXd& probs) const {
     return quantiles(index(name), probs);
   }
 
+  /**
+   * Computes the split potential scale reduction (split Rhat) using rank based
+   * diagnostic for a set of per-chain draws, for bulk and tail Rhat.
+   * Based on paper https://arxiv.org/abs/1903.08008
+   *
+   * @param index parameter index
+   * @return pair (bulk_rhat, tail_rhat)
+   */
   std::pair<double, double> split_rank_normalized_rhat(const int index) const {
     return analyze::split_rank_normalized_rhat(samples(index));
   }
 
+  /**
+   * Computes the split potential scale reduction (split Rhat) using rank based
+   * diagnostic for a set of per-chain draws, for bulk and tail Rhat.
+   * Based on paper https://arxiv.org/abs/1903.08008
+   *
+   * @param name parameter name
+   * @return pair (bulk_rhat, tail_rhat)
+   */
   std::pair<double, double> split_rank_normalized_rhat(
       const std::string& name) const {
     return split_rank_normalized_rhat(index(name));
   }
 
+  /**
+   * Computes the effective sample size (ESS) for the specified
+   * parameter across all chains, according to the algorithm presented in
+   * https://arxiv.org/abs/1903.08008, section 3.2 for folded (split)
+   * rank-normalized ESS for both bulk and tail ESS.
+   *
+   * @param index parameter index
+   * @return pair (bulk_ess, tail_ess)
+   */
   std::pair<double, double> split_rank_normalized_ess(const int index) const {
     return analyze::split_rank_normalized_ess(samples(index));
   }
 
+  /**
+   * Computes the effective sample size (ESS) for the specified
+   * parameter across all chains, according to the algorithm presented in
+   * https://arxiv.org/abs/1903.08008, section 3.2 for folded (split)
+   * rank-normalized ESS for both bulk and tail ESS.
+   *
+   * @param name parameter name
+   * @return pair (bulk_ess, tail_ess)
+   */
   std::pair<double, double> split_rank_normalized_ess(
       const std::string& name) const {
     return split_rank_normalized_ess(index(name));
   }
 
+  /**
+   * Computes the mean Monte Carlo error estimate for the central 90% interval.
+   * See https://arxiv.org/abs/1903.08008, section 4.4.
+   * Follows implementation in the R posterior package
+   *
+   * @param index parameter index
+   * @return pair (bulk_ess, tail_ess)
+   */
   double mcse_mean(const int index) const {
     double ess_bulk = analyze::split_rank_normalized_ess(samples(index)).first;
     return sd(index) / std::sqrt(ess_bulk);
   }
 
+  /**
+   * Computes the mean Monte Carlo error estimate for the central 90% interval.
+   * See https://arxiv.org/abs/1903.08008, section 4.4.
+   * Follows implementation in the R posterior package.
+   *
+   * @param name parameter name
+   * @return pair (bulk_ess, tail_ess)
+   */
   double mcse_mean(const std::string& name) const {
     return mcse_mean(index(name));
   }
 
-  // translated from R package posterior
+  /**
+   * Computes the standard deviation of the Monte Carlo error estimate
+   * https://arxiv.org/abs/1903.08008, section 4.4.
+   * Follows implementation in the R posterior package.
+   *
+   * @param index parameter index
+   * @return pair (bulk_ess, tail_ess)
+   */
   double mcse_sd(const int index) const {
     Eigen::MatrixXd s = samples(index);
     Eigen::MatrixXd s2 = s.array().square();
@@ -265,6 +496,14 @@ class chainset {
            * std::sqrt(std::exp(1) * std::pow(1 - 1 / ess_sd, ess_sd - 1) - 1);
   }
 
+  /**
+   * Computes the standard deviation of the Monte Carlo error estimate
+   * https://arxiv.org/abs/1903.08008, section 4.4.
+   * Follows implementation in the R posterior package
+   *
+   * @param name parameter name
+   * @return pair (bulk_ess, tail_ess)
+   */
   double mcse_sd(const std::string& name) const { return mcse_sd(index(name)); }
 };
 

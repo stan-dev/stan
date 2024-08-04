@@ -165,6 +165,9 @@ TEST_F(McmcChains, paramNameIndex) {
     EXPECT_EQ(eight_schools_1.header[i], chains_csv.param_name(i));
     EXPECT_EQ(i, chains_csv.index(eight_schools_1.header[i]));
   }
+  EXPECT_THROW(chains_csv.param_name(-5000), std::invalid_argument);
+  EXPECT_THROW(chains_csv.param_name(5000), std::invalid_argument);
+  EXPECT_THROW(chains_csv.index("foo"), std::invalid_argument);
 }
 
 TEST_F(McmcChains, eight_schools_samples) {
@@ -174,6 +177,11 @@ TEST_F(McmcChains, eight_schools_samples) {
   stan::mcmc::chainset<> chain_2(eight_schools);
   Eigen::MatrixXd mu_all = chain_2.samples("mu");
   EXPECT_EQ(chain_2.num_chains() * chain_2.num_samples(), mu_all.size());
+  mu_all = chain_2.samples(7);
+  EXPECT_EQ(chain_2.num_chains() * chain_2.num_samples(), mu_all.size());
+
+  EXPECT_THROW(chain_2.samples(5000), std::invalid_argument);
+  EXPECT_THROW(chain_2.samples("foo"), std::invalid_argument);
 }
 
 TEST_F(McmcChains, split_rank_normalized_rhat) {
@@ -293,4 +301,32 @@ TEST_F(McmcChains, mcse) {
     auto mcse_sd = chain_2.mcse_sd(i + 7);
     EXPECT_NEAR(mcse_sd, s8_mcse_sd(i), 0.7);
   }
+}
+
+TEST_F(McmcChains, const_fail) {
+  std::ifstream bernoulli_const_1_stream, bernoulli_const_2_stream;
+  stan::io::stan_csv bernoulli_const_1, bernoulli_const_2;
+  bernoulli_const_1_stream.open(
+      "src/test/unit/mcmc/test_csv_files/bernoulli_const_1.csv",
+      std::ifstream::in);
+  bernoulli_const_1
+      = stan::io::stan_csv_reader::parse(bernoulli_const_1_stream, &out);
+  bernoulli_const_1_stream.close();
+  bernoulli_const_2_stream.open(
+      "src/test/unit/mcmc/test_csv_files/bernoulli_const_2.csv",
+      std::ifstream::in);
+  bernoulli_const_2
+      = stan::io::stan_csv_reader::parse(bernoulli_const_2_stream, &out);
+  bernoulli_const_2_stream.close();
+  std::vector<stan::io::stan_csv> bernoulli_const;
+  bernoulli_const.push_back(bernoulli_const_1);
+  bernoulli_const.push_back(bernoulli_const_2);
+  stan::mcmc::chainset<> chain_2(bernoulli_const);
+  EXPECT_EQ(2, chain_2.num_chains());
+  auto rhat = chain_2.split_rank_normalized_rhat("zeta");
+  EXPECT_TRUE(std::isnan(rhat.first));
+  EXPECT_TRUE(std::isnan(rhat.second));
+  auto ess = chain_2.split_rank_normalized_ess("zeta");
+  EXPECT_TRUE(std::isnan(ess.first));
+  EXPECT_TRUE(std::isnan(ess.second));
 }
