@@ -30,7 +30,8 @@ class StanIoStanCsvReader : public testing::Test {
         "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
     missing_draws_stream.open(
         "src/test/unit/io/test_csv_files/missing_draws.csv");
-    fixed_param_stream.open("src/test/unit/io/test_csv_files/fixed_param_output.csv");
+    fixed_param_stream.open(
+        "src/test/unit/io/test_csv_files/fixed_param_output.csv");
   }
 
   void TearDown() {
@@ -583,7 +584,6 @@ TEST_F(StanIoStanCsvReader, thinned_data) {
 TEST_F(StanIoStanCsvReader, fixed_param) {
   stan::io::stan_csv fixed_param;
   std::stringstream out;
-  fixed_param
-      = stan::io::stan_csv_reader::parse(fixed_param_stream, &out);
+  fixed_param = stan::io::stan_csv_reader::parse(fixed_param_stream, &out);
   ASSERT_EQ(10, fixed_param.samples.rows());
 }
