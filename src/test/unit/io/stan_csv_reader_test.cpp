@@ -30,6 +30,7 @@ class StanIoStanCsvReader : public testing::Test {
         "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
     missing_draws_stream.open(
         "src/test/unit/io/test_csv_files/missing_draws.csv");
+    fixed_param_stream.open("src/test/unit/io/test_csv_files/fixed_param_output.csv");
   }
 
   void TearDown() {
@@ -46,6 +47,7 @@ class StanIoStanCsvReader : public testing::Test {
     bernoulli_thin_stream.close();
     bernoulli_warmup_stream.close();
     missing_draws_stream.close();
+    fixed_param_stream.close();
   }
 
   std::ifstream blocker0_stream, epil0_stream;
@@ -58,6 +60,7 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream bernoulli_thin_stream;
   std::ifstream bernoulli_warmup_stream;
   std::ifstream missing_draws_stream;
+  std::ifstream fixed_param_stream;
 };
 
 TEST_F(StanIoStanCsvReader, read_metadata1) {
@@ -575,4 +578,12 @@ TEST_F(StanIoStanCsvReader, thinned_data) {
   bernoulli_thin
       = stan::io::stan_csv_reader::parse(bernoulli_thin_stream, &out);
   ASSERT_EQ(1000, bernoulli_thin.samples.rows());
+}
+
+TEST_F(StanIoStanCsvReader, fixed_param) {
+  stan::io::stan_csv fixed_param;
+  std::stringstream out;
+  fixed_param
+      = stan::io::stan_csv_reader::parse(fixed_param_stream, &out);
+  ASSERT_EQ(10, fixed_param.samples.rows());
 }
