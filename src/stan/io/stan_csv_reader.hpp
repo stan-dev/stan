@@ -376,7 +376,7 @@ class stan_csv_reader {
     }
 
     if (data.metadata.algorithm != "fixed_param"
-	&& !read_adaptation(in, data.adaptation, out)) {
+        && !read_adaptation(in, data.adaptation, out)) {
       if (out)
         *out << "Warning: non-fatal error reading adaptation data" << std::endl;
     }
