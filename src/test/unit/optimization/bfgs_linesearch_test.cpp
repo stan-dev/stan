@@ -192,3 +192,46 @@ TEST(OptimizationBfgsLinesearch, wolfeLineSearch) {
   EXPECT_LE(f1, f0 + c1 * alpha * p.dot(gradx0));
   EXPECT_LE(std::fabs(p.dot(gradx1)), c2 * std::fabs(p.dot(gradx0)));
 }
+
+class linesearch_testfunc_nonfinite {
+ public:
+  double operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x) {
+    return x.dot(x) - 1.0;
+  }
+  int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x, double &f,
+                 Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
+    f = x.dot(x) - 1.0;
+    g = 2.0 * x;
+    if (!g.allFinite()) {
+      return 1;
+    }
+    return 0;
+  }
+};
+
+TEST(OptimizationBfgsLinesearch, wolfeLineSearch_nonfinite_gradient) {
+  using stan::optimization::WolfeLineSearch;
+
+  static const double c1 = 1e-4;
+  static const double c2 = 0.9;
+  static const double minAlpha = 1e-16;
+  static const double maxLSIts = 20;
+  static const double maxLSRestarts = 10;
+
+  linesearch_testfunc_nonfinite func1;
+  Eigen::Matrix<double, -1, 1> x0, x1;
+  double f0, f1;
+  Eigen::Matrix<double, -1, 1> p, gradx0, gradx1;
+  double alpha;
+  int ret;
+
+  x0.setOnes(5, 1);
+  func1(x0, f0, gradx0);
+
+  p = -gradx0;
+
+  alpha = 2.0;
+  ret = WolfeLineSearch(func1, alpha, x1, f1, gradx1, p, x0, f0, gradx0, c1, c2,
+                        minAlpha, maxLSIts, maxLSRestarts);
+  EXPECT_EQ(1, ret);
+}
