@@ -545,10 +545,10 @@ class chainset {
    * @param name column name
    * @return vector of chain autocorrelation at all lags
    */
-  Eigen::VectorXd autocorrelation(const int chain, const std::string name) const {
+  Eigen::VectorXd autocorrelation(const int chain,
+                                  const std::string name) const {
     return autocorrelation(chain, index(name));
   }
-
 };
 
 }  // namespace mcmc
