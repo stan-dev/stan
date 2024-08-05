@@ -349,6 +349,11 @@ class stan_csv_reader {
   /**
    * Parses the file.
    *
+   * Warns if missing metatdata, inconsistencies between metadata config
+   * and parsed data rows.
+   *
+   * Throws exception if no header row found.
+   *
    * @param[in] in input stream to parse
    * @param[out] out output stream to send messages
    */

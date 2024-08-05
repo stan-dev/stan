@@ -330,3 +330,17 @@ TEST_F(McmcChains, const_fail) {
   EXPECT_TRUE(std::isnan(ess.first));
   EXPECT_TRUE(std::isnan(ess.second));
 }
+
+TEST_F(McmcChains, autocorrelation) {
+  stan::mcmc::chainset<> chain_1(eight_schools_1);
+  EXPECT_EQ(1, chain_1.num_chains());
+
+  Eigen::VectorXd mu_ac_posterior(10);
+  mu_ac_posterior << 1.00000000000, 0.19487668999, 0.05412049365, 0.07834048575,
+      0.04145609855, 0.04353962161, -0.00977255885, 0.00005175308,
+      0.01791577080, 0.01245035817;
+  auto mu_ac = chain_1.autocorrelation(0, "mu");
+  for (size_t i = 0; i < 10; ++i) {
+    EXPECT_NEAR(mu_ac_posterior(i), mu_ac(i), 0.05);
+  }
+}

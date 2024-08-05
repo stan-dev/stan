@@ -505,6 +505,50 @@ class chainset {
    * @return pair (bulk_ess, tail_ess)
    */
   double mcse_sd(const std::string& name) const { return mcse_sd(index(name)); }
+
+  /**
+   * Compute autocorrelation for one column of one chain.
+   * Throws exception if column index is out of bounds.
+   * Autocorrelation is computed using Stan math library implmentation.
+   *
+   * @param chain chain index
+   * @param index column index
+   * @return vector of chain autocorrelation at all lags
+   */
+  Eigen::VectorXd autocorrelation(const int chain, const int index) const {
+    if (chain < 0 || chain >= num_chains()) {
+      std::stringstream ss;
+      ss << "Bad index " << index << ", should be between 0 and "
+         << (num_chains() - 1);
+      throw std::invalid_argument(ss.str());
+    }
+    if (index < 0 || index >= param_names().size()) {
+      std::stringstream ss;
+      ss << "Bad index " << index << ", should be between 0 and "
+         << (num_params() - 1);
+      throw std::invalid_argument(ss.str());
+    }
+    Eigen::MatrixXd s = samples(index);
+    Eigen::Map<const Eigen::VectorXd> chain_col(samples(chain).data(),
+                                                num_samples());
+    Eigen::VectorXd autocorr_col(num_samples());
+    stan::math::autocorrelation<double>(s.col(chain), autocorr_col);
+    return autocorr_col;
+  }
+
+  /**
+   * Compute autocorrelation for one column of one chain.
+   * Throws exception if column index is out of bounds.
+   * Autocorrelation is computed using Stan math library implmentation.
+   *
+   * @param chain chain index
+   * @param name column name
+   * @return vector of chain autocorrelation at all lags
+   */
+  Eigen::VectorXd autocorrelation(const int chain,
+                                  const std::string name) const {
+    return autocorrelation(chain, index(name));
+  }
 };
 
 }  // namespace mcmc
