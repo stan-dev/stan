@@ -991,7 +991,7 @@ class deserializer {
    * @param lp The reference to the variable holding the log
    * probability to increment.
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr,
@@ -1047,7 +1047,7 @@ class deserializer {
    * @param lp The reference to the variable holding the log
    * probability to increment.
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr,
@@ -1447,7 +1447,7 @@ class deserializer {
    *
    * @tparam Ret Type of output
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
@@ -1481,7 +1481,7 @@ class deserializer {
    *
    * @tparam Ret Type of output
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
