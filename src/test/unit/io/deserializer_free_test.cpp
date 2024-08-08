@@ -248,6 +248,30 @@ TEST(deserializer_vector, read_free_simplex) {
                     SimplexConstrain>(std::make_tuple(3, 2, 4));
 }
 
+// sum_to_zero
+template <typename Ret>
+struct SumToZeroConstrain {
+  static auto read() {
+    return [](stan::io::deserializer<double>& deserializer, auto&&... args) {
+      return deserializer.read_constrain_sum_to_zero<Ret, false>(args...);
+    };
+  }
+  static auto free() {
+    return [](stan::io::deserializer<double>& deserializer, auto&&... args) {
+      return deserializer.read_free_sum_to_zero<Ret>(args...);
+    };
+  }
+};
+
+TEST(deserializer_vector, read_free_sum_to_zero) {
+  using stan::test::deserializer_test;
+  deserializer_test<Eigen::VectorXd, SumToZeroConstrain>(std::make_tuple(4));
+  deserializer_test<std::vector<Eigen::VectorXd>, SumToZeroConstrain>(
+      std::make_tuple(2, 4));
+  deserializer_test<std::vector<std::vector<Eigen::VectorXd>>,
+                    SumToZeroConstrain>(std::make_tuple(3, 2, 4));
+}
+
 // ordered
 template <typename Ret>
 struct OrderedConstrain {

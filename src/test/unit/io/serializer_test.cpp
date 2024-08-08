@@ -298,7 +298,6 @@ template <typename Ret, typename DeserializeRead, typename SerializeFree,
 void serializer_test_impl(DeserializeRead&& deserialize_read,
                           SerializeFree&& serialize_free,
                           const std::tuple<Sizes...>& sizes, Args&&... args) {
-  double lb = 0.5;
   constexpr size_t theta_size = 100;
   Eigen::VectorXd theta1 = Eigen::VectorXd::Random(theta_size);
   Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta_size);
@@ -497,6 +496,30 @@ TEST(serializer_vectorized, write_free_simplex) {
       std::make_tuple(2, 4));
   serializer_test<std::vector<std::vector<Eigen::VectorXd>>, SimplexConstrain>(
       std::make_tuple(3, 2, 4));
+}
+
+// sum_to_zero
+template <typename Ret>
+struct SumToZeroConstrain {
+  static auto read() {
+    return [](stan::io::deserializer<double>& deserializer, auto&&... args) {
+      return deserializer.read_constrain_sum_to_zero<Ret, false>(args...);
+    };
+  }
+  static auto free() {
+    return [](stan::io::serializer<double>& serial, auto&&... args) {
+      return serial.write_free_sum_to_zero(args...);
+    };
+  }
+};
+
+TEST(serializer_vectorized, write_free_sum_to_zero) {
+  using stan::test::serializer_test;
+  serializer_test<Eigen::VectorXd, SumToZeroConstrain>(std::make_tuple(4));
+  serializer_test<std::vector<Eigen::VectorXd>, SumToZeroConstrain>(
+      std::make_tuple(2, 4));
+  serializer_test<std::vector<std::vector<Eigen::VectorXd>>,
+                  SumToZeroConstrain>(std::make_tuple(3, 2, 4));
 }
 
 // ordered

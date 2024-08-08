@@ -672,6 +672,48 @@ TEST(deserializer_vector, simplex_jacobian) {
   EXPECT_FLOAT_EQ(lp_ref, lp);
 }
 
+// sum_to_zero
+
+TEST(deserializer_vector, sum_to_zero_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 0;
+  Eigen::VectorXd reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta));
+  Eigen::VectorXd phi(
+      deserializer.read_constrain_sum_to_zero<Eigen::VectorXd, false>(
+          lp, theta.size() + 1));
+  for (size_t i = 0; i < phi.size(); ++i) {
+    EXPECT_FLOAT_EQ(reference(i), phi[i]);
+  }
+}
+
+TEST(deserializer_vector, sum_to_zero_jacobian) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 0.0;
+  double lp_ref = 0.0;
+  Eigen::VectorXd reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta), lp_ref);
+  Eigen::VectorXd phi(
+      deserializer.read_constrain_sum_to_zero<Eigen::VectorXd, true>(
+          lp, theta.size() + 1));
+  for (size_t i = 0; i < phi.size(); ++i) {
+    EXPECT_FLOAT_EQ(reference(i), phi[i]);
+  }
+  EXPECT_FLOAT_EQ(lp_ref, lp);
+}
+
 // ordered
 
 TEST(deserializer_vector, ordered_constrain) {
