@@ -109,7 +109,7 @@ class McmcChains : public testing::Test {
 };
 
 TEST_F(McmcChains, constructor) {
-  stan::mcmc::chainset<> chain_1(eight_schools_1);
+  stan::mcmc::chainset chain_1(eight_schools_1);
   EXPECT_EQ(1, chain_1.num_chains());
   EXPECT_EQ(eight_schools_1.header.size(), chain_1.num_params());
   EXPECT_EQ(
@@ -119,7 +119,7 @@ TEST_F(McmcChains, constructor) {
   std::vector<stan::io::stan_csv> eight_schools;
   eight_schools.push_back(eight_schools_1);
   eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset<> chain_2(eight_schools);
+  stan::mcmc::chainset chain_2(eight_schools);
   EXPECT_EQ(2, chain_2.num_chains());
   EXPECT_EQ(eight_schools_1.header.size(), chain_2.num_params());
   EXPECT_EQ(
@@ -130,7 +130,7 @@ TEST_F(McmcChains, constructor) {
   bernoulli.push_back(bernoulli_default);
   bernoulli.push_back(bernoulli_thin);
   bernoulli.push_back(bernoulli_warmup);
-  stan::mcmc::chainset<> chain_3(bernoulli);
+  stan::mcmc::chainset chain_3(bernoulli);
   EXPECT_EQ(3, chain_3.num_chains());
   EXPECT_EQ(bernoulli_default.header.size(), chain_3.num_params());
   EXPECT_EQ(bernoulli_default.metadata.num_samples, chain_3.num_samples());
@@ -140,26 +140,26 @@ TEST_F(McmcChains, addFail) {
   std::vector<stan::io::stan_csv> bad;
   bad.push_back(bernoulli_default);
   bad.push_back(bernoulli_corrupt);
-  EXPECT_THROW(stan::mcmc::chainset<> fail(bad), std::invalid_argument);
+  EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
 
   bad.clear();
   bad.push_back(bernoulli_default);
   bad.push_back(bernoulli_500);
-  EXPECT_THROW(stan::mcmc::chainset<> fail(bad), std::invalid_argument);
+  EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
 
   bad.clear();
   bad.push_back(bernoulli_default);
   bad.push_back(eight_schools_1);
-  EXPECT_THROW(stan::mcmc::chainset<> fail(bad), std::invalid_argument);
+  EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
 
   bad.clear();
   bad.push_back(bernoulli_default);
   bad.push_back(bernoulli_zeta);
-  EXPECT_THROW(stan::mcmc::chainset<> fail(bad), std::invalid_argument);
+  EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
 }
 
 TEST_F(McmcChains, paramNameIndex) {
-  stan::mcmc::chainset<> chains_csv(eight_schools_1);
+  stan::mcmc::chainset chains_csv(eight_schools_1);
   EXPECT_EQ(1, chains_csv.num_chains());
   for (int i = 0; i < eight_schools_1.header.size(); i++) {
     EXPECT_EQ(eight_schools_1.header[i], chains_csv.param_name(i));
@@ -174,7 +174,7 @@ TEST_F(McmcChains, eight_schools_samples) {
   std::vector<stan::io::stan_csv> eight_schools;
   eight_schools.push_back(eight_schools_1);
   eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset<> chain_2(eight_schools);
+  stan::mcmc::chainset chain_2(eight_schools);
   Eigen::MatrixXd mu_all = chain_2.samples("mu");
   EXPECT_EQ(chain_2.num_chains() * chain_2.num_samples(), mu_all.size());
   mu_all = chain_2.samples(7);
@@ -185,7 +185,7 @@ TEST_F(McmcChains, eight_schools_samples) {
 }
 
 TEST_F(McmcChains, split_rank_normalized_rhat) {
-  stan::mcmc::chainset<> chain_1(eight_schools_1);
+  stan::mcmc::chainset chain_1(eight_schools_1);
   EXPECT_EQ(1, chain_1.num_chains());
 
   // test against R implementation in pkg posterior
@@ -210,7 +210,7 @@ TEST_F(McmcChains, split_rank_normalized_ess) {
   std::vector<stan::io::stan_csv> eight_schools;
   eight_schools.push_back(eight_schools_1);
   eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset<> chain_2(eight_schools);
+  stan::mcmc::chainset chain_2(eight_schools);
   EXPECT_EQ(2, chain_2.num_chains());
 
   // test against R implementation in pkg posterior (via cmdstanr)
@@ -230,7 +230,7 @@ TEST_F(McmcChains, ess_short_chains) {
   std::vector<stan::io::stan_csv> eight_schools_5iters;
   eight_schools_5iters.push_back(eight_schools_5iters_1);
   eight_schools_5iters.push_back(eight_schools_5iters_2);
-  stan::mcmc::chainset<> chain_2(eight_schools_5iters);
+  stan::mcmc::chainset chain_2(eight_schools_5iters);
   EXPECT_EQ(2, chain_2.num_chains());
 
   for (size_t i = 0; i < 10; ++i) {
@@ -244,7 +244,7 @@ TEST_F(McmcChains, summary_stats) {
   std::vector<stan::io::stan_csv> eight_schools;
   eight_schools.push_back(eight_schools_1);
   eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset<> chain_2(eight_schools);
+  stan::mcmc::chainset chain_2(eight_schools);
   EXPECT_EQ(2, chain_2.num_chains());
 
   // test against R implementation in pkg posterior (via cmdstanr)
@@ -285,7 +285,7 @@ TEST_F(McmcChains, mcse) {
   std::vector<stan::io::stan_csv> eight_schools;
   eight_schools.push_back(eight_schools_1);
   eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset<> chain_2(eight_schools);
+  stan::mcmc::chainset chain_2(eight_schools);
   EXPECT_EQ(2, chain_2.num_chains());
 
   // test against R implementation in pkg posterior
@@ -321,7 +321,7 @@ TEST_F(McmcChains, const_fail) {
   std::vector<stan::io::stan_csv> bernoulli_const;
   bernoulli_const.push_back(bernoulli_const_1);
   bernoulli_const.push_back(bernoulli_const_2);
-  stan::mcmc::chainset<> chain_2(bernoulli_const);
+  stan::mcmc::chainset chain_2(bernoulli_const);
   EXPECT_EQ(2, chain_2.num_chains());
   auto rhat = chain_2.split_rank_normalized_rhat("zeta");
   EXPECT_TRUE(std::isnan(rhat.first));
@@ -332,7 +332,7 @@ TEST_F(McmcChains, const_fail) {
 }
 
 TEST_F(McmcChains, autocorrelation) {
-  stan::mcmc::chainset<> chain_1(eight_schools_1);
+  stan::mcmc::chainset chain_1(eight_schools_1);
   EXPECT_EQ(1, chain_1.num_chains());
 
   Eigen::VectorXd mu_ac_posterior(10);

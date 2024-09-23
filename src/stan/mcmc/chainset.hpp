@@ -34,7 +34,6 @@ using Eigen::Dynamic;
  *
  * <p><b>Storage Order</b>: Storage is column/last-index major.
  */
-template <typename Unused = void*>
 class chainset {
  private:
   size_t num_samples_;
