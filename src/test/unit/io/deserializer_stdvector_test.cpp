@@ -129,6 +129,52 @@ TEST(deserializer_array, simplex) {
   }
 }
 
+// sum_to_zero
+
+TEST(deserializer_array, sum_to_zero) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100U; ++i)
+    theta.push_back(static_cast<double>(i));
+
+  stan::io::deserializer<double> deserializer1(theta, theta_i);
+  stan::io::deserializer<double> deserializer2(theta, theta_i);
+
+  // no jac
+  {
+    double lp_ref = 0.0;
+    double lp = 0.0;
+    auto y
+        = deserializer1
+              .read_constrain_sum_to_zero<std::vector<Eigen::VectorXd>, false>(
+                  lp, 4, 3);
+    for (size_t i = 0; i < 4; ++i) {
+      stan::test::expect_near_rel(
+          "test_std_vector_deserializer", y[i],
+          deserializer2.read_constrain_sum_to_zero<Eigen::VectorXd, false>(
+              lp_ref, 3));
+    }
+    EXPECT_FLOAT_EQ(lp_ref, lp);
+  }
+
+  // jac
+  {
+    double lp_ref = 0.0;
+    double lp = 0.0;
+    auto y
+        = deserializer1
+              .read_constrain_sum_to_zero<std::vector<Eigen::VectorXd>, true>(
+                  lp, 4, 3);
+    for (size_t i = 0; i < 4; ++i) {
+      stan::test::expect_near_rel(
+          "test_std_vector_deserializer", y[i],
+          deserializer2.read_constrain_sum_to_zero<Eigen::VectorXd, true>(
+              lp_ref, 3));
+    }
+    EXPECT_FLOAT_EQ(lp_ref, lp);
+  }
+}
+
 // ordered
 
 TEST(deserializer_array, ordered) {

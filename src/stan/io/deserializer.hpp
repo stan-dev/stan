@@ -582,6 +582,64 @@ class deserializer {
   }
 
   /**
+   * Return the next zero sum vector of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant (no adjustment, in this case).
+   *
+   * <p>See <code>stan::math::sum_to_zero_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @tparam Sizes A parameter pack of integral types.
+   * @param lp The reference to the variable holding the log
+   * @param size Number of cells in zero sum vector to generate.
+   * @return The next zero sum of the specified size.
+   * @throws std::invalid_argument if number of dimensions (`k`) is zero
+   */
+  template <typename Ret, bool Jacobian, typename LP,
+            require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_constrain_sum_to_zero(LP& lp, size_t size) {
+    stan::math::check_positive("read_sum_to_zero", "size", size);
+    return stan::math::sum_to_zero_constrain<Jacobian>(
+        this->read<Ret>(size - 1), lp);
+  }
+
+  /**
+   * Return the next zero sum vector of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant (no adjustment, in this case).
+   *
+   * <p>See <code>stan::math::sum_to_zero_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @tparam Sizes A parameter pack of integral types.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @param vecsize The size of the return vector.
+   * @param sizes Pack of integrals to use to construct the return's type.
+   * @return The next zero sum of the specified size.
+   * @throws std::invalid_argument if number of dimensions (`k`) is zero
+   */
+  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_constrain_sum_to_zero(LP& lp, const size_t vecsize,
+                                         Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(
+          this->read_constrain_sum_to_zero<value_type_t<Ret>, Jacobian>(
+              lp, sizes...));
+    }
+    return ret;
+  }
+
+  /**
    * Return the next ordered vector of the specified
    * size, incrementing the specified reference with the log
    * absolute Jacobian of the determinant.
@@ -933,7 +991,7 @@ class deserializer {
    * @param lp The reference to the variable holding the log
    * probability to increment.
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr,
@@ -989,7 +1047,7 @@ class deserializer {
    * @param lp The reference to the variable holding the log
    * probability to increment.
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr,
@@ -1156,6 +1214,37 @@ class deserializer {
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_simplex<value_type_t<Ret>>(sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Read a serialized sum_to_zero vector and unconstrain it
+   *
+   * @tparam Ret Type of output
+   * @return Unconstrained vector
+   */
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_sum_to_zero(size_t size) {
+    return stan::math::sum_to_zero_free(this->read<Ret>(size));
+  }
+
+  /**
+   * Read serialized zero-sum vectors and unconstrain them
+   *
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained vectors
+   */
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_sum_to_zero(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_sum_to_zero<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
@@ -1358,7 +1447,7 @@ class deserializer {
    *
    * @tparam Ret Type of output
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
@@ -1392,7 +1481,7 @@ class deserializer {
    *
    * @tparam Ret Type of output
    * @param rows Rows of matrix
-   * @param cows Cows of matrix
+   * @param cols Cols of matrix
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
