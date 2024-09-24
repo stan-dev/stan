@@ -62,7 +62,7 @@ class chainset {
    * Process first chain: record header, thinned samples,
    * add samples to vector chains.
    */
-  void initFromStanCsv(const stan::io::stan_csv& stan_csv) {
+  void init_from_stan_csv(const stan::io::stan_csv& stan_csv) {
     if (!is_valid(stan_csv)) {
       throw std::invalid_argument("Invalid sample");
     }
@@ -105,13 +105,13 @@ class chainset {
 
  public:
   explicit chainset(const stan::io::stan_csv& stan_csv) {
-    initFromStanCsv(stan_csv);
+    init_from_stan_csv(stan_csv);
   }
 
   explicit chainset(const std::vector<stan::io::stan_csv>& stan_csv) {
     if (stan_csv.empty())
       return;
-    initFromStanCsv(stan_csv[0]);
+    init_from_stan_csv(stan_csv[0]);
     for (size_t i = 1; i < stan_csv.size(); ++i) {
       add(stan_csv[i]);
     }
