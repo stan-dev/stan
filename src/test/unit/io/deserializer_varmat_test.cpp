@@ -325,6 +325,44 @@ TEST(deserializer, read_constrain_simplex_jacobian) {
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
 }
 
+// sum_to_zero
+
+TEST(deserializer, read_constrain_sum_to_zero_constrain) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(-2.0);
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp = 0.0;
+  auto reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta));
+  auto y = deserializer.read_constrain_sum_to_zero<var_vector_t, false>(
+      lp, theta.size() + 1);
+  EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
+  stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
+}
+
+TEST(deserializer, read_constrain_sum_to_zero_jacobian) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(-2.0);
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp_ref = 0.0;
+  stan::math::var lp = 0.0;
+  auto reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta), lp_ref);
+  auto y = deserializer.read_constrain_sum_to_zero<var_vector_t, true>(
+      lp, theta.size() + 1);
+  EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
+  stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
+  EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
+}
+
 // ordered
 
 TEST(deserializer, read_constrain_ordered_constrain) {

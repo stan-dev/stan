@@ -348,6 +348,31 @@ class serializer {
   }
 
   /**
+   * Write a serialized sum-to-zero vector and unconstrain it
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_free_sum_to_zero(const Vec& x) {
+    this->write(stan::math::sum_to_zero_free(x));
+  }
+
+  /**
+   * Write serialized zero sum vectors and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_sum_to_zero(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_free_sum_to_zero(ret_i);
+    }
+  }
+
+  /**
    * Write a serialized ordered and unconstrain it
    *
    * @tparam Vec An Eigen type with either fixed rows or columns at compile
@@ -490,6 +515,54 @@ class serializer {
   inline void write_free_corr_matrix(const StdVec& x) {
     for (const auto& ret_i : x) {
       this->write_free_corr_matrix(ret_i);
+    }
+  }
+
+  /**
+   * Read a serialized column simplex matrix and unconstrain it
+   *
+   * @tparam Mat An Eigen matrix
+   * @param x A column stochastic eigen matrix
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_stochastic_column(Mat&& x) {
+    this->write(stan::math::stochastic_column_free(x));
+  }
+
+  /**
+   * Read serialized column simplex matrices and unconstrain them
+   *
+   * @tparam StdVec A standard vector of Eigen matrices
+   * @param x A vector of column stochastic Eigen matrices
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_stochastic_column(StdVec&& x) {
+    for (auto&& x_i : x) {
+      this->write_free_stochastic_column(x_i);
+    }
+  }
+
+  /**
+   * Read a serialized row simplex matrix and unconstrain it
+   *
+   * @tparam Mat An Eigen matrix
+   * @param x A row stochastic eigen matrix
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_stochastic_row(Mat&& x) {
+    this->write(stan::math::stochastic_row_free(x));
+  }
+
+  /**
+   * Read serialized row simplex matrices and unconstrain them
+   *
+   * @tparam StdVec A standard vector of Eigen matrices
+   * @param x A vector of row stochastic Eigen matrices
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_stochastic_row(StdVec&& x) {
+    for (auto&& x_i : x) {
+      this->write_free_stochastic_row(x_i);
     }
   }
 };
