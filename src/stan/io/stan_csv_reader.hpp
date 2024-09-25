@@ -29,8 +29,6 @@ inline void prettify_stan_csv_name(std::string& variable) {
   }
 }
 
-// FIXME: should consolidate with the options from
-// the command line in stan::lang
 struct stan_csv_metadata {
   int stan_version_major;
   int stan_version_minor;
@@ -47,6 +45,7 @@ struct stan_csv_metadata {
   bool save_warmup;
   size_t thin;
   bool append_samples;
+  std::string method;
   std::string algorithm;
   std::string engine;
   int max_depth;
@@ -64,8 +63,9 @@ struct stan_csv_metadata {
         num_samples(0),
         num_warmup(0),
         save_warmup(false),
-        thin(0),
+        thin(1),
         append_samples(false),
+        method(""),
         algorithm(""),
         engine(""),
         max_depth(10) {}
@@ -161,9 +161,15 @@ class stan_csv_reader {
         metadata.model = value;
       } else if (name.compare("num_samples") == 0) {
         std::stringstream(value) >> metadata.num_samples;
+      } else if (name.compare("output_samples") == 0) {  // ADVI config name
+        std::stringstream(value) >> metadata.num_samples;
       } else if (name.compare("num_warmup") == 0) {
         std::stringstream(value) >> metadata.num_warmup;
       } else if (name.compare("save_warmup") == 0) {
+        // cmdstan args can be "true" and "false", was "1", "0"
+        if (value.compare("true") == 0) {
+          value = "1";
+        }
         std::stringstream(value) >> metadata.save_warmup;
       } else if (name.compare("thin") == 0) {
         std::stringstream(value) >> metadata.thin;
@@ -177,6 +183,8 @@ class stan_csv_reader {
         metadata.random_seed = false;
       } else if (name.compare("append_samples") == 0) {
         std::stringstream(value) >> metadata.append_samples;
+      } else if (name.compare("method") == 0) {
+        metadata.method = value;
       } else if (name.compare("algorithm") == 0) {
         metadata.algorithm = value;
       } else if (name.compare("engine") == 0) {
@@ -232,18 +240,20 @@ class stan_csv_reader {
     }
     ss.seekg(std::ios_base::beg);
 
-    if (lines < 4)
+    if (lines < 2)
       return false;
 
     char comment;  // Buffer for comment indicator, #
 
-    // Skip first two lines
+    // Skip "Adaptation terminated"
     std::getline(ss, line);
 
     // Stepsize
     std::getline(ss, line, '=');
     boost::trim(line);
     ss >> adaptation.step_size;
+    if (lines == 2)  // ADVI reports stepsize, no metric
+      return true;
 
     // Metric parameters
     std::getline(ss, line);
@@ -290,7 +300,6 @@ class stan_csv_reader {
       bool empty_line = (in.peek() == '\n');
 
       std::getline(in, line);
-
       if (empty_line)
         continue;
       if (!line.length())
@@ -348,24 +357,38 @@ class stan_csv_reader {
   /**
    * Parses the file.
    *
+   * Warns if missing metatdata, inconsistencies between metadata config
+   * and parsed data rows.
+   *
+   * Throws exception if no header row found.
+   *
    * @param[in] in input stream to parse
    * @param[out] out output stream to send messages
    */
   static stan_csv parse(std::istream& in, std::ostream* out) {
     stan_csv data;
+    std::string line;
 
     if (!read_metadata(in, data.metadata, out)) {
       if (out)
         *out << "Warning: non-fatal error reading metadata" << std::endl;
     }
-
     if (!read_header(in, data.header, out)) {
       if (out)
         *out << "Error: error reading header" << std::endl;
       throw std::invalid_argument("Error with header of input file in parse");
     }
 
-    if (!read_adaptation(in, data.adaptation, out)) {
+    // skip warmup draws, if any
+    if (data.metadata.algorithm != "fixed_param" && data.metadata.num_warmup > 0
+        && data.metadata.save_warmup) {
+      while (in.peek() != '#') {
+        std::getline(in, line);
+      }
+    }
+
+    if (data.metadata.algorithm != "fixed_param"
+        && !read_adaptation(in, data.adaptation, out)) {
       if (out)
         *out << "Warning: non-fatal error reading adaptation data" << std::endl;
     }
@@ -373,11 +396,24 @@ class stan_csv_reader {
     data.timing.warmup = 0;
     data.timing.sampling = 0;
 
+    if (data.metadata.method == "variational") {
+      std::getline(in, line);  // discard variational estimate
+    }
+
     if (!read_samples(in, data.samples, data.timing, out)) {
       if (out)
         *out << "Warning: non-fatal error reading samples" << std::endl;
     }
-
+    if (data.metadata.method == "sample") {
+      int expected_samples = data.metadata.num_samples / data.metadata.thin;
+      if (expected_samples != data.samples.rows()) {
+        std::stringstream msg;
+        msg << ", expecting " << expected_samples << " samples, found "
+            << data.samples.rows();
+        if (out)
+          *out << "Warning: error reading samples" << msg.str() << std::endl;
+      }
+    }
     return data;
   }
 };
