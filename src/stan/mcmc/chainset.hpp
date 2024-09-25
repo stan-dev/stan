@@ -42,19 +42,22 @@ class chainset {
 
   static size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
     size_t thinned_samples = stan_csv.metadata.num_samples;
-    if (stan_csv.metadata.thin > 0) {
+    if (stan_csv.metadata.thin > 1) {
       thinned_samples = thinned_samples / stan_csv.metadata.thin;
     }
     return thinned_samples;
   }
 
   static bool is_valid(const stan::io::stan_csv& stan_csv) {
-    if (stan_csv.header.empty())
+    if (stan_csv.header.empty()) {
       return false;
-    if (stan_csv.samples.size() == 0)
+    }
+    if (stan_csv.samples.size() == 0) {
       return false;
-    if (stan_csv.samples.rows() != thinned_samples(stan_csv))
+    }
+    if (stan_csv.samples.rows() != thinned_samples(stan_csv)) {
       return false;
+    }
     return true;
   }
 
@@ -370,14 +373,15 @@ class chainset {
    */
   Eigen::VectorXd quantiles(const int index,
                             const Eigen::VectorXd& probs) const {
-    // Ensure the probability is within [0, 1]
+    Eigen::VectorXd quantiles(probs.size());
+    if (probs.size() == 0)
+      return quantiles;
     if (probs.minCoeff() < 0.0 || probs.maxCoeff() > 1.0) {
       throw std::out_of_range("Probabilities must be between 0 and 1.");
     }
     Eigen::MatrixXd draws = samples(index);
     std::vector<double> sorted(draws.data(), draws.data() + draws.size());
     std::sort(sorted.begin(), sorted.end());
-    Eigen::VectorXd quantiles(probs.size());
     for (size_t i = 0; i < probs.size(); ++i) {
       size_t idx = static_cast<size_t>(probs[i] * (sorted.size() - 1));
       quantiles[i] = sorted[idx];
