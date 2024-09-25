@@ -404,7 +404,7 @@ class stan_csv_reader {
       if (out)
         *out << "Warning: non-fatal error reading samples" << std::endl;
     }
-    if (data.metadata.thin > 1) {
+    if (data.metadata.method == "sample") {
       int expected_samples = data.metadata.num_samples / data.metadata.thin;
       if (expected_samples != data.samples.rows()) {
         std::stringstream msg;
