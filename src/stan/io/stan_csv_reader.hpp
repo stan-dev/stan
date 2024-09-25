@@ -161,7 +161,7 @@ class stan_csv_reader {
         metadata.model = value;
       } else if (name.compare("num_samples") == 0) {
         std::stringstream(value) >> metadata.num_samples;
-      } else if (name.compare("output_samples") == 0) { // ADVI config name
+      } else if (name.compare("output_samples") == 0) {  // ADVI config name
         std::stringstream(value) >> metadata.num_samples;
       } else if (name.compare("num_warmup") == 0) {
         std::stringstream(value) >> metadata.num_warmup;
@@ -380,8 +380,7 @@ class stan_csv_reader {
     }
 
     // skip warmup draws, if any
-    if (data.metadata.algorithm != "fixed_param"
-	&& data.metadata.num_warmup > 0
+    if (data.metadata.algorithm != "fixed_param" && data.metadata.num_warmup > 0
         && data.metadata.save_warmup) {
       while (in.peek() != '#') {
         std::getline(in, line);
@@ -399,7 +398,7 @@ class stan_csv_reader {
 
     if (data.metadata.method == "variational") {
       std::getline(in, line);  // discard variational estimate
-    }      
+    }
 
     if (!read_samples(in, data.samples, data.timing, out)) {
       if (out)
