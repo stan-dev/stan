@@ -2,16 +2,12 @@
 # Stan
 # -----------------
 #
-# To customize your build, set make variables in either:
-#    ~/.config/stan/make.local
-#    make/local
-# Variables in make/local is loaded after ~/.config/stan/make.local
+# To customize your build, set make variables in make/local
 
 
 ## 'help' is the default make target.
 help:
 
--include $(HOME)/.config/stan/make.local  # user-defined variables
 -include make/local                       # user-defined variables
 
 MATH ?= lib/stan_math/

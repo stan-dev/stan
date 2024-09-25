@@ -232,7 +232,8 @@ int hmc_nuts_diag_e(Model& model, size_t num_chains,
           util::run_sampler(samplers[i], model, cont_vectors[i], num_warmup,
                             num_samples, num_thin, refresh, save_warmup,
                             rngs[i], interrupt, logger, sample_writer[i],
-                            diagnostic_writer[i], init_chain_id + i);
+                            diagnostic_writer[i], init_chain_id + i,
+                            num_chains);
         }
       },
       tbb::simple_partitioner());
