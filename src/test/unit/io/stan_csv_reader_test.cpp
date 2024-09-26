@@ -27,7 +27,7 @@ class StanIoStanCsvReader : public testing::Test {
     bernoulli_thin_stream.open(
         "src/test/unit/io/test_csv_files/bernoulli_thin.csv");
     bernoulli_trunc_stream.open(
-	"src/test/unit/io/test_csv_files/bernoulli_corrupt.csv");
+        "src/test/unit/io/test_csv_files/bernoulli_corrupt.csv");
     bernoulli_warmup_stream.open(
         "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
     missing_draws_stream.open(
@@ -571,10 +571,10 @@ TEST_F(StanIoStanCsvReader, missing_data) {
   stan::io::stan_csv missing_draws;
   std::stringstream out;
   EXPECT_THROW(stan::io::stan_csv_reader::parse(missing_draws_stream, &out),
-	       std::invalid_argument);
+               std::invalid_argument);
   stan::io::stan_csv bernoulli_trunc;
   EXPECT_THROW(stan::io::stan_csv_reader::parse(bernoulli_trunc_stream, &out),
-	       std::invalid_argument);
+               std::invalid_argument);
 }
 
 TEST_F(StanIoStanCsvReader, thinned_data) {
