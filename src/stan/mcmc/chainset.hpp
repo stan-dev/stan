@@ -49,21 +49,19 @@ static bool is_valid(const stan::io::stan_csv& stan_csv) {
   return true;
 }
 
-
 /**
  * An <code>mcmc::chainset</code> object manages the post-warmup draws
  * across a set of MCMC chains, which all have the same number of samples.
  *
  * @note samples are stored in column major, i.e., each column corresponds to
  * an output variable (element).
- * 
+ *
  */
 class chainset {
  private:
   size_t num_samples_;
   std::vector<std::string> param_names_;
   std::vector<Eigen::MatrixXd> chains_;
-
 
   /**
    * Process first chain: record header, thinned samples,
