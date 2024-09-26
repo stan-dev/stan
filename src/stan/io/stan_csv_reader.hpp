@@ -320,10 +320,10 @@ class stan_csv_reader {
         if (cols == -1) {
           cols = current_cols;
         } else if (cols != current_cols) {
-	  std::stringstream msg;
-	  msg << "Error: expected " << cols << " columns, but found "
-	      << current_cols << " instead for row " << rows + 1;
-	  throw std::invalid_argument(msg.str());
+          std::stringstream msg;
+          msg << "Error: expected " << cols << " columns, but found "
+              << current_cols << " instead for row " << rows + 1;
+          throw std::invalid_argument(msg.str());
         }
         rows++;
       }
@@ -397,9 +397,9 @@ class stan_csv_reader {
       int expected_samples = data.metadata.num_samples / data.metadata.thin;
       if (expected_samples != data.samples.rows()) {
         std::stringstream msg;
-        msg << "Error reading samples, expecting " << expected_samples << " samples, found "
-            << data.samples.rows();
-	throw std::invalid_argument(msg.str());
+        msg << "Error reading samples, expecting " << expected_samples
+            << " samples, found " << data.samples.rows();
+        throw std::invalid_argument(msg.str());
       }
     }
     return data;

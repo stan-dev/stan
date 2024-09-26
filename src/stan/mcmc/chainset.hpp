@@ -32,7 +32,7 @@ using Eigen::Dynamic;
  * Checks that a Stan CSV file contains both a header row
  * and a set of draws from the posterior.
  * Throws exception if either are missing.
- * 
+ *
  * @param stan_csv parsed csv file object
  */
 void validate_sample(const stan::io::stan_csv& stan_csv) {
@@ -46,7 +46,7 @@ void validate_sample(const stan::io::stan_csv& stan_csv) {
 
 /**
  * Reports the expected number of post-warmup draws in the CSV output file.
- * 
+ *
  * @param stan_csv parsed csv file object
  * @return expected number of draws
  */
@@ -64,7 +64,7 @@ size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
  *
  * @note samples are stored in column major, i.e., each column corresponds to
  * an output variable (element).
- * 
+ *
  */
 class chainset {
  private:

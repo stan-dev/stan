@@ -40,11 +40,11 @@ class McmcChains : public testing::Test {
         "src/test/unit/mcmc/test_csv_files/eight_schools_5iters_2.csv",
         std::ifstream::in);
 
-    if (!bernoulli_500_stream
-        || !bernoulli_default_stream || !bernoulli_thin_stream
-        || !bernoulli_warmup_stream || !bernoulli_zeta_stream
-        || !eight_schools_1_stream || !eight_schools_2_stream
-        || !eight_schools_5iters_1_stream || !eight_schools_5iters_2_stream) {
+    if (!bernoulli_500_stream || !bernoulli_default_stream
+        || !bernoulli_thin_stream || !bernoulli_warmup_stream
+        || !bernoulli_zeta_stream || !eight_schools_1_stream
+        || !eight_schools_2_stream || !eight_schools_5iters_1_stream
+        || !eight_schools_5iters_2_stream) {
       FAIL() << "Failed to open one or more test files";
     }
     bernoulli_500_stream.seekg(0, std::ios::beg);
@@ -91,14 +91,14 @@ class McmcChains : public testing::Test {
 
   std::stringstream out;
 
-  std::ifstream bernoulli_500_stream,
-    bernoulli_default_stream, bernoulli_thin_stream, bernoulli_warmup_stream,
-    bernoulli_zeta_stream, eight_schools_1_stream, eight_schools_2_stream,
-    eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
+  std::ifstream bernoulli_500_stream, bernoulli_default_stream,
+      bernoulli_thin_stream, bernoulli_warmup_stream, bernoulli_zeta_stream,
+      eight_schools_1_stream, eight_schools_2_stream,
+      eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
 
-  stan::io::stan_csv bernoulli_500, bernoulli_default,
-    bernoulli_thin, bernoulli_warmup, bernoulli_zeta, eight_schools_1,
-    eight_schools_2, eight_schools_5iters_1, eight_schools_5iters_2;
+  stan::io::stan_csv bernoulli_500, bernoulli_default, bernoulli_thin,
+      bernoulli_warmup, bernoulli_zeta, eight_schools_1, eight_schools_2,
+      eight_schools_5iters_1, eight_schools_5iters_2;
 };
 
 TEST_F(McmcChains, constructor) {
