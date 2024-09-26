@@ -28,11 +28,35 @@ namespace stan {
 namespace mcmc {
 using Eigen::Dynamic;
 
+static size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
+  size_t thinned_samples = stan_csv.metadata.num_samples;
+  if (stan_csv.metadata.thin > 1) {
+    thinned_samples = thinned_samples / stan_csv.metadata.thin;
+  }
+  return thinned_samples;
+}
+
+static bool is_valid(const stan::io::stan_csv& stan_csv) {
+  if (stan_csv.header.empty()) {
+    return false;
+  }
+  if (stan_csv.samples.size() == 0) {
+    return false;
+  }
+  if (stan_csv.samples.rows() != thinned_samples(stan_csv)) {
+    return false;
+  }
+  return true;
+}
+
+
 /**
  * An <code>mcmc::chainset</code> object manages the post-warmup draws
- * across a set of MCMC chains, which all have the same number or samples.
+ * across a set of MCMC chains, which all have the same number of samples.
  *
- * <p><b>Storage Order</b>: Storage is column/last-index major.
+ * @note samples are stored in column major, i.e., each column corresponds to
+ * an output variable (element).
+ * 
  */
 class chainset {
  private:
@@ -40,26 +64,6 @@ class chainset {
   std::vector<std::string> param_names_;
   std::vector<Eigen::MatrixXd> chains_;
 
-  static size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
-    size_t thinned_samples = stan_csv.metadata.num_samples;
-    if (stan_csv.metadata.thin > 1) {
-      thinned_samples = thinned_samples / stan_csv.metadata.thin;
-    }
-    return thinned_samples;
-  }
-
-  static bool is_valid(const stan::io::stan_csv& stan_csv) {
-    if (stan_csv.header.empty()) {
-      return false;
-    }
-    if (stan_csv.samples.size() == 0) {
-      return false;
-    }
-    if (stan_csv.samples.rows() != thinned_samples(stan_csv)) {
-      return false;
-    }
-    return true;
-  }
 
   /**
    * Process first chain: record header, thinned samples,
