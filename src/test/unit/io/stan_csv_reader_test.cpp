@@ -26,6 +26,8 @@ class StanIoStanCsvReader : public testing::Test {
 
     bernoulli_thin_stream.open(
         "src/test/unit/io/test_csv_files/bernoulli_thin.csv");
+    bernoulli_trunc_stream.open(
+	"src/test/unit/io/test_csv_files/bernoulli_corrupt.csv");
     bernoulli_warmup_stream.open(
         "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
     missing_draws_stream.open(
@@ -46,6 +48,7 @@ class StanIoStanCsvReader : public testing::Test {
     epil0_stream.close();
     blocker_nondiag0_stream.close();
     bernoulli_thin_stream.close();
+    bernoulli_trunc_stream.close();
     bernoulli_warmup_stream.close();
     missing_draws_stream.close();
     fixed_param_stream.close();
@@ -59,6 +62,7 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream eight_schools_stream;
   std::ifstream header3_stream;
   std::ifstream bernoulli_thin_stream;
+  std::ifstream bernoulli_trunc_stream;
   std::ifstream bernoulli_warmup_stream;
   std::ifstream missing_draws_stream;
   std::ifstream fixed_param_stream;
@@ -66,8 +70,7 @@ class StanIoStanCsvReader : public testing::Test {
 
 TEST_F(StanIoStanCsvReader, read_metadata1) {
   stan::io::stan_csv_metadata metadata;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata, 0));
+  stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata);
 
   EXPECT_EQ(2, metadata.stan_version_major);
   EXPECT_EQ(9, metadata.stan_version_minor);
@@ -93,9 +96,7 @@ TEST_F(StanIoStanCsvReader, read_metadata1) {
 
 TEST_F(StanIoStanCsvReader, read_metadata3) {
   stan::io::stan_csv_metadata metadata;
-
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_metadata(metadata3_stream, metadata, 0));
+  stan::io::stan_csv_reader::read_metadata(metadata3_stream, metadata);
 
   EXPECT_EQ(2, metadata.stan_version_major);
   EXPECT_EQ(9, metadata.stan_version_minor);
@@ -569,8 +570,11 @@ TEST_F(StanIoStanCsvReader, skip_warmup) {
 TEST_F(StanIoStanCsvReader, missing_data) {
   stan::io::stan_csv missing_draws;
   std::stringstream out;
-  missing_draws = stan::io::stan_csv_reader::parse(missing_draws_stream, &out);
-  ASSERT_TRUE(boost::algorithm::starts_with(out.str(), "Warning:"));
+  EXPECT_THROW(stan::io::stan_csv_reader::parse(missing_draws_stream, &out),
+	       std::invalid_argument);
+  stan::io::stan_csv bernoulli_trunc;
+  EXPECT_THROW(stan::io::stan_csv_reader::parse(bernoulli_trunc_stream, &out),
+	       std::invalid_argument);
 }
 
 TEST_F(StanIoStanCsvReader, thinned_data) {

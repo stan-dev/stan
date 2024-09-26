@@ -101,13 +101,12 @@ class stan_csv_reader {
   stan_csv_reader() {}
   ~stan_csv_reader() {}
 
-  static bool read_metadata(std::istream& in, stan_csv_metadata& metadata,
-                            std::ostream* out) {
+  static void read_metadata(std::istream& in, stan_csv_metadata& metadata) {
     std::stringstream ss;
     std::string line;
 
     if (in.peek() != '#')
-      return false;
+      return;
     while (in.peek() == '#') {
       std::getline(in, line);
       ss << line << '\n';
@@ -193,10 +192,6 @@ class stan_csv_reader {
         std::stringstream(value) >> metadata.max_depth;
       }
     }
-    if (ss.good() == true)
-      return false;
-
-    return true;
   }  // read_metadata
 
   static bool read_header(std::istream& in, std::vector<std::string>& header,
@@ -325,11 +320,10 @@ class stan_csv_reader {
         if (cols == -1) {
           cols = current_cols;
         } else if (cols != current_cols) {
-          if (out)
-            *out << "Error: expected " << cols << " columns, but found "
-                 << current_cols << " instead for row " << rows + 1
-                 << std::endl;
-          return false;
+	  std::stringstream msg;
+	  msg << "Error: expected " << cols << " columns, but found "
+	      << current_cols << " instead for row " << rows + 1;
+	  throw std::invalid_argument(msg.str());
         }
         rows++;
       }
@@ -357,10 +351,10 @@ class stan_csv_reader {
   /**
    * Parses the file.
    *
-   * Warns if missing metatdata, inconsistencies between metadata config
-   * and parsed data rows.
+   * Throws exception if contents can't be parsed into header + data rows
+   * or if sample size doesn't match metadata config.
    *
-   * Throws exception if no header row found.
+   * Emits warning message if can't parse sampler adaptation.
    *
    * @param[in] in input stream to parse
    * @param[out] out output stream to send messages
@@ -369,13 +363,8 @@ class stan_csv_reader {
     stan_csv data;
     std::string line;
 
-    if (!read_metadata(in, data.metadata, out)) {
-      if (out)
-        *out << "Warning: non-fatal error reading metadata" << std::endl;
-    }
+    read_metadata(in, data.metadata);
     if (!read_header(in, data.header, out)) {
-      if (out)
-        *out << "Error: error reading header" << std::endl;
       throw std::invalid_argument("Error with header of input file in parse");
     }
 
@@ -408,10 +397,9 @@ class stan_csv_reader {
       int expected_samples = data.metadata.num_samples / data.metadata.thin;
       if (expected_samples != data.samples.rows()) {
         std::stringstream msg;
-        msg << ", expecting " << expected_samples << " samples, found "
+        msg << "Error reading samples, expecting " << expected_samples << " samples, found "
             << data.samples.rows();
-        if (out)
-          *out << "Warning: error reading samples" << msg.str() << std::endl;
+	throw std::invalid_argument(msg.str());
       }
     }
     return data;

@@ -29,10 +29,42 @@ namespace mcmc {
 using Eigen::Dynamic;
 
 /**
+ * Checks that a Stan CSV file contains both a header row
+ * and a set of draws from the posterior.
+ * Throws exception if either are missing.
+ * 
+ * @param stan_csv parsed csv file object
+ */
+void validate_sample(const stan::io::stan_csv& stan_csv) {
+  if (stan_csv.header.empty()) {
+    throw std::invalid_argument("Error: Stan CSV file missing header row");
+  }
+  if (stan_csv.samples.size() == 0) {
+    throw std::invalid_argument("Error: no sample found in Stan CSV file");
+  }
+}
+
+/**
+ * Reports the expected number of post-warmup draws in the CSV output file.
+ * 
+ * @param stan_csv parsed csv file object
+ * @return expected number of draws
+ */
+size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
+  size_t thinned_samples = stan_csv.metadata.num_samples;
+  if (stan_csv.metadata.thin > 1) {
+    thinned_samples = thinned_samples / stan_csv.metadata.thin;
+  }
+  return thinned_samples;
+}
+
+/**
  * An <code>mcmc::chainset</code> object manages the post-warmup draws
- * across a set of MCMC chains, which all have the same number or samples.
+ * across a set of MCMC chains, which all have the same number of samples.
  *
- * <p><b>Storage Order</b>: Storage is column/last-index major.
+ * @note samples are stored in column major, i.e., each column corresponds to
+ * an output variable (element).
+ * 
  */
 class chainset {
  private:
@@ -40,35 +72,12 @@ class chainset {
   std::vector<std::string> param_names_;
   std::vector<Eigen::MatrixXd> chains_;
 
-  static size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
-    size_t thinned_samples = stan_csv.metadata.num_samples;
-    if (stan_csv.metadata.thin > 1) {
-      thinned_samples = thinned_samples / stan_csv.metadata.thin;
-    }
-    return thinned_samples;
-  }
-
-  static bool is_valid(const stan::io::stan_csv& stan_csv) {
-    if (stan_csv.header.empty()) {
-      return false;
-    }
-    if (stan_csv.samples.size() == 0) {
-      return false;
-    }
-    if (stan_csv.samples.rows() != thinned_samples(stan_csv)) {
-      return false;
-    }
-    return true;
-  }
-
   /**
    * Process first chain: record header, thinned samples,
    * add samples to vector chains.
    */
   void init_from_stan_csv(const stan::io::stan_csv& stan_csv) {
-    if (!is_valid(stan_csv)) {
-      throw std::invalid_argument("Invalid sample");
-    }
+    validate_sample(stan_csv);
     if (chains_.size() > 0) {
       throw std::invalid_argument("Cannot re-initialize chains object");
     }
@@ -82,9 +91,7 @@ class chainset {
    * append to vector chains.
    */
   void add(const stan::io::stan_csv& stan_csv) {
-    if (!is_valid(stan_csv)) {
-      throw std::invalid_argument("Invalid sample");
-    }
+    validate_sample(stan_csv);
     if (stan_csv.header.size() != num_params()) {
       throw std::invalid_argument(
           "Error add(stan_csv): number of columns in"

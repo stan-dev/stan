@@ -15,9 +15,6 @@ class McmcChains : public testing::Test {
     bernoulli_500_stream.open(
         "src/test/unit/mcmc/test_csv_files/bernoulli_500.csv",
         std::ifstream::in);
-    bernoulli_corrupt_stream.open(
-        "src/test/unit/mcmc/test_csv_files/bernoulli_corrupt.csv",
-        std::ifstream::in);
     bernoulli_default_stream.open(
         "src/test/unit/mcmc/test_csv_files/bernoulli_default.csv",
         std::ifstream::in);
@@ -43,7 +40,7 @@ class McmcChains : public testing::Test {
         "src/test/unit/mcmc/test_csv_files/eight_schools_5iters_2.csv",
         std::ifstream::in);
 
-    if (!bernoulli_500_stream || !bernoulli_corrupt_stream
+    if (!bernoulli_500_stream
         || !bernoulli_default_stream || !bernoulli_thin_stream
         || !bernoulli_warmup_stream || !bernoulli_zeta_stream
         || !eight_schools_1_stream || !eight_schools_2_stream
@@ -51,7 +48,6 @@ class McmcChains : public testing::Test {
       FAIL() << "Failed to open one or more test files";
     }
     bernoulli_500_stream.seekg(0, std::ios::beg);
-    bernoulli_corrupt_stream.seekg(0, std::ios::beg);
     bernoulli_default_stream.seekg(0, std::ios::beg);
     bernoulli_thin_stream.seekg(0, std::ios::beg);
     bernoulli_warmup_stream.seekg(0, std::ios::beg);
@@ -63,8 +59,6 @@ class McmcChains : public testing::Test {
 
     bernoulli_500
         = stan::io::stan_csv_reader::parse(bernoulli_500_stream, &out);
-    bernoulli_corrupt
-        = stan::io::stan_csv_reader::parse(bernoulli_corrupt_stream, &out);
     bernoulli_default
         = stan::io::stan_csv_reader::parse(bernoulli_default_stream, &out);
     bernoulli_thin
@@ -85,7 +79,6 @@ class McmcChains : public testing::Test {
 
   void TearDown() override {
     bernoulli_500_stream.close();
-    bernoulli_corrupt_stream.close();
     bernoulli_default_stream.close();
     bernoulli_thin_stream.close();
     bernoulli_warmup_stream.close();
@@ -98,14 +91,14 @@ class McmcChains : public testing::Test {
 
   std::stringstream out;
 
-  std::ifstream bernoulli_500_stream, bernoulli_corrupt_stream,
-      bernoulli_default_stream, bernoulli_thin_stream, bernoulli_warmup_stream,
-      bernoulli_zeta_stream, eight_schools_1_stream, eight_schools_2_stream,
-      eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
+  std::ifstream bernoulli_500_stream,
+    bernoulli_default_stream, bernoulli_thin_stream, bernoulli_warmup_stream,
+    bernoulli_zeta_stream, eight_schools_1_stream, eight_schools_2_stream,
+    eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
 
-  stan::io::stan_csv bernoulli_500, bernoulli_corrupt, bernoulli_default,
-      bernoulli_thin, bernoulli_warmup, bernoulli_zeta, eight_schools_1,
-      eight_schools_2, eight_schools_5iters_1, eight_schools_5iters_2;
+  stan::io::stan_csv bernoulli_500, bernoulli_default,
+    bernoulli_thin, bernoulli_warmup, bernoulli_zeta, eight_schools_1,
+    eight_schools_2, eight_schools_5iters_1, eight_schools_5iters_2;
 };
 
 TEST_F(McmcChains, constructor) {
@@ -138,11 +131,6 @@ TEST_F(McmcChains, constructor) {
 
 TEST_F(McmcChains, addFail) {
   std::vector<stan::io::stan_csv> bad;
-  bad.push_back(bernoulli_default);
-  bad.push_back(bernoulli_corrupt);
-  EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
-
-  bad.clear();
   bad.push_back(bernoulli_default);
   bad.push_back(bernoulli_500);
   EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
