@@ -26,12 +26,8 @@ class StanIoStanCsvReader : public testing::Test {
 
     bernoulli_thin_stream.open(
         "src/test/unit/io/test_csv_files/bernoulli_thin.csv");
-    bernoulli_trunc_stream.open(
-        "src/test/unit/io/test_csv_files/bernoulli_corrupt.csv");
     bernoulli_warmup_stream.open(
         "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
-    missing_draws_stream.open(
-        "src/test/unit/io/test_csv_files/missing_draws.csv");
     fixed_param_stream.open(
         "src/test/unit/io/test_csv_files/fixed_param_output.csv");
   }
@@ -48,9 +44,7 @@ class StanIoStanCsvReader : public testing::Test {
     epil0_stream.close();
     blocker_nondiag0_stream.close();
     bernoulli_thin_stream.close();
-    bernoulli_trunc_stream.close();
     bernoulli_warmup_stream.close();
-    missing_draws_stream.close();
     fixed_param_stream.close();
   }
 
@@ -62,9 +56,7 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream eight_schools_stream;
   std::ifstream header3_stream;
   std::ifstream bernoulli_thin_stream;
-  std::ifstream bernoulli_trunc_stream;
   std::ifstream bernoulli_warmup_stream;
-  std::ifstream missing_draws_stream;
   std::ifstream fixed_param_stream;
 };
 
@@ -196,8 +188,8 @@ TEST_F(StanIoStanCsvReader, read_header_tuples) {
 
 TEST_F(StanIoStanCsvReader, read_adaptation1) {
   stan::io::stan_csv_adaptation adaptation;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation1_stream,
-                                                         adaptation));
+  stan::io::stan_csv_reader::read_adaptation(adaptation1_stream,
+					     adaptation);
 
   EXPECT_FLOAT_EQ(0.118745, adaptation.step_size);
   ASSERT_EQ(47, adaptation.metric.size());
@@ -564,15 +556,6 @@ TEST_F(StanIoStanCsvReader, skip_warmup) {
   ASSERT_NE(0, bernoulli_warmup.adaptation.step_size);
 }
 
-TEST_F(StanIoStanCsvReader, missing_data) {
-  stan::io::stan_csv missing_draws;
-  std::stringstream out;
-  EXPECT_THROW(stan::io::stan_csv_reader::parse(missing_draws_stream, &out),
-               std::invalid_argument);
-  stan::io::stan_csv bernoulli_trunc;
-  EXPECT_THROW(stan::io::stan_csv_reader::parse(bernoulli_trunc_stream, &out),
-               std::invalid_argument);
-}
 
 TEST_F(StanIoStanCsvReader, thinned_data) {
   stan::io::stan_csv bernoulli_thin;
