@@ -219,7 +219,8 @@ class stan_csv_reader {
     return true;
   }
 
-  static bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation) {
+  static bool read_adaptation(std::istream& in,
+                              stan_csv_adaptation& adaptation) {
     std::stringstream ss;
     std::string line;
     int lines = 0;
