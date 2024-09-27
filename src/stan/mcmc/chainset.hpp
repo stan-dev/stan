@@ -28,7 +28,7 @@
 namespace stan {
 namespace mcmc {
 using Eigen::Dynamic;
-  
+
 /**
  * An <code>mcmc::chainset</code> object manages the post-warmup draws
  * across a set of MCMC chains, which all have the same number of samples.
@@ -77,19 +77,19 @@ class chainset {
     std::stringstream ss;
     for (size_t i = 1; i < stan_csv.size(); ++i) {
       if (stan_csv[i].header.size() != param_names_.size()) {
-	ss << "Error: chain " << (i + 1) << " missing or extra columns.";
+        ss << "Error: chain " << (i + 1) << " missing or extra columns.";
         throw std::invalid_argument(ss.str());
       }
       for (int j = 0; j < param_names_.size(); j++) {
-	if (param_names_[j] != stan_csv[i].header[j]) {
-	  ss << "Error: chain " << (i + 1) << " header column " << (j + 1)
-	     << " doesn't match chain 1 header, found: " << stan_csv[i].header[j]
-	     << " expecting: " << param_names_[j];
-	  throw std::invalid_argument(ss.str());
-	}
+        if (param_names_[j] != stan_csv[i].header[j]) {
+          ss << "Error: chain " << (i + 1) << " header column " << (j + 1)
+             << " doesn't match chain 1 header, found: "
+             << stan_csv[i].header[j] << " expecting: " << param_names_[j];
+          throw std::invalid_argument(ss.str());
+        }
       }
       if (stan_csv[i].samples.rows() != num_samples_) {
-	ss << "Error: chain " << (i + 1) << ", missing or extra rows.";
+        ss << "Error: chain " << (i + 1) << ", missing or extra rows.";
         throw std::invalid_argument(ss.str());
       }
       chains_.push_back(stan_csv[i].samples);
@@ -361,7 +361,7 @@ class chainset {
     }
     return quantiles;
   }
-  
+
   /**
    * Compute the quantile values of the specified parameter
    * for a set of specified probabilities.
@@ -469,7 +469,8 @@ class chainset {
     double ess_s2 = analyze::split_rank_normalized_ess(s2).first;
     double ess_sd = std::min(ess_s, ess_s2);
     return sd(index)
-      * std::sqrt(stan::math::e() * std::pow(1 - 1 / ess_sd, ess_sd - 1) - 1);
+           * std::sqrt(stan::math::e() * std::pow(1 - 1 / ess_sd, ess_sd - 1)
+                       - 1);
   }
 
   /**
