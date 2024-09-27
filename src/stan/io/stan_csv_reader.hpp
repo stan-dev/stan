@@ -195,7 +195,7 @@ class stan_csv_reader {
   }  // read_metadata
 
   static bool read_header(std::istream& in, std::vector<std::string>& header,
-                          std::ostream* out, bool prettify_name = true) {
+                          bool prettify_name = true) {
     std::string line;
 
     if (!std::isalpha(in.peek()))
@@ -219,8 +219,7 @@ class stan_csv_reader {
     return true;
   }
 
-  static bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation,
-                              std::ostream* out) {
+  static bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation) {
     std::stringstream ss;
     std::string line;
     int lines = 0;
@@ -364,7 +363,7 @@ class stan_csv_reader {
     std::string line;
 
     read_metadata(in, data.metadata);
-    if (!read_header(in, data.header, out)) {
+    if (!read_header(in, data.header)) {
       throw std::invalid_argument("Error with header of input file in parse");
     }
 
@@ -376,10 +375,8 @@ class stan_csv_reader {
       }
     }
 
-    if (data.metadata.algorithm != "fixed_param"
-        && !read_adaptation(in, data.adaptation, out)) {
-      if (out)
-        *out << "Warning: non-fatal error reading adaptation data" << std::endl;
+    if (data.metadata.algorithm != "fixed_param") {
+      read_adaptation(in, data.adaptation);
     }
 
     data.timing.warmup = 0;
