@@ -51,11 +51,11 @@ class chainset {
     if (chains_.size() > 0) {
       throw std::invalid_argument("Cannot re-initialize chains object");
     }
-    param_names_ = stan_csv.header;
-    num_samples_ = stan_csv.samples.rows();
-    if (num_samples_ == 0) {
+    if (stan_csv.header.size() == 0 or stan_csv.samples.row() == 0) {
       throw std::invalid_argument("Error: empty sample");
     }
+    param_names_ = stan_csv.header;
+    num_samples_ = stan_csv.samples.rows();
     chains_.push_back(stan_csv.samples);
   }
 
@@ -68,16 +68,16 @@ class chainset {
     if (chains_.size() > 0) {
       throw std::invalid_argument("Cannot re-initialize chains object");
     }
-    param_names_ = stan_csv[0].header;
-    num_samples_ = stan_csv[0].samples.rows();
-    if (num_samples_ == 0) {
+    if (stan_csv[0].header.size() == 0 or stan_csv[0].samples.row() == 0) {
       throw std::invalid_argument("Error: empty sample");
     }
+    param_names_ = stan_csv[0].header;
+    num_samples_ = stan_csv[0].samples.rows();
     chains_.push_back(stan_csv[0].samples);
     std::stringstream ss;
     for (size_t i = 1; i < stan_csv.size(); ++i) {
       if (stan_csv[i].header.size() != param_names_.size()) {
-        ss << "Error: chain " << (i + 1) << " missing or extra columns.";
+        ss << "Error: chain " << (i + 1) << " missing or extra columns";
         throw std::invalid_argument(ss.str());
       }
       for (int j = 0; j < param_names_.size(); j++) {
