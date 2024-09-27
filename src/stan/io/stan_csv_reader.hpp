@@ -101,13 +101,12 @@ class stan_csv_reader {
   stan_csv_reader() {}
   ~stan_csv_reader() {}
 
-  static bool read_metadata(std::istream& in, stan_csv_metadata& metadata,
-                            std::ostream* out) {
+  static void read_metadata(std::istream& in, stan_csv_metadata& metadata) {
     std::stringstream ss;
     std::string line;
 
     if (in.peek() != '#')
-      return false;
+      return;
     while (in.peek() == '#') {
       std::getline(in, line);
       ss << line << '\n';
@@ -193,14 +192,10 @@ class stan_csv_reader {
         std::stringstream(value) >> metadata.max_depth;
       }
     }
-    if (ss.good() == true)
-      return false;
-
-    return true;
   }  // read_metadata
 
   static bool read_header(std::istream& in, std::vector<std::string>& header,
-                          std::ostream* out, bool prettify_name = true) {
+                          bool prettify_name = true) {
     std::string line;
 
     if (!std::isalpha(in.peek()))
@@ -224,64 +219,53 @@ class stan_csv_reader {
     return true;
   }
 
-  static bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation,
-                              std::ostream* out) {
+  static void read_adaptation(std::istream& in,
+                              stan_csv_adaptation& adaptation) {
     std::stringstream ss;
     std::string line;
     int lines = 0;
-
     if (in.peek() != '#' || in.good() == false)
-      return false;
-
+      return;
     while (in.peek() == '#') {
       std::getline(in, line);
       ss << line << std::endl;
       lines++;
     }
     ss.seekg(std::ios_base::beg);
-
     if (lines < 2)
-      return false;
+      return;
 
-    char comment;  // Buffer for comment indicator, #
+    std::getline(ss, line);  // comment adaptation terminated
 
-    // Skip "Adaptation terminated"
-    std::getline(ss, line);
-
-    // Stepsize
-    std::getline(ss, line, '=');
+    // parse stepsize
+    std::getline(ss, line, '=');  // stepsize
     boost::trim(line);
     ss >> adaptation.step_size;
     if (lines == 2)  // ADVI reports stepsize, no metric
-      return true;
+      return;
 
-    // Metric parameters
-    std::getline(ss, line);
-    std::getline(ss, line);
-    std::getline(ss, line);
+    std::getline(ss, line);  // consume end of stepsize line
+    std::getline(ss, line);  // comment elements of mass matrix
+    std::getline(ss, line);  // diagonal metric or row 1 of dense metric
 
     int rows = lines - 3;
     int cols = std::count(line.begin(), line.end(), ',') + 1;
     adaptation.metric.resize(rows, cols);
+    char comment;  // Buffer for comment indicator, #
 
+    // parse metric, row by row, element by element
     for (int row = 0; row < rows; row++) {
       std::stringstream line_ss;
       line_ss.str(line);
       line_ss >> comment;
-
       for (int col = 0; col < cols; col++) {
         std::string token;
         std::getline(line_ss, token, ',');
         boost::trim(token);
         std::stringstream(token) >> adaptation.metric(row, col);
       }
-      std::getline(ss, line);  // Read in next line
+      std::getline(ss, line);
     }
-
-    if (ss.good())
-      return false;
-    else
-      return true;
   }
 
   static bool read_samples(std::istream& in, Eigen::MatrixXd& samples,
@@ -325,11 +309,10 @@ class stan_csv_reader {
         if (cols == -1) {
           cols = current_cols;
         } else if (cols != current_cols) {
-          if (out)
-            *out << "Error: expected " << cols << " columns, but found "
-                 << current_cols << " instead for row " << rows + 1
-                 << std::endl;
-          return false;
+          std::stringstream msg;
+          msg << "Error: expected " << cols << " columns, but found "
+              << current_cols << " instead for row " << rows + 1;
+          throw std::invalid_argument(msg.str());
         }
         rows++;
       }
@@ -357,10 +340,9 @@ class stan_csv_reader {
   /**
    * Parses the file.
    *
-   * Warns if missing metatdata, inconsistencies between metadata config
-   * and parsed data rows.
+   * Throws exception if contents can't be parsed into header + data rows.
    *
-   * Throws exception if no header row found.
+   * Emits warning message
    *
    * @param[in] in input stream to parse
    * @param[out] out output stream to send messages
@@ -369,14 +351,9 @@ class stan_csv_reader {
     stan_csv data;
     std::string line;
 
-    if (!read_metadata(in, data.metadata, out)) {
-      if (out)
-        *out << "Warning: non-fatal error reading metadata" << std::endl;
-    }
-    if (!read_header(in, data.header, out)) {
-      if (out)
-        *out << "Error: error reading header" << std::endl;
-      throw std::invalid_argument("Error with header of input file in parse");
+    read_metadata(in, data.metadata);
+    if (!read_header(in, data.header)) {
+      throw std::invalid_argument("Error: no column names found in csv file");
     }
 
     // skip warmup draws, if any
@@ -387,10 +364,8 @@ class stan_csv_reader {
       }
     }
 
-    if (data.metadata.algorithm != "fixed_param"
-        && !read_adaptation(in, data.adaptation, out)) {
-      if (out)
-        *out << "Warning: non-fatal error reading adaptation data" << std::endl;
+    if (data.metadata.algorithm != "fixed_param") {
+      read_adaptation(in, data.adaptation);
     }
 
     data.timing.warmup = 0;
@@ -403,16 +378,6 @@ class stan_csv_reader {
     if (!read_samples(in, data.samples, data.timing, out)) {
       if (out)
         *out << "Warning: non-fatal error reading samples" << std::endl;
-    }
-    if (data.metadata.method == "sample") {
-      int expected_samples = data.metadata.num_samples / data.metadata.thin;
-      if (expected_samples != data.samples.rows()) {
-        std::stringstream msg;
-        msg << ", expecting " << expected_samples << " samples, found "
-            << data.samples.rows();
-        if (out)
-          *out << "Warning: error reading samples" << msg.str() << std::endl;
-      }
     }
     return data;
   }

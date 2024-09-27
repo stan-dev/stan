@@ -3,6 +3,7 @@
 
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim.hpp>
+#include <stan/math/prim/fun/constants.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_ess.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_rhat.hpp>
 #include <boost/accumulators/accumulators.hpp>
@@ -30,9 +31,11 @@ using Eigen::Dynamic;
 
 /**
  * An <code>mcmc::chainset</code> object manages the post-warmup draws
- * across a set of MCMC chains, which all have the same number or samples.
+ * across a set of MCMC chains, which all have the same number of samples.
  *
- * <p><b>Storage Order</b>: Storage is column/last-index major.
+ * @note samples are stored in column major, i.e., each column corresponds to
+ * an output variable (element).
+ *
  */
 class chainset {
  private:
@@ -40,83 +43,56 @@ class chainset {
   std::vector<std::string> param_names_;
   std::vector<Eigen::MatrixXd> chains_;
 
-  static size_t thinned_samples(const stan::io::stan_csv& stan_csv) {
-    size_t thinned_samples = stan_csv.metadata.num_samples;
-    if (stan_csv.metadata.thin > 1) {
-      thinned_samples = thinned_samples / stan_csv.metadata.thin;
-    }
-    return thinned_samples;
-  }
-
-  static bool is_valid(const stan::io::stan_csv& stan_csv) {
-    if (stan_csv.header.empty()) {
-      return false;
-    }
-    if (stan_csv.samples.size() == 0) {
-      return false;
-    }
-    if (stan_csv.samples.rows() != thinned_samples(stan_csv)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Process first chain: record header, thinned samples,
-   * add samples to vector chains.
+ public:
+  /* Construct a chainset from a single sample.
+   * Throws execption if sample is empty.
    */
-  void init_from_stan_csv(const stan::io::stan_csv& stan_csv) {
-    if (!is_valid(stan_csv)) {
-      throw std::invalid_argument("Invalid sample");
-    }
+  explicit chainset(const stan::io::stan_csv& stan_csv) {
     if (chains_.size() > 0) {
       throw std::invalid_argument("Cannot re-initialize chains object");
     }
+    if (stan_csv.header.size() == 0 or stan_csv.samples.row() == 0) {
+      throw std::invalid_argument("Error: empty sample");
+    }
     param_names_ = stan_csv.header;
-    num_samples_ = thinned_samples(stan_csv);
+    num_samples_ = stan_csv.samples.rows();
     chains_.push_back(stan_csv.samples);
   }
 
-  /**
-   * Process next chain: validate size, shape, column names,
-   * append to vector chains.
+  /* Construct a chainset from a set of samples.
+   * Throws execption if sample column names and shapes don't match.
    */
-  void add(const stan::io::stan_csv& stan_csv) {
-    if (!is_valid(stan_csv)) {
-      throw std::invalid_argument("Invalid sample");
-    }
-    if (stan_csv.header.size() != num_params()) {
-      throw std::invalid_argument(
-          "Error add(stan_csv): number of columns in"
-          " sample does not match first chain");
-    }
-    if (thinned_samples(stan_csv) != num_samples_) {
-      throw std::invalid_argument(
-          "Error add(stan_csv): number of sampling draws in"
-          " sample does not match first chain");
-    }
-    for (int i = 0; i < num_params(); i++) {
-      if (param_names_[i] != stan_csv.header[i]) {
-        std::stringstream ss;
-        ss << "Error add(stan_csv): header " << param_names_[i]
-           << " does not match chain's header (" << stan_csv.header[i] << ")";
-        throw std::invalid_argument(ss.str());
-      }
-    }
-    chains_.push_back(stan_csv.samples);
-  }
-
- public:
-  explicit chainset(const stan::io::stan_csv& stan_csv) {
-    init_from_stan_csv(stan_csv);
-  }
-
   explicit chainset(const std::vector<stan::io::stan_csv>& stan_csv) {
     if (stan_csv.empty())
       return;
-    init_from_stan_csv(stan_csv[0]);
+    if (chains_.size() > 0) {
+      throw std::invalid_argument("Cannot re-initialize chains object");
+    }
+    if (stan_csv[0].header.size() == 0 or stan_csv[0].samples.row() == 0) {
+      throw std::invalid_argument("Error: empty sample");
+    }
+    param_names_ = stan_csv[0].header;
+    num_samples_ = stan_csv[0].samples.rows();
+    chains_.push_back(stan_csv[0].samples);
+    std::stringstream ss;
     for (size_t i = 1; i < stan_csv.size(); ++i) {
-      add(stan_csv[i]);
+      if (stan_csv[i].header.size() != param_names_.size()) {
+        ss << "Error: chain " << (i + 1) << " missing or extra columns";
+        throw std::invalid_argument(ss.str());
+      }
+      for (int j = 0; j < param_names_.size(); j++) {
+        if (param_names_[j] != stan_csv[i].header[j]) {
+          ss << "Error: chain " << (i + 1) << " header column " << (j + 1)
+             << " doesn't match chain 1 header, found: "
+             << stan_csv[i].header[j] << " expecting: " << param_names_[j];
+          throw std::invalid_argument(ss.str());
+        }
+      }
+      if (stan_csv[i].samples.rows() != num_samples_) {
+        ss << "Error: chain " << (i + 1) << ", missing or extra rows.";
+        throw std::invalid_argument(ss.str());
+      }
+      chains_.push_back(stan_csv[i].samples);
     }
   }
 
@@ -275,10 +251,7 @@ class chainset {
    */
   double median(const int index) const {
     Eigen::MatrixXd draws = samples(index);
-    std::vector<double> sorted(draws.data(), draws.data() + draws.size());
-    std::sort(sorted.begin(), sorted.end());
-    size_t idx = static_cast<size_t>(0.5 * (sorted.size() - 1));
-    return sorted[idx];
+    return quantile(index, 0.5);
   }
 
   /**
@@ -341,9 +314,9 @@ class chainset {
       throw std::out_of_range("Probability must be between 0 and 1.");
     }
     Eigen::MatrixXd draws = samples(index);
+    size_t idx = static_cast<size_t>(prob * (draws.size() - 1));
     std::vector<double> sorted(draws.data(), draws.data() + draws.size());
-    std::sort(sorted.begin(), sorted.end());
-    size_t idx = static_cast<size_t>(prob * (sorted.size() - 1));
+    std::nth_element(sorted.begin(), sorted.begin() + idx, sorted.end());
     return sorted[idx];
   }
 
@@ -496,7 +469,8 @@ class chainset {
     double ess_s2 = analyze::split_rank_normalized_ess(s2).first;
     double ess_sd = std::min(ess_s, ess_s2);
     return sd(index)
-           * std::sqrt(std::exp(1) * std::pow(1 - 1 / ess_sd, ess_sd - 1) - 1);
+           * std::sqrt(stan::math::e() * std::pow(1 - 1 / ess_sd, ess_sd - 1)
+                       - 1);
   }
 
   /**
@@ -519,18 +493,6 @@ class chainset {
    * @return vector of chain autocorrelation at all lags
    */
   Eigen::VectorXd autocorrelation(const int chain, const int index) const {
-    if (chain < 0 || chain >= num_chains()) {
-      std::stringstream ss;
-      ss << "Bad index " << index << ", should be between 0 and "
-         << (num_chains() - 1);
-      throw std::invalid_argument(ss.str());
-    }
-    if (index < 0 || index >= param_names().size()) {
-      std::stringstream ss;
-      ss << "Bad index " << index << ", should be between 0 and "
-         << (num_params() - 1);
-      throw std::invalid_argument(ss.str());
-    }
     Eigen::MatrixXd s = samples(index);
     Eigen::Map<const Eigen::VectorXd> chain_col(samples(chain).data(),
                                                 num_samples());

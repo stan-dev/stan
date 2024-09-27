@@ -28,8 +28,6 @@ class StanIoStanCsvReader : public testing::Test {
         "src/test/unit/io/test_csv_files/bernoulli_thin.csv");
     bernoulli_warmup_stream.open(
         "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
-    missing_draws_stream.open(
-        "src/test/unit/io/test_csv_files/missing_draws.csv");
     fixed_param_stream.open(
         "src/test/unit/io/test_csv_files/fixed_param_output.csv");
   }
@@ -47,7 +45,6 @@ class StanIoStanCsvReader : public testing::Test {
     blocker_nondiag0_stream.close();
     bernoulli_thin_stream.close();
     bernoulli_warmup_stream.close();
-    missing_draws_stream.close();
     fixed_param_stream.close();
   }
 
@@ -60,14 +57,12 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream header3_stream;
   std::ifstream bernoulli_thin_stream;
   std::ifstream bernoulli_warmup_stream;
-  std::ifstream missing_draws_stream;
   std::ifstream fixed_param_stream;
 };
 
 TEST_F(StanIoStanCsvReader, read_metadata1) {
   stan::io::stan_csv_metadata metadata;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata, 0));
+  stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata);
 
   EXPECT_EQ(2, metadata.stan_version_major);
   EXPECT_EQ(9, metadata.stan_version_minor);
@@ -93,9 +88,7 @@ TEST_F(StanIoStanCsvReader, read_metadata1) {
 
 TEST_F(StanIoStanCsvReader, read_metadata3) {
   stan::io::stan_csv_metadata metadata;
-
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_metadata(metadata3_stream, metadata, 0));
+  stan::io::stan_csv_reader::read_metadata(metadata3_stream, metadata);
 
   EXPECT_EQ(2, metadata.stan_version_major);
   EXPECT_EQ(9, metadata.stan_version_minor);
@@ -121,8 +114,7 @@ TEST_F(StanIoStanCsvReader, read_metadata3) {
 
 TEST_F(StanIoStanCsvReader, read_header1) {
   std::vector<std::string> header;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_header(header1_stream, header, 0));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header1_stream, header));
 
   ASSERT_EQ(55, header.size());
   EXPECT_EQ("lp__", header[0]);
@@ -149,8 +141,7 @@ TEST_F(StanIoStanCsvReader, read_header1) {
 
 TEST_F(StanIoStanCsvReader, read_header2) {
   std::vector<std::string> header;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_header(header2_stream, header, 0));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header2_stream, header));
 
   ASSERT_EQ(5, header.size());
   EXPECT_EQ("d", header[0]);
@@ -164,8 +155,7 @@ TEST_F(StanIoStanCsvReader, read_header2) {
 
 TEST_F(StanIoStanCsvReader, read_header_tuples) {
   std::vector<std::string> header;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_header(header3_stream, header, 0));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header3_stream, header));
 
   ASSERT_EQ(46, header.size());
 
@@ -198,8 +188,7 @@ TEST_F(StanIoStanCsvReader, read_header_tuples) {
 
 TEST_F(StanIoStanCsvReader, read_adaptation1) {
   stan::io::stan_csv_adaptation adaptation;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation1_stream,
-                                                         adaptation, 0));
+  stan::io::stan_csv_reader::read_adaptation(adaptation1_stream, adaptation);
 
   EXPECT_FLOAT_EQ(0.118745, adaptation.step_size);
   ASSERT_EQ(47, adaptation.metric.size());
@@ -564,13 +553,6 @@ TEST_F(StanIoStanCsvReader, skip_warmup) {
   ASSERT_EQ(1000, bernoulli_warmup.metadata.num_warmup);
   ASSERT_EQ(1000, bernoulli_warmup.metadata.num_samples);
   ASSERT_NE(0, bernoulli_warmup.adaptation.step_size);
-}
-
-TEST_F(StanIoStanCsvReader, missing_data) {
-  stan::io::stan_csv missing_draws;
-  std::stringstream out;
-  missing_draws = stan::io::stan_csv_reader::parse(missing_draws_stream, &out);
-  ASSERT_TRUE(boost::algorithm::starts_with(out.str(), "Warning:"));
 }
 
 TEST_F(StanIoStanCsvReader, thinned_data) {
