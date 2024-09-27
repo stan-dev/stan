@@ -122,8 +122,7 @@ TEST_F(StanIoStanCsvReader, read_metadata3) {
 
 TEST_F(StanIoStanCsvReader, read_header1) {
   std::vector<std::string> header;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_header(header1_stream, header, 0));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header1_stream, header));
 
   ASSERT_EQ(55, header.size());
   EXPECT_EQ("lp__", header[0]);
@@ -150,8 +149,7 @@ TEST_F(StanIoStanCsvReader, read_header1) {
 
 TEST_F(StanIoStanCsvReader, read_header2) {
   std::vector<std::string> header;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_header(header2_stream, header, 0));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header2_stream, header));
 
   ASSERT_EQ(5, header.size());
   EXPECT_EQ("d", header[0]);
@@ -165,8 +163,7 @@ TEST_F(StanIoStanCsvReader, read_header2) {
 
 TEST_F(StanIoStanCsvReader, read_header_tuples) {
   std::vector<std::string> header;
-  EXPECT_TRUE(
-      stan::io::stan_csv_reader::read_header(header3_stream, header, 0));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header3_stream, header));
 
   ASSERT_EQ(46, header.size());
 
@@ -200,7 +197,7 @@ TEST_F(StanIoStanCsvReader, read_header_tuples) {
 TEST_F(StanIoStanCsvReader, read_adaptation1) {
   stan::io::stan_csv_adaptation adaptation;
   EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation1_stream,
-                                                         adaptation, 0));
+                                                         adaptation));
 
   EXPECT_FLOAT_EQ(0.118745, adaptation.step_size);
   ASSERT_EQ(47, adaptation.metric.size());
