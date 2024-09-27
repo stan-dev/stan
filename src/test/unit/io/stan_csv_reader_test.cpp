@@ -188,8 +188,7 @@ TEST_F(StanIoStanCsvReader, read_header_tuples) {
 
 TEST_F(StanIoStanCsvReader, read_adaptation1) {
   stan::io::stan_csv_adaptation adaptation;
-  stan::io::stan_csv_reader::read_adaptation(adaptation1_stream,
-					     adaptation);
+  stan::io::stan_csv_reader::read_adaptation(adaptation1_stream, adaptation);
 
   EXPECT_FLOAT_EQ(0.118745, adaptation.step_size);
   ASSERT_EQ(47, adaptation.metric.size());
@@ -555,7 +554,6 @@ TEST_F(StanIoStanCsvReader, skip_warmup) {
   ASSERT_EQ(1000, bernoulli_warmup.metadata.num_samples);
   ASSERT_NE(0, bernoulli_warmup.adaptation.step_size);
 }
-
 
 TEST_F(StanIoStanCsvReader, thinned_data) {
   stan::io::stan_csv bernoulli_thin;

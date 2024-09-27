@@ -342,7 +342,7 @@ class stan_csv_reader {
    *
    * Throws exception if contents can't be parsed into header + data rows.
    *
-   * Emits warning message 
+   * Emits warning message
    *
    * @param[in] in input stream to parse
    * @param[out] out output stream to send messages
