@@ -51,7 +51,7 @@ class chainset {
     if (chains_.size() > 0) {
       throw std::invalid_argument("Cannot re-initialize chains object");
     }
-    if (stan_csv.header.size() == 0 or stan_csv.samples.row() == 0) {
+    if (stan_csv.header.size() == 0 or stan_csv.samples.rows() == 0) {
       throw std::invalid_argument("Error: empty sample");
     }
     param_names_ = stan_csv.header;
@@ -68,7 +68,7 @@ class chainset {
     if (chains_.size() > 0) {
       throw std::invalid_argument("Cannot re-initialize chains object");
     }
-    if (stan_csv[0].header.size() == 0 or stan_csv[0].samples.row() == 0) {
+    if (stan_csv[0].header.size() == 0 or stan_csv[0].samples.rows() == 0) {
       throw std::invalid_argument("Error: empty sample");
     }
     param_names_ = stan_csv[0].header;
