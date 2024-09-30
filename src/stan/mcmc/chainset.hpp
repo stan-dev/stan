@@ -249,10 +249,7 @@ class chainset {
    * @param index parameter index
    * @return median
    */
-  double median(const int index) const {
-    Eigen::MatrixXd draws = samples(index);
-    return quantile(index, 0.5);
-  }
+  double median(const int index) const { return quantile(index, 0.5); }
 
   /**
    * Compute median value of specified parameter across all chains.
@@ -277,9 +274,9 @@ class chainset {
     Eigen::MatrixXd draws = samples(index);
     auto center = median(index);
     Eigen::MatrixXd abs_dev = (draws.array() - center).abs();
+    size_t idx = static_cast<size_t>(0.5 * (abs_dev.size() - 1));
     std::vector<double> sorted(abs_dev.data(), abs_dev.data() + abs_dev.size());
-    std::sort(sorted.begin(), sorted.end());
-    size_t idx = static_cast<size_t>(0.5 * (sorted.size() - 1));
+    std::nth_element(sorted.begin(), sorted.begin() + idx, sorted.end());
     return 1.4826 * sorted[idx];
   }
 
