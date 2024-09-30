@@ -117,7 +117,6 @@ class chains {
     using boost::accumulators::tag::tail;
     using boost::accumulators::tag::tail_quantile;
     double M = x.rows();
-    // size_t cache_size = std::min(prob, 1-prob)*M + 2;
     size_t cache_size = M;
 
     if (prob < 0.5) {
@@ -146,8 +145,7 @@ class chains {
     using boost::accumulators::tag::tail_quantile;
     double M = x.rows();
 
-    // size_t cache_size = M/2 + 2;
-    size_t cache_size = M;  // 2 + 2;
+    size_t cache_size = M;
 
     accumulator_set<double, stats<tail_quantile<left> > > acc_left(
         tail<left>::cache_size = cache_size);
@@ -591,24 +589,6 @@ class chains {
 
   double split_effective_sample_size(const std::string& name) const {
     return split_effective_sample_size(index(name));
-  }
-
-  double split_potential_scale_reduction(const int index) const {
-    int n_chains = num_chains();
-    std::vector<const double*> draws(n_chains);
-    std::vector<size_t> sizes(n_chains);
-    int n_kept_samples = 0;
-    for (int chain = 0; chain < n_chains; ++chain) {
-      n_kept_samples = num_kept_samples(chain);
-      draws[chain]
-          = samples_(chain).col(index).bottomRows(n_kept_samples).data();
-      sizes[chain] = n_kept_samples;
-    }
-    return analyze::compute_split_potential_scale_reduction(draws, sizes);
-  }
-
-  double split_potential_scale_reduction(const std::string& name) const {
-    return split_potential_scale_reduction(index(name));
   }
 };
 
