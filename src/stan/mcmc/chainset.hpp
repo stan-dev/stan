@@ -249,9 +249,7 @@ class chainset {
    * @param index parameter index
    * @return median
    */
-  double median(const int index) const {
-    return quantile(index, 0.5);
-  }
+  double median(const int index) const { return quantile(index, 0.5); }
 
   /**
    * Compute median value of specified parameter across all chains.
