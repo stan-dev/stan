@@ -590,6 +590,25 @@ class chains {
   double split_effective_sample_size(const std::string& name) const {
     return split_effective_sample_size(index(name));
   }
+
+  double split_potential_scale_reduction(const int index) const {
+    int n_chains = num_chains();
+    std::vector<const double*> draws(n_chains);
+    std::vector<size_t> sizes(n_chains);
+    int n_kept_samples = 0;
+    for (int chain = 0; chain < n_chains; ++chain) {
+      n_kept_samples = num_kept_samples(chain);
+      draws[chain]
+          = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+      sizes[chain] = n_kept_samples;
+    }
+
+    return analyze::compute_split_potential_scale_reduction(draws, sizes);
+  }
+
+  double split_potential_scale_reduction(const std::string& name) const {
+    return split_potential_scale_reduction(index(name));
+  }
 };
 
 }  // namespace mcmc
