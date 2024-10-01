@@ -4,15 +4,9 @@
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/math/prim/fun/constants.hpp>
+#include <stan/math/prim/fun/quantile.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_ess.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_rhat.hpp>
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/median.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
-#include <boost/accumulators/statistics/covariance.hpp>
-#include <boost/accumulators/statistics/variates/covariate.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -273,10 +267,8 @@ class chainset {
     Eigen::MatrixXd draws = samples(index);
     auto center = median(index);
     Eigen::MatrixXd abs_dev = (draws.array() - center).abs();
-    size_t idx = static_cast<size_t>(0.5 * (abs_dev.size() - 1));
-    std::vector<double> copy(abs_dev.data(), abs_dev.data() + abs_dev.size());
-    std::nth_element(copy.begin(), copy.begin() + idx, copy.end());
-    return 1.4826 * copy[idx];
+    Eigen::Map<Eigen::VectorXd> map(abs_dev.data(), abs_dev.size());
+    return 1.4826 * stan::math::quantile(map, 0.5);
   }
 
   /**
@@ -306,14 +298,12 @@ class chainset {
    */
   double quantile(const int index, const double prob) const {
     // Ensure the probability is within [0, 1]
-    if (prob < 0.0 || prob > 1.0) {
+    if (prob <= 0.0 || prob >= 1.0) {
       throw std::out_of_range("Probability must be between 0 and 1.");
     }
     Eigen::MatrixXd draws = samples(index);
-    std::vector<double> copy(draws.data(), draws.data() + draws.size());
-    int idx = static_cast<int>(prob * (copy.size() - 1));
-    std::nth_element(copy.begin(), copy.begin() + idx, copy.end());
-    return copy[idx];
+    Eigen::Map<Eigen::VectorXd> map(draws.data(), draws.size());
+    return stan::math::quantile(map, prob);
   }
 
   /**
@@ -342,16 +332,16 @@ class chainset {
    */
   Eigen::VectorXd quantiles(const int index,
                             const Eigen::VectorXd& probs) const {
-    Eigen::VectorXd quantiles(probs.size());
     if (probs.size() == 0)
-      return quantiles;
-    if (probs.minCoeff() < 0.0 || probs.maxCoeff() > 1.0) {
+      return Eigen::VectorXd::Zero(0);
+    if (probs.minCoeff() <= 0.0 || probs.maxCoeff() >= 1.0) {
       throw std::out_of_range("Probabilities must be between 0 and 1.");
     }
-    for (size_t i = 0; i < probs.size(); ++i) {
-      quantiles[i] = quantile(index, probs[i]);
-    }
-    return quantiles;
+    Eigen::MatrixXd draws = samples(index);
+    Eigen::Map<Eigen::VectorXd> map(draws.data(), draws.size());
+    std::vector<double> probs_vec(probs.data(), probs.data() + probs.size()); 
+    std::vector<double> quantiles = stan::math::quantile(map, probs_vec);
+    return Eigen::Map<Eigen::VectorXd>(quantiles.data(), quantiles.size());
   }
 
   /**
