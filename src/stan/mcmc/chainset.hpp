@@ -339,7 +339,7 @@ class chainset {
     }
     Eigen::MatrixXd draws = samples(index);
     Eigen::Map<Eigen::VectorXd> map(draws.data(), draws.size());
-    std::vector<double> probs_vec(probs.data(), probs.data() + probs.size()); 
+    std::vector<double> probs_vec(probs.data(), probs.data() + probs.size());
     std::vector<double> quantiles = stan::math::quantile(map, probs_vec);
     return Eigen::Map<Eigen::VectorXd>(quantiles.data(), quantiles.size());
   }
