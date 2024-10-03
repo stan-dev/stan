@@ -1,0 +1,57 @@
+# stan_version_major = 2
+# stan_version_minor = 35
+# stan_version_patch = 0
+# model = bernoulli_model
+# start_datetime = 2024-10-03 16:54:16 UTC
+# method = sample (Default)
+#   sample
+#     num_samples = 0
+#     num_warmup = 1000 (Default)
+#     save_warmup = false (Default)
+#     thin = 1 (Default)
+#     adapt
+#       engaged = true (Default)
+#       gamma = 0.05 (Default)
+#       delta = 0.8 (Default)
+#       kappa = 0.75 (Default)
+#       t0 = 10 (Default)
+#       init_buffer = 75 (Default)
+#       term_buffer = 50 (Default)
+#       window = 25 (Default)
+#       save_metric = false (Default)
+#     algorithm = hmc (Default)
+#       hmc
+#         engine = nuts (Default)
+#           nuts
+#             max_depth = 10 (Default)
+#         metric = diag_e (Default)
+#         metric_file =  (Default)
+#         stepsize = 1 (Default)
+#         stepsize_jitter = 0 (Default)
+#     num_chains = 1 (Default)
+# id = 1 (Default)
+# data
+#   file = examples/bernoulli/bernoulli.data.json
+# init = 2 (Default)
+# random
+#   seed = 1517767693 (Default)
+# output
+#   file = output.csv (Default)
+#   diagnostic_file =  (Default)
+#   refresh = 100 (Default)
+#   sig_figs = -1 (Default)
+#   profile_file = profile.csv (Default)
+#   save_cmdstan_config = false (Default)
+# num_threads = 1 (Default)
+# stanc_version = stanc3 v2.35.0
+# stancflags = 
+lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,theta
+# Adaptation terminated
+# Step size = 1.22726
+# Diagonal elements of inverse mass matrix:
+# 0.489285
+# 
+#  Elapsed Time: 0.005 seconds (Warm-up)
+#                0 seconds (Sampling)
+#                0.005 seconds (Total)
+# 

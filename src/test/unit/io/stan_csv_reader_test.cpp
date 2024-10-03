@@ -246,7 +246,7 @@ TEST_F(StanIoStanCsvReader, read_samples1) {
   stan::io::stan_csv_timing timing;
 
   EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples1_stream, samples,
-                                                      timing, 0));
+                                                      timing));
 
   ASSERT_EQ(5, samples.rows());
   ASSERT_EQ(55, samples.cols());
@@ -568,4 +568,24 @@ TEST_F(StanIoStanCsvReader, fixed_param) {
   std::stringstream out;
   fixed_param = stan::io::stan_csv_reader::parse(fixed_param_stream, &out);
   ASSERT_EQ(10, fixed_param.samples.rows());
+}
+
+
+TEST_F(StanIoStanCsvReader, no_samples) {
+  std::ifstream no_samples_stream;
+  no_samples_stream.open("src/test/unit/io/test_csv_files/bernoulli_no_samples.csv");
+  std::stringstream out;
+  stan::io::stan_csv no_samples = stan::io::stan_csv_reader::parse(no_samples_stream, &out);
+  no_samples_stream.close();
+  ASSERT_EQ(out.str(), "Unable to parse sample\n");
+}
+
+
+TEST_F(StanIoStanCsvReader, variational) {
+  std::ifstream variational_stream;
+  variational_stream.open("src/test/unit/io/test_csv_files/bernoulli_variational.csv");
+  std::stringstream out;
+  stan::io::stan_csv variational = stan::io::stan_csv_reader::parse(variational_stream, &out);
+  variational_stream.close();
+  ASSERT_EQ(1000, variational.metadata.num_samples);
 }

@@ -269,7 +269,7 @@ class stan_csv_reader {
   }
 
   static bool read_samples(std::istream& in, Eigen::MatrixXd& samples,
-                           stan_csv_timing& timing, std::ostream* out) {
+                           stan_csv_timing& timing) {
     std::stringstream ss;
     std::string line;
 
@@ -277,7 +277,7 @@ class stan_csv_reader {
     int cols = -1;
 
     if (in.peek() == '#' || in.good() == false)
-      return false;
+      return false;  // need at least one data row
 
     while (in.good()) {
       bool comment_line = (in.peek() == '#');
@@ -375,9 +375,9 @@ class stan_csv_reader {
       std::getline(in, line);  // discard variational estimate
     }
 
-    if (!read_samples(in, data.samples, data.timing, out)) {
+    if (!read_samples(in, data.samples, data.timing)) {
       if (out)
-        *out << "Warning: non-fatal error reading samples" << std::endl;
+        *out << "Unable to parse sample" << std::endl;
     }
     return data;
   }
