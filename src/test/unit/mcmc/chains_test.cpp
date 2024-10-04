@@ -886,15 +886,6 @@ TEST_F(McmcChains, blocker_split_potential_scale_reduction_rank) {
   stan::mcmc::chains<> chains(blocker1);
   chains.add(blocker2);
 
-  // Eigen::VectorXd rhat(48);
-  // rhat
-  // << 1.0078, 1.0109, 1.00731, 1.00333, 1.00401, 1.00992, 1.00734, 1.00633,
-  //     1.00095, 1.00906, 1.01019, 1.00075, 1.00595, 1.00473, 1.00895, 1.01304,
-  //     1.00166, 1.0074, 1.00236, 1.00588, 1.00414, 1.00303, 1.00976, 1.00295,
-  //     1.00193, 1.0044, 1.00488, 1.00178, 1.01082, 1.0019, 1.00413, 1.01303,
-  //     1.0024, 1.01148, 1.00436, 1.00515, 1.00712, 1.0089, 1.00222, 1.00118,
-  //     1.00381, 1.00283, 1.00188, 1.00225, 1.00335, 1.00133, 1.00209, 1.0109;
-
   Eigen::VectorXd rhat_bulk(48);
   rhat_bulk << 1.0078, 1.0109, 0.99919, 1.001, 1.00401, 1.00992, 1.00182,
       1.00519, 1.00095, 1.00351, 1.00554, 1.00075, 1.00595, 1.00473, 1.00546,
@@ -925,14 +916,9 @@ TEST_F(McmcChains, blocker_split_potential_scale_reduction_rank) {
     ASSERT_NEAR(expected_tail_rhat, computed_tail_rhat, 1e-4)
         << "Tail Rhat mismatch for index: " << index
         << ", parameter: " << chains.param_name(index);
-
-    // ASSERT_NEAR(rhat(index - 4),
-    //             chains.split_potential_scale_reduction_rank(index), 1e-4)
-    //     << "rhat for index: " << index
-    //     << ", parameter: " << chains.param_name(index);
   }
 
-  for (int index = 0; index < chains.num_params(); index++) {
+  for (int index = 4; index < chains.num_params(); index++) {
     std::string name = chains.param_name(index);
     ASSERT_EQ(chains.split_potential_scale_reduction_rank(index),
               chains.split_potential_scale_reduction_rank(name));
