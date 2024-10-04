@@ -6,38 +6,16 @@
 #include <string>
 #include <cmath>
 
-class RankNormalizedRhat : public testing::Test {
- public:
-  void SetUp() {
-    eight_schools_1_stream.open(
-        "src/test/unit/mcmc/test_csv_files/eight_schools_1.csv",
-        std::ifstream::in);
-    eight_schools_2_stream.open(
-        "src/test/unit/mcmc/test_csv_files/eight_schools_2.csv",
-        std::ifstream::in);
-    if (!eight_schools_1_stream || !eight_schools_2_stream) {
-      FAIL() << "Failed to open one or more test files";
-    }
-    eight_schools_1_stream.seekg(0, std::ios::beg);
-    eight_schools_2_stream.seekg(0, std::ios::beg);
-    eight_schools_1
-        = stan::io::stan_csv_reader::parse(eight_schools_1_stream, &out);
-    eight_schools_2
-        = stan::io::stan_csv_reader::parse(eight_schools_2_stream, &out);
-  }
-
-  void TearDown() {
-    blocker1_stream.close();
-    blocker2_stream.close();
-  }
-
+TEST(RankNormalizedRhat, compute_split_rank_normalized_rhat) {
   std::stringstream out;
-  std::ifstream eight_schools_1_stream, eight_schools_2_stream;
-  stan::io::stan_csv eight_schools_1, eight_schools_2;
-};
-
-
-TEST_F(RankNormalizedRhat, compute_split_rank_normalized_rhat) {
+  std::ifstream eight_schools_1_stream;
+  stan::io::stan_csv eight_schools_1;
+  eight_schools_1_stream.open(
+      "src/test/unit/mcmc/test_csv_files/eight_schools_1.csv",
+      std::ifstream::in);
+  eight_schools_1
+      = stan::io::stan_csv_reader::parse(eight_schools_1_stream, &out);
+  eight_schools_1_stream.close();
   stan::mcmc::chains<> chains(eight_schools_1);
 
   // test against R implementation in pkg posterior
@@ -52,13 +30,14 @@ TEST_F(RankNormalizedRhat, compute_split_rank_normalized_rhat) {
       1.025817745;
 
   for (size_t i = 0; i < 10; ++i) {
-    auto rhats = chains.split_rank_normalized_rhat(i + 7);
+    auto rhats = chains.split_potential_scale_reduction_rank(i + 7);
     EXPECT_NEAR(rhats.first, rhat_8_schools_1_bulk(i), 0.05);
     EXPECT_NEAR(rhats.second, rhat_8_schools_1_tail(i), 0.05);
   }
 }
 
-TEST_F(RankNormalizedRhat, const_fail) {
+TEST(RankNormalizedRhat, const_fail) {
+  std::stringstream out;
   std::ifstream bernoulli_const_1_stream, bernoulli_const_2_stream;
   stan::io::stan_csv bernoulli_const_1, bernoulli_const_2;
   bernoulli_const_1_stream.open(
@@ -76,7 +55,7 @@ TEST_F(RankNormalizedRhat, const_fail) {
   stan::mcmc::chains<> chains(bernoulli_const_1);
   chains.add(bernoulli_const_2);
   
-  auto rhat = chains.split_rank_normalized_rhat("zeta");
+  auto rhat = chains.split_potential_scale_reduction_rank("zeta");
   EXPECT_TRUE(std::isnan(rhat.first));
   EXPECT_TRUE(std::isnan(rhat.second));
 }
