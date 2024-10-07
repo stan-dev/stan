@@ -625,7 +625,7 @@ class chains {
     Eigen::MatrixXd chains(n_kept_samples, n_chains);
     for (size_t i = 0; i < n_chains; ++i) {
       auto bottom_rows = samples_(i).col(index).bottomRows(n_kept_samples);
-      chains.col(i) =  bottom_rows.eval();
+      chains.col(i) = bottom_rows.eval();
     }
     return analyze::split_rank_normalized_rhat(chains);
   }
