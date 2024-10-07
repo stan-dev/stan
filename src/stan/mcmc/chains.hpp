@@ -588,13 +588,13 @@ class chains {
           = samples_(chain).col(index).bottomRows(n_kept_samples).data();
       sizes[chain] = n_kept_samples;
     }
+
     return analyze::compute_split_effective_sample_size(draws, sizes);
   }
 
   double split_effective_sample_size(const std::string& name) const {
     return split_effective_sample_size(index(name));
   }
-
 
   double split_potential_scale_reduction(const int index) const {
     int n_chains = num_chains();
@@ -634,7 +634,6 @@ class chains {
       const std::string& name) const {
     return split_potential_scale_reduction_rank(index(name));
   }
-
 };
 
 }  // namespace mcmc
