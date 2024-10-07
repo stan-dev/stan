@@ -43,6 +43,6 @@ TEST(CheckChains, good_and_bad) {
 
   // above test shows that column 7 is - make it non-finite
   chain_1.col(0) = eight_schools_1.samples.col(7);
-  chain_1(0,0) = std::numeric_limits<double>::infinity();
+  chain_1(0, 0) = std::numeric_limits<double>::infinity();
   EXPECT_FALSE(stan::analyze::is_finite_and_varies(chain_1));
 }
