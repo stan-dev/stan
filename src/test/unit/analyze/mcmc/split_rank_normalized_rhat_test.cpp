@@ -1,4 +1,4 @@
-#include <stan/mcmc/chains.hpp>
+#include <stan/analyze/mcmc/split_rank_normalized_rhat.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
@@ -16,7 +16,6 @@ TEST(RankNormalizedRhat, compute_split_rank_normalized_rhat) {
   eight_schools_1
       = stan::io::stan_csv_reader::parse(eight_schools_1_stream, &out);
   eight_schools_1_stream.close();
-  stan::mcmc::chains<> chains(eight_schools_1);
 
   // test against R implementation in pkg posterior
   Eigen::VectorXd rhat_8_schools_1_bulk(10);
@@ -29,8 +28,10 @@ TEST(RankNormalizedRhat, compute_split_rank_normalized_rhat) {
       1.004148161, 1.003218528, 1.009195353, 1.001426744, 1.003984381,
       1.025817745;
 
+  Eigen::MatrixXd chains(eight_schools_1.samples.rows(), 1);
   for (size_t i = 0; i < 10; ++i) {
-    auto rhats = chains.split_potential_scale_reduction_rank(i + 7);
+    chains.col(0) = eight_schools_1.samples.col(i + 7);
+    auto rhats = stan::analyze::split_rank_normalized_rhat(chains);
     EXPECT_NEAR(rhats.first, rhat_8_schools_1_bulk(i), 0.05);
     EXPECT_NEAR(rhats.second, rhat_8_schools_1_tail(i), 0.05);
   }
@@ -52,10 +53,11 @@ TEST(RankNormalizedRhat, const_fail) {
   bernoulli_const_2
       = stan::io::stan_csv_reader::parse(bernoulli_const_2_stream, &out);
   bernoulli_const_2_stream.close();
-  stan::mcmc::chains<> chains(bernoulli_const_1);
-  chains.add(bernoulli_const_2);
   
-  auto rhat = chains.split_potential_scale_reduction_rank("zeta");
+  Eigen::MatrixXd chains(bernoulli_const_1.samples.rows(), 2);
+  chains.col(0) = bernoulli_const_1.samples.col(bernoulli_const_1.samples.cols() - 1);
+  chains.col(1) = bernoulli_const_2.samples.col(bernoulli_const_2.samples.cols() - 1);
+  auto rhat = stan::analyze::split_rank_normalized_rhat(chains);
   EXPECT_TRUE(std::isnan(rhat.first));
   EXPECT_TRUE(std::isnan(rhat.second));
 }
