@@ -224,7 +224,6 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_constant) {
       << "rhat for index: " << 1 << ", parameter: " << chains.param_name(1);
 }
 
-
 TEST_F(ComputeRhat, compute_potential_scale_reduction_nan) {
   std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);

@@ -53,10 +53,12 @@ TEST(RankNormalizedRhat, const_fail) {
   bernoulli_const_2
       = stan::io::stan_csv_reader::parse(bernoulli_const_2_stream, &out);
   bernoulli_const_2_stream.close();
-  
+
   Eigen::MatrixXd chains(bernoulli_const_1.samples.rows(), 2);
-  chains.col(0) = bernoulli_const_1.samples.col(bernoulli_const_1.samples.cols() - 1);
-  chains.col(1) = bernoulli_const_2.samples.col(bernoulli_const_2.samples.cols() - 1);
+  chains.col(0)
+      = bernoulli_const_1.samples.col(bernoulli_const_1.samples.cols() - 1);
+  chains.col(1)
+      = bernoulli_const_2.samples.col(bernoulli_const_2.samples.cols() - 1);
   auto rhat = stan::analyze::split_rank_normalized_rhat(chains);
   EXPECT_TRUE(std::isnan(rhat.first));
   EXPECT_TRUE(std::isnan(rhat.second));
