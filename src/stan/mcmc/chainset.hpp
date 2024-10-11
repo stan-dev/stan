@@ -420,8 +420,8 @@ class chainset {
    * @return pair (bulk_ess, tail_ess)
    */
   double mcse_mean(const int index) const {
-    double ess_bulk = analyze::split_rank_normalized_ess(samples(index)).first;
-    return sd(index) / std::sqrt(ess_bulk);
+    double ess_basic = analyze::split_basic_ess(samples(index));
+    return sd(index) / std::sqrt(ess_basic);
   }
 
   /**
