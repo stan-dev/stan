@@ -30,7 +30,7 @@ TEST(RankNormalizedEss, test_bulk_tail_basic_ess) {
   Eigen::VectorXd ess_8_schools_tail(10);
   ess_8_schools_tail << 845, 858, 874, 726, 620, 753, 826, 628, 587, 108;
   Eigen::VectorXd ess_8_schools_basic(10);
-  ess_8_schools_basic << 361, 407, 624, 649, 779, 607, 643, 267, 537, 208;
+  ess_8_schools_basic << 351, 403, 569, 646, 788, 602, 634, 262, 520, 223;
 
   Eigen::MatrixXd chains(eight_schools_1.samples.rows(), 2);
   for (size_t i = 0; i < 10; ++i) {
@@ -39,7 +39,7 @@ TEST(RankNormalizedEss, test_bulk_tail_basic_ess) {
     auto ess = stan::analyze::split_rank_normalized_ess(chains);
     EXPECT_NEAR(ess.first, ess_8_schools_bulk(i), 5);
     EXPECT_NEAR(ess.second, ess_8_schools_tail(i), 5);
-    auto ess_basic = stan::analyze::split_basic_ess(chains);
+    auto ess_basic = stan::analyze::ess(chains);
     EXPECT_NEAR(ess_basic, ess_8_schools_basic(i), 5);
   }
 }
@@ -66,10 +66,8 @@ TEST(RankNormalizedEss, short_chains_fail) {
     chains.col(0) = eight_schools_5iters_1.samples.col(i + 7);
     chains.col(1) = eight_schools_5iters_2.samples.col(i + 7);
     auto ess = stan::analyze::split_rank_normalized_ess(chains);
-    auto ess_basic = stan::analyze::split_basic_ess(chains);
     EXPECT_TRUE(std::isnan(ess.first));
     EXPECT_TRUE(std::isnan(ess.second));
-    EXPECT_TRUE(std::isnan(ess_basic));
   }
 }
 

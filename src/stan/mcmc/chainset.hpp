@@ -417,11 +417,14 @@ class chainset {
    * Follows implementation in the R posterior package
    *
    * @param index parameter index
-   * @return pair (bulk_ess, tail_ess)
+   * @return mcse
    */
   double mcse_mean(const int index) const {
-    double ess_basic = analyze::split_basic_ess(samples(index));
-    return sd(index) / std::sqrt(ess_basic);
+    if (num_samples() < 4
+	|| !stan::analyze::is_finite_and_varies(samples(index)))
+      return std::numeric_limits<double>::quiet_NaN();
+    double ess = analyze::ess(samples(index));
+    return sd(index) / std::sqrt(ess);
   }
 
   /**
@@ -430,7 +433,7 @@ class chainset {
    * Follows implementation in the R posterior package.
    *
    * @param name parameter name
-   * @return pair (bulk_ess, tail_ess)
+   * @return mcse
    */
   double mcse_mean(const std::string& name) const {
     return mcse_mean(index(name));
@@ -442,13 +445,16 @@ class chainset {
    * Follows implementation in the R posterior package.
    *
    * @param index parameter index
-   * @return pair (bulk_ess, tail_ess)
+   * @return mcse_sd
    */
   double mcse_sd(const int index) const {
+    if (num_samples() < 4
+	|| !stan::analyze::is_finite_and_varies(samples(index)))
+      return std::numeric_limits<double>::quiet_NaN();
     Eigen::MatrixXd s = samples(index);
     Eigen::MatrixXd s2 = s.array().square();
-    double ess_s = analyze::split_rank_normalized_ess(s).first;
-    double ess_s2 = analyze::split_rank_normalized_ess(s2).first;
+    double ess_s = analyze::ess(s);
+    double ess_s2 = analyze::ess(s2);
     double ess_sd = std::min(ess_s, ess_s2);
     return sd(index)
            * std::sqrt(stan::math::e() * std::pow(1 - 1 / ess_sd, ess_sd - 1)
@@ -461,7 +467,7 @@ class chainset {
    * Follows implementation in the R posterior package
    *
    * @param name parameter name
-   * @return pair (bulk_ess, tail_ess)
+   * @return mcse_sd
    */
   double mcse_sd(const std::string& name) const { return mcse_sd(index(name)); }
 

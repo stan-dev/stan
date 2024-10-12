@@ -143,27 +143,6 @@ inline std::pair<double, double> split_rank_normalized_ess(
   return std::make_pair(ess_bulk, ess_tail);
 }
 
-/**
- * Computes the split effective sample size (split ESS)
- * diagnostic for a set of per-chain draws.
- *
- * When the number of total draws N is odd, the last draw is ignored.
- *
- * See more details in Stan reference manual section "Potential
- * Scale Reduction". http://mc-stan.org/users/documentation
-
- * @param chains matrix of per-chain draws, num_iters X chain
- * @return potential scale reduction
- */
-inline double split_basic_ess(const Eigen::MatrixXd& chains) {
-  Eigen::MatrixXd split_draws_matrix = split_chains(chains);
-  if (!is_finite_and_varies(split_draws_matrix)
-      || split_draws_matrix.rows() < 4) {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
-  return ess(split_draws_matrix);
-}
-
 }  // namespace analyze
 }  // namespace stan
 
