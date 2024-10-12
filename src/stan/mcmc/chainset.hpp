@@ -421,7 +421,7 @@ class chainset {
    */
   double mcse_mean(const int index) const {
     if (num_samples() < 4
-	|| !stan::analyze::is_finite_and_varies(samples(index)))
+        || !stan::analyze::is_finite_and_varies(samples(index)))
       return std::numeric_limits<double>::quiet_NaN();
     double ess = analyze::ess(samples(index));
     return sd(index) / std::sqrt(ess);
@@ -449,7 +449,7 @@ class chainset {
    */
   double mcse_sd(const int index) const {
     if (num_samples() < 4
-	|| !stan::analyze::is_finite_and_varies(samples(index)))
+        || !stan::analyze::is_finite_and_varies(samples(index)))
       return std::numeric_limits<double>::quiet_NaN();
     Eigen::MatrixXd s = samples(index);
     Eigen::MatrixXd s2 = s.array().square();
