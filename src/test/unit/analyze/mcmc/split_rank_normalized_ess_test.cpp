@@ -70,4 +70,3 @@ TEST(RankNormalizedEss, short_chains_fail) {
     EXPECT_TRUE(std::isnan(ess.second));
   }
 }
-
