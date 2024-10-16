@@ -7,6 +7,7 @@
 #include <stan/math/prim/fun/quantile.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_ess.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_rhat.hpp>
+#include <stan/analyze/mcmc/mcse.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -20,10 +21,9 @@
 
 namespace stan {
 namespace mcmc {
-using Eigen::Dynamic;
 
 /**
- * An <code>mcmc::chainset</code> object manages the post-warmup draws
+ * A <code>mcmc::chainset</code> object manages the post-warmup draws
  * across a set of MCMC chains, which all have the same number of samples.
  *
  * @note samples are stored in column major, i.e., each column corresponds to
@@ -290,7 +290,9 @@ class chainset {
    * Compute the quantile value of the specified parameter
    * at the specified probability.
    *
-   * Throws exception if specified probability is not between 0 and 1.
+   * Calls stan::math::quantile which throws
+   * std::invalid_argument If any element of samples_vec is NaN, or size 0.
+   * and std::domain_error If `p<0` or `p>1`.
    *
    * @param index parameter index
    * @param prob probability
@@ -298,9 +300,6 @@ class chainset {
    */
   double quantile(const int index, const double prob) const {
     // Ensure the probability is within [0, 1]
-    if (prob <= 0.0 || prob >= 1.0) {
-      throw std::out_of_range("Probability must be between 0 and 1.");
-    }
     Eigen::MatrixXd draws = samples(index);
     Eigen::Map<Eigen::VectorXd> map(draws.data(), draws.size());
     return stan::math::quantile(map, prob);
@@ -309,8 +308,6 @@ class chainset {
   /**
    * Compute the quantile value of the specified parameter
    * at the specified probability.
-   *
-   * Throws exception if specified probability is not between 0 and 1.
    *
    * @param name parameter name
    * @param prob probability
@@ -324,8 +321,6 @@ class chainset {
    * Compute the quantile values of the specified parameter
    * for a set of specified probabilities.
    *
-   * Throws exception if any probability is not between 0 and 1.
-   *
    * @param index parameter index
    * @param probs vector of probabilities
    * @return vector of parameter values for quantiles
@@ -334,9 +329,6 @@ class chainset {
                             const Eigen::VectorXd& probs) const {
     if (probs.size() == 0)
       return Eigen::VectorXd::Zero(0);
-    if (probs.minCoeff() <= 0.0 || probs.maxCoeff() >= 1.0) {
-      throw std::out_of_range("Probabilities must be between 0 and 1.");
-    }
     Eigen::MatrixXd draws = samples(index);
     Eigen::Map<Eigen::VectorXd> map(draws.data(), draws.size());
     std::vector<double> probs_vec(probs.data(), probs.data() + probs.size());
@@ -347,8 +339,6 @@ class chainset {
   /**
    * Compute the quantile values of the specified parameter
    * for a set of specified probabilities.
-   *
-   * Throws exception if any probability is not between 0 and 1.
    *
    * @param name parameter name
    * @param probs vector of probabilities
@@ -420,11 +410,12 @@ class chainset {
    * @return mcse
    */
   double mcse_mean(const int index) const {
-    if (num_samples() < 4
-        || !stan::analyze::is_finite_and_varies(samples(index)))
-      return std::numeric_limits<double>::quiet_NaN();
-    double ess = analyze::ess(samples(index));
-    return sd(index) / std::sqrt(ess);
+    return analyze::mcse_mean(samples(index));
+    // if (num_samples() < 4
+    //     || !stan::analyze::is_finite_and_varies(samples(index)))
+    //   return std::numeric_limits<double>::quiet_NaN();
+    // double ess = analyze::ess(samples(index));
+    // return sd(index) / std::sqrt(ess);
   }
 
   /**
@@ -448,17 +439,18 @@ class chainset {
    * @return mcse_sd
    */
   double mcse_sd(const int index) const {
-    if (num_samples() < 4
-        || !stan::analyze::is_finite_and_varies(samples(index)))
-      return std::numeric_limits<double>::quiet_NaN();
-    Eigen::MatrixXd s = samples(index);
-    Eigen::MatrixXd s2 = s.array().square();
-    double ess_s = analyze::ess(s);
-    double ess_s2 = analyze::ess(s2);
-    double ess_sd = std::min(ess_s, ess_s2);
-    return sd(index)
-           * std::sqrt(stan::math::e() * std::pow(1 - 1 / ess_sd, ess_sd - 1)
-                       - 1);
+    return analyze::mcse_sd(samples(index));
+    // if (num_samples() < 4
+    //     || !stan::analyze::is_finite_and_varies(samples(index)))
+    //   return std::numeric_limits<double>::quiet_NaN();
+    // Eigen::MatrixXd s = samples(index);
+    // Eigen::MatrixXd s2 = s.array().square();
+    // double ess_s = analyze::ess(s);
+    // double ess_s2 = analyze::ess(s2);
+    // double ess_sd = std::min(ess_s, ess_s2);
+    // return sd(index)
+    //        * std::sqrt(stan::math::e() * std::pow(1 - 1 / ess_sd, ess_sd - 1)
+    //                    - 1);
   }
 
   /**

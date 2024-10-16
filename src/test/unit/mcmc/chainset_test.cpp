@@ -189,8 +189,8 @@ TEST_F(McmcChains, split_rank_normalized_rhat) {
 
   for (size_t i = 0; i < 10; ++i) {
     auto rhats = chain_1.split_rank_normalized_rhat(i + 7);
-    EXPECT_NEAR(rhats.first, rhat_8_schools_1_bulk(i), 0.05);
-    EXPECT_NEAR(rhats.second, rhat_8_schools_1_tail(i), 0.05);
+    EXPECT_NEAR(rhats.first, rhat_8_schools_1_bulk(i), 0.04);
+    EXPECT_NEAR(rhats.second, rhat_8_schools_1_tail(i), 0.04);
   }
 }
 
@@ -285,9 +285,9 @@ TEST_F(McmcChains, mcse) {
 
   for (size_t i = 0; i < 10; ++i) {
     auto mcse_mean = chain_2.mcse_mean(i + 7);
-    EXPECT_NEAR(mcse_mean, s8_mcse_mean(i), 0.5);
     auto mcse_sd = chain_2.mcse_sd(i + 7);
-    EXPECT_NEAR(mcse_sd, s8_mcse_sd(i), 0.7);
+    EXPECT_NEAR(mcse_mean, s8_mcse_mean(i), 0.05);
+    EXPECT_NEAR(mcse_sd, s8_mcse_sd(i), 0.09);
   }
 }
 
@@ -329,6 +329,6 @@ TEST_F(McmcChains, autocorrelation) {
       0.01791577080, 0.01245035817;
   auto mu_ac = chain_1.autocorrelation(0, "mu");
   for (size_t i = 0; i < 10; ++i) {
-    EXPECT_NEAR(mu_ac_posterior(i), mu_ac(i), 0.05);
+    EXPECT_NEAR(mu_ac_posterior(i), mu_ac(i), 0.0005);
   }
 }
