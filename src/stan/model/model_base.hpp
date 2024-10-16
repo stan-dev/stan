@@ -66,8 +66,9 @@ class model_base : public prob_grad {
 
   /**
    * Set the specified argument to sequence of parameters, transformed
-   * parameters, and generated quantities in the order in which they
-   * were declared.  The input sequence is cleared and resized.
+   * parameters, and generated quantities in the order in which they were
+   * declared.  Each parameter is included once, regardless of its size or
+   * dimensionality.  The input sequence is cleared and resized.
    *
    * @param[in,out] names sequence of names parameters, transformed
    * parameters, and generated quantities
@@ -109,9 +110,10 @@ class model_base : public prob_grad {
                         bool include_tparams = true,
                         bool include_gqs = true) const = 0;
   /**
-   *  Set the specified sequence to the indexed, scalar, constrained
-   *  parameter names.  Each variable is output with a
-   *  period-separated list of indexes as a suffix, indexing from 1.
+   *  Append to the given sequence with the names of the indexed, scalar,
+   *  constrained parameters.  Each variable is output with a period-separated
+   *  list of indexes as a suffix, indexing from 1.  This gives a "flattened"
+   *  representation of all constrained parameters.
    *
    * <p>A real parameter `alpha` will produce output `alpha` with no
    * indexes.
@@ -151,10 +153,11 @@ class model_base : public prob_grad {
                                        bool include_gqs = true) const = 0;
 
   /**
-   * Set the specified sequence of parameter names to the
-   * unconstrained parameter names.  Each unconstrained parameter is
-   * represented as a simple one-dimensional sequence of values.  The
-   * actual transforms are documented in the reference manual.
+   * Append to the given sequence with unconstrained parameter names.  Each
+   * unconstrained parameter is represented as a simple one-dimensional
+   * sequence of values.  Transforms from the unconstrained parameter space
+   * back to the constrained parameter space are documented in the reference
+   * manual, and implemented in the model_base::write_array methods.
    *
    * <p>The sizes will not be the declared sizes for types such as
    * simplexes, correlation, and covariance matrices.  A simplex of
