@@ -238,34 +238,33 @@ TEST_F(McmcChains, summary_stats) {
   // test against R implementation in pkg posterior (via cmdstanr)
   Eigen::VectorXd s8_mean(10), s8_median(10), s8_sd(10), s8_mad(10), s8_q5(10),
       s8_q95(10);
-  s8_mean << 7.95, 12.54, 7.82, 5.33, 7.09, 4.12, 5.72, 11.65, 8.80, 8.26;
-  s8_median << 8.00, 11.27, 7.39, 5.44, 6.64, 4.54, 5.93, 11.38, 8.28, 7.05;
-  s8_sd << 5.48, 9.57, 6.85, 8.39, 6.91, 6.57, 6.85, 7.76, 8.40, 5.53;
-  s8_mad << 5.49, 8.79, 6.39, 7.38, 5.98, 6.25, 6.59, 7.79, 7.59, 4.66;
-  s8_q5 << -0.46, -0.39, -3.04, -8.90, -3.31, -7.58, -5.84, 0.10, -4.15, 2.08;
-  s8_q95 << 17.01, 30.47, 19.25, 19.02, 18.72, 14.49, 16.04, 25.77, 22.71,
-      18.74;
+  s8_mean << 7.9521, 12.5353, 7.8192, 5.3280, 7.0912, 4.1186, 5.7168, 11.6524, 8.7999, 8.2576;
+  s8_median << 8.0022, 11.2668,  7.3903,  5.4445,  6.6407,  4.5394,  5.9275, 11.3828,  8.2815,  7.0482;
+  s8_sd << 5.4815, 9.5707, 6.8468, 8.3925, 6.9054, 6.5684, 6.8479, 7.7581, 8.3962, 5.5285;
+  s8_mad << 5.4883, 8.7866, 6.3884, 7.3821, 5.9796, 6.2451, 6.5869, 7.7937, 7.5919, 4.6552;
+  s8_q5 << -0.46348, -0.39469, -3.03780, -8.90229, -3.30596, -7.58377, -5.84182, 0.10131, -4.15281, 2.08010;
+  s8_q95 << 17.010, 30.466, 19.249, 19.018, 18.724, 14.486, 16.042, 25.769, 22.705, 18.742;
   Eigen::VectorXd probs(3);
   probs << 0.05, 0.5, 0.95;
 
   for (size_t i = 0; i < 10; ++i) {
     auto mean = chain_2.mean(i + 7);
-    EXPECT_NEAR(mean, s8_mean(i), 0.05);
+    EXPECT_NEAR(mean, s8_mean(i), 0.001);
     auto median = chain_2.median(i + 7);
-    EXPECT_NEAR(median, s8_median(i), 0.05);
+    EXPECT_NEAR(median, s8_median(i), 0.001);
     auto sd = chain_2.sd(i + 7);
-    EXPECT_NEAR(sd, s8_sd(i), 0.05);
+    EXPECT_NEAR(sd, s8_sd(i), 0.001);
     auto mad = chain_2.max_abs_deviation(i + 7);
-    EXPECT_NEAR(mad, s8_mad(i), 0.05);
+    EXPECT_NEAR(mad, s8_mad(i), 0.001);
     auto q_5 = chain_2.quantile(i + 7, 0.05);
     EXPECT_NEAR(q_5, s8_q5(i), 0.5);
     auto q_95 = chain_2.quantile(i + 7, 0.95);
     EXPECT_NEAR(q_95, s8_q95(i), 0.5);
     auto qs_5_50_95 = chain_2.quantiles(i + 7, probs);
     EXPECT_EQ(3, qs_5_50_95.size());
-    EXPECT_NEAR(qs_5_50_95(0), s8_q5(i), 0.5);
-    EXPECT_NEAR(qs_5_50_95(1), s8_median(i), 0.05);
-    EXPECT_NEAR(qs_5_50_95(2), s8_q95(i), 0.5);
+    EXPECT_NEAR(qs_5_50_95(0), s8_q5(i), 0.001);
+    EXPECT_NEAR(qs_5_50_95(1), s8_median(i), 0.001);
+    EXPECT_NEAR(qs_5_50_95(2), s8_q95(i), 0.001);
   }
 }
 
