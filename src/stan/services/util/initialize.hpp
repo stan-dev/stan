@@ -102,8 +102,9 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
         model.transform_inits(context, disc_vector, unconstrained, &msg);
       }
     } catch (std::domain_error& e) {
-      if (msg.str().length() > 0)
+      if (msg.str().length() > 0) {
         logger.info(msg);
+      }
       logger.warn("Rejecting initial value:");
       logger.warn(
           "  Error evaluating the log probability"
@@ -111,8 +112,9 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       logger.warn(e.what());
       continue;
     } catch (std::exception& e) {
-      if (msg.str().length() > 0)
+      if (msg.str().length() > 0) {
         logger.info(msg);
+      }
       logger.error(
           "Unrecoverable error evaluating the log probability"
           " at the initial value.");
@@ -127,8 +129,9 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       // the parameters.
       log_prob = model.template log_prob<false, Jacobian>(unconstrained,
                                                           disc_vector, &msg);
-      if (msg.str().length() > 0)
+      if (msg.str().length() > 0) {
         logger.info(msg);
+      }
     } catch (std::domain_error& e) {
       if (msg.str().length() > 0)
         logger.info(msg);
@@ -139,8 +142,9 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       logger.warn(e.what());
       continue;
     } catch (std::exception& e) {
-      if (msg.str().length() > 0)
+      if (msg.str().length() > 0) {
         logger.info(msg);
+      }
       logger.error(
           "Unrecoverable error evaluating the log probability"
           " at the initial value.");
@@ -165,8 +169,9 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       log_prob = stan::model::log_prob_grad<true, Jacobian>(
           model, unconstrained, disc_vector, gradient, &log_prob_msg);
     } catch (const std::exception& e) {
-      if (log_prob_msg.str().length() > 0)
+      if (log_prob_msg.str().length() > 0) {
         logger.info(log_prob_msg);
+      }
       logger.error(e.what());
       throw;
     }
@@ -210,8 +215,36 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       return unconstrained;
     }
   }
-
-  if (!is_initialized_with_zero) {
+  if (is_fully_initialized) {
+    logger.info("");
+    logger.error("User-specified initialization failed.");
+    logger.error(
+        " Try specifying new initial values,"
+        " using partially specialized initialization,"
+        " reducing the range of constrained values,"
+        " or reparameterizing the model.");
+  } else if (any_initialized) {
+    logger.info("");
+    std::stringstream msg;
+    msg << "Partial user-specified initialization failed. "
+           "Initialization of non user specified parameters "
+           "between (-"
+        << init_radius << ", " << init_radius << ") failed after"
+        << " " << MAX_INIT_TRIES << " attempts. ";
+    logger.error(msg);
+    logger.error(
+        " Try specifying full initial values,"
+        " reducing the range of constrained values,"
+        " or reparameterizing the model.");
+  } else if (is_initialized_with_zero) {
+    logger.info("");
+    logger.error("Initial values of 0 failed to initialize.");
+    logger.error(
+        " Try specifying new initial values,"
+        " using partially specialized initialization,"
+        " reducing the range of constrained values,"
+        " or reparameterizing the model.");
+  } else {
     logger.info("");
     std::stringstream msg;
     msg << "Initialization between (-" << init_radius << ", " << init_radius
