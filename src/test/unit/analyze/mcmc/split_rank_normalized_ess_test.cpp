@@ -7,7 +7,6 @@
 #include <string>
 #include <cmath>
 
-
 TEST(RankNormalizedEss, test_basic_bulk_tail_ess) {
   std::stringstream out;
   Eigen::MatrixXd chains_lp(1000, 4);
@@ -19,9 +18,11 @@ TEST(RankNormalizedEss, test_basic_bulk_tail_ess) {
 
   for (size_t i = 0; i < 4; ++i) {
     std::stringstream fname;
-    fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1) << ".csv"; 
+    fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1)
+          << ".csv";
     std::ifstream bern_stream(fname.str(), std::ifstream::in);
-    stan::io::stan_csv bern_csv = stan::io::stan_csv_reader::parse(bern_stream, &out);
+    stan::io::stan_csv bern_csv
+        = stan::io::stan_csv_reader::parse(bern_stream, &out);
     bern_stream.close();
     chains_lp.col(i) = bern_csv.samples.col(0);
     chains_theta.col(i) = bern_csv.samples.col(7);
@@ -36,13 +37,15 @@ TEST(RankNormalizedEss, test_basic_bulk_tail_ess) {
   double ess_theta_expect = 1377.503;
   double ess_theta_bulk_expect = 1407.5124;
   double ess_theta_tail_expect = 1291.7131;
-  
+
   auto ess_basic_lp = stan::analyze::ess(chains_lp);
-  auto old_ess_basic_lp = stan::analyze::compute_effective_sample_size(draws_lp, sizes);
+  auto old_ess_basic_lp
+      = stan::analyze::compute_effective_sample_size(draws_lp, sizes);
   auto ess_lp = stan::analyze::split_rank_normalized_ess(chains_lp);
 
   auto ess_basic_theta = stan::analyze::ess(chains_theta);
-  auto old_ess_basic_theta = stan::analyze::compute_effective_sample_size(draws_theta, sizes);
+  auto old_ess_basic_theta
+      = stan::analyze::compute_effective_sample_size(draws_theta, sizes);
   auto ess_theta = stan::analyze::split_rank_normalized_ess(chains_theta);
 
   EXPECT_NEAR(ess_lp_expect, ess_basic_lp, 0.001);
@@ -57,7 +60,6 @@ TEST(RankNormalizedEss, test_basic_bulk_tail_ess) {
   EXPECT_NEAR(ess_theta_bulk_expect, ess_theta.first, 0.001);
   EXPECT_NEAR(ess_theta_tail_expect, ess_theta.second, 0.001);
 }
-
 
 TEST(RankNormalizedEss, short_chains_fail) {
   std::stringstream out;
