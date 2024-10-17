@@ -2,6 +2,7 @@
 #define STAN_ANALYZE_MCMC_SPLIT_RANK_NORMALIZED_ESS_HPP
 
 #include <stan/math/prim.hpp>
+#include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/check_chains.hpp>
 #include <stan/analyze/mcmc/rank_normalization.hpp>
 #include <stan/analyze/mcmc/split_chains.hpp>
@@ -38,11 +39,12 @@ double ess(const Eigen::MatrixXd& chains) {
 
   // compute the per-chain autocovariance
   for (size_t i = 0; i < num_chains; ++i) {
-    Eigen::Map<const Eigen::VectorXd> chain_col(chains.col(i).data(),
+    chain_mean(i) = chains.col(i).mean();
+    Eigen::Map<const Eigen::VectorXd> draw_col(chains.col(i).data(),
                                                 num_draws);
-    Eigen::Map<Eigen::VectorXd> cov_col(acov.col(i).data(), num_draws);
-    stan::math::autocovariance<double>(chain_col, cov_col);
-    chain_mean(i) = chain_col.mean();
+    Eigen::VectorXd cov_col(num_draws);
+    autocovariance<double>(draw_col, cov_col);
+    acov.col(i) = cov_col;
     chain_var(i) = cov_col(0) * num_draws / (num_draws - 1);
   }
 
@@ -56,9 +58,12 @@ double ess(const Eigen::MatrixXd& chains) {
   // Geyer's initial positive sequence, eqn (11)
   Eigen::VectorXd rho_hat_t = Eigen::VectorXd::Zero(num_draws);
   Eigen::VectorXd acov_t(num_chains);
+  for (size_t i = 0; i < num_chains; ++i) {
+    acov_t(i) = acov(1, i);
+  }
   double rho_hat_even = 1.0;
   rho_hat_t(0) = rho_hat_even;  // lag 0
-  double rho_hat_odd = 1 - (w_chain_var - acov.row(1).mean()) / var_plus;
+  double rho_hat_odd = 1 - (w_chain_var - acov_t.mean()) / var_plus;
   rho_hat_t(1) = rho_hat_odd;  // lag 1
 
   // compute autocorrelation at lag t for pair (t, t+1)
