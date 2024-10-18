@@ -377,7 +377,7 @@ class stan_csv_reader {
 
     if (!read_samples(in, data.samples, data.timing)) {
       if (out)
-        *out << "Unable to parse sample" << std::endl;
+        *out << "No draws found" << std::endl;
     }
     return data;
   }
