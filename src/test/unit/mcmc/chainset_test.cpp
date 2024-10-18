@@ -228,7 +228,6 @@ TEST_F(McmcChains, mcse) {
   }
 }
 
-
 TEST_F(McmcChains, autocorrelation) {
   stan::mcmc::chainset chain_1(eight_schools_1);
   EXPECT_EQ(1, chain_1.num_chains());
