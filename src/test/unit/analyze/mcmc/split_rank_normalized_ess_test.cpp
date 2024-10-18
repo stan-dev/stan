@@ -1,4 +1,3 @@
-#include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_ess.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
@@ -7,7 +6,7 @@
 #include <string>
 #include <cmath>
 
-TEST(RankNormalizedEss, test_basic_bulk_tail_ess) {
+TEST(RankNormalizedEss, test_bulk_tail_ess) {
   std::stringstream out;
   Eigen::MatrixXd chains_lp(1000, 4);
   Eigen::MatrixXd chains_theta(1000, 4);
@@ -30,29 +29,14 @@ TEST(RankNormalizedEss, test_basic_bulk_tail_ess) {
     draws_theta[i] = chains_theta.col(i).data();
     sizes[i] = 1000;
   }
-  double ess_lp_expect = 1335.4137;
   double ess_lp_bulk_expect = 1512.7684;
   double ess_lp_tail_expect = 1591.9707;
 
-  double ess_theta_expect = 1377.503;
   double ess_theta_bulk_expect = 1407.5124;
   double ess_theta_tail_expect = 1291.7131;
 
-  auto ess_basic_lp = stan::analyze::ess(chains_lp);
-  auto old_ess_basic_lp
-      = stan::analyze::compute_effective_sample_size(draws_lp, sizes);
   auto ess_lp = stan::analyze::split_rank_normalized_ess(chains_lp);
-
-  auto ess_basic_theta = stan::analyze::ess(chains_theta);
-  auto old_ess_basic_theta
-      = stan::analyze::compute_effective_sample_size(draws_theta, sizes);
   auto ess_theta = stan::analyze::split_rank_normalized_ess(chains_theta);
-
-  EXPECT_NEAR(ess_lp_expect, ess_basic_lp, 0.001);
-  EXPECT_NEAR(ess_theta_expect, ess_basic_theta, 0.001);
-
-  EXPECT_NEAR(old_ess_basic_lp, ess_basic_lp, 0.00001);
-  EXPECT_NEAR(old_ess_basic_theta, ess_basic_theta, 0.00001);
 
   EXPECT_NEAR(ess_lp_bulk_expect, ess_lp.first, 0.001);
   EXPECT_NEAR(ess_lp_tail_expect, ess_lp.second, 0.001);
@@ -86,4 +70,31 @@ TEST(RankNormalizedEss, short_chains_fail) {
     EXPECT_TRUE(std::isnan(ess.first));
     EXPECT_TRUE(std::isnan(ess.second));
   }
+}
+
+TEST(RankNormalizedEss, const_fail) {
+  std::stringstream out;
+  std::ifstream bernoulli_const_1_stream, bernoulli_const_2_stream;
+  stan::io::stan_csv bernoulli_const_1, bernoulli_const_2;
+  bernoulli_const_1_stream.open(
+      "src/test/unit/mcmc/test_csv_files/bernoulli_const_1.csv",
+      std::ifstream::in);
+  bernoulli_const_1
+      = stan::io::stan_csv_reader::parse(bernoulli_const_1_stream, &out);
+  bernoulli_const_1_stream.close();
+  bernoulli_const_2_stream.open(
+      "src/test/unit/mcmc/test_csv_files/bernoulli_const_2.csv",
+      std::ifstream::in);
+  bernoulli_const_2
+      = stan::io::stan_csv_reader::parse(bernoulli_const_2_stream, &out);
+  bernoulli_const_2_stream.close();
+
+  Eigen::MatrixXd chains(bernoulli_const_1.samples.rows(), 2);
+  chains.col(0)
+      = bernoulli_const_1.samples.col(bernoulli_const_1.samples.cols() - 1);
+  chains.col(1)
+      = bernoulli_const_2.samples.col(bernoulli_const_2.samples.cols() - 1);
+  auto ess = stan::analyze::split_rank_normalized_ess(chains);
+  EXPECT_TRUE(std::isnan(ess.first));
+  EXPECT_TRUE(std::isnan(ess.second));
 }

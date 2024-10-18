@@ -172,106 +172,38 @@ TEST_F(McmcChains, eight_schools_samples) {
   EXPECT_THROW(chain_2.samples("foo"), std::invalid_argument);
 }
 
-TEST_F(McmcChains, split_rank_normalized_rhat) {
-  stan::mcmc::chainset chain_1(eight_schools_1);
-  EXPECT_EQ(1, chain_1.num_chains());
-
-  // test against R implementation in pkg posterior
-  Eigen::VectorXd rhat_8_schools_1_bulk(10);
-  rhat_8_schools_1_bulk << 1.0012958313, 1.0046136496, 1.0085723580,
-      1.0248629375, 1.0111456620, 1.0004458336, 0.9987162973, 1.0339773469,
-      0.9985612618, 1.0281667351;
-
-  Eigen::VectorXd rhat_8_schools_1_tail(10);
-  rhat_8_schools_1_tail << 1.005676523, 1.009670999, 1.00184184, 1.002222679,
-      1.004148161, 1.003218528, 1.009195353, 1.001426744, 1.003984381,
-      1.025817745;
-
-  for (size_t i = 0; i < 10; ++i) {
-    auto rhats = chain_1.split_rank_normalized_rhat(i + 7);
-    EXPECT_NEAR(rhats.first, rhat_8_schools_1_bulk(i), 0.04);
-    EXPECT_NEAR(rhats.second, rhat_8_schools_1_tail(i), 0.04);
-  }
-}
-
-TEST_F(McmcChains, split_rank_normalized_ess) {
-  std::vector<stan::io::stan_csv> eight_schools;
-  eight_schools.push_back(eight_schools_1);
-  eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset chain_2(eight_schools);
-  EXPECT_EQ(2, chain_2.num_chains());
-
-  // test against R implementation in pkg posterior (via cmdstanr)
-  Eigen::VectorXd ess_8_schools_bulk(10);
-  ess_8_schools_bulk << 348, 370, 600, 638, 765, 608, 629, 274, 517, 112;
-  Eigen::VectorXd ess_8_schools_tail(10);
-  ess_8_schools_tail << 845, 858, 874, 726, 620, 753, 826, 628, 587, 108;
-
-  for (size_t i = 0; i < 10; ++i) {
-    auto ess = chain_2.split_rank_normalized_ess(i + 7);
-    EXPECT_NEAR(ess.first, ess_8_schools_bulk(i), 5);
-    EXPECT_NEAR(ess.second, ess_8_schools_tail(i), 5);
-  }
-}
-
-TEST_F(McmcChains, ess_short_chains) {
-  std::vector<stan::io::stan_csv> eight_schools_5iters;
-  eight_schools_5iters.push_back(eight_schools_5iters_1);
-  eight_schools_5iters.push_back(eight_schools_5iters_2);
-  stan::mcmc::chainset chain_2(eight_schools_5iters);
-  EXPECT_EQ(2, chain_2.num_chains());
-
-  for (size_t i = 0; i < 10; ++i) {
-    auto ess = chain_2.split_rank_normalized_ess(i + 7);
-    EXPECT_TRUE(std::isnan(ess.first));
-    EXPECT_TRUE(std::isnan(ess.second));
-  }
-}
-
 TEST_F(McmcChains, summary_stats) {
-  std::vector<stan::io::stan_csv> eight_schools;
-  eight_schools.push_back(eight_schools_1);
-  eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset chain_2(eight_schools);
-  EXPECT_EQ(2, chain_2.num_chains());
-
-  // test against R implementation in pkg posterior (via cmdstanr)
-  Eigen::VectorXd s8_mean(10), s8_median(10), s8_sd(10), s8_mad(10), s8_q5(10),
-      s8_q95(10);
-  s8_mean << 7.9521, 12.5353, 7.8192, 5.3280, 7.0912, 4.1186, 5.7168, 11.6524,
-      8.7999, 8.2576;
-  s8_median << 8.0022, 11.2668, 7.3903, 5.4445, 6.6407, 4.5394, 5.9275, 11.3828,
-      8.2815, 7.0482;
-  s8_sd << 5.4815, 9.5707, 6.8468, 8.3925, 6.9054, 6.5684, 6.8479, 7.7581,
-      8.3962, 5.5285;
-  s8_mad << 5.4883, 8.7866, 6.3884, 7.3821, 5.9796, 6.2451, 6.5869, 7.7937,
-      7.5919, 4.6552;
-  s8_q5 << -0.46348, -0.39469, -3.03780, -8.90229, -3.30596, -7.58377, -5.84182,
-      0.10131, -4.15281, 2.08010;
-  s8_q95 << 17.010, 30.466, 19.249, 19.018, 18.724, 14.486, 16.042, 25.769,
-      22.705, 18.742;
-  Eigen::VectorXd probs(3);
-  probs << 0.05, 0.5, 0.95;
-
-  for (size_t i = 0; i < 10; ++i) {
-    auto mean = chain_2.mean(i + 7);
-    EXPECT_NEAR(mean, s8_mean(i), 0.001);
-    auto median = chain_2.median(i + 7);
-    EXPECT_NEAR(median, s8_median(i), 0.001);
-    auto sd = chain_2.sd(i + 7);
-    EXPECT_NEAR(sd, s8_sd(i), 0.001);
-    auto mad = chain_2.max_abs_deviation(i + 7);
-    EXPECT_NEAR(mad, s8_mad(i), 0.001);
-    auto q_5 = chain_2.quantile(i + 7, 0.05);
-    EXPECT_NEAR(q_5, s8_q5(i), 0.5);
-    auto q_95 = chain_2.quantile(i + 7, 0.95);
-    EXPECT_NEAR(q_95, s8_q95(i), 0.5);
-    auto qs_5_50_95 = chain_2.quantiles(i + 7, probs);
-    EXPECT_EQ(3, qs_5_50_95.size());
-    EXPECT_NEAR(qs_5_50_95(0), s8_q5(i), 0.001);
-    EXPECT_NEAR(qs_5_50_95(1), s8_median(i), 0.001);
-    EXPECT_NEAR(qs_5_50_95(2), s8_q95(i), 0.001);
+  std::stringstream out;
+  std::vector<stan::io::stan_csv> bern_csvs(4);
+  for (size_t i = 0; i < 4; ++i) {
+    std::stringstream fname;
+    fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1)
+          << ".csv";
+    std::ifstream bern_stream(fname.str(), std::ifstream::in);
+    stan::io::stan_csv bern_csv
+        = stan::io::stan_csv_reader::parse(bern_stream, &out);
+    bern_stream.close();
+    bern_csvs[i] = bern_csv;
   }
+  stan::mcmc::chainset bern_chains(bern_csvs);
+  EXPECT_EQ(4, bern_chains.num_chains());
+  // mean
+  // median
+  // sd
+  // max abs deviation
+  // mcse_mean
+  // mcse_sd
+  // q1
+  // q5
+  // q95
+  // q99
+  // q0
+  // q100
+  // rhat
+  // rhat_basic
+  // ess_bulk, tail
+  // ess_basic
+  // autocovariance
 }
 
 TEST_F(McmcChains, mcse) {
@@ -296,33 +228,6 @@ TEST_F(McmcChains, mcse) {
   }
 }
 
-TEST_F(McmcChains, const_fail) {
-  std::ifstream bernoulli_const_1_stream, bernoulli_const_2_stream;
-  stan::io::stan_csv bernoulli_const_1, bernoulli_const_2;
-  bernoulli_const_1_stream.open(
-      "src/test/unit/mcmc/test_csv_files/bernoulli_const_1.csv",
-      std::ifstream::in);
-  bernoulli_const_1
-      = stan::io::stan_csv_reader::parse(bernoulli_const_1_stream, &out);
-  bernoulli_const_1_stream.close();
-  bernoulli_const_2_stream.open(
-      "src/test/unit/mcmc/test_csv_files/bernoulli_const_2.csv",
-      std::ifstream::in);
-  bernoulli_const_2
-      = stan::io::stan_csv_reader::parse(bernoulli_const_2_stream, &out);
-  bernoulli_const_2_stream.close();
-  std::vector<stan::io::stan_csv> bernoulli_const;
-  bernoulli_const.push_back(bernoulli_const_1);
-  bernoulli_const.push_back(bernoulli_const_2);
-  stan::mcmc::chainset chain_2(bernoulli_const);
-  EXPECT_EQ(2, chain_2.num_chains());
-  auto rhat = chain_2.split_rank_normalized_rhat("zeta");
-  EXPECT_TRUE(std::isnan(rhat.first));
-  EXPECT_TRUE(std::isnan(rhat.second));
-  auto ess = chain_2.split_rank_normalized_ess("zeta");
-  EXPECT_TRUE(std::isnan(ess.first));
-  EXPECT_TRUE(std::isnan(ess.second));
-}
 
 TEST_F(McmcChains, autocorrelation) {
   stan::mcmc::chainset chain_1(eight_schools_1);

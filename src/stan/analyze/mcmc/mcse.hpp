@@ -2,11 +2,11 @@
 #define STAN_ANALYZE_MCMC_MCSE_HPP
 
 #include <stan/analyze/mcmc/check_chains.hpp>
-#include <stan/analyze/mcmc/split_rank_normalized_ess.hpp>
+#include <stan/analyze/mcmc/ess.hpp>
 #include <stan/math/prim.hpp>
 #include <cmath>
-#include <vector>
-#include <algorithm>
+#include <limits>
+#include <utility>
 
 namespace stan {
 namespace analyze {
