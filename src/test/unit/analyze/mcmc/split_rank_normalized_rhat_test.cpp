@@ -1,40 +1,56 @@
+#include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_rhat.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <cmath>
 
-TEST(RankNormalizedRhat, compute_split_rank_normalized_rhat) {
+TEST(RankNormalizedRhat, test_basic_bulk_tail_rhat) {
   std::stringstream out;
-  std::ifstream eight_schools_1_stream;
-  stan::io::stan_csv eight_schools_1;
-  eight_schools_1_stream.open(
-      "src/test/unit/mcmc/test_csv_files/eight_schools_1.csv",
-      std::ifstream::in);
-  eight_schools_1
-      = stan::io::stan_csv_reader::parse(eight_schools_1_stream, &out);
-  eight_schools_1_stream.close();
+  Eigen::MatrixXd chains_lp(1000, 4);
+  Eigen::MatrixXd chains_theta(1000, 4);
 
-  // test against R implementation in pkg posterior
-  Eigen::VectorXd rhat_8_schools_1_bulk(10);
-  rhat_8_schools_1_bulk << 1.0012958313, 1.0046136496, 1.0085723580,
-      1.0248629375, 1.0111456620, 1.0004458336, 0.9987162973, 1.0339773469,
-      0.9985612618, 1.0281667351;
+  std::vector<const double*> draws_theta(4);
+  std::vector<const double*> draws_lp(4);
+  std::vector<size_t> sizes(4);
 
-  Eigen::VectorXd rhat_8_schools_1_tail(10);
-  rhat_8_schools_1_tail << 1.005676523, 1.009670999, 1.00184184, 1.002222679,
-      1.004148161, 1.003218528, 1.009195353, 1.001426744, 1.003984381,
-      1.025817745;
-
-  Eigen::MatrixXd chains(eight_schools_1.samples.rows(), 1);
-  for (size_t i = 0; i < 10; ++i) {
-    chains.col(0) = eight_schools_1.samples.col(i + 7);
-    auto rhats = stan::analyze::split_rank_normalized_rhat(chains);
-    EXPECT_NEAR(rhats.first, rhat_8_schools_1_bulk(i), 0.05);
-    EXPECT_NEAR(rhats.second, rhat_8_schools_1_tail(i), 0.05);
+  for (size_t i = 0; i < 4; ++i) {
+    std::stringstream fname;
+    fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1) << ".csv"; 
+    std::ifstream bern_stream(fname.str(), std::ifstream::in);
+    stan::io::stan_csv bern_csv = stan::io::stan_csv_reader::parse(bern_stream, &out);
+    bern_stream.close();
+    chains_lp.col(i) = bern_csv.samples.col(0);
+    chains_theta.col(i) = bern_csv.samples.col(7);
+    draws_lp[i] = chains_lp.col(i).data();
+    draws_theta[i] = chains_theta.col(i).data();
+    sizes[i] = 1000;
   }
+  double rhat_lp_basic_expect = 1.0001296;
+  double rhat_lp_new_expect = 1.0007301;
+
+  double rhat_theta_basic_expect = 1.0029197;
+  double rhat_theta_new_expect = 1.0067897;
+  
+  auto rhat_basic_lp = stan::analyze::rhat(chains_lp);
+  auto old_rhat_basic_lp = stan::analyze::compute_potential_scale_reduction(draws_lp, sizes);
+  auto rhat_lp = stan::analyze::split_rank_normalized_rhat(chains_lp);
+
+  auto rhat_basic_theta = stan::analyze::rhat(chains_theta);
+  auto old_rhat_basic_theta = stan::analyze::compute_potential_scale_reduction(draws_theta, sizes);
+  auto rhat_theta = stan::analyze::split_rank_normalized_rhat(chains_theta);
+
+  EXPECT_NEAR(rhat_lp_basic_expect, rhat_basic_lp, 0.00001);
+  EXPECT_NEAR(rhat_theta_basic_expect, rhat_basic_theta, 0.00001);
+
+  EXPECT_NEAR(old_rhat_basic_lp, rhat_basic_lp, 0.00001);
+  EXPECT_NEAR(old_rhat_basic_theta, rhat_basic_theta, 0.00001);
+
+  EXPECT_NEAR(rhat_lp_new_expect, std::max(rhat_lp.first, rhat_lp.second), 0.00001);
+  EXPECT_NEAR(rhat_theta_new_expect, std::max(rhat_theta.first, rhat_theta.second), 0.00001);
 }
 
 TEST(RankNormalizedRhat, const_fail) {
