@@ -19,9 +19,11 @@ TEST(RankNormalizedRhat, test_basic_bulk_tail_rhat) {
 
   for (size_t i = 0; i < 4; ++i) {
     std::stringstream fname;
-    fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1) << ".csv"; 
+    fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1)
+          << ".csv";
     std::ifstream bern_stream(fname.str(), std::ifstream::in);
-    stan::io::stan_csv bern_csv = stan::io::stan_csv_reader::parse(bern_stream, &out);
+    stan::io::stan_csv bern_csv
+        = stan::io::stan_csv_reader::parse(bern_stream, &out);
     bern_stream.close();
     chains_lp.col(i) = bern_csv.samples.col(0);
     chains_theta.col(i) = bern_csv.samples.col(7);
@@ -34,13 +36,15 @@ TEST(RankNormalizedRhat, test_basic_bulk_tail_rhat) {
 
   double rhat_theta_basic_expect = 1.0029197;
   double rhat_theta_new_expect = 1.0067897;
-  
+
   auto rhat_basic_lp = stan::analyze::rhat(chains_lp);
-  auto old_rhat_basic_lp = stan::analyze::compute_potential_scale_reduction(draws_lp, sizes);
+  auto old_rhat_basic_lp
+      = stan::analyze::compute_potential_scale_reduction(draws_lp, sizes);
   auto rhat_lp = stan::analyze::split_rank_normalized_rhat(chains_lp);
 
   auto rhat_basic_theta = stan::analyze::rhat(chains_theta);
-  auto old_rhat_basic_theta = stan::analyze::compute_potential_scale_reduction(draws_theta, sizes);
+  auto old_rhat_basic_theta
+      = stan::analyze::compute_potential_scale_reduction(draws_theta, sizes);
   auto rhat_theta = stan::analyze::split_rank_normalized_rhat(chains_theta);
 
   EXPECT_NEAR(rhat_lp_basic_expect, rhat_basic_lp, 0.00001);
@@ -49,8 +53,10 @@ TEST(RankNormalizedRhat, test_basic_bulk_tail_rhat) {
   EXPECT_NEAR(old_rhat_basic_lp, rhat_basic_lp, 0.00001);
   EXPECT_NEAR(old_rhat_basic_theta, rhat_basic_theta, 0.00001);
 
-  EXPECT_NEAR(rhat_lp_new_expect, std::max(rhat_lp.first, rhat_lp.second), 0.00001);
-  EXPECT_NEAR(rhat_theta_new_expect, std::max(rhat_theta.first, rhat_theta.second), 0.00001);
+  EXPECT_NEAR(rhat_lp_new_expect, std::max(rhat_lp.first, rhat_lp.second),
+              0.00001);
+  EXPECT_NEAR(rhat_theta_new_expect,
+              std::max(rhat_theta.first, rhat_theta.second), 0.00001);
 }
 
 TEST(RankNormalizedRhat, const_fail) {
