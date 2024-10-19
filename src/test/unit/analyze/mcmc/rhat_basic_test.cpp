@@ -1,13 +1,11 @@
-#include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
-#include <stan/analyze/mcmc/ess.hpp>
+#include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
+#include <stan/analyze/mcmc/rhat.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
 #include <sstream>
-#include <string>
-#include <cmath>
 
-class EssBasic : public testing::Test {
+class RhatBasic : public testing::Test {
 public:
   void SetUp() {
     chains_lp.resize(1000, 4);
@@ -42,21 +40,22 @@ public:
   std::vector<size_t> sizes;
 };
 
-TEST_F(EssBasic, test_basic_ess) {
-  double ess_lp_expect = 1335.4137;
-  double ess_theta_expect = 1377.503;
+TEST_F(RhatBasic, test_basic_rhat) {
+  double rhat_lp_basic_expect = 1.0001296;
+  double rhat_theta_basic_expect = 1.0029197;
 
-  auto ess_basic_lp = stan::analyze::ess(chains_lp);
-  auto old_ess_basic_lp
-      = stan::analyze::compute_effective_sample_size(draws_lp, sizes);
+  auto rhat_basic_lp = stan::analyze::rhat(chains_lp);
+  auto old_rhat_basic_lp
+      = stan::analyze::compute_potential_scale_reduction(draws_lp, sizes);
 
-  auto ess_basic_theta = stan::analyze::ess(chains_theta);
-  auto old_ess_basic_theta
-      = stan::analyze::compute_effective_sample_size(draws_theta, sizes);
+  auto rhat_basic_theta = stan::analyze::rhat(chains_theta);
+  auto old_rhat_basic_theta
+      = stan::analyze::compute_potential_scale_reduction(draws_theta, sizes);
 
-  EXPECT_NEAR(ess_lp_expect, ess_basic_lp, 0.0001);
-  EXPECT_NEAR(ess_theta_expect, ess_basic_theta, 0.0001);
+  EXPECT_NEAR(rhat_lp_basic_expect, rhat_basic_lp, 0.00001);
+  EXPECT_NEAR(rhat_theta_basic_expect, rhat_basic_theta, 0.00001);
 
-  EXPECT_NEAR(old_ess_basic_lp, ess_basic_lp, 0.00001);
-  EXPECT_NEAR(old_ess_basic_theta, ess_basic_theta, 0.00001);
+  EXPECT_NEAR(old_rhat_basic_lp, rhat_basic_lp, 0.00001);
+  EXPECT_NEAR(old_rhat_basic_theta, rhat_basic_theta, 0.00001);
 }
+

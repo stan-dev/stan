@@ -2,6 +2,7 @@
 #define STAN_ANALYZE_MCMC_MCSE_HPP
 
 #include <stan/analyze/mcmc/check_chains.hpp>
+#include <stan/analyze/mcmc/split_chains.hpp>
 #include <stan/analyze/mcmc/ess.hpp>
 #include <stan/math/prim.hpp>
 #include <cmath>
@@ -42,11 +43,22 @@ inline double mcse_sd(const Eigen::MatrixXd& chains) {
   if (chains.rows() < 4 || !is_finite_and_varies(chains))
     return std::numeric_limits<double>::quiet_NaN();
 
-  Eigen::MatrixXd diffs = (chains.array() - chains.mean()).matrix();
-  double Evar = diffs.array().square().mean();
-  double varvar = (math::mean(diffs.array().pow(4) - Evar * Evar))
-                  / ess(diffs.array().abs().matrix());
-  return std::sqrt(varvar / Evar / 4);
+  // center the data, take abs value 
+  Eigen::MatrixXd draws_ctr = (chains.array() - chains.mean()).abs().matrix();
+
+  // posterior pkg fn `ess_mean` computes on split chains
+  double ess_mean = ess(split_chains(draws_ctr));
+
+  // estimated variance (2nd moment)
+  double Evar = draws_ctr.array().square().mean();
+
+  // variance of variance, adjusted for ESS
+  double fourth_moment = draws_ctr.array().pow(4).mean();
+  double varvar = (fourth_moment - std::pow(Evar, 2)) / ess_mean;
+
+  // variance of standard deviation - use Taylor series approximation
+  double varsd = varvar / Evar / 4.0;
+  return std::sqrt(varsd);
 }
 
 }  // namespace analyze
