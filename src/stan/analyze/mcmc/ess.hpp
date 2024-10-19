@@ -32,7 +32,8 @@ double ess(const Eigen::MatrixXd& chains) {
   // compute the per-chain autocovariance
   for (size_t i = 0; i < num_chains; ++i) {
     chain_mean(i) = chains.col(i).mean();
-    Eigen::Map<const Eigen::VectorXd> draw_col(chains.col(i).data(), draws_per_chain);
+    Eigen::Map<const Eigen::VectorXd> draw_col(chains.col(i).data(),
+                                               draws_per_chain);
     Eigen::VectorXd cov_col(draws_per_chain);
     autocovariance<double>(draw_col, cov_col);
     acov.col(i) = cov_col;
@@ -41,7 +42,8 @@ double ess(const Eigen::MatrixXd& chains) {
 
   // compute var_plus, eqn (3)
   double w_chain_var = math::mean(chain_var);  // W (within chain var)
-  double var_plus = w_chain_var * (draws_per_chain - 1) / draws_per_chain;  // \hat{var}^{+}
+  double var_plus
+      = w_chain_var * (draws_per_chain - 1) / draws_per_chain;  // \hat{var}^{+}
   if (num_chains > 1) {
     var_plus += math::variance(chain_mean);  // B (between chain var)
   }
