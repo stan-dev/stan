@@ -66,29 +66,9 @@ TEST_F(RankNormalizedEss, inf_fail) {
 }
 
 TEST_F(RankNormalizedEss, short_chains_fail) {
-  std::stringstream out;
-  std::ifstream eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
-  stan::io::stan_csv eight_schools_5iters_1, eight_schools_5iters_2;
-  eight_schools_5iters_1_stream.open(
-      "src/test/unit/mcmc/test_csv_files/eight_schools_5iters_1.csv",
-      std::ifstream::in);
-  eight_schools_5iters_1
-      = stan::io::stan_csv_reader::parse(eight_schools_5iters_1_stream, &out);
-  eight_schools_5iters_1_stream.close();
-  eight_schools_5iters_2_stream.open(
-      "src/test/unit/mcmc/test_csv_files/eight_schools_5iters_2.csv",
-      std::ifstream::in);
-  eight_schools_5iters_2
-      = stan::io::stan_csv_reader::parse(eight_schools_5iters_2_stream, &out);
-  eight_schools_5iters_2_stream.close();
-
-  Eigen::MatrixXd chains(eight_schools_5iters_1.samples.rows(), 2);
-  for (size_t i = 0; i < 10; ++i) {
-    chains.col(0) = eight_schools_5iters_1.samples.col(i + 7);
-    chains.col(1) = eight_schools_5iters_2.samples.col(i + 7);
-    auto ess = stan::analyze::split_rank_normalized_ess(chains);
-    EXPECT_TRUE(std::isnan(ess.first));
-    EXPECT_TRUE(std::isnan(ess.second));
-  }
+  chains_theta.resize(3, 4);
+  auto ess = stan::analyze::split_rank_normalized_ess(chains_theta);
+  EXPECT_TRUE(std::isnan(ess.first));
+  EXPECT_TRUE(std::isnan(ess.second));
 }
 
