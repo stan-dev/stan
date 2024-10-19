@@ -7,7 +7,7 @@
 #include <cmath>
 
 class MonteCarloStandardError : public testing::Test {
-public:
+ public:
   void SetUp() {
     chains_lp.resize(1000, 4);
     chains_theta.resize(1000, 4);
@@ -15,10 +15,10 @@ public:
     for (size_t i = 0; i < 4; ++i) {
       std::stringstream fname;
       fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1)
-	    << ".csv";
+            << ".csv";
       std::ifstream bern_stream(fname.str(), std::ifstream::in);
       stan::io::stan_csv bern_csv
-        = stan::io::stan_csv_reader::parse(bern_stream, &out);
+          = stan::io::stan_csv_reader::parse(bern_stream, &out);
       bern_stream.close();
       chains_lp.col(i) = bern_csv.samples.col(0);
       chains_theta.col(i) = bern_csv.samples.col(7);
@@ -26,8 +26,7 @@ public:
     }
   }
 
-  void TearDown() {
-  }
+  void TearDown() {}
 
   std::stringstream out;
   Eigen::MatrixXd chains_lp;
@@ -42,10 +41,12 @@ TEST_F(MonteCarloStandardError, test_mcse) {
   double mcse_sd_lp_expect = 0.0355305;
   double mcse_sd_theta_expect = 0.0021642137;
   EXPECT_NEAR(mcse_mean_lp_expect, stan::analyze::mcse_mean(chains_lp), 0.0001);
-  EXPECT_NEAR(mcse_mean_theta_expect, stan::analyze::mcse_mean(chains_theta), 0.0001);
+  EXPECT_NEAR(mcse_mean_theta_expect, stan::analyze::mcse_mean(chains_theta),
+              0.0001);
 
   EXPECT_NEAR(mcse_sd_lp_expect, stan::analyze::mcse_sd(chains_lp), 0.0001);
-  EXPECT_NEAR(mcse_sd_theta_expect, stan::analyze::mcse_sd(chains_theta), 0.0001);
+  EXPECT_NEAR(mcse_sd_theta_expect, stan::analyze::mcse_sd(chains_theta),
+              0.0001);
 }
 
 TEST_F(MonteCarloStandardError, const_fail) {
@@ -56,7 +57,7 @@ TEST_F(MonteCarloStandardError, const_fail) {
 }
 
 TEST_F(MonteCarloStandardError, inf_fail) {
-  chains_theta(0,0) = std::numeric_limits<double>::infinity();
+  chains_theta(0, 0) = std::numeric_limits<double>::infinity();
   auto mcse_mean = stan::analyze::mcse_mean(chains_theta);
   auto mcse_sd = stan::analyze::mcse_sd(chains_theta);
   EXPECT_TRUE(std::isnan(mcse_mean));

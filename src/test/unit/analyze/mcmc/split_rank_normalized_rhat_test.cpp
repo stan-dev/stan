@@ -9,7 +9,7 @@
 #include <limits>
 
 class RankNormalizedRhat : public testing::Test {
-public:
+ public:
   void SetUp() {
     chains_lp.resize(1000, 4);
     chains_theta.resize(1000, 4);
@@ -17,10 +17,10 @@ public:
     for (size_t i = 0; i < 4; ++i) {
       std::stringstream fname;
       fname << "src/test/unit/analyze/mcmc/test_csv_files/bern" << (i + 1)
-	    << ".csv";
+            << ".csv";
       std::ifstream bern_stream(fname.str(), std::ifstream::in);
       stan::io::stan_csv bern_csv
-        = stan::io::stan_csv_reader::parse(bern_stream, &out);
+          = stan::io::stan_csv_reader::parse(bern_stream, &out);
       bern_stream.close();
       chains_lp.col(i) = bern_csv.samples.col(0);
       chains_theta.col(i) = bern_csv.samples.col(7);
@@ -28,8 +28,7 @@ public:
     }
   }
 
-  void TearDown() {
-  }
+  void TearDown() {}
 
   std::stringstream out;
   Eigen::MatrixXd chains_lp;
@@ -44,10 +43,9 @@ TEST_F(RankNormalizedRhat, test_bulk_tail_rhat) {
   auto rhat_lp = stan::analyze::split_rank_normalized_rhat(chains_lp);
   auto rhat_theta = stan::analyze::split_rank_normalized_rhat(chains_theta);
 
-  EXPECT_NEAR(rhat_lp_expect, std::max(rhat_lp.first, rhat_lp.second),
+  EXPECT_NEAR(rhat_lp_expect, std::max(rhat_lp.first, rhat_lp.second), 0.00001);
+  EXPECT_NEAR(rhat_theta_expect, std::max(rhat_theta.first, rhat_theta.second),
               0.00001);
-  EXPECT_NEAR(rhat_theta_expect,
-              std::max(rhat_theta.first, rhat_theta.second), 0.00001);
 }
 
 TEST_F(RankNormalizedRhat, const_fail) {
@@ -57,7 +55,7 @@ TEST_F(RankNormalizedRhat, const_fail) {
 }
 
 TEST_F(RankNormalizedRhat, inf_fail) {
-  chains_theta(0,0) = std::numeric_limits<double>::infinity();
+  chains_theta(0, 0) = std::numeric_limits<double>::infinity();
   auto rhat = stan::analyze::split_rank_normalized_rhat(chains_theta);
   EXPECT_TRUE(std::isnan(rhat.first));
   EXPECT_TRUE(std::isnan(rhat.second));

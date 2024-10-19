@@ -43,7 +43,7 @@ inline double mcse_sd(const Eigen::MatrixXd& chains) {
   if (chains.rows() < 4 || !is_finite_and_varies(chains))
     return std::numeric_limits<double>::quiet_NaN();
 
-  // center the data, take abs value 
+  // center the data, take abs value
   Eigen::MatrixXd draws_ctr = (chains.array() - chains.mean()).abs().matrix();
 
   // posterior pkg fn `ess_mean` computes on split chains
