@@ -69,11 +69,11 @@ class McmcChains : public testing::Test {
   std::stringstream out;
 
   std::ifstream bernoulli_500_stream, bernoulli_default_stream,
-    bernoulli_thin_stream, bernoulli_warmup_stream,
-    eight_schools_1_stream, eight_schools_2_stream;
+      bernoulli_thin_stream, bernoulli_warmup_stream, eight_schools_1_stream,
+      eight_schools_2_stream;
 
   stan::io::stan_csv bernoulli_500, bernoulli_default, bernoulli_thin,
-    bernoulli_warmup, eight_schools_1, eight_schools_2;
+      bernoulli_warmup, eight_schools_1, eight_schools_2;
 };
 
 TEST_F(McmcChains, constructor) {
