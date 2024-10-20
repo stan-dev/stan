@@ -202,6 +202,12 @@ TEST_F(McmcChains, summary_stats) {
   double theta_mad_expect = 0.1230906411;
   EXPECT_NEAR(theta_mad_expect, bern_chains.max_abs_deviation("theta"), 0.00001);
 
+  double theta_mcse_mean_expect = 0.0032339916;
+  EXPECT_NEAR(theta_mcse_mean_expect, bern_chains.mcse_mean("theta"), 0.0001);
+
+  double theta_mcse_sd_expect = 0.0021642137;
+  EXPECT_NEAR(theta_mcse_sd_expect, bern_chains.mcse_sd("theta"), 0.0001);
+  
   Eigen::VectorXd probs(6);
   probs << 0.0, 0.01, 0.05, 0.95, 0.99, 1.0;
   Eigen::VectorXd quantiles_expect(6);
