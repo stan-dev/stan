@@ -178,7 +178,7 @@ TEST_F(McmcChains, summary_stats) {
 
   double theta_mcse_sd_expect = 0.0021642137;
   EXPECT_NEAR(theta_mcse_sd_expect, bern_chains.mcse_sd("theta"), 0.0001);
-  
+
   Eigen::VectorXd probs(6);
   probs << 0.0, 0.01, 0.05, 0.95, 0.99, 1.0;
   Eigen::VectorXd quantiles_expect(6);
