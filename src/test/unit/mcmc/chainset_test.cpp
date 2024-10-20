@@ -187,57 +187,47 @@ TEST_F(McmcChains, summary_stats) {
   }
   stan::mcmc::chainset bern_chains(bern_csvs);
   EXPECT_EQ(4, bern_chains.num_chains());
-  // mean
-  // median
-  // sd
-  // max abs deviation
-  // mcse_mean
-  // mcse_sd
-  // q1
-  // q5
-  // q95
-  // q99
-  // q0
-  // q100
-  // rhat
-  // rhat_basic
-  // ess_bulk, tail
-  // ess_basic
-  // autocovariance
-}
 
-TEST_F(McmcChains, mcse) {
-  std::vector<stan::io::stan_csv> eight_schools;
-  eight_schools.push_back(eight_schools_1);
-  eight_schools.push_back(eight_schools_2);
-  stan::mcmc::chainset chain_2(eight_schools);
-  EXPECT_EQ(2, chain_2.num_chains());
+  Eigen::MatrixXd theta = bern_chains.samples("theta");
+  // default summary statistics - via R pkg posterior
+  double theta_mean_expect = 0.2512974105;
+  EXPECT_NEAR(theta_mean_expect, bern_chains.mean("theta"), 0.00001);
 
-  // test against R implementation in pkg posterior
-  Eigen::VectorXd s8_mcse_mean(10), s8_mcse_sd(10);
-  s8_mcse_mean << 0.288379, 0.4741815, 0.2741001, 0.3294614, 0.2473758,
-      0.2665048, 0.2701363, 0.4740092, 0.3621771, 0.3832464;
-  s8_mcse_sd << 0.1841825, 0.2854258, 0.192332, 0.2919369, 0.2478025, 0.2207478,
-      0.2308452, 0.2522107, 0.2946896, 0.3184745;
+  double theta_median_expect = 0.237476;
+  EXPECT_NEAR(theta_median_expect, bern_chains.median("theta"), 0.00001);
 
-  for (size_t i = 0; i < 10; ++i) {
-    auto mcse_mean = chain_2.mcse_mean(i + 7);
-    auto mcse_sd = chain_2.mcse_sd(i + 7);
-    EXPECT_NEAR(mcse_mean, s8_mcse_mean(i), 0.05);
-    EXPECT_NEAR(mcse_sd, s8_mcse_sd(i), 0.09);
+  double theta_sd_expect = 0.1215466867;
+  EXPECT_NEAR(theta_sd_expect, bern_chains.sd("theta"), 0.00001);
+
+  double theta_mad_expect = 0.1230906411;
+  EXPECT_NEAR(theta_mad_expect, bern_chains.max_abs_deviation("theta"), 0.00001);
+
+  Eigen::VectorXd probs(6);
+  probs << 0.0, 0.01, 0.05, 0.95, 0.99, 1.0;
+  Eigen::VectorXd quantiles_expect(6);
+  quantiles_expect << 0.004072430, 0.046281211, 0.07716935, 0.47388505, 0.574524110, 0.698401000;
+  Eigen::VectorXd theta_quantiles = bern_chains.quantiles("theta", probs);
+  for (size_t i=0; i < probs.size(); ++i) {
+    EXPECT_NEAR(quantiles_expect(i), theta_quantiles(i), 0.00001);
   }
-}
 
-TEST_F(McmcChains, autocorrelation) {
-  stan::mcmc::chainset chain_1(eight_schools_1);
-  EXPECT_EQ(1, chain_1.num_chains());
+  double theta_rhat_expect = 1.0067897;
+  auto rhat = bern_chains.split_rank_normalized_rhat("theta");
+  EXPECT_NEAR(theta_rhat_expect, std::max(rhat.first, rhat.second), 0.00001);
 
-  Eigen::VectorXd mu_ac_posterior(10);
-  mu_ac_posterior << 1.00000000000, 0.19487668999, 0.05412049365, 0.07834048575,
-      0.04145609855, 0.04353962161, -0.00977255885, 0.00005175308,
-      0.01791577080, 0.01245035817;
-  auto mu_ac = chain_1.autocorrelation(0, "mu");
+  double theta_ess_bulk_expect = 1407.5124;
+  double theta_ess_tail_expect =  1291.7131;
+  auto ess = bern_chains.split_rank_normalized_ess("theta");
+  EXPECT_NEAR(theta_ess_bulk_expect, ess.first, 0.0001);
+  EXPECT_NEAR(theta_ess_tail_expect, ess.second, 0.0001);
+
+  // autocorrelation - first 10 lags
+  Eigen::VectorXd theta_ac_expect(10);
+  theta_ac_expect << 1.000000000000, 0.422042451075, 0.206832857945,
+    0.083833599168, 0.037326065784, 0.025076266911, 0.020038613922,
+    0.013467409681, 0.004762861453, 0.029494701819;
+  auto theta_ac = bern_chains.autocorrelation(0, "theta");
   for (size_t i = 0; i < 10; ++i) {
-    EXPECT_NEAR(mu_ac_posterior(i), mu_ac(i), 0.0005);
+    EXPECT_NEAR(theta_ac(i), theta_ac_expect(i), 0.0005);
   }
 }
