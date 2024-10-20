@@ -24,38 +24,24 @@ class McmcChains : public testing::Test {
     bernoulli_warmup_stream.open(
         "src/test/unit/mcmc/test_csv_files/bernoulli_warmup.csv",
         std::ifstream::in);
-    bernoulli_zeta_stream.open(
-        "src/test/unit/mcmc/test_csv_files/bernoulli_zeta.csv",
-        std::ifstream::in);
     eight_schools_1_stream.open(
         "src/test/unit/mcmc/test_csv_files/eight_schools_1.csv",
         std::ifstream::in);
     eight_schools_2_stream.open(
         "src/test/unit/mcmc/test_csv_files/eight_schools_2.csv",
         std::ifstream::in);
-    eight_schools_5iters_1_stream.open(
-        "src/test/unit/mcmc/test_csv_files/eight_schools_5iters_1.csv",
-        std::ifstream::in);
-    eight_schools_5iters_2_stream.open(
-        "src/test/unit/mcmc/test_csv_files/eight_schools_5iters_2.csv",
-        std::ifstream::in);
 
     if (!bernoulli_500_stream || !bernoulli_default_stream
         || !bernoulli_thin_stream || !bernoulli_warmup_stream
-        || !bernoulli_zeta_stream || !eight_schools_1_stream
-        || !eight_schools_2_stream || !eight_schools_5iters_1_stream
-        || !eight_schools_5iters_2_stream) {
+        || !eight_schools_1_stream || !eight_schools_2_stream) {
       FAIL() << "Failed to open one or more test files";
     }
     bernoulli_500_stream.seekg(0, std::ios::beg);
     bernoulli_default_stream.seekg(0, std::ios::beg);
     bernoulli_thin_stream.seekg(0, std::ios::beg);
     bernoulli_warmup_stream.seekg(0, std::ios::beg);
-    bernoulli_zeta_stream.seekg(0, std::ios::beg);
     eight_schools_1_stream.seekg(0, std::ios::beg);
     eight_schools_2_stream.seekg(0, std::ios::beg);
-    eight_schools_5iters_1_stream.seekg(0, std::ios::beg);
-    eight_schools_5iters_2_stream.seekg(0, std::ios::beg);
 
     bernoulli_500
         = stan::io::stan_csv_reader::parse(bernoulli_500_stream, &out);
@@ -65,16 +51,10 @@ class McmcChains : public testing::Test {
         = stan::io::stan_csv_reader::parse(bernoulli_thin_stream, &out);
     bernoulli_warmup
         = stan::io::stan_csv_reader::parse(bernoulli_warmup_stream, &out);
-    bernoulli_zeta
-        = stan::io::stan_csv_reader::parse(bernoulli_zeta_stream, &out);
     eight_schools_1
         = stan::io::stan_csv_reader::parse(eight_schools_1_stream, &out);
     eight_schools_2
         = stan::io::stan_csv_reader::parse(eight_schools_2_stream, &out);
-    eight_schools_5iters_1
-        = stan::io::stan_csv_reader::parse(eight_schools_5iters_1_stream, &out);
-    eight_schools_5iters_2
-        = stan::io::stan_csv_reader::parse(eight_schools_5iters_2_stream, &out);
   }
 
   void TearDown() override {
@@ -82,23 +62,18 @@ class McmcChains : public testing::Test {
     bernoulli_default_stream.close();
     bernoulli_thin_stream.close();
     bernoulli_warmup_stream.close();
-    bernoulli_zeta_stream.close();
     eight_schools_1_stream.close();
     eight_schools_2_stream.close();
-    eight_schools_5iters_1_stream.close();
-    eight_schools_5iters_2_stream.close();
   }
 
   std::stringstream out;
 
   std::ifstream bernoulli_500_stream, bernoulli_default_stream,
-      bernoulli_thin_stream, bernoulli_warmup_stream, bernoulli_zeta_stream,
-      eight_schools_1_stream, eight_schools_2_stream,
-      eight_schools_5iters_1_stream, eight_schools_5iters_2_stream;
+    bernoulli_thin_stream, bernoulli_warmup_stream,
+    eight_schools_1_stream, eight_schools_2_stream;
 
   stan::io::stan_csv bernoulli_500, bernoulli_default, bernoulli_thin,
-      bernoulli_warmup, bernoulli_zeta, eight_schools_1, eight_schools_2,
-      eight_schools_5iters_1, eight_schools_5iters_2;
+    bernoulli_warmup, eight_schools_1, eight_schools_2;
 };
 
 TEST_F(McmcChains, constructor) {
@@ -138,11 +113,6 @@ TEST_F(McmcChains, addFail) {
   bad.clear();
   bad.push_back(bernoulli_default);
   bad.push_back(eight_schools_1);
-  EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
-
-  bad.clear();
-  bad.push_back(bernoulli_default);
-  bad.push_back(bernoulli_zeta);
   EXPECT_THROW(stan::mcmc::chainset fail(bad), std::invalid_argument);
 }
 
