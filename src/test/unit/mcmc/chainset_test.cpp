@@ -200,7 +200,8 @@ TEST_F(McmcChains, summary_stats) {
   EXPECT_NEAR(theta_sd_expect, bern_chains.sd("theta"), 0.00001);
 
   double theta_mad_expect = 0.1230906411;
-  EXPECT_NEAR(theta_mad_expect, bern_chains.max_abs_deviation("theta"), 0.00001);
+  EXPECT_NEAR(theta_mad_expect, bern_chains.max_abs_deviation("theta"),
+              0.00001);
 
   double theta_mcse_mean_expect = 0.0032339916;
   EXPECT_NEAR(theta_mcse_mean_expect, bern_chains.mcse_mean("theta"), 0.0001);
@@ -211,9 +212,10 @@ TEST_F(McmcChains, summary_stats) {
   Eigen::VectorXd probs(6);
   probs << 0.0, 0.01, 0.05, 0.95, 0.99, 1.0;
   Eigen::VectorXd quantiles_expect(6);
-  quantiles_expect << 0.004072430, 0.046281211, 0.07716935, 0.47388505, 0.574524110, 0.698401000;
+  quantiles_expect << 0.004072430, 0.046281211, 0.07716935, 0.47388505,
+      0.574524110, 0.698401000;
   Eigen::VectorXd theta_quantiles = bern_chains.quantiles("theta", probs);
-  for (size_t i=0; i < probs.size(); ++i) {
+  for (size_t i = 0; i < probs.size(); ++i) {
     EXPECT_NEAR(quantiles_expect(i), theta_quantiles(i), 0.00001);
   }
 
@@ -222,7 +224,7 @@ TEST_F(McmcChains, summary_stats) {
   EXPECT_NEAR(theta_rhat_expect, std::max(rhat.first, rhat.second), 0.00001);
 
   double theta_ess_bulk_expect = 1407.5124;
-  double theta_ess_tail_expect =  1291.7131;
+  double theta_ess_tail_expect = 1291.7131;
   auto ess = bern_chains.split_rank_normalized_ess("theta");
   EXPECT_NEAR(theta_ess_bulk_expect, ess.first, 0.0001);
   EXPECT_NEAR(theta_ess_tail_expect, ess.second, 0.0001);
@@ -230,8 +232,8 @@ TEST_F(McmcChains, summary_stats) {
   // autocorrelation - first 10 lags
   Eigen::VectorXd theta_ac_expect(10);
   theta_ac_expect << 1.000000000000, 0.422042451075, 0.206832857945,
-    0.083833599168, 0.037326065784, 0.025076266911, 0.020038613922,
-    0.013467409681, 0.004762861453, 0.029494701819;
+      0.083833599168, 0.037326065784, 0.025076266911, 0.020038613922,
+      0.013467409681, 0.004762861453, 0.029494701819;
   auto theta_ac = bern_chains.autocorrelation(0, "theta");
   for (size_t i = 0; i < 10; ++i) {
     EXPECT_NEAR(theta_ac(i), theta_ac_expect(i), 0.0005);
