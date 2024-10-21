@@ -170,8 +170,7 @@ TEST_F(McmcChains, summary_stats) {
   EXPECT_NEAR(theta_sd_expect, bern_chains.sd("theta"), 1e-5);
 
   double theta_mad_expect = 0.12309;
-  EXPECT_NEAR(theta_mad_expect, bern_chains.max_abs_deviation("theta"),
-              1e-5);
+  EXPECT_NEAR(theta_mad_expect, bern_chains.max_abs_deviation("theta"), 1e-5);
 
   double theta_mcse_mean_expect = 0.003234;
   EXPECT_NEAR(theta_mcse_mean_expect, bern_chains.mcse_mean("theta"), 1e-4);
@@ -182,8 +181,8 @@ TEST_F(McmcChains, summary_stats) {
   Eigen::VectorXd probs(6);
   probs << 0.0, 0.01, 0.05, 0.95, 0.99, 1.0;
   Eigen::VectorXd quantiles_expect(6);
-  quantiles_expect << 0.004072, 0.046281, 0.077169, 0.473885,
-      0.574524, 0.698401;
+  quantiles_expect << 0.004072, 0.046281, 0.077169, 0.473885, 0.574524,
+      0.698401;
   Eigen::VectorXd theta_quantiles = bern_chains.quantiles("theta", probs);
   for (size_t i = 0; i < probs.size(); ++i) {
     EXPECT_NEAR(quantiles_expect(i), theta_quantiles(i), 1e-5);
@@ -196,14 +195,13 @@ TEST_F(McmcChains, summary_stats) {
   double theta_ess_bulk_expect = 1407.5124;
   double theta_ess_tail_expect = 1291.7131;
   auto ess = bern_chains.split_rank_normalized_ess("theta");
-  EXPECT_NEAR(theta_ess_bulk_expect, ess.first,  1e-4);
+  EXPECT_NEAR(theta_ess_bulk_expect, ess.first, 1e-4);
   EXPECT_NEAR(theta_ess_tail_expect, ess.second, 1e-4);
 
   // autocorrelation - first 10 lags
   Eigen::VectorXd theta_ac_expect(10);
-  theta_ac_expect << 1.00000, 0.42204, 0.20683,
-      0.08383, 0.037326, 0.02507, 0.02003,
-      0.01347, 0.00476, 0.029495;
+  theta_ac_expect << 1.00000, 0.42204, 0.20683, 0.08383, 0.037326, 0.02507,
+      0.02003, 0.01347, 0.00476, 0.029495;
   auto theta_ac = bern_chains.autocorrelation(0, "theta");
   for (size_t i = 0; i < 10; ++i) {
     EXPECT_NEAR(theta_ac(i), theta_ac_expect(i), 0.0005);

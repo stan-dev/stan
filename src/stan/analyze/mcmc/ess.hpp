@@ -21,7 +21,7 @@ namespace analyze {
  * which normalizes lag-k autocorrelation estimators by N instead of (N - k),
  * yielding biased but more stable estimators as discussed in Geyer (1992); see
  * https://projecteuclid.org/euclid.ss/1177011137.
- * 
+ *
  * @param chains matrix of draws across all chains
  * @return effective sample size for the specified parameter
  */

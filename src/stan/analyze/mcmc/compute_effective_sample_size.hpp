@@ -36,8 +36,9 @@ __attribute__((deprecated))
 #elif defined(_MSC_VER)
 __declspec(deprecated)
 #endif
-inline double compute_effective_sample_size(std::vector<const double*> draws,
-                                            std::vector<size_t> sizes) {
+inline double
+compute_effective_sample_size(std::vector<const double*> draws,
+                              std::vector<size_t> sizes) {
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   for (int chain = 1; chain < num_chains; ++chain) {
@@ -170,8 +171,8 @@ __attribute__((deprecated))
 #elif defined(_MSC_VER)
 __declspec(deprecated)
 #endif
-inline double compute_effective_sample_size(std::vector<const double*> draws,
-                                            size_t size) {
+inline double
+compute_effective_sample_size(std::vector<const double*> draws, size_t size) {
   int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_effective_sample_size(draws, sizes);
@@ -203,8 +204,9 @@ __attribute__((deprecated))
 #elif defined(_MSC_VER)
 __declspec(deprecated)
 #endif
-inline double compute_split_effective_sample_size(
-    std::vector<const double*> draws, std::vector<size_t> sizes) {
+inline double
+compute_split_effective_sample_size(std::vector<const double*> draws,
+                                    std::vector<size_t> sizes) {
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   for (int chain = 1; chain < num_chains; ++chain) {
@@ -246,8 +248,9 @@ __attribute__((deprecated))
 #elif defined(_MSC_VER)
 __declspec(deprecated)
 #endif
-inline double compute_split_effective_sample_size(
-    std::vector<const double*> draws, size_t size) {
+inline double
+compute_split_effective_sample_size(std::vector<const double*> draws,
+                                    size_t size) {
   int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_split_effective_sample_size(draws, sizes);
