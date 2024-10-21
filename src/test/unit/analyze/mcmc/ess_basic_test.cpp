@@ -42,6 +42,7 @@ class EssBasic : public testing::Test {
 };
 
 TEST_F(EssBasic, test_basic_ess) {
+  // computed via R pkg posterior
   double ess_lp_expect = 1335.4137;
   double ess_theta_expect = 1377.503;
 
@@ -53,9 +54,9 @@ TEST_F(EssBasic, test_basic_ess) {
   auto old_ess_basic_theta
       = stan::analyze::compute_effective_sample_size(draws_theta, sizes);
 
-  EXPECT_NEAR(ess_lp_expect, ess_basic_lp, 0.0001);
-  EXPECT_NEAR(ess_theta_expect, ess_basic_theta, 0.0001);
+  EXPECT_NEAR(ess_lp_expect, ess_basic_lp, 1e-4);
+  EXPECT_NEAR(ess_theta_expect, ess_basic_theta, 1e-4);
 
-  EXPECT_NEAR(old_ess_basic_lp, ess_basic_lp, 0.00001);
-  EXPECT_NEAR(old_ess_basic_theta, ess_basic_theta, 0.00001);
+  EXPECT_NEAR(old_ess_basic_lp, ess_basic_lp, 1e-9);
+  EXPECT_NEAR(old_ess_basic_theta, ess_basic_theta, 1e-9);
 }

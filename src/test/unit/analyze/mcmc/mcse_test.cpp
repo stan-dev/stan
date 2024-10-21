@@ -35,18 +35,19 @@ class MonteCarloStandardError : public testing::Test {
 };
 
 TEST_F(MonteCarloStandardError, test_mcse) {
-  double mcse_mean_lp_expect = 0.020164778;
-  double mcse_mean_theta_expect = 0.0032339916;
+  // computed via R pkg posterior
+  double mcse_mean_lp_expect = 0.02016;
+  double mcse_mean_theta_expect = 0.00323;
 
-  double mcse_sd_lp_expect = 0.0355305;
-  double mcse_sd_theta_expect = 0.0021642137;
-  EXPECT_NEAR(mcse_mean_lp_expect, stan::analyze::mcse_mean(chains_lp), 0.0001);
+  double mcse_sd_lp_expect = 0.03553;
+  double mcse_sd_theta_expect = 0.00216;
+  EXPECT_NEAR(mcse_mean_lp_expect, stan::analyze::mcse_mean(chains_lp), 1e-4);
   EXPECT_NEAR(mcse_mean_theta_expect, stan::analyze::mcse_mean(chains_theta),
-              0.0001);
+              1e-4);
 
-  EXPECT_NEAR(mcse_sd_lp_expect, stan::analyze::mcse_sd(chains_lp), 0.0001);
+  EXPECT_NEAR(mcse_sd_lp_expect, stan::analyze::mcse_sd(chains_lp), 1e-4);
   EXPECT_NEAR(mcse_sd_theta_expect, stan::analyze::mcse_sd(chains_theta),
-              0.0001);
+              1e-4);
 }
 
 TEST_F(MonteCarloStandardError, const_fail) {
