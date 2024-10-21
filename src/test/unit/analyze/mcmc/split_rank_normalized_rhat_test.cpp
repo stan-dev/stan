@@ -37,15 +37,16 @@ class RankNormalizedRhat : public testing::Test {
 };
 
 TEST_F(RankNormalizedRhat, test_bulk_tail_rhat) {
-  double rhat_lp_expect = 1.0007301;
-  double rhat_theta_expect = 1.0067897;
+  // computed via R pkg posterior
+  double rhat_lp_expect = 1.00073;
+  double rhat_theta_expect = 1.006789;
 
   auto rhat_lp = stan::analyze::split_rank_normalized_rhat(chains_lp);
   auto rhat_theta = stan::analyze::split_rank_normalized_rhat(chains_theta);
 
-  EXPECT_NEAR(rhat_lp_expect, std::max(rhat_lp.first, rhat_lp.second), 0.00001);
+  EXPECT_NEAR(rhat_lp_expect, std::max(rhat_lp.first, rhat_lp.second), 1e-5);
   EXPECT_NEAR(rhat_theta_expect, std::max(rhat_theta.first, rhat_theta.second),
-              0.00001);
+              1e-5);
 }
 
 TEST_F(RankNormalizedRhat, const_fail) {

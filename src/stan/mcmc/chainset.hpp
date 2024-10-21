@@ -411,11 +411,6 @@ class chainset {
    */
   double mcse_mean(const int index) const {
     return analyze::mcse_mean(samples(index));
-    // if (num_samples() < 4
-    //     || !stan::analyze::is_finite_and_varies(samples(index)))
-    //   return std::numeric_limits<double>::quiet_NaN();
-    // double ess = analyze::ess(samples(index));
-    // return sd(index) / std::sqrt(ess);
   }
 
   /**
@@ -440,17 +435,6 @@ class chainset {
    */
   double mcse_sd(const int index) const {
     return analyze::mcse_sd(samples(index));
-    // if (num_samples() < 4
-    //     || !stan::analyze::is_finite_and_varies(samples(index)))
-    //   return std::numeric_limits<double>::quiet_NaN();
-    // Eigen::MatrixXd s = samples(index);
-    // Eigen::MatrixXd s2 = s.array().square();
-    // double ess_s = analyze::ess(s);
-    // double ess_s2 = analyze::ess(s2);
-    // double ess_sd = std::min(ess_s, ess_s2);
-    // return sd(index)
-    //        * std::sqrt(stan::math::e() * std::pow(1 - 1 / ess_sd, ess_sd - 1)
-    //                    - 1);
   }
 
   /**

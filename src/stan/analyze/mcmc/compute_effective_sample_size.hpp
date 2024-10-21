@@ -12,6 +12,8 @@
 namespace stan {
 namespace analyze {
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
@@ -29,6 +31,11 @@ namespace analyze {
  * @param sizes stores sizes of chains
  * @return effective sample size for the specified parameter
  */
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((deprecated))
+#elif defined(_MSC_VER)
+__declspec(deprecated)
+#endif
 inline double compute_effective_sample_size(std::vector<const double*> draws,
                                             std::vector<size_t> sizes) {
   int num_chains = sizes.size();
@@ -138,6 +145,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
 }
 
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
@@ -156,6 +165,11 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
  * @param size size of chains
  * @return effective sample size for the specified parameter
  */
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((deprecated))
+#elif defined(_MSC_VER)
+__declspec(deprecated)
+#endif
 inline double compute_effective_sample_size(std::vector<const double*> draws,
                                             size_t size) {
   int num_chains = draws.size();
@@ -164,6 +178,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
 }
 
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the split effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
@@ -182,6 +198,11 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
  * @param sizes stores sizes of chains
  * @return effective sample size for the specified parameter
  */
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((deprecated))
+#elif defined(_MSC_VER)
+__declspec(deprecated)
+#endif
 inline double compute_split_effective_sample_size(
     std::vector<const double*> draws, std::vector<size_t> sizes) {
   int num_chains = sizes.size();
@@ -199,6 +220,8 @@ inline double compute_split_effective_sample_size(
 }
 
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the split effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
@@ -218,6 +241,11 @@ inline double compute_split_effective_sample_size(
  * @param size size of chains
  * @return effective sample size for the specified parameter
  */
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((deprecated))
+#elif defined(_MSC_VER)
+__declspec(deprecated)
+#endif
 inline double compute_split_effective_sample_size(
     std::vector<const double*> draws, size_t size) {
   int num_chains = draws.size();

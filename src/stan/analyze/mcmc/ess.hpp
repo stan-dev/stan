@@ -15,10 +15,13 @@ namespace analyze {
  * Computes the effective sample size (ESS) for the specified
  * parameter across all chains.  The number of draws per chain must be > 3,
  * and the values across all draws must be finite and not constant.
- * The value returned is the minimum of ESS and (sample_sz * log10(sample_sz).
- * Sample autocovariance is computed using Stan math library implmentation.
  * See https://arxiv.org/abs/1903.08008, section 3.2 for discussion.
  *
+ * Sample autocovariance is computed using the implementation in this namespace
+ * which normalizes lag-k autocorrelation estimators by N instead of (N - k),
+ * yielding biased but more stable estimators as discussed in Geyer (1992); see
+ * https://projecteuclid.org/euclid.ss/1177011137.
+ * 
  * @param chains matrix of draws across all chains
  * @return effective sample size for the specified parameter
  */

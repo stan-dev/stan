@@ -35,6 +35,7 @@ class RankNormalizedEss : public testing::Test {
 };
 
 TEST_F(RankNormalizedEss, test_bulk_tail_ess) {
+  // computed via R pkg posterior
   double ess_lp_bulk_expect = 1512.7684;
   double ess_lp_tail_expect = 1591.9707;
 
