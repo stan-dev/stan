@@ -31,11 +31,6 @@ namespace analyze {
  * @param sizes stores sizes of chains
  * @return effective sample size for the specified parameter
  */
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((deprecated))
-#elif defined(_MSC_VER)
-__declspec(deprecated)
-#endif
 inline double
 compute_effective_sample_size(std::vector<const double*> draws,
                               std::vector<size_t> sizes) {
@@ -166,11 +161,6 @@ compute_effective_sample_size(std::vector<const double*> draws,
  * @param size size of chains
  * @return effective sample size for the specified parameter
  */
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((deprecated))
-#elif defined(_MSC_VER)
-__declspec(deprecated)
-#endif
 inline double
 compute_effective_sample_size(std::vector<const double*> draws, size_t size) {
   int num_chains = draws.size();
@@ -199,11 +189,6 @@ compute_effective_sample_size(std::vector<const double*> draws, size_t size) {
  * @param sizes stores sizes of chains
  * @return effective sample size for the specified parameter
  */
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((deprecated))
-#elif defined(_MSC_VER)
-__declspec(deprecated)
-#endif
 inline double
 compute_split_effective_sample_size(std::vector<const double*> draws,
                                     std::vector<size_t> sizes) {
@@ -243,11 +228,6 @@ compute_split_effective_sample_size(std::vector<const double*> draws,
  * @param size size of chains
  * @return effective sample size for the specified parameter
  */
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((deprecated))
-#elif defined(_MSC_VER)
-__declspec(deprecated)
-#endif
 inline double
 compute_split_effective_sample_size(std::vector<const double*> draws,
                                     size_t size) {

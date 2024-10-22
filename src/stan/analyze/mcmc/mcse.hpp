@@ -25,9 +25,9 @@ inline double mcse_mean(const Eigen::MatrixXd& chains) {
   if (chains.rows() < 4 || !is_finite_and_varies(chains))
     return std::numeric_limits<double>::quiet_NaN();
 
-  double sd
+  double sample_var
       = (chains.array() - chains.mean()).square().sum() / (chains.size() - 1);
-  return std::sqrt(sd / ess(chains));
+  return std::sqrt(sample_var / ess(chains));
 }
 
 /**
