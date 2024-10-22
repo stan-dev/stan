@@ -46,8 +46,7 @@ TEST_F(MonteCarloStandardError, test_mcse) {
               1e-4);
 
   EXPECT_NEAR(mcse_sd_lp_expect, stan::analyze::mcse_sd(chains_lp), 1e-4);
-  EXPECT_NEAR(mcse_sd_theta_expect, stan::analyze::mcse_sd(chains_theta),
-              1e-4);
+  EXPECT_NEAR(mcse_sd_theta_expect, stan::analyze::mcse_sd(chains_theta), 1e-4);
 }
 
 TEST_F(MonteCarloStandardError, const_fail) {
