@@ -44,8 +44,10 @@ TEST_F(RhatBasic, test_basic_rhat) {
   double rhat_lp_basic_expect = 1.00035489482;
   double rhat_theta_basic_expect = 1.00721797217;
 
-  auto rhat_basic_lp = stan::analyze::rhat(stan::analyze::split_chains(chains_lp));
-  auto rhat_basic_theta = stan::analyze::rhat(stan::analyze::split_chains(chains_theta));
+  auto rhat_basic_lp
+      = stan::analyze::rhat(stan::analyze::split_chains(chains_lp));
+  auto rhat_basic_theta
+      = stan::analyze::rhat(stan::analyze::split_chains(chains_theta));
 
   EXPECT_NEAR(rhat_lp_basic_expect, rhat_basic_lp, 1e-10);
   EXPECT_NEAR(rhat_theta_basic_expect, rhat_basic_theta, 1e-10);
