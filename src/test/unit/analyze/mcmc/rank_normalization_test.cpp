@@ -39,7 +39,7 @@ TEST_F(RankNormalization, test_min_max) {
   chains_theta(minRow, minCol) = 0.001;
 
   auto rank_norm_theta = stan::analyze::rank_transform(chains_theta);
-  
+
   Eigen::Index maxRowRankNorm, maxColRankNorm;
   Eigen::Index minRowRankNorm, minColRankNorm;
   max_val = rank_norm_theta.maxCoeff(&maxRowRankNorm, &maxColRankNorm);
