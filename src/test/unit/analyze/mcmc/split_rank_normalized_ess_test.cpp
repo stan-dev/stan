@@ -45,11 +45,11 @@ TEST_F(RankNormalizedEss, test_bulk_tail_ess) {
   auto ess_lp = stan::analyze::split_rank_normalized_ess(chains_lp);
   auto ess_theta = stan::analyze::split_rank_normalized_ess(chains_theta);
 
-  EXPECT_NEAR(ess_lp_bulk_expect, ess_lp.first, 0.001);
-  EXPECT_NEAR(ess_lp_tail_expect, ess_lp.second, 0.001);
+  EXPECT_NEAR(ess_lp_bulk_expect, ess_lp.first, 1e-4);
+  EXPECT_NEAR(ess_lp_tail_expect, ess_lp.second, 1e-4);
 
-  EXPECT_NEAR(ess_theta_bulk_expect, ess_theta.first, 0.001);
-  EXPECT_NEAR(ess_theta_tail_expect, ess_theta.second, 0.001);
+  EXPECT_NEAR(ess_theta_bulk_expect, ess_theta.first, 1e-4);
+  EXPECT_NEAR(ess_theta_tail_expect, ess_theta.second, 1e-4);
 }
 
 TEST_F(RankNormalizedEss, const_fail) {
