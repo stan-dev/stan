@@ -123,18 +123,18 @@ TEST_F(SplitChains, split_draws_matrix_odd_rows) {
   auto bar = stan::analyze::split_chains(foo);
   EXPECT_EQ(4, bar.cols());
   EXPECT_EQ(3, bar.rows());
-  EXPECT_EQ(bar(0,0), 1);
-  EXPECT_EQ(bar(1,0), 2);
-  EXPECT_EQ(bar(2,0), 3);
-  EXPECT_EQ(bar(0,1), 5);
-  EXPECT_EQ(bar(1,1), 6);
-  EXPECT_EQ(bar(2,1), 7);
-  EXPECT_EQ(bar(0,2), 8);
-  EXPECT_EQ(bar(1,2), 9);
-  EXPECT_EQ(bar(2,2), 10);
-  EXPECT_EQ(bar(0,3), 12);
-  EXPECT_EQ(bar(1,3), 13);
-  EXPECT_EQ(bar(2,3), 14);
+  EXPECT_EQ(bar(0, 0), 1);
+  EXPECT_EQ(bar(1, 0), 2);
+  EXPECT_EQ(bar(2, 0), 3);
+  EXPECT_EQ(bar(0, 1), 5);
+  EXPECT_EQ(bar(1, 1), 6);
+  EXPECT_EQ(bar(2, 1), 7);
+  EXPECT_EQ(bar(0, 2), 8);
+  EXPECT_EQ(bar(1, 2), 9);
+  EXPECT_EQ(bar(2, 2), 10);
+  EXPECT_EQ(bar(0, 3), 12);
+  EXPECT_EQ(bar(1, 3), 13);
+  EXPECT_EQ(bar(2, 3), 14);
 
   Eigen::MatrixXd baz(4, 2);
   for (size_t col = 0; col < 2; ++col) {
@@ -146,12 +146,12 @@ TEST_F(SplitChains, split_draws_matrix_odd_rows) {
   auto boz = stan::analyze::split_chains(baz);
   EXPECT_EQ(4, boz.cols());
   EXPECT_EQ(2, boz.rows());
-  EXPECT_EQ(boz(0,0), 15);
-  EXPECT_EQ(boz(1,0), 16);
-  EXPECT_EQ(boz(0,1), 17);
-  EXPECT_EQ(boz(1,1), 18);
-  EXPECT_EQ(boz(0,2), 19);
-  EXPECT_EQ(boz(1,2), 20);
-  EXPECT_EQ(boz(0,3), 21);
-  EXPECT_EQ(boz(1,3), 22);
+  EXPECT_EQ(boz(0, 0), 15);
+  EXPECT_EQ(boz(1, 0), 16);
+  EXPECT_EQ(boz(0, 1), 17);
+  EXPECT_EQ(boz(1, 1), 18);
+  EXPECT_EQ(boz(0, 2), 19);
+  EXPECT_EQ(boz(1, 2), 20);
+  EXPECT_EQ(boz(0, 3), 21);
+  EXPECT_EQ(boz(1, 3), 22);
 }

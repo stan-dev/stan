@@ -56,8 +56,8 @@ inline Eigen::MatrixXd split_chains(const Eigen::MatrixXd& samples) {
   int split_i = 0;
   for (std::size_t i = 0; i < num_chains; ++i) {
     Eigen::Map<const Eigen::VectorXd> head_block(samples.col(i).data(), half);
-    Eigen::Map<const Eigen::VectorXd> tail_block(samples.col(i).data() + tail_start,
-                                                 half);
+    Eigen::Map<const Eigen::VectorXd> tail_block(
+        samples.col(i).data() + tail_start, half);
 
     split_draws_matrix.col(split_i) = head_block;
     split_draws_matrix.col(split_i + 1) = tail_block;
