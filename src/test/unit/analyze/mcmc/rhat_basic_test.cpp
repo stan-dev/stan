@@ -1,5 +1,5 @@
-#include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
 #include <stan/analyze/mcmc/rhat.hpp>
+#include <stan/analyze/mcmc/split_chains.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
@@ -40,21 +40,13 @@ class RhatBasic : public testing::Test {
 };
 
 TEST_F(RhatBasic, test_basic_rhat) {
-  // computed via R pkg posterior
-  double rhat_lp_basic_expect = 1.0001296;
-  double rhat_theta_basic_expect = 1.0029197;
+  // computed via cmdstan 2.35.0 stansummary
+  double rhat_lp_basic_expect = 1.00035489482;
+  double rhat_theta_basic_expect = 1.00721797217;
 
-  auto rhat_basic_lp = stan::analyze::rhat(chains_lp);
-  auto old_rhat_basic_lp
-      = stan::analyze::compute_potential_scale_reduction(draws_lp, sizes);
+  auto rhat_basic_lp = stan::analyze::rhat(stan::analyze::split_chains(chains_lp));
+  auto rhat_basic_theta = stan::analyze::rhat(stan::analyze::split_chains(chains_theta));
 
-  auto rhat_basic_theta = stan::analyze::rhat(chains_theta);
-  auto old_rhat_basic_theta
-      = stan::analyze::compute_potential_scale_reduction(draws_theta, sizes);
-
-  EXPECT_NEAR(rhat_lp_basic_expect, rhat_basic_lp, 1e-5);
-  EXPECT_NEAR(rhat_theta_basic_expect, rhat_basic_theta, 1e-5);
-
-  EXPECT_NEAR(old_rhat_basic_lp, rhat_basic_lp, 1e-12);
-  EXPECT_NEAR(old_rhat_basic_theta, rhat_basic_theta, 1e-12);
+  EXPECT_NEAR(rhat_lp_basic_expect, rhat_basic_lp, 1e-10);
+  EXPECT_NEAR(rhat_theta_basic_expect, rhat_basic_theta, 1e-10);
 }
