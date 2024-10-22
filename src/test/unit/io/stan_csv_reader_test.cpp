@@ -578,7 +578,7 @@ TEST_F(StanIoStanCsvReader, no_samples) {
   stan::io::stan_csv no_samples
       = stan::io::stan_csv_reader::parse(no_samples_stream, &out);
   no_samples_stream.close();
-  ASSERT_EQ(out.str(), "Unable to parse sample\n");
+  ASSERT_EQ(out.str(), "No draws found\n");
 }
 
 TEST_F(StanIoStanCsvReader, variational) {

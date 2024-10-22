@@ -18,6 +18,8 @@ namespace stan {
 namespace analyze {
 
 /**
+ * \deprecated use `rhat` instead
+ *
  * Computes the potential scale reduction (Rhat) for the specified
  * parameter across all kept samples.
  *
@@ -102,6 +104,8 @@ inline double compute_potential_scale_reduction(
 }
 
 /**
+ * \deprecated use split_rank_normalized_rhat instead
+ *
  * Computes the potential scale reduction (Rhat) for the specified
  * parameter across all kept samples.
  *
@@ -125,6 +129,8 @@ inline double compute_potential_scale_reduction(
 }
 
 /**
+ * \deprecated use split_rank_normalized_rhat instead
+ *
  * Computes the split potential scale reduction (Rhat) for the
  * specified parameter across all kept samples.  When the number of
  * total draws N is odd, the (N+1)/2th draw is ignored.
@@ -157,6 +163,8 @@ inline double compute_split_potential_scale_reduction(
 }
 
 /**
+ * \deprecated use split_rank_normalized_rhat instead
+ *
  * Computes the split potential scale reduction (Rhat) for the
  * specified parameter across all kept samples.  When the number of
  * total draws N is odd, the (N+1)/2th draw is ignored.

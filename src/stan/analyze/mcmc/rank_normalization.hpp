@@ -12,8 +12,9 @@ namespace stan {
 namespace analyze {
 
 /**
- * Computes normalized average ranks for pooled draws. Normal scores computed
- * using inverse normal transformation and a fractional offset. Based on paper
+ * Computes normalized average ranks for pooled draws.  The values across
+ * all draws be finite and not constant. Normal scores computed using
+ * inverse normal transformation and a fractional offset. Based on paper
  * https://arxiv.org/abs/1903.08008
  *
  * @param chains matrix of draws, one column per chain

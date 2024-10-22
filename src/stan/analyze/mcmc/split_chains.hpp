@@ -20,8 +20,9 @@ namespace analyze {
 inline Eigen::MatrixXd split_chains(const std::vector<Eigen::MatrixXd>& chains,
                                     const int index) {
   size_t num_chains = chains.size();
-  size_t num_samples = chains[0].rows();
-  size_t half = std::floor(num_samples / 2.0);
+  size_t num_draws = chains[0].rows();
+  size_t half = std::floor(num_draws / 2.0);
+  size_t tail_start = std::floor((num_draws + 1) / 2.0);
 
   Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
   int split_i = 0;
@@ -29,7 +30,7 @@ inline Eigen::MatrixXd split_chains(const std::vector<Eigen::MatrixXd>& chains,
     Eigen::Map<const Eigen::VectorXd> head_block(chains[i].col(index).data(),
                                                  half);
     Eigen::Map<const Eigen::VectorXd> tail_block(
-        chains[i].col(index).data() + half, half);
+        chains[i].col(index).data() + tail_start, half);
 
     split_draws_matrix.col(split_i) = head_block;
     split_draws_matrix.col(split_i + 1) = tail_block;
@@ -47,15 +48,16 @@ inline Eigen::MatrixXd split_chains(const std::vector<Eigen::MatrixXd>& chains,
  */
 inline Eigen::MatrixXd split_chains(const Eigen::MatrixXd& samples) {
   size_t num_chains = samples.cols();
-  size_t num_samples = samples.rows();
-  size_t half = std::floor(num_samples / 2.0);
+  size_t num_draws = samples.rows();
+  size_t half = std::floor(num_draws / 2.0);
+  size_t tail_start = std::floor((num_draws + 1) / 2.0);
 
   Eigen::MatrixXd split_draws_matrix(half, num_chains * 2);
   int split_i = 0;
   for (std::size_t i = 0; i < num_chains; ++i) {
     Eigen::Map<const Eigen::VectorXd> head_block(samples.col(i).data(), half);
-    Eigen::Map<const Eigen::VectorXd> tail_block(samples.col(i).data() + half,
-                                                 half);
+    Eigen::Map<const Eigen::VectorXd> tail_block(
+        samples.col(i).data() + tail_start, half);
 
     split_draws_matrix.col(split_i) = head_block;
     split_draws_matrix.col(split_i + 1) = tail_block;

@@ -12,6 +12,8 @@
 namespace stan {
 namespace analyze {
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
@@ -138,6 +140,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
 }
 
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
@@ -164,6 +168,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
 }
 
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the split effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
@@ -199,6 +205,8 @@ inline double compute_split_effective_sample_size(
 }
 
 /**
+ * \deprecated use split_rank_normalized_ess instead
+ *
  * Computes the split effective sample size (ESS) for the specified
  * parameter across all kept samples.  The value returned is the
  * minimum of ESS and the number_total_draws *
