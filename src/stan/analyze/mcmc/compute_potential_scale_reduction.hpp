@@ -34,9 +34,8 @@ namespace analyze {
  * @param sizes stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
-inline double
-compute_potential_scale_reduction(std::vector<const double*> draws,
-                                  std::vector<size_t> sizes) {
+inline double compute_potential_scale_reduction(
+    std::vector<const double*> draws, std::vector<size_t> sizes) {
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   if (num_draws == 0) {
@@ -122,9 +121,8 @@ compute_potential_scale_reduction(std::vector<const double*> draws,
  * @param size stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
-inline double
-compute_potential_scale_reduction(std::vector<const double*> draws,
-                                  size_t size) {
+inline double compute_potential_scale_reduction(
+    std::vector<const double*> draws, size_t size) {
   int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_potential_scale_reduction(draws, sizes);
@@ -148,9 +146,8 @@ compute_potential_scale_reduction(std::vector<const double*> draws,
  * @param sizes stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
-inline double
-compute_split_potential_scale_reduction(std::vector<const double*> draws,
-                                        std::vector<size_t> sizes) {
+inline double compute_split_potential_scale_reduction(
+    std::vector<const double*> draws, std::vector<size_t> sizes) {
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   for (int chain = 1; chain < num_chains; ++chain) {
@@ -184,9 +181,8 @@ compute_split_potential_scale_reduction(std::vector<const double*> draws,
  * @param size stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
-inline double
-compute_split_potential_scale_reduction(std::vector<const double*> draws,
-                                        size_t size) {
+inline double compute_split_potential_scale_reduction(
+    std::vector<const double*> draws, size_t size) {
   int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_split_potential_scale_reduction(draws, sizes);

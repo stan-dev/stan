@@ -31,9 +31,8 @@ namespace analyze {
  * @param sizes stores sizes of chains
  * @return effective sample size for the specified parameter
  */
-inline double
-compute_effective_sample_size(std::vector<const double*> draws,
-                              std::vector<size_t> sizes) {
+inline double compute_effective_sample_size(std::vector<const double*> draws,
+                                            std::vector<size_t> sizes) {
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   for (int chain = 1; chain < num_chains; ++chain) {
@@ -161,8 +160,8 @@ compute_effective_sample_size(std::vector<const double*> draws,
  * @param size size of chains
  * @return effective sample size for the specified parameter
  */
-inline double
-compute_effective_sample_size(std::vector<const double*> draws, size_t size) {
+inline double compute_effective_sample_size(std::vector<const double*> draws,
+                                            size_t size) {
   int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_effective_sample_size(draws, sizes);
@@ -189,9 +188,8 @@ compute_effective_sample_size(std::vector<const double*> draws, size_t size) {
  * @param sizes stores sizes of chains
  * @return effective sample size for the specified parameter
  */
-inline double
-compute_split_effective_sample_size(std::vector<const double*> draws,
-                                    std::vector<size_t> sizes) {
+inline double compute_split_effective_sample_size(
+    std::vector<const double*> draws, std::vector<size_t> sizes) {
   int num_chains = sizes.size();
   size_t num_draws = sizes[0];
   for (int chain = 1; chain < num_chains; ++chain) {
@@ -228,9 +226,8 @@ compute_split_effective_sample_size(std::vector<const double*> draws,
  * @param size size of chains
  * @return effective sample size for the specified parameter
  */
-inline double
-compute_split_effective_sample_size(std::vector<const double*> draws,
-                                    size_t size) {
+inline double compute_split_effective_sample_size(
+    std::vector<const double*> draws, size_t size) {
   int num_chains = draws.size();
   std::vector<size_t> sizes(num_chains, size);
   return compute_split_effective_sample_size(draws, sizes);
