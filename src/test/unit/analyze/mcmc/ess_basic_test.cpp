@@ -57,6 +57,6 @@ TEST_F(EssBasic, test_basic_ess) {
   EXPECT_NEAR(ess_lp_expect, ess_basic_lp, 1e-4);
   EXPECT_NEAR(ess_theta_expect, ess_basic_theta, 1e-4);
 
-  EXPECT_NEAR(old_ess_basic_lp, ess_basic_lp, 1e-9);
-  EXPECT_NEAR(old_ess_basic_theta, ess_basic_theta, 1e-9);
+  EXPECT_NEAR(old_ess_basic_lp, ess_basic_lp, 1e-12);
+  EXPECT_NEAR(old_ess_basic_theta, ess_basic_theta, 1e-12);
 }

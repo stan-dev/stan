@@ -55,6 +55,6 @@ TEST_F(RhatBasic, test_basic_rhat) {
   EXPECT_NEAR(rhat_lp_basic_expect, rhat_basic_lp, 1e-5);
   EXPECT_NEAR(rhat_theta_basic_expect, rhat_basic_theta, 1e-5);
 
-  EXPECT_NEAR(old_rhat_basic_lp, rhat_basic_lp, 1e-9);
-  EXPECT_NEAR(old_rhat_basic_theta, rhat_basic_theta, 1e-9);
+  EXPECT_NEAR(old_rhat_basic_lp, rhat_basic_lp, 1e-12);
+  EXPECT_NEAR(old_rhat_basic_theta, rhat_basic_theta, 1e-12);
 }
