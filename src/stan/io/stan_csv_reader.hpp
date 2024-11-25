@@ -250,6 +250,10 @@ class stan_csv_reader {
 
     int rows = lines - 3;
     int cols = std::count(line.begin(), line.end(), ',') + 1;
+    if (cols == 1) {
+      // model has no parameters
+      return;
+    }
     adaptation.metric.resize(rows, cols);
     char comment;  // Buffer for comment indicator, #
 

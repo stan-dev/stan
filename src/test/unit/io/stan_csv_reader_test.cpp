@@ -30,6 +30,8 @@ class StanIoStanCsvReader : public testing::Test {
         "src/test/unit/io/test_csv_files/bernoulli_warmup.csv");
     fixed_param_stream.open(
         "src/test/unit/io/test_csv_files/fixed_param_output.csv");
+    no_params_stream.open(
+        "src/test/unit/io/test_csv_files/no_parameters_hmc.csv");
   }
 
   void TearDown() {
@@ -46,6 +48,7 @@ class StanIoStanCsvReader : public testing::Test {
     bernoulli_thin_stream.close();
     bernoulli_warmup_stream.close();
     fixed_param_stream.close();
+    no_params_stream.close();
   }
 
   std::ifstream blocker0_stream, epil0_stream;
@@ -58,6 +61,7 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream bernoulli_thin_stream;
   std::ifstream bernoulli_warmup_stream;
   std::ifstream fixed_param_stream;
+  std::ifstream no_params_stream;
 };
 
 TEST_F(StanIoStanCsvReader, read_metadata1) {
@@ -570,6 +574,14 @@ TEST_F(StanIoStanCsvReader, fixed_param) {
   ASSERT_EQ(10, fixed_param.samples.rows());
 }
 
+TEST_F(StanIoStanCsvReader, no_parameters) {
+  stan::io::stan_csv no_parameters_hmc;
+  std::stringstream out;
+  no_parameters_hmc = stan::io::stan_csv_reader::parse(no_params_stream, &out);
+  ASSERT_EQ(100, no_parameters_hmc.samples.rows());
+  ASSERT_EQ(0, no_parameters_hmc.adaptation.metric.size());
+}
+
 TEST_F(StanIoStanCsvReader, no_samples) {
   std::ifstream no_samples_stream;
   no_samples_stream.open(
@@ -590,4 +602,5 @@ TEST_F(StanIoStanCsvReader, variational) {
       = stan::io::stan_csv_reader::parse(variational_stream, &out);
   variational_stream.close();
   ASSERT_EQ(1000, variational.metadata.num_samples);
+  ASSERT_EQ(0, variational.adaptation.metric.size());
 }
