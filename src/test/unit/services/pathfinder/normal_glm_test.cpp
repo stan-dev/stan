@@ -11,7 +11,7 @@
 #include <test/unit/services/util.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
-
+#define LOCAL_THREADS_TEST 4
 // Locally tests can use threads but for jenkins we should just use 1 thread
 #ifdef LOCAL_THREADS_TEST
 auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);

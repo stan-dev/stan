@@ -13,6 +13,7 @@
 #include <stan/services/util/duration_diff.hpp>
 #include <boost/circular_buffer.hpp>
 #include <tbb/parallel_for.h>
+#include <tbb/flow_graph.h>
 #include <tbb/concurrent_queue.h>
 #include <tbb/task_group.h>
 #include <string>
@@ -538,6 +539,29 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
 }
 }  // namespace internal
 
+template <typename T>
+inline decltype(auto) get_ref(T&& t) {
+  if constexpr (std::is_pointer_v<std::decay_t<T>>) {
+    return (*t);
+  } else {
+    return std::forward<T>(t);
+  }
+}
+template <typename T>
+inline auto&& get_ref(const T*& t) {
+  return (*t);
+}
+
+template <typename T >
+inline auto&& get_ref(T*& t) {
+  return (*t);
+}
+template <typename T >
+inline auto&& get_ref(T*&& t) {
+  return (*t);
+}
+
+
 /**
  * Run single path pathfinder with specified initializations and write results
  * to the specified callbacks and it returns a return code.
@@ -698,7 +722,54 @@ inline auto pathfinder_lbfgs_single(
       msg.str("");
     }
   };
+  Eigen::Index concurrent_jobs = 10;
+  // In your setup code, create a flow graph and nodes:
+  tbb::flow::graph g;
+  using PathfinderOutput = std::pair<
+    std::pair<internal::elbo_est_t, internal::taylor_approx_t>, int>;
+using PathfinderInput = std::pair<
+  std::tuple<
+    stan::rng_t*,
+    decltype(lp_fun)*,
+    decltype(constrain_fun)*,
+    Eigen::VectorXd,
+    Eigen::VectorXd,
+    Eigen::VectorXd,
+    Eigen::MatrixXd,
+    Eigen::MatrixXd,
+    std::size_t,
+    std::string,
+    callbacks::logger*
+  >,
+  int
+>;
 
+  tbb::flow::function_node<PathfinderInput, PathfinderOutput> pathfinder_node(
+      g, concurrent_jobs,
+      [](auto& in) mutable -> PathfinderOutput {
+        return stan::math::apply(
+          [iter = in.second](auto&... args) mutable -> PathfinderOutput {
+            return PathfinderOutput{internal::pathfinder_impl(
+              const_cast<std::remove_pointer_t<std::decay_t<decltype(args)>>&>(get_ref(args))...), iter};
+        }, in.first);
+      }
+  );
+  // Node that updates the best ELBO if needed
+  tbb::flow::function_node<PathfinderOutput, tbb::flow::continue_msg> result_node(
+      g, tbb::flow::serial,
+      [&](auto&& out) -> tbb::flow::continue_msg {
+        auto& pathfinder_res = out.first;
+        // Update best result if better
+        if (pathfinder_res.first.elbo > elbo_best.elbo) {
+          elbo_best = std::move(pathfinder_res.first);
+          taylor_approx_best = std::move(pathfinder_res.second);
+          best_iteration = out.second;
+        }
+        return tbb::flow::continue_msg();
+      }
+  );
+    // Connect the nodes if needed (here just a simple chain)
+  tbb::flow::make_edge(pathfinder_node, result_node);
   while (ret == 0) {
     std::stringstream msg;
     interrupt();
@@ -775,10 +846,22 @@ inline auto pathfinder_lbfgs_single(
       }
       std::string iter_msg(path_num + "Iter: ["
                            + std::to_string(lbfgs.iter_num()) + "] ");
-
+      /*
       auto pathfinder_res = internal::pathfinder_impl(
           rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(), lbfgs.curr_g(),
           Ykt_map, Skt_map, num_elbo_draws, iter_msg, logger);
+      */
+      pathfinder_node.try_put(std::make_pair(
+        std::make_tuple(&rng, &lp_fun,
+          &constrain_fun, alpha,
+          lbfgs.curr_x(),
+          lbfgs.curr_g(),
+          Eigen::MatrixXd(Ykt_map),
+          Eigen::MatrixXd(Skt_map),
+                        num_elbo_draws,
+                        iter_msg, &logger),
+        lbfgs.iter_num()));
+      /*
       num_evals += pathfinder_res.first.fn_calls;
       print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs,
                           pathfinder_res.first.elbo, pathfinder_res.first.elbo,
@@ -796,16 +879,18 @@ inline auto pathfinder_lbfgs_single(
         diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
         diagnostic_writer.end_record();
       }
+      */
       if (lbfgs_ss.str().length() > 0) {
         logger.info(lbfgs_ss);
         lbfgs_ss.str("");
       }
-
+      /*
       if (pathfinder_res.first.elbo > elbo_best.elbo) {
         elbo_best = std::move(pathfinder_res.first);
         taylor_approx_best = std::move(pathfinder_res.second);
         best_iteration = lbfgs.iter_num();
       }
+      */
     } catch (const std::exception& e) {
       if (unlikely(save_iterations)) {
         diagnostic_writer.write("lbfgs_success", true);
@@ -832,6 +917,8 @@ inline auto pathfinder_lbfgs_single(
       }
     }
   }
+    // When done, wait for all graph tasks to finish
+  g.wait_for_all();
   if (unlikely(save_iterations)) {
     diagnostic_writer.end_record();
   }
