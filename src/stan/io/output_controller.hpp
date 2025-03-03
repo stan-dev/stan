@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/json/json_data.hpp>
-#include <stan/io/mcmc_writer.hpp>
+#include <stan/services/util/mcmc_writer.hpp>
 #include <memory>
 #include <vector>
 
