@@ -1,6 +1,5 @@
 #include <stan/io/output_controller.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/test/unit/util.hpp>
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
