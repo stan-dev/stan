@@ -5,13 +5,8 @@
 #include <memory>
 #include <vector>
 
-namespace stan {
-namespace test {
-namespace unit {
-namespace io {
-
 // Mock writer for testing
-class mock_writer : public callbacks::writer {
+class mock_writer : public stan::callbacks::writer {
  public:
   std::vector<std::vector<double>> samples;
   std::vector<std::vector<double>> diagnostics;
@@ -26,7 +21,7 @@ class mock_writer : public callbacks::writer {
 };
 
 TEST(output_controller, add_and_write_sample) {
-  output_controller controller;
+  stan::io::output_controller controller;
   
   // Create two mock writers
   auto writer1 = std::make_unique<mock_writer>();
@@ -52,7 +47,7 @@ TEST(output_controller, add_and_write_sample) {
 }
 
 TEST(output_controller, add_and_write_diagnostic) {
-  output_controller controller;
+  stan::io::output_controller controller;
   
   // Create two mock writers
   auto writer1 = std::make_unique<mock_writer>();
@@ -78,7 +73,7 @@ TEST(output_controller, add_and_write_diagnostic) {
 }
 
 TEST(output_controller, empty_writers) {
-  output_controller controller;
+  stan::io::output_controller controller;
   
   // Writing to empty writers should not crash
   std::vector<double> data = {1.0, 2.0, 3.0};
@@ -89,7 +84,7 @@ TEST(output_controller, empty_writers) {
 }
 
 TEST(output_controller, multiple_writes) {
-  output_controller controller;
+  stan::io::output_controller controller;
   
   auto writer = std::make_unique<mock_writer>();
   auto* writer_ptr = writer.get();
@@ -107,9 +102,4 @@ TEST(output_controller, multiple_writes) {
   EXPECT_EQ(writer_ptr->samples.size(), 2);
   EXPECT_EQ(writer_ptr->samples[0], sample1);
   EXPECT_EQ(writer_ptr->samples[1], sample2);
-}
-
-} // namespace io
-} // namespace unit
-} // namespace test
-} // namespace stan 
+} 
