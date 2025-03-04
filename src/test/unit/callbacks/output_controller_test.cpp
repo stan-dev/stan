@@ -25,7 +25,7 @@ class mock_writer : public stan::callbacks::writer {
 };
 
 TEST(output_controller, configure_and_write_streaming) {
-  stan::io::output_controller controller;
+  stan::callbacks::output_controller controller;
   
   // Configure output for samples
   controller.configure_output("samples", 
@@ -45,7 +45,7 @@ TEST(output_controller, configure_and_write_streaming) {
 }
 
 TEST(output_controller, write_metadata) {
-  stan::io::output_controller controller;
+  stan::callbacks::output_controller controller;
   
   // Configure output for metadata
   controller.configure_output("model_info", 
@@ -62,7 +62,7 @@ TEST(output_controller, write_metadata) {
 }
 
 TEST(output_controller, get_json_writer) {
-  stan::io::output_controller controller;
+  stan::callbacks::output_controller controller;
   
   // Configure JSON writer for metric
   controller.configure_output("metric", 
@@ -78,7 +78,7 @@ TEST(output_controller, get_json_writer) {
 }
 
 TEST(output_controller, get_json_writer_wrong_type) {
-  stan::io::output_controller controller;
+  stan::callbacks::output_controller controller;
   
   // Configure non-JSON writer
   controller.configure_output("samples", 
@@ -89,7 +89,7 @@ TEST(output_controller, get_json_writer_wrong_type) {
 }
 
 TEST(output_controller, multiple_formats) {
-  stan::io::output_controller controller;
+  stan::callbacks::output_controller controller;
   
   // Configure different formats for different information types
   controller.configure_output("samples", 
@@ -119,7 +119,7 @@ TEST(output_controller, multiple_formats) {
 }
 
 TEST(output_controller, unconfigured_output) {
-  stan::io::output_controller controller;
+  stan::callbacks::output_controller controller;
   
   // Attempt to write without configuration
   std::vector<double> data = {1.0, 2.0, 3.0};
@@ -131,7 +131,7 @@ TEST(output_controller, unconfigured_output) {
 }
 
 TEST(output_controller, invalid_format) {
-  stan::io::output_controller controller;
+  stan::callbacks::output_controller controller;
   
   // Configure with invalid format
   controller.configure_output("samples", 
