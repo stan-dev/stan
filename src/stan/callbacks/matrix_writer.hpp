@@ -48,3 +48,4 @@ class matrix_writer : public writer {
 }  // namespace stan
 
 #endif
+
