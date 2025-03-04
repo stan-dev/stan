@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
 
 namespace stan {
 namespace io {
@@ -56,15 +57,21 @@ class output_controller {
   
   std::unique_ptr<callbacks::writer> create_writer(const OutputConfig& config) {
     switch (config.format) {
-      case OutputFormat::CSV:
-        return std::make_unique<stan::callbacks::stream_writer>(config.path);
+      case OutputFormat::CSV: {
+        auto* file = new std::ofstream(config.path);
+        return std::unique_ptr<callbacks::writer>(
+            new callbacks::stream_writer(*file));
+      }
       case OutputFormat::MATRIX:
         if (config.rows == 0 || config.cols == 0) {
           throw std::runtime_error("Matrix dimensions must be specified");
         }
-        return std::make_unique<stan::callbacks::matrix_writer>(config.rows, config.cols);
-      case OutputFormat::JSON:
-        return std::make_unique<stan::callbacks::json_writer>(config.path);
+        return std::make_unique<callbacks::matrix_writer>(config.rows, config.cols);
+      case OutputFormat::JSON: {
+        auto* file = new std::ofstream(config.path);
+        return std::unique_ptr<callbacks::writer>(
+            new callbacks::json_writer(*file));
+      }
       default:
         throw std::runtime_error("Unsupported output format");
     }
