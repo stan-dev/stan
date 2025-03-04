@@ -15,9 +15,9 @@ namespace stan {
 namespace callbacks {
 
 enum class OutputFormat {
-  CSV,      // Plain text CSV files for streaming data
-  MATRIX,   // In-memory column-major matrix
-  JSON      // JSON format for flexible metadata
+  CSV,     // Plain text CSV files for streaming data
+  MATRIX,  // In-memory column-major matrix
+  JSON     // JSON format for flexible metadata
 };
 
 struct OutputDims {
@@ -34,7 +34,8 @@ struct OutputConfig {
 class output_controller {
  private:
   std::unordered_map<std::string, std::shared_ptr<writer>> writers_;
-  std::unordered_map<std::string, std::shared_ptr<structured_writer>> structured_writers_;
+  std::unordered_map<std::string, std::shared_ptr<structured_writer>>
+      structured_writers_;
   std::unordered_map<std::string, std::shared_ptr<std::ofstream>> files_;
 
   std::shared_ptr<writer> create_writer(const OutputConfig& config) {
@@ -45,14 +46,14 @@ class output_controller {
         return std::make_shared<stream_writer>(*file);
       }
       case OutputFormat::MATRIX:
-        return std::make_shared<matrix_writer>(
-            config.dims.rows, config.dims.cols);
+        return std::make_shared<matrix_writer>(config.dims.rows,
+                                               config.dims.cols);
       case OutputFormat::JSON: {
         auto file = std::make_shared<std::ofstream>(config.file_path);
         files_[config.file_path] = file;
         auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
-        auto jwriter = std::make_shared<json_writer<std::ofstream>>(
-            std::move(file_ptr));
+        auto jwriter
+            = std::make_shared<json_writer<std::ofstream>>(std::move(file_ptr));
         return nullptr;  // JSON writers are handled separately
       }
       default:
@@ -61,13 +62,14 @@ class output_controller {
   }
 
  public:
-  void configure_output(const std::string& info_type, const OutputConfig& config) {
+  void configure_output(const std::string& info_type,
+                        const OutputConfig& config) {
     if (config.format == OutputFormat::JSON) {
       auto file = std::make_shared<std::ofstream>(config.file_path);
       files_[config.file_path] = file;
       auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
-      auto jwriter = std::make_shared<json_writer<std::ofstream>>(
-          std::move(file_ptr));
+      auto jwriter
+          = std::make_shared<json_writer<std::ofstream>>(std::move(file_ptr));
       structured_writers_[info_type] = jwriter;
     } else {
       auto writer = create_writer(config);
@@ -86,7 +88,7 @@ class output_controller {
     return it->second;
   }
 
-  template<typename Stream = std::ofstream>
+  template <typename Stream = std::ofstream>
   json_writer<Stream>* get_json_writer(const std::string& info_type) {
     auto it = structured_writers_.find(info_type);
     if (it == structured_writers_.end()) {
@@ -101,7 +103,7 @@ class output_controller {
   }
 };
 
-} // namespace callbacks
-} // namespace stan
+}  // namespace callbacks
+}  // namespace stan
 
-#endif 
+#endif
