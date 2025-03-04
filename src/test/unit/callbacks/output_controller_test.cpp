@@ -51,11 +51,10 @@ TEST(output_controller, write_metadata) {
   controller.configure_output("model_info", 
       {stan::callbacks::OutputFormat::JSON, "model.json"});
   
-  // Get JSON writer
+  // Get JSON writer and write metadata directly
   auto* json_writer = controller.get_json_writer<std::ofstream>("model_info");
   EXPECT_NE(json_writer, nullptr);
   
-  // Write metadata as a properly structured JSON record
   json_writer->begin_record();
   json_writer->write("model_name", "bernoulli");
   json_writer->write("version", "2.29.0");
