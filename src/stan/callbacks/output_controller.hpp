@@ -54,8 +54,9 @@ class output_controller {
         auto file = std::make_shared<std::ofstream>(config.file_path);
         files_[config.file_path] = file;  // Store file
         auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
-        return std::make_shared<json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
+        auto json_writer = std::make_shared<json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
             std::move(file_ptr));
+        return std::static_pointer_cast<writer>(json_writer);
       }
       default:
         throw std::runtime_error("Invalid output format");
