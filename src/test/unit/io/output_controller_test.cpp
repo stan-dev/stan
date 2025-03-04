@@ -57,7 +57,7 @@ TEST(output_controller, write_metadata) {
   
   // Get writer and verify it's a JSON writer
   auto writer = controller.get_writer("model_info");
-  auto* json_writer = dynamic_cast<stan::callbacks::json_writer<std::ofstream>*>(writer.get());
+  auto* json_writer = dynamic_cast<stan::callbacks::json_writer<std::ofstream, std::default_delete<std::ofstream>>*>(writer.get());
   EXPECT_NE(json_writer, nullptr);
 }
 
@@ -73,8 +73,8 @@ TEST(output_controller, get_json_writer) {
   EXPECT_NE(metric_writer, nullptr);
   
   // Test using JSON writer interface directly
-  std::vector<std::string> metric_data = {"stepsize", "0.1", "metric_type", "dense"};
-  metric_writer->write(metric_data);
+  metric_writer->write("stepsize", "0.1");
+  metric_writer->write("metric_type", "dense");
 }
 
 TEST(output_controller, get_json_writer_wrong_type) {
@@ -107,8 +107,7 @@ TEST(output_controller, multiple_formats) {
   
   // Write metric using JSON writer interface
   auto* metric_writer = controller.get_json_writer<std::ofstream>("metric");
-  std::vector<std::string> metric_data = {"stepsize", "0.1"};
-  metric_writer->write(metric_data);
+  metric_writer->write("stepsize", "0.1");
   
   // Verify writers
   auto sample_writer = controller.get_writer("samples");

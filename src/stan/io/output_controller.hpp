@@ -50,7 +50,8 @@ class output_controller {
         throw std::runtime_error("Arrow writer not yet implemented");
       case OutputFormat::JSON: {
         auto file = std::make_unique<std::ofstream>(config.file_path);
-        return std::make_shared<callbacks::json_writer<std::ofstream>>(std::move(file));
+        return std::make_shared<callbacks::json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
+            std::move(file));
       }
       default:
         throw std::runtime_error("Invalid output format");
