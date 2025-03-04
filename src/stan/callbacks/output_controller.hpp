@@ -53,7 +53,6 @@ class output_controller {
         auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
         auto jwriter = std::make_shared<json_writer<std::ofstream>>(
             std::move(file_ptr));
-        structured_writers_[config.file_path] = jwriter;
         return nullptr;  // JSON writers are handled separately
       }
       default:
@@ -63,9 +62,18 @@ class output_controller {
 
  public:
   void configure_output(const std::string& info_type, const OutputConfig& config) {
-    auto writer = create_writer(config);
-    if (writer) {
-      writers_[info_type] = writer;
+    if (config.format == OutputFormat::JSON) {
+      auto file = std::make_shared<std::ofstream>(config.file_path);
+      files_[config.file_path] = file;
+      auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
+      auto jwriter = std::make_shared<json_writer<std::ofstream>>(
+          std::move(file_ptr));
+      structured_writers_[info_type] = jwriter;
+    } else {
+      auto writer = create_writer(config);
+      if (writer) {
+        writers_[info_type] = writer;
+      }
     }
   }
 
