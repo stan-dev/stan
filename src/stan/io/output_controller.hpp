@@ -7,9 +7,8 @@
 #include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <memory>
-#include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <fstream>
 
 namespace stan {
@@ -22,54 +21,53 @@ enum class OutputFormat {
   JSON      // JSON format for flexible metadata
 };
 
+struct OutputDims {
+  size_t rows;
+  size_t cols;
+};
+
 struct OutputConfig {
   OutputFormat format;
-  std::string path;  // File path or identifier for the output
-  size_t rows{0};    // For matrix format
-  size_t cols{0};    // For matrix format
+  std::string file_path;
+  OutputDims dims;
 };
 
 class output_controller {
+ private:
+  std::unordered_map<std::string, std::shared_ptr<callbacks::writer>> writers_;
+
+  std::shared_ptr<callbacks::writer> create_writer(const OutputConfig& config) {
+    switch (config.format) {
+      case OutputFormat::CSV: {
+        auto file = std::make_unique<std::ofstream>(config.file_path);
+        return std::make_shared<callbacks::stream_writer>(*file);
+      }
+      case OutputFormat::MATRIX:
+        return std::make_shared<callbacks::matrix_writer>(
+            config.dims.rows, config.dims.cols);
+      case OutputFormat::ARROW:
+        // TODO: Implement Arrow writer
+        throw std::runtime_error("Arrow writer not yet implemented");
+      case OutputFormat::JSON: {
+        auto file = std::make_unique<std::ofstream>(config.file_path);
+        return std::make_shared<callbacks::json_writer<std::ofstream>>(std::move(file));
+      }
+      default:
+        throw std::runtime_error("Invalid output format");
+    }
+  }
+
  public:
-  output_controller() = default;
-  
-  // Configure output format for a specific information type
-  void configure_output(const std::string& info_type, OutputConfig config) {
-    output_configs_[info_type] = config;
-  }
-  
-  // Get appropriate writer for information type
-  std::unique_ptr<callbacks::writer> get_writer(const std::string& info_type) {
-    auto it = output_configs_.find(info_type);
-    if (it == output_configs_.end()) {
-      throw std::runtime_error("No output configuration for " + info_type);
-    }
-    
-    return create_writer(it->second);
-  }
-  
-  // Write streaming data (samples, diagnostics) - works for CSV, MATRIX, and ARROW
-  void write(const std::string& info_type, const std::vector<double>& data) {
-    auto writer = get_writer(info_type);
-    writer->operator()(data);
+  void configure_output(const std::string& info_type, const OutputConfig& config) {
+    writers_[info_type] = create_writer(config);
   }
 
-  // Write metadata (flexible JSON format)
-  void write_metadata(const std::string& info_type, 
-                     const std::vector<std::string>& metadata) {
-    auto writer = get_writer(info_type);
-    writer->operator()(metadata);
-  }
-
-  // Get structured writer for backward compatibility with existing code
-  template<typename Stream = std::ofstream, typename Deleter = std::default_delete<Stream>>
-  callbacks::structured_writer* get_structured_writer(const std::string& info_type) {
-    auto writer = get_writer(info_type);
-    auto* structured_writer = dynamic_cast<callbacks::structured_writer*>(writer.get());
-    if (!structured_writer) {
-      throw std::runtime_error("Writer for " + info_type + " is not a structured writer");
+  std::shared_ptr<callbacks::writer> get_writer(const std::string& info_type) {
+    auto it = writers_.find(info_type);
+    if (it == writers_.end()) {
+      throw std::runtime_error("No writer configured for " + info_type);
     }
-    return structured_writer;
+    return it->second;
   }
 
   // Get JSON writer for backward compatibility with existing code
@@ -83,40 +81,14 @@ class output_controller {
     return json_writer;
   }
 
-  // Get Arrow writer for backward compatibility with existing code
-  template<typename Stream = std::ofstream, typename Deleter = std::default_delete<Stream>>
-  callbacks::arrow_writer<Stream, Deleter>* get_arrow_writer(const std::string& info_type) {
+  void write(const std::string& info_type, const std::vector<double>& data) {
     auto writer = get_writer(info_type);
-    auto* arrow_writer = dynamic_cast<callbacks::arrow_writer<Stream, Deleter>*>(writer.get());
-    if (!arrow_writer) {
-      throw std::runtime_error("Writer for " + info_type + " is not an Arrow writer");
-    }
-    return arrow_writer;
+    writer->operator()(data);
   }
 
- private:
-  std::map<std::string, OutputConfig> output_configs_;
-  
-  std::unique_ptr<callbacks::writer> create_writer(const OutputConfig& config) {
-    switch (config.format) {
-      case OutputFormat::CSV:
-        return std::make_unique<callbacks::stream_writer>(config.path);
-      case OutputFormat::MATRIX:
-        if (config.rows == 0 || config.cols == 0) {
-          throw std::runtime_error("Matrix dimensions must be specified");
-        }
-        return std::make_unique<callbacks::matrix_writer>(config.rows, config.cols);
-      case OutputFormat::ARROW: {
-        auto file = std::make_unique<std::ofstream>(config.path);
-        return std::make_unique<callbacks::structured_writer<std::ofstream>>(std::move(file));
-      }
-      case OutputFormat::JSON: {
-        auto file = std::make_unique<std::ofstream>(config.path);
-        return std::make_unique<callbacks::json_writer<std::ofstream>>(std::move(file));
-      }
-      default:
-        throw std::runtime_error("Invalid output format");
-    }
+  void write_metadata(const std::string& info_type, const std::vector<std::string>& metadata) {
+    auto writer = get_writer(info_type);
+    writer->operator()(metadata);
   }
 };
 
