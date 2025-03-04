@@ -128,10 +128,12 @@ TEST(output_controller, unconfigured_output) {
 TEST(output_controller, invalid_format) {
   stan::callbacks::output_controller controller;
   
-  // Configure with invalid format
-  controller.configure_output("samples", 
-      {static_cast<stan::callbacks::OutputFormat>(999), "invalid"});
+  // Configure with invalid format - should throw during configuration
+  EXPECT_THROW(controller.configure_output("samples", 
+      {static_cast<stan::callbacks::OutputFormat>(999), "invalid"}),
+      std::runtime_error);
   
+  // Verify we can't write after invalid configuration
   std::vector<double> data = {1.0, 2.0, 3.0};
   EXPECT_THROW(controller.write("samples", data), std::runtime_error);
 } 
