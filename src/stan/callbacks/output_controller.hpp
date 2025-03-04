@@ -12,7 +12,7 @@
 #include <fstream>
 
 namespace stan {
-namespace io {
+namespace callbacks {
 
 enum class OutputFormat {
   CSV,      // Plain text CSV files for streaming data
@@ -34,18 +34,18 @@ struct OutputConfig {
 
 class output_controller {
  private:
-  std::unordered_map<std::string, std::shared_ptr<callbacks::writer>> writers_;
+  std::unordered_map<std::string, std::shared_ptr<writer>> writers_;
   std::unordered_map<std::string, std::shared_ptr<std::ofstream>> files_;  // Keep files alive
 
-  std::shared_ptr<callbacks::writer> create_writer(const OutputConfig& config) {
+  std::shared_ptr<writer> create_writer(const OutputConfig& config) {
     switch (config.format) {
       case OutputFormat::CSV: {
         auto file = std::make_shared<std::ofstream>(config.file_path);
         files_[config.file_path] = file;  // Store file
-        return std::make_shared<callbacks::stream_writer>(*file);
+        return std::make_shared<stream_writer>(*file);
       }
       case OutputFormat::MATRIX:
-        return std::make_shared<callbacks::matrix_writer>(
+        return std::make_shared<matrix_writer>(
             config.dims.rows, config.dims.cols);
       case OutputFormat::ARROW:
         // TODO: Implement Arrow writer
@@ -54,9 +54,9 @@ class output_controller {
         auto file = std::make_shared<std::ofstream>(config.file_path);
         files_[config.file_path] = file;  // Store file
         auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
-        auto json_writer = std::make_shared<callbacks::json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
+        auto json_writer = std::make_shared<json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
             std::move(file_ptr));
-        return std::dynamic_pointer_cast<callbacks::writer>(json_writer);
+        return std::dynamic_pointer_cast<writer>(json_writer);
       }
       default:
         throw std::runtime_error("Invalid output format");
@@ -68,7 +68,7 @@ class output_controller {
     writers_[info_type] = create_writer(config);
   }
 
-  std::shared_ptr<callbacks::writer> get_writer(const std::string& info_type) {
+  std::shared_ptr<writer> get_writer(const std::string& info_type) {
     auto it = writers_.find(info_type);
     if (it == writers_.end()) {
       throw std::runtime_error("No writer configured for " + info_type);
@@ -78,9 +78,9 @@ class output_controller {
 
   // Get JSON writer for backward compatibility with existing code
   template<typename Stream = std::ofstream, typename Deleter = std::default_delete<Stream>>
-  callbacks::json_writer<Stream, Deleter>* get_json_writer(const std::string& info_type) {
+  json_writer<Stream, Deleter>* get_json_writer(const std::string& info_type) {
     auto writer = get_writer(info_type);
-    auto* json_writer = dynamic_cast<callbacks::json_writer<Stream, Deleter>*>(writer.get());
+    auto* json_writer = dynamic_cast<json_writer<Stream, Deleter>*>(writer.get());
     if (!json_writer) {
       throw std::runtime_error("Writer for " + info_type + " is not a JSON writer");
     }
@@ -98,7 +98,7 @@ class output_controller {
   }
 };
 
-} // namespace io
+} // namespace callbacks
 } // namespace stan
 
 #endif 
