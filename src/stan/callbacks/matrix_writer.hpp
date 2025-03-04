@@ -10,7 +10,7 @@ namespace callbacks {
 
 class matrix_writer : public writer {
  public:
-  matrix_writer(size_t rows, size_t cols) 
+  matrix_writer(size_t rows, size_t cols)
       : rows_(rows), cols_(cols), data_(rows * cols) {}
 
   void operator()(const std::vector<double>& x) override {
@@ -20,7 +20,7 @@ class matrix_writer : public writer {
     if (x.size() != cols_) {
       throw std::runtime_error("Matrix writer: incorrect number of columns");
     }
-    
+
     // Store in column-major order
     for (size_t j = 0; j < cols_; ++j) {
       data_[j * rows_ + current_row_] = x[j];
@@ -44,7 +44,7 @@ class matrix_writer : public writer {
   std::vector<double> data_;
 };
 
-} // namespace callbacks
-} // namespace stan
+}  // namespace callbacks
+}  // namespace stan
 
-#endif 
+#endif
