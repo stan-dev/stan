@@ -4,6 +4,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/matrix_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <memory>
 #include <vector>
@@ -15,9 +16,10 @@ namespace stan {
 namespace io {
 
 enum class OutputFormat {
-  CSV,      // Plain text CSV files
+  CSV,      // Plain text CSV files for streaming data
   MATRIX,   // In-memory column-major matrix
-  JSON      // JSON files
+  ARROW,    // Apache Arrow format for streaming data
+  JSON      // JSON format for flexible metadata
 };
 
 struct OutputConfig {
@@ -46,10 +48,27 @@ class output_controller {
     return create_writer(it->second);
   }
   
-  // Write data using appropriate writer
+  // Write streaming data (samples, diagnostics) - works for CSV, MATRIX, and ARROW
   void write(const std::string& info_type, const std::vector<double>& data) {
     auto writer = get_writer(info_type);
     writer->operator()(data);
+  }
+
+  // Write metadata (flexible JSON format)
+  void write_metadata(const std::string& info_type, 
+                     const std::vector<std::string>& metadata) {
+    auto writer = get_writer(info_type);
+    writer->operator()(metadata);
+  }
+
+  // For backward compatibility with existing JSON writer usage
+  callbacks::json_writer* get_json_writer(const std::string& info_type) {
+    auto writer = get_writer(info_type);
+    auto* json_writer = dynamic_cast<callbacks::json_writer*>(writer.get());
+    if (!json_writer) {
+      throw std::runtime_error("Writer is not a JSON writer");
+    }
+    return json_writer;
   }
 
  private:
@@ -67,6 +86,11 @@ class output_controller {
           throw std::runtime_error("Matrix dimensions must be specified");
         }
         return std::make_unique<callbacks::matrix_writer>(config.rows, config.cols);
+      case OutputFormat::ARROW: {
+        auto* file = new std::ofstream(config.path);
+        return std::unique_ptr<callbacks::writer>(
+            new callbacks::structured_writer(*file));
+      }
       case OutputFormat::JSON: {
         auto* file = new std::ofstream(config.path);
         return std::unique_ptr<callbacks::writer>(
