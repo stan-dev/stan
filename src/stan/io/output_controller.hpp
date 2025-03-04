@@ -53,9 +53,10 @@ class output_controller {
       case OutputFormat::JSON: {
         auto file = std::make_shared<std::ofstream>(config.file_path);
         files_[config.file_path] = file;  // Store file
+        auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
         auto json_writer = std::make_shared<callbacks::json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
-            file.get());
-        return json_writer;  // No need for dynamic_cast since json_writer inherits from writer
+            std::move(file_ptr));
+        return std::dynamic_pointer_cast<callbacks::writer>(json_writer);
       }
       default:
         throw std::runtime_error("Invalid output format");
