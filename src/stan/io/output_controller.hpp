@@ -35,11 +35,13 @@ struct OutputConfig {
 class output_controller {
  private:
   std::unordered_map<std::string, std::shared_ptr<callbacks::writer>> writers_;
+  std::unordered_map<std::string, std::shared_ptr<std::ofstream>> files_;  // Keep files alive
 
   std::shared_ptr<callbacks::writer> create_writer(const OutputConfig& config) {
     switch (config.format) {
       case OutputFormat::CSV: {
-        auto file = std::make_unique<std::ofstream>(config.file_path);
+        auto file = std::make_shared<std::ofstream>(config.file_path);
+        files_[config.file_path] = file;  // Store file
         return std::make_shared<callbacks::stream_writer>(*file);
       }
       case OutputFormat::MATRIX:
@@ -49,10 +51,11 @@ class output_controller {
         // TODO: Implement Arrow writer
         throw std::runtime_error("Arrow writer not yet implemented");
       case OutputFormat::JSON: {
-        auto file = std::make_unique<std::ofstream>(config.file_path);
+        auto file = std::make_shared<std::ofstream>(config.file_path);
+        files_[config.file_path] = file;  // Store file
         auto json_writer = std::make_shared<callbacks::json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
-            std::move(file));
-        return std::dynamic_pointer_cast<callbacks::writer>(json_writer);
+            file.get());
+        return json_writer;  // No need for dynamic_cast since json_writer inherits from writer
       }
       default:
         throw std::runtime_error("Invalid output format");
