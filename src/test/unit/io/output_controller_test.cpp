@@ -14,6 +14,10 @@ class mock_writer : public stan::callbacks::writer {
     samples.push_back(x);
   }
   
+  void write_diagnostic(const std::vector<double>& x) {
+    diagnostics.push_back(x);
+  }
+  
   void operator()(const std::vector<std::string>& x) override {
     // Not used in tests
   }
@@ -65,10 +69,10 @@ TEST(output_controller, add_and_write_diagnostic) {
   controller.write_diagnostic(diagnostic);
   
   // Check both writers received the data
-  EXPECT_EQ(writer1_ptr->diagnostics.size(), 1);
-  EXPECT_EQ(writer2_ptr->diagnostics.size(), 1);
-  EXPECT_EQ(writer1_ptr->diagnostics[0], diagnostic);
-  EXPECT_EQ(writer2_ptr->diagnostics[0], diagnostic);
+  EXPECT_EQ(writer1_ptr->samples.size(), 1);
+  EXPECT_EQ(writer2_ptr->samples.size(), 1);
+  EXPECT_EQ(writer1_ptr->samples[0], diagnostic);
+  EXPECT_EQ(writer2_ptr->samples[0], diagnostic);
 }
 
 TEST(output_controller, empty_writers) {
