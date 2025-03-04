@@ -61,14 +61,37 @@ class output_controller {
     writer->operator()(metadata);
   }
 
-  // For backward compatibility with existing JSON writer usage
-  callbacks::json_writer* get_json_writer(const std::string& info_type) {
+  // Get structured writer for backward compatibility with existing code
+  template<typename Stream = std::ofstream, typename Deleter = std::default_delete<Stream>>
+  callbacks::structured_writer* get_structured_writer(const std::string& info_type) {
     auto writer = get_writer(info_type);
-    auto* json_writer = dynamic_cast<callbacks::json_writer*>(writer.get());
+    auto* structured_writer = dynamic_cast<callbacks::structured_writer*>(writer.get());
+    if (!structured_writer) {
+      throw std::runtime_error("Writer for " + info_type + " is not a structured writer");
+    }
+    return structured_writer;
+  }
+
+  // Get JSON writer for backward compatibility with existing code
+  template<typename Stream = std::ofstream, typename Deleter = std::default_delete<Stream>>
+  callbacks::json_writer<Stream, Deleter>* get_json_writer(const std::string& info_type) {
+    auto writer = get_writer(info_type);
+    auto* json_writer = dynamic_cast<callbacks::json_writer<Stream, Deleter>*>(writer.get());
     if (!json_writer) {
-      throw std::runtime_error("Writer is not a JSON writer");
+      throw std::runtime_error("Writer for " + info_type + " is not a JSON writer");
     }
     return json_writer;
+  }
+
+  // Get Arrow writer for backward compatibility with existing code
+  template<typename Stream = std::ofstream, typename Deleter = std::default_delete<Stream>>
+  callbacks::arrow_writer<Stream, Deleter>* get_arrow_writer(const std::string& info_type) {
+    auto writer = get_writer(info_type);
+    auto* arrow_writer = dynamic_cast<callbacks::arrow_writer<Stream, Deleter>*>(writer.get());
+    if (!arrow_writer) {
+      throw std::runtime_error("Writer for " + info_type + " is not an Arrow writer");
+    }
+    return arrow_writer;
   }
 
  private:
@@ -76,28 +99,23 @@ class output_controller {
   
   std::unique_ptr<callbacks::writer> create_writer(const OutputConfig& config) {
     switch (config.format) {
-      case OutputFormat::CSV: {
-        auto* file = new std::ofstream(config.path);
-        return std::unique_ptr<callbacks::writer>(
-            new callbacks::stream_writer(*file));
-      }
+      case OutputFormat::CSV:
+        return std::make_unique<callbacks::stream_writer>(config.path);
       case OutputFormat::MATRIX:
         if (config.rows == 0 || config.cols == 0) {
           throw std::runtime_error("Matrix dimensions must be specified");
         }
         return std::make_unique<callbacks::matrix_writer>(config.rows, config.cols);
       case OutputFormat::ARROW: {
-        auto* file = new std::ofstream(config.path);
-        return std::unique_ptr<callbacks::writer>(
-            new callbacks::structured_writer(*file));
+        auto file = std::make_unique<std::ofstream>(config.path);
+        return std::make_unique<callbacks::structured_writer<std::ofstream>>(std::move(file));
       }
       case OutputFormat::JSON: {
-        auto* file = new std::ofstream(config.path);
-        return std::unique_ptr<callbacks::writer>(
-            new callbacks::json_writer(*file));
+        auto file = std::make_unique<std::ofstream>(config.path);
+        return std::make_unique<callbacks::json_writer<std::ofstream>>(std::move(file));
       }
       default:
-        throw std::runtime_error("Unsupported output format");
+        throw std::runtime_error("Invalid output format");
     }
   }
 };
