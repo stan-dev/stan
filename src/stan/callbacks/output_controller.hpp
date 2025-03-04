@@ -56,7 +56,7 @@ class output_controller {
         return nullptr;  // JSON writers are handled separately
       }
       default:
-        throw std::runtime_error("Invalid output format");
+        return nullptr;  // Let configure_output handle the error
     }
   }
 
@@ -71,9 +71,10 @@ class output_controller {
       structured_writers_[info_type] = jwriter;
     } else {
       auto writer = create_writer(config);
-      if (writer) {
-        writers_[info_type] = writer;
+      if (!writer) {
+        throw std::runtime_error("Invalid output format");
       }
+      writers_[info_type] = writer;
     }
   }
 
