@@ -22,6 +22,8 @@ enum class OutputFormat {
 struct OutputConfig {
   OutputFormat format;
   std::string path;  // File path or identifier for the output
+  size_t rows{0};    // For matrix format
+  size_t cols{0};    // For matrix format
 };
 
 class output_controller {
@@ -57,7 +59,10 @@ class output_controller {
       case OutputFormat::CSV:
         return std::make_unique<stan::callbacks::stream_writer>(config.path);
       case OutputFormat::MATRIX:
-        return std::make_unique<stan::callbacks::matrix_writer>(/* dimensions */);
+        if (config.rows == 0 || config.cols == 0) {
+          throw std::runtime_error("Matrix dimensions must be specified");
+        }
+        return std::make_unique<stan::callbacks::matrix_writer>(config.rows, config.cols);
       case OutputFormat::ARROW:
         return std::make_unique<stan::callbacks::arrow_writer>(config.path);
       case OutputFormat::JSON:
