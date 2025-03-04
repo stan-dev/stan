@@ -1,5 +1,5 @@
-#ifndef STAN_IO_OUTPUT_CONTROLLER_HPP
-#define STAN_IO_OUTPUT_CONTROLLER_HPP
+#ifndef STAN_CALLBACKS_OUTPUT_CONTROLLER_HPP
+#define STAN_CALLBACKS_OUTPUT_CONTROLLER_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
@@ -54,9 +54,9 @@ class output_controller {
         auto file = std::make_shared<std::ofstream>(config.file_path);
         files_[config.file_path] = file;  // Store file
         auto file_ptr = std::make_unique<std::ofstream>(config.file_path);
-        auto json_writer = std::make_shared<json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
+        auto writer = std::make_shared<json_writer<std::ofstream, std::default_delete<std::ofstream>>>(
             std::move(file_ptr));
-        return std::dynamic_pointer_cast<writer>(json_writer);
+        return std::dynamic_pointer_cast<writer>(writer);
       }
       default:
         throw std::runtime_error("Invalid output format");
@@ -76,7 +76,7 @@ class output_controller {
     return it->second;
   }
 
-  // Get JSON writer for backward compatibility with existing code
+  // Forward all JSON writer methods to the underlying writer
   template<typename Stream = std::ofstream, typename Deleter = std::default_delete<Stream>>
   json_writer<Stream, Deleter>* get_json_writer(const std::string& info_type) {
     auto writer = get_writer(info_type);
