@@ -13,14 +13,9 @@
 class mock_writer : public stan::callbacks::writer {
  public:
   std::vector<std::vector<double>> data;
-  std::vector<std::vector<std::string>> metadata;
   
   void operator()(const std::vector<double>& x) override {
     data.push_back(x);
-  }
-  
-  void operator()(const std::vector<std::string>& x) override {
-    metadata.push_back(x);
   }
 };
 
@@ -126,7 +121,6 @@ TEST(output_controller, unconfigured_output) {
   std::vector<std::string> metadata = {"model_name", "bernoulli"};
   
   EXPECT_THROW(controller.write("samples", data), std::runtime_error);
-  EXPECT_THROW(controller.write_metadata("model_info", metadata), std::runtime_error);
   EXPECT_THROW(controller.get_json_writer<std::ofstream>("metric"), std::runtime_error);
 }
 
