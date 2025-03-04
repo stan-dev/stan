@@ -2,8 +2,9 @@
 #define STAN_IO_OUTPUT_CONTROLLER_HPP
 
 #include <stan/callbacks/writer.hpp>
-#include <stan/io/json/json_data.hpp>
-#include <stan/services/util/mcmc_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/matrix_writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <memory>
 #include <vector>
 #include <string>
@@ -15,7 +16,6 @@ namespace io {
 enum class OutputFormat {
   CSV,      // Plain text CSV files
   MATRIX,   // In-memory column-major matrix
-  ARROW,    // Apache Arrow files
   JSON      // JSON files
 };
 
@@ -63,8 +63,6 @@ class output_controller {
           throw std::runtime_error("Matrix dimensions must be specified");
         }
         return std::make_unique<stan::callbacks::matrix_writer>(config.rows, config.cols);
-      case OutputFormat::ARROW:
-        return std::make_unique<stan::callbacks::arrow_writer>(config.path);
       case OutputFormat::JSON:
         return std::make_unique<stan::callbacks::json_writer>(config.path);
       default:
