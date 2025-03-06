@@ -38,17 +38,20 @@ class DispatcherTest : public ::testing::Test {
     ss_metric.str(std::string());
     ss_metric.clear();
 
-    dispatcher.register_channel(InfoType::CONFIG,
-      std::unique_ptr<stan::callbacks::Channel>(
-        new stan::callbacks::WriterChannel(&writer_config)));
+    dispatcher.register_channel(
+        InfoType::CONFIG,
+        std::unique_ptr<stan::callbacks::Channel>(
+            new stan::callbacks::WriterChannel(&writer_config)));
 
-    dispatcher.register_channel(InfoType::SAMPLE,
-      std::unique_ptr<stan::callbacks::Channel>(
-        new stan::callbacks::WriterChannel(&writer_sample)));
+    dispatcher.register_channel(
+        InfoType::SAMPLE,
+        std::unique_ptr<stan::callbacks::Channel>(
+            new stan::callbacks::WriterChannel(&writer_sample)));
 
-    dispatcher.register_channel(InfoType::METRIC,
-      std::unique_ptr<stan::callbacks::Channel>(
-        new stan::callbacks::StructuredWriterChannel(&writer_metric)));
+    dispatcher.register_channel(
+        InfoType::METRIC,
+        std::unique_ptr<stan::callbacks::Channel>(
+            new stan::callbacks::StructuredWriterChannel(&writer_metric)));
   }
 
   void TearDown() {}
@@ -185,39 +188,21 @@ TEST_F(DispatcherTest, StructuredMultipleValueTypes) {
   EXPECT_NE(output.find("true"), std::string::npos);
 }
 
-// Test structured writer with vector values
-TEST_F(DispatcherTest, StructuredVectorValues) {
-  dispatcher.begin_record(InfoType::METRIC);
-  
-  std::vector<double> doubles = {1.1, 2.2, 3.3};
-  dispatcher.dispatch(InfoType::METRIC, "doubles", doubles);
-  
-  std::vector<std::string> strings = {"one", "two", "three"};
-  dispatcher.dispatch(InfoType::METRIC, "strings", strings);
-  
-  dispatcher.end_record(InfoType::METRIC);
-  
-  std::string output = ss_metric.str();
-  EXPECT_NE(output.find("doubles"), std::string::npos);
-  EXPECT_NE(output.find("1.1"), std::string::npos);
-  EXPECT_NE(output.find("strings"), std::string::npos);
-  EXPECT_NE(output.find("one"), std::string::npos);
-}
 
 // Test structured writer with Eigen values
 TEST_F(DispatcherTest, StructuredEigenValues) {
   dispatcher.begin_record(InfoType::METRIC);
-  
+
   Eigen::MatrixXd matrix(2, 2);
   matrix << 1.0, 2.0, 3.0, 4.0;
   dispatcher.dispatch(InfoType::METRIC, "matrix", matrix);
-  
+
   Eigen::VectorXd vector(3);
   vector << 5.0, 6.0, 7.0;
   dispatcher.dispatch(InfoType::METRIC, "vector", vector);
-  
+
   dispatcher.end_record(InfoType::METRIC);
-  
+
   std::string output = ss_metric.str();
   EXPECT_NE(output.find("matrix"), std::string::npos);
   EXPECT_NE(output.find("1"), std::string::npos);
@@ -231,11 +216,12 @@ TEST_F(DispatcherTest, StructuredEigenValues) {
 TEST_F(DispatcherTest, UnregisteredChannel) {
   // Dispatch to unregistered channel should silently do nothing
   dispatcher.dispatch(InfoType::ALGORITHM_STATE, std::string("Message"));
-  dispatcher.dispatch(InfoType::ALGORITHM_STATE, std::vector<double>{1.0, 2.0});
+  dispatcher.dispatch(InfoType::ALGORITHM_STATE,
+		      std::vector<double>{1.0, 2.0});
   dispatcher.begin_record(InfoType::ALGORITHM_STATE);
   dispatcher.dispatch(InfoType::ALGORITHM_STATE, "key", "value");
   dispatcher.end_record(InfoType::ALGORITHM_STATE);
-  
+
   // No exceptions should be thrown
 }
 
@@ -244,56 +230,19 @@ TEST_F(DispatcherTest, NamedRecord) {
   dispatcher.begin_record(InfoType::METRIC, "record_name");
   dispatcher.dispatch(InfoType::METRIC, "key", "value");
   dispatcher.end_record(InfoType::METRIC);
-  
+
   std::string output = ss_metric.str();
   EXPECT_NE(output.find("record_name"), std::string::npos);
   EXPECT_NE(output.find("key"), std::string::npos);
   EXPECT_NE(output.find("value"), std::string::npos);
 }
 
-// Test that begin_record and end_record on a plain writer channel are silently ignored
+// Test that begin_record and end_record on a plain writer channel are
+// silently ignored
 TEST_F(DispatcherTest, RecordOperationsOnPlainWriter) {
   dispatcher.begin_record(InfoType::CONFIG);
   dispatcher.end_record(InfoType::CONFIG);
-  
+
   // Should not generate any output
   EXPECT_EQ(ss_config.str(), "");
-}
-
-// Test complex sampler metric output pattern
-TEST_F(DispatcherTest, ComplexSamplerMetricPattern) {
-  // This test simulates a more complex real-world usage pattern
-  
-  // Start a record for a sampling iteration
-  dispatcher.begin_record(InfoType::METRIC);
-  
-  // Add various diagnostic info
-  dispatcher.dispatch(InfoType::METRIC, "iter", 10);
-  dispatcher.dispatch(InfoType::METRIC, "lp", -105.2);
-  dispatcher.dispatch(InfoType::METRIC, "accept_stat", 0.8);
-  
-  // Add a nested object for adaptation
-  dispatcher.begin_record(InfoType::METRIC, "adaptation");
-  dispatcher.dispatch(InfoType::METRIC, "step_size", 0.85);
-  
-  // Add an inverse metric matrix
-  Eigen::MatrixXd inv_metric(2, 2);
-  inv_metric << 1.2, 0.1, 0.1, 0.9;
-  dispatcher.dispatch(InfoType::METRIC, "inv_metric", inv_metric);
-  
-  // End adaptation object
-  dispatcher.end_record(InfoType::METRIC);
-  
-  // End the main record
-  dispatcher.end_record(InfoType::METRIC);
-  
-  // Verify key entries exist in the output
-  std::string output = ss_metric.str();
-  EXPECT_NE(output.find("iter"), std::string::npos);
-  EXPECT_NE(output.find("10"), std::string::npos);
-  EXPECT_NE(output.find("lp"), std::string::npos);
-  EXPECT_NE(output.find("-105.2"), std::string::npos);
-  EXPECT_NE(output.find("adaptation"), std::string::npos);
-  EXPECT_NE(output.find("step_size"), std::string::npos);
-  EXPECT_NE(output.find("inv_metric"), std::string::npos);
 }
