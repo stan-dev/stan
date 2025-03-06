@@ -10,8 +10,8 @@
 #include <iostream>
 
 // For this test we assume that InfoType has at least these values:
-using stan::callbacks::InfoType;
 using stan::callbacks::dispatcher;
+using stan::callbacks::InfoType;
 
 struct deleter_noop {
   template <typename T>
@@ -20,14 +20,15 @@ struct deleter_noop {
 
 class DispatcherTest : public ::testing::Test {
  public:
-  DispatcherTest() :
-      ss_sample(),
-      ss_config(),
-      ss_metric(),
-      writer_sample(ss_sample),
-      writer_config(ss_config),
-      writer_metric(std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric)),
-      dispatcher() {}
+  DispatcherTest()
+      : ss_sample(),
+        ss_config(),
+        ss_metric(),
+        writer_sample(ss_sample),
+        writer_config(ss_config),
+        writer_metric(
+            std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric)),
+        dispatcher() {}
 
   void SetUp() {
     ss_sample.str(std::string());
@@ -37,14 +38,20 @@ class DispatcherTest : public ::testing::Test {
     ss_metric.str(std::string());
     ss_metric.clear();
 
-    dispatcher.register_channel(InfoType::CONFIG,
-      std::unique_ptr<stan::callbacks::Channel>(new stan::callbacks::WriterChannel(&writer_config)));
+    dispatcher.register_channel(
+        InfoType::CONFIG,
+        std::unique_ptr<stan::callbacks::Channel>(
+            new stan::callbacks::WriterChannel(&writer_config)));
 
-    dispatcher.register_channel(InfoType::SAMPLE,
-      std::unique_ptr<stan::callbacks::Channel>(new stan::callbacks::WriterChannel(&writer_sample)));
+    dispatcher.register_channel(
+        InfoType::SAMPLE,
+        std::unique_ptr<stan::callbacks::Channel>(
+            new stan::callbacks::WriterChannel(&writer_sample)));
 
-    dispatcher.register_channel(InfoType::METRIC,
-      std::unique_ptr<stan::callbacks::Channel>(new stan::callbacks::StructuredWriterChannel(&writer_metric)));
+    dispatcher.register_channel(
+        InfoType::METRIC,
+        std::unique_ptr<stan::callbacks::Channel>(
+            new stan::callbacks::StructuredWriterChannel(&writer_metric)));
   }
 
   void TearDown() {}
@@ -78,21 +85,25 @@ TEST_F(DispatcherTest, SamplePlainVector) {
 }
 
 TEST_F(DispatcherTest, MetricStructuredKeyValueRecord) {
-  // For METRIC (structured writer), open a record, dispatch key/value pairs, then close the record.
+  // For METRIC (structured writer), open a record, dispatch key/value pairs,
+  // then close the record.
   dispatcher.begin_record(InfoType::METRIC);
   dispatcher.dispatch(InfoType::METRIC, "metric_type", std::string("diag"));
   dispatcher.dispatch(InfoType::METRIC, "stepsize", 0.6789);
-  // For the inv_metric, assume the caller converts the vector to a comma-separated string.
+  // For the inv_metric, assume the caller converts the vector to a
+  // comma-separated string.
   std::vector<double> inv_metric = {0.1, 0.2, 0.3};
   std::string inv_metric_str;
   for (size_t i = 0; i < inv_metric.size(); ++i) {
     inv_metric_str += std::to_string(inv_metric[i]);
-    if(i != inv_metric.size() - 1) inv_metric_str += ",";
+    if (i != inv_metric.size() - 1)
+      inv_metric_str += ",";
   }
   dispatcher.dispatch(InfoType::METRIC, "inv_metric", inv_metric_str);
   dispatcher.end_record(InfoType::METRIC);
   // Expected output:
-  // Begin record marker, followed by key/value pairs each formatted as "key:value;" and then end record marker.
+  // Begin record marker, followed by key/value pairs each formatted as
+  // "key:value;" and then end record marker.
   std::cout << ss_metric.str() << std::endl;
 }
 
@@ -104,14 +115,14 @@ TEST_F(DispatcherTest, MetricStructuredKeyValueRecord) {
 // }
 
 // TEST_F(DispatcherTest, NonStringDispatchToStructuredIgnored) {
-//   // Dispatch a non-string (e.g., an int) to a structured writer (METRIC) should be ignored.
-//   dispatcher.dispatch(InfoType::METRIC, 123);
+//   // Dispatch a non-string (e.g., an int) to a structured writer (METRIC)
+//   should be ignored. dispatcher.dispatch(InfoType::METRIC, 123);
 //   EXPECT_EQ(structuredWriter.output, "");
 // }
 
 // TEST_F(DispatcherTest, UnregisteredInfoType) {
-//   // Dispatch to an unregistered InfoType (e.g., ALGORITHM_STATE) produces no output.
-//   dispatcher.dispatch(InfoType::ALGORITHM_STATE, std::string("NoOutput"));
-//   EXPECT_EQ(plainWriter.output, "");
+//   // Dispatch to an unregistered InfoType (e.g., ALGORITHM_STATE) produces no
+//   output. dispatcher.dispatch(InfoType::ALGORITHM_STATE,
+//   std::string("NoOutput")); EXPECT_EQ(plainWriter.output, "");
 //   EXPECT_EQ(structuredWriter.output, "");
 // }
