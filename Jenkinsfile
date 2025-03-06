@@ -276,7 +276,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:gpu'
-                            label 'linux'
+                            label 'linux && gpu'
                             args '--pull always --gpus 1'
                         }
                     }
