@@ -171,12 +171,13 @@ TEST_F(DispatcherTest, MetricStructuredKeyValueRecord) {
 // Test structured writer with multiple key-value types
 TEST_F(DispatcherTest, StructuredMultipleValueTypes) {
   dispatcher.begin_record(InfoType::METRIC);
-  dispatcher.dispatch(InfoType::METRIC, "string_key", std::string("string_value"));
+  dispatcher.dispatch(InfoType::METRIC, "string_key",
+                      std::string("string_value"));
   dispatcher.dispatch(InfoType::METRIC, "int_key", 42);
   dispatcher.dispatch(InfoType::METRIC, "double_key", 3.14159);
   dispatcher.dispatch(InfoType::METRIC, "bool_key", true);
   dispatcher.end_record(InfoType::METRIC);
-  
+
   std::string output = ss_metric.str();
   EXPECT_NE(output.find("string_key"), std::string::npos);
   EXPECT_NE(output.find("string_value"), std::string::npos);
@@ -187,7 +188,6 @@ TEST_F(DispatcherTest, StructuredMultipleValueTypes) {
   EXPECT_NE(output.find("bool_key"), std::string::npos);
   EXPECT_NE(output.find("true"), std::string::npos);
 }
-
 
 // Test structured writer with Eigen values
 TEST_F(DispatcherTest, StructuredEigenValues) {
@@ -216,8 +216,7 @@ TEST_F(DispatcherTest, StructuredEigenValues) {
 TEST_F(DispatcherTest, UnregisteredChannel) {
   // Dispatch to unregistered channel should silently do nothing
   dispatcher.dispatch(InfoType::ALGORITHM_STATE, std::string("Message"));
-  dispatcher.dispatch(InfoType::ALGORITHM_STATE,
-		      std::vector<double>{1.0, 2.0});
+  dispatcher.dispatch(InfoType::ALGORITHM_STATE, std::vector<double>{1.0, 2.0});
   dispatcher.begin_record(InfoType::ALGORITHM_STATE);
   dispatcher.dispatch(InfoType::ALGORITHM_STATE, "key", "value");
   dispatcher.end_record(InfoType::ALGORITHM_STATE);
