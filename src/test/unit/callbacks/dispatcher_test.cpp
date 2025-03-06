@@ -10,7 +10,6 @@
 #include <iostream>
 #include <Eigen/Dense>
 
-// For this test we assume that InfoType has at least these values:
 using stan::callbacks::dispatcher;
 using stan::callbacks::InfoType;
 
@@ -147,43 +146,25 @@ TEST_F(DispatcherTest, StructuredBeginEndRecord) {
   // JSON output should contain opening and closing braces
   EXPECT_NE(output.find("{"), std::string::npos);
   EXPECT_NE(output.find("}"), std::string::npos);
-=======
+}
+
 TEST_F(DispatcherTest, MetricStructuredKeyValueRecord) {
   // For METRIC (structured writer), open a record, dispatch key/value pairs,
   // then close the record.
   dispatcher.begin_record(InfoType::METRIC);
   dispatcher.dispatch(InfoType::METRIC, "metric_type", std::string("diag"));
   dispatcher.dispatch(InfoType::METRIC, "stepsize", 0.6789);
-  // For the inv_metric, assume the caller converts the vector to a
-  // comma-separated string.
   std::vector<double> inv_metric = {0.1, 0.2, 0.3};
-  std::string inv_metric_str;
-  for (size_t i = 0; i < inv_metric.size(); ++i) {
-    inv_metric_str += std::to_string(inv_metric[i]);
-    if (i != inv_metric.size() - 1)
-      inv_metric_str += ",";
-  }
-  dispatcher.dispatch(InfoType::METRIC, "inv_metric", inv_metric_str);
+  dispatcher.dispatch(InfoType::METRIC, "inv_metric", inv_metric);
   dispatcher.end_record(InfoType::METRIC);
   // Expected output:
   // Begin record marker, followed by key/value pairs each formatted as
   // "key:value;" and then end record marker.
-  std::cout << ss_metric.str() << std::endl;
->>>>>>> 89d756b23a601c560cb63a09930f5fcbce011efc
-}
-
-// Test structured writer key-value pairs with string value
-TEST_F(DispatcherTest, StructuredKeyStringValue) {
-  dispatcher.begin_record(InfoType::METRIC);
-  dispatcher.dispatch(InfoType::METRIC, "key1", std::string("value1"));
-  dispatcher.end_record(InfoType::METRIC);
-  
   std::string output = ss_metric.str();
-  EXPECT_NE(output.find("key1"), std::string::npos);
-  EXPECT_NE(output.find("value1"), std::string::npos);
+  EXPECT_NE(output.find("metric_type"), std::string::npos);
+  EXPECT_NE(output.find("diag"), std::string::npos);
 }
 
-<<<<<<< HEAD
 // Test structured writer with multiple key-value types
 TEST_F(DispatcherTest, StructuredMultipleValueTypes) {
   dispatcher.begin_record(InfoType::METRIC);
