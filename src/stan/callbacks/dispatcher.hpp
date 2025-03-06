@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <utility>
 #include <type_traits>
-
+#include <variant>
 
 namespace stan {
   namespace callbacks {
@@ -31,58 +31,59 @@ namespace stan {
     // Base type for type erasure.
     class Channel {
     public:
-      virtual ~Channel() {}
+      virtual ~Channel() = default;
     };
 
     // Adapter for plain writers.
-    // These writer types (e.g., stream_writer, unique_stream_writer) support only a one-argument operator().
     class WriterChannel : public Channel {
     public:
       explicit WriterChannel(stan::callbacks::writer* w) : writer_(w) {
-        if (!w)
-          throw std::runtime_error("Null writer pointer provided to WriterChannel");
+        if (!w) throw std::runtime_error("Null writer pointer provided to WriterChannel");
       }
-      // Single-argument dispatch: forwards to operator().
+
+      // Handle all types that writer supports via operator()
+      void dispatch() { (*writer_)(); }
+      void dispatch(const std::string& value) { (*writer_)(value); }
+      void dispatch(const std::vector<double>& value) { (*writer_)(value); }
+      void dispatch(const std::vector<std::string>& value) { (*writer_)(value); }
+      
+      // Handle any Eigen Matrix type
+      template <int R, int C>
+      void dispatch(const Eigen::Matrix<double, R, C>& value) { (*writer_)(value); }
+      
+      // No key-value support for plain writers
       template <typename T>
-      void dispatch(const T& value) {
-        (*writer_)(value);
-      }
-      // Plain writers do not support key/value writes.
-      void begin_record() { }
-      void end_record() { }
+      void dispatch(const std::string&, const T&) {}
+      
     private:
       stan::callbacks::writer* writer_;
     };
 
     // Adapter for structured writers.
-    // The structured_writer interface provides a one-argument write(const std::string&)
-    // and a key/value write(const std::string&, const T&) overload.
     class StructuredWriterChannel : public Channel {
     public:
       explicit StructuredWriterChannel(stan::callbacks::structured_writer* sw) : writer_(sw) {
-        if (!sw)
-          throw std::runtime_error("Null structured writer pointer provided to StructuredWriterChannel");
+        if (!sw) throw std::runtime_error("Null structured writer pointer provided to StructuredWriterChannel");
       }
-      // Key dispatch
-      void dispatch(const std::string& key) {
-        writer_->write(key);
-      }
-      // Key/value dispatch
+      
+      // Forward all key-value calls directly to the writer
+      void dispatch(const std::string& key) { writer_->write(key); }
+      
+      // Perfect forwarding for any key-value pair
       template <typename T>
-      void dispatch(const std::string& key, const T& value) {
+      void dispatch(const std::string& key, T&& value) {
         writer_->write(key, std::forward<T>(value));
       }
-      void begin_record() {
-        writer_->begin_record();
-      }
-      void end_record() {
-        writer_->end_record();
-      }
+      
+      void begin_record() { writer_->begin_record(); }
+      void begin_record(const std::string& key) { writer_->begin_record(key); }
+      void end_record() { writer_->end_record(); }
+      
     private:
       stan::callbacks::structured_writer* writer_;
     };
 
-    // dispatcher class with two overloads for dispatch().
+    // dispatcher class
     class dispatcher {
     public:
       dispatcher() = default;
@@ -92,44 +93,69 @@ namespace stan {
         channels_[type] = std::move(channel);
       }
 
-      // Overload for non-string types: only forward to plain writer channels.
-      template <typename T,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<T>, std::string>::value>>
-      void dispatch(InfoType type, T&& info) {
-        auto it = channels_.find(type);
-        if (it == channels_.end()) return; // silently do nothing
-        if (auto* wc = dynamic_cast<WriterChannel*>(it->second.get()))
-          wc->dispatch(std::forward<T>(info));
-        // We do not forward non-string types to structured writer channels.
+      // Empty call
+      void dispatch(InfoType type) {
+        if (auto* wc = find_channel<WriterChannel>(type))
+          wc->dispatch();
       }
-
-      // Overload for string types: forward to both plain and structured writer channels.
-      void dispatch(InfoType type, const std::string& info) {
-        auto it = channels_.find(type);
-        if (it == channels_.end()) return; // silently do nothing
-        if (auto* wc = dynamic_cast<WriterChannel*>(it->second.get()))
-          wc->dispatch(info);
-        if (auto* sw = dynamic_cast<StructuredWriterChannel*>(it->second.get()))
-          sw->dispatch(info);
+      
+      // String, vector<double>, vector<string>
+      template <typename T, 
+                typename = std::enable_if_t<
+                  std::is_same_v<std::decay_t<T>, std::string> ||
+                  std::is_same_v<std::decay_t<T>, std::vector<double>> ||
+                  std::is_same_v<std::decay_t<T>, std::vector<std::string>>
+                >>
+      void dispatch(InfoType type, T&& value) {
+        if (auto* wc = find_channel<WriterChannel>(type))
+          wc->dispatch(std::forward<T>(value));
       }
-
-      // Forward a begin_record call.
+      
+      // Eigen matrix types
+      template <int R, int C>
+      void dispatch(InfoType type, const Eigen::Matrix<double, R, C>& value) {
+        if (auto* wc = find_channel<WriterChannel>(type))
+          wc->dispatch(value);
+      }
+      
+      // Key with no value (null)
+      void dispatch(InfoType type, const std::string& key) {
+        if (auto* sw = find_channel<StructuredWriterChannel>(type))
+          sw->dispatch(key);
+      }
+      
+      // Key-value pairs (forward to structured writers)
+      template <typename T>
+      void dispatch(InfoType type, const std::string& key, T&& value) {
+        if (auto* sw = find_channel<StructuredWriterChannel>(type))
+          sw->dispatch(key, std::forward<T>(value));
+      }
+      
+      // Record operations
       void begin_record(InfoType type) {
-        auto it = channels_.find(type);
-        if (it == channels_.end()) return;
-        if (auto* sw = dynamic_cast<StructuredWriterChannel*>(it->second.get()))
+        if (auto* sw = find_channel<StructuredWriterChannel>(type))
           sw->begin_record();
       }
-
-      // Forward an end_record call.
+      
+      void begin_record(InfoType type, const std::string& key) {
+        if (auto* sw = find_channel<StructuredWriterChannel>(type))
+          sw->begin_record(key);
+      }
+      
       void end_record(InfoType type) {
-        auto it = channels_.find(type);
-        if (it == channels_.end()) return;
-        if (auto* sw = dynamic_cast<StructuredWriterChannel*>(it->second.get()))
+        if (auto* sw = find_channel<StructuredWriterChannel>(type))
           sw->end_record();
       }
 
-    protected:
+    private:
+      // Helper to find and cast a channel of specific type
+      template <typename ChannelType>
+      ChannelType* find_channel(InfoType type) {
+        auto it = channels_.find(type);
+        if (it == channels_.end()) return nullptr;
+        return dynamic_cast<ChannelType*>(it->second.get());
+      }
+      
       std::unordered_map<InfoType, std::unique_ptr<Channel>, InfoTypeHash> channels_;
     };
 
