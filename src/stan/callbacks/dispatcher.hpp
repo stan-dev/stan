@@ -91,25 +91,10 @@ class dispatcher {
  public:
   dispatcher() = default;
   ~dispatcher() = default;
-
-  void register_channel(InfoType type, std::unique_ptr<Channel> channel) {
-    channels_[type] = std::move(channel);
-  }
-
-  // Empty call
-  void dispatch(InfoType type) {
-    if (auto* wc = find_channel<WriterChannel>(type))
-      wc->dispatch();
-  }
-
-  // String, vector<double>, vector<string>
-  template <
-      typename T,
-      typename = std::enable_if_t<
-          std::is_same_v<
-              std::decay_t<T>,
-              std::
-                  string> || std::is_same_v<std::decay_t<T>, std::vector<double>> || std::is_same_v<std::decay_t<T>, std::vector<std::string>>>>
+  typename = std::enable_if_t<
+    std::is_same_v<std::decay_t<T>, std::string>
+    || std::is_same_v<std::decay_t<T>, std::vector<double>>
+    || std::is_same_v<std::decay_t<T>, std::vector<std::string>>>>  // NOLINT
   void dispatch(InfoType type, T&& value) {
     if (auto* wc = find_channel<WriterChannel>(type))
       wc->dispatch(std::forward<T>(value));
