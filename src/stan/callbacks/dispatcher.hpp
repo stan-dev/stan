@@ -106,10 +106,9 @@ class dispatcher {
   template <
       typename T,
       typename = std::enable_if_t<
-          std::is_same_v<
-              std::decay_t<T>,
-              std::
-                  string> || std::is_same_v<std::decay_t<T>, std::vector<double>> || std::is_same_v<std::decay_t<T>, std::vector<std::string>>>>
+	std::is_same_v<std::decay_t<T>, std::string>
+	|| std::is_same_v<std::decay_t<T>, std::vector<double>>
+	|| std::is_same_v<std::decay_t<T>, std::vector<std::string>>>>
   void dispatch(InfoType type, T&& value) {
     if (auto* wc = find_channel<WriterChannel>(type))
       wc->dispatch(std::forward<T>(value));
