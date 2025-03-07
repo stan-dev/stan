@@ -29,6 +29,7 @@ class DispatcherTest : public ::testing::Test {
         writer_config(ss_config),
         writer_metric(
             std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric)),
+        writer_sample_in_memory(3,12),
         dispatcher() {}
 
   void SetUp() {
