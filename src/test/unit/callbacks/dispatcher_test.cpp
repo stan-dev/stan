@@ -56,7 +56,7 @@ class DispatcherTest : public ::testing::Test {
             new stan::callbacks::StructuredWriterChannel(&writer_metric)));
 
     dispatcher.register_channel(
-	InfoType::SAMPLE_RAW,
+        InfoType::SAMPLE_RAW,
         std::unique_ptr<stan::callbacks::Channel>(
             new stan::callbacks::WriterChannel(&writer_sample_in_memory)));
   }
@@ -260,26 +260,26 @@ TEST_F(DispatcherTest, InMemoryWriterBasic) {
   std::vector<double> row1 = {1.1, 2.2, 3.3};
   std::vector<double> row2 = {4.4, 5.5, 6.6};
   std::vector<double> row3 = {7.7, 8.8, 9.9};
-  
+
   dispatcher.dispatch(InfoType::SAMPLE_RAW, row1);
   dispatcher.dispatch(InfoType::SAMPLE_RAW, row2);
   dispatcher.dispatch(InfoType::SAMPLE_RAW, row3);
-  
+
   // Check that the data was stored correctly
   const Eigen::MatrixXd& data = writer_sample_in_memory.get_eigen_state_values();
-  
+
   EXPECT_EQ(data.rows(), 5);  // As initialized
   EXPECT_EQ(data.cols(), 3);  // As initialized
-  
+
   // Check the stored values (first 3 rows should have our data)
   EXPECT_DOUBLE_EQ(data(0, 0), 1.1);
   EXPECT_DOUBLE_EQ(data(0, 1), 2.2);
   EXPECT_DOUBLE_EQ(data(0, 2), 3.3);
-  
+
   EXPECT_DOUBLE_EQ(data(1, 0), 4.4);
   EXPECT_DOUBLE_EQ(data(1, 1), 5.5);
   EXPECT_DOUBLE_EQ(data(1, 2), 6.6);
-  
+
   EXPECT_DOUBLE_EQ(data(2, 0), 7.7);
   EXPECT_DOUBLE_EQ(data(2, 1), 8.8);
   EXPECT_DOUBLE_EQ(data(2, 2), 9.9);
@@ -289,35 +289,31 @@ TEST_F(DispatcherTest, InMemoryWriterBasic) {
 TEST_F(DispatcherTest, InMemoryWriterRowOverflow) {
   // Try to write more rows than allocated
   std::vector<double> row = {1.0, 2.0, 3.0};
-  
+
   // Should be able to write 5 rows (as initialized)
   for (int i = 0; i < 5; i++) {
     dispatcher.dispatch(InfoType::SAMPLE_RAW, row);
   }
-  
+
   // Sixth row should throw exception
-  EXPECT_THROW(
-    dispatcher.dispatch(InfoType::SAMPLE_RAW, row),
-    std::runtime_error
-  );
+  EXPECT_THROW(dispatcher.dispatch(InfoType::SAMPLE_RAW, row),
+               std::runtime_error);
 }
 
 // Test in_memory_writer with column mismatch
 TEST_F(DispatcherTest, InMemoryWriterColumnMismatch) {
   // Try to write a row with wrong number of columns
-  std::vector<double> wrong_size_row = {1.0, 2.0};  // Only 2 columns when we need 3
-  
-  EXPECT_THROW(
-    dispatcher.dispatch(InfoType::SAMPLE_RAW, wrong_size_row),
-    std::runtime_error
-  );
-  
-  std::vector<double> also_wrong_size = {1.0, 2.0, 3.0, 4.0};  // 4 columns when we need 3
-  
-  EXPECT_THROW(
-    dispatcher.dispatch(InfoType::SAMPLE_RAW, also_wrong_size),
-    std::runtime_error
-  );
+  std::vector<double> wrong_size_row
+      = {1.0, 2.0};  // Only 2 columns when we need 3
+
+  EXPECT_THROW(dispatcher.dispatch(InfoType::SAMPLE_RAW, wrong_size_row),
+               std::runtime_error);
+
+  std::vector<double> also_wrong_size
+      = {1.0, 2.0, 3.0, 4.0};  // 4 columns when we need 3
+
+  EXPECT_THROW(dispatcher.dispatch(InfoType::SAMPLE_RAW, also_wrong_size),
+               std::runtime_error);
 }
 
 // Test in_memory_writer reset
@@ -325,22 +321,22 @@ TEST_F(DispatcherTest, InMemoryWriterReset) {
   // Write some data
   std::vector<double> row = {1.1, 2.2, 3.3};
   dispatcher.dispatch(InfoType::SAMPLE_RAW, row);
-  
+
   // Verify data is written
   const Eigen::MatrixXd& data1 = writer_sample_in_memory.get_eigen_state_values();
   EXPECT_DOUBLE_EQ(data1(0, 0), 1.1);
-  
+
   // Reset the writer
   writer_sample_in_memory.reset();
-  
+
   // Verify data is cleared
   const Eigen::MatrixXd& data2 = writer_sample_in_memory.get_eigen_state_values();
   EXPECT_DOUBLE_EQ(data2(0, 0), 0.0);
-  
+
   // Write new data
   std::vector<double> new_row = {4.4, 5.5, 6.6};
   dispatcher.dispatch(InfoType::SAMPLE_RAW, new_row);
-  
+
   // Verify new data is written
   const Eigen::MatrixXd& data3 = writer_sample_in_memory.get_eigen_state_values();
   EXPECT_DOUBLE_EQ(data3(0, 0), 4.4);
