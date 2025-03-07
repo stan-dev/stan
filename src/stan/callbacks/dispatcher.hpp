@@ -16,10 +16,10 @@ namespace stan {
 namespace callbacks {
 
 enum class InfoType {
-  CONFIG,  // series of string messages
-  SAMPLE,  // draw from posterior
+  CONFIG,      // series of string messages
+  SAMPLE,      // draw from posterior
   SAMPLE_RAW,  // draw from posterior
-  METRIC,  // struct with kv pairs 'metric_type', 'stepsize', 'inv_metric'
+  METRIC,      // struct with kv pairs 'metric_type', 'stepsize', 'inv_metric'
   ALGORITHM_STATE,  // sampler state for returned draw
 };
 

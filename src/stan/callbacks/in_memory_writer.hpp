@@ -21,7 +21,7 @@ namespace callbacks {
  * does not have the expected number of columns, an exception is thrown.
  */
 class in_memory_writer : public stan::callbacks::writer {
-public:
+ public:
   /**
    * Construct an in-memory writer.
    *
@@ -32,11 +32,11 @@ public:
    * num_rows x num_cols in column-major order.
    */
   in_memory_writer(std::size_t num_rows, std::size_t num_cols)
-    : num_rows_(num_rows),
-      num_cols_(num_cols),
-      data_(Eigen::MatrixXd::Zero(num_rows, num_cols)),  // column-major
-      current_row_(0),
-      names_() {}
+      : num_rows_(num_rows),
+        num_cols_(num_cols),
+        data_(Eigen::MatrixXd::Zero(num_rows, num_cols)),  // column-major
+        current_row_(0),
+        names_() {}
 
   virtual ~in_memory_writer() {}
 
@@ -77,12 +77,12 @@ public:
   /**
    * Default implementation for empty call.
    */
-  void operator()() override { }
+  void operator()() override {}
 
   /**
    * Default implementation for string message.
    */
-  void operator()(const std::string& message) override { }
+  void operator()(const std::string& message) override {}
 
   /**
    * Handles Eigen matrix input by converting to rows and inserting.
@@ -123,44 +123,37 @@ public:
   /**
    * Always returns true as the in-memory writer is always valid.
    */
-  bool is_valid() const noexcept override {
-    return true;
-  }
+  bool is_valid() const noexcept override { return true; }
 
   /**
-   * Returns a const reference to the in-memory Eigen matrix containing all draws.
+   * Returns a const reference to the in-memory Eigen matrix containing all
+   * draws.
    *
    * The matrix is stored in column-major order.
    *
    * @return const reference to the Eigen::MatrixXd holding the draws.
    */
-  const Eigen::MatrixXd& get_eigen_state_values() const {
-    return data_;
-  }
+  const Eigen::MatrixXd& get_eigen_state_values() const { return data_; }
 
   /**
    * Returns a const reference to the column names.
    *
    * @return const reference to the vector of column names.
    */
-  const std::vector<std::string>& get_names() const {
-    return names_;
-  }
+  const std::vector<std::string>& get_names() const { return names_; }
 
   /**
    * Returns the number of rows that have been written so far.
    *
    * @return The current row count.
    */
-  std::size_t get_row_count() const {
-    return current_row_;
-  }
+  std::size_t get_row_count() const { return current_row_; }
 
   /**
    * Resets the writer to its initial state.
    *
-   * Clears the stored data (sets the matrix to zero) and resets the current row index.
-   * Column names are retained.
+   * Clears the stored data (sets the matrix to zero) and resets the current row
+   * index. Column names are retained.
    */
   void reset() {
     current_row_ = 0;
@@ -176,11 +169,11 @@ public:
     names_.clear();
   }
 
-private:
-  std::size_t num_rows_;   // Total number of draws (rows) expected.
-  std::size_t num_cols_;   // Number of parameters (columns) per draw.
-  Eigen::MatrixXd data_;   // Internal storage; Eigen matrices are column-major.
-  std::size_t current_row_;  // Next row index to be written.
+ private:
+  std::size_t num_rows_;  // Total number of draws (rows) expected.
+  std::size_t num_cols_;  // Number of parameters (columns) per draw.
+  Eigen::MatrixXd data_;  // Internal storage; Eigen matrices are column-major.
+  std::size_t current_row_;         // Next row index to be written.
   std::vector<std::string> names_;  // Column names
 };
 
