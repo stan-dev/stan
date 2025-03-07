@@ -18,6 +18,7 @@ namespace callbacks {
 enum class InfoType {
   CONFIG,  // series of string messages
   SAMPLE,  // draw from posterior
+  SAMPLE_RAW,  // draw from posterior
   METRIC,  // struct with kv pairs 'metric_type', 'stepsize', 'inv_metric'
   ALGORITHM_STATE,  // sampler state for returned draw
 };
@@ -104,7 +105,7 @@ class dispatcher {
     if (auto* wc = dynamic_cast<WriterChannel*>(it->second.get()))
       wc->dispatch();
   }
-  
+
   // single non-string argument - call writer operator ()
   template <
     typename T,
