@@ -104,14 +104,15 @@ class dispatcher {
     if (auto* wc = dynamic_cast<WriterChannel*>(it->second.get()))
       wc->dispatch();
   }
-  
+
   // single non-string argument - call writer operator ()
   template <
-    typename T,
-    typename = std::enable_if_t<
-      std::is_same_v<std::decay_t<T>, std::string>
-      || std::is_same_v<std::decay_t<T>, std::vector<double>>
-      || std::is_same_v<std::decay_t<T>, std::vector<std::string>>>>  // NOLINT
+      typename T,
+      typename = std::enable_if_t<
+          std::is_same_v<
+              std::decay_t<T>,
+              std::
+                  string> || std::is_same_v<std::decay_t<T>, std::vector<double>> || std::is_same_v<std::decay_t<T>, std::vector<std::string>>>>  // NOLINT
   void dispatch(InfoType type, T&& value) {
     if (auto* wc = find_channel<WriterChannel>(type))
       wc->dispatch(std::forward<T>(value));
