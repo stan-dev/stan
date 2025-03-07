@@ -29,7 +29,7 @@ class DispatcherTest : public ::testing::Test {
         writer_config(ss_config),
         writer_metric(
             std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric)),
-        writer_sample_in_memory(5,3),
+        writer_sample_in_memory(5, 3),
         dispatcher() {}
 
   void SetUp() {
@@ -266,7 +266,8 @@ TEST_F(DispatcherTest, InMemoryWriterBasic) {
   dispatcher.dispatch(InfoType::SAMPLE_RAW, row3);
 
   // Check that the data was stored correctly
-  const Eigen::MatrixXd& data = writer_sample_in_memory.get_eigen_state_values();
+  const Eigen::MatrixXd& data
+      = writer_sample_in_memory.get_eigen_state_values();
 
   EXPECT_EQ(data.rows(), 5);  // As initialized
   EXPECT_EQ(data.cols(), 3);  // As initialized
@@ -323,14 +324,16 @@ TEST_F(DispatcherTest, InMemoryWriterReset) {
   dispatcher.dispatch(InfoType::SAMPLE_RAW, row);
 
   // Verify data is written
-  const Eigen::MatrixXd& data1 = writer_sample_in_memory.get_eigen_state_values();
+  const Eigen::MatrixXd& data1
+      = writer_sample_in_memory.get_eigen_state_values();
   EXPECT_DOUBLE_EQ(data1(0, 0), 1.1);
 
   // Reset the writer
   writer_sample_in_memory.reset();
 
   // Verify data is cleared
-  const Eigen::MatrixXd& data2 = writer_sample_in_memory.get_eigen_state_values();
+  const Eigen::MatrixXd& data2
+      = writer_sample_in_memory.get_eigen_state_values();
   EXPECT_DOUBLE_EQ(data2(0, 0), 0.0);
 
   // Write new data
@@ -338,6 +341,7 @@ TEST_F(DispatcherTest, InMemoryWriterReset) {
   dispatcher.dispatch(InfoType::SAMPLE_RAW, new_row);
 
   // Verify new data is written
-  const Eigen::MatrixXd& data3 = writer_sample_in_memory.get_eigen_state_values();
+  const Eigen::MatrixXd& data3
+      = writer_sample_in_memory.get_eigen_state_values();
   EXPECT_DOUBLE_EQ(data3(0, 0), 4.4);
 }
