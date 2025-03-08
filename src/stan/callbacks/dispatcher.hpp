@@ -22,7 +22,6 @@ namespace callbacks {
  * the callback registered on the channel.
  */
 
-
 /**
  * Enum `info_type` holds output type labels which are used by
  * the dispatcher class to map outputs to output channels.
@@ -44,7 +43,6 @@ struct info_type_hash {
   }
 };
 
-
 /**
  * Base type for all callbacks, needed for type erasure.
  */
@@ -52,7 +50,6 @@ class channel {
  public:
   virtual ~channel() = default;
 };
-
 
 /**
  * A `writer_channel` holds a reference to a stan::callbacks::writer object
@@ -121,7 +118,7 @@ class dispatcher {
  private:
   /* Lookup registered channels for info_type.
    * Returns nullptr if no channel found.
-   */ 
+   */
   template <typename channel_type>
   channel_type* find_channel(info_type type) {
     auto it = channels_.find(type);
@@ -139,7 +136,7 @@ class dispatcher {
 
   /* Add channel to map.
    * Assumes a 1:1 mapping between info type and callback.
-   */ 
+   */
   void register_channel(info_type type, std::unique_ptr<channel> channel) {
     channels_[type] = std::move(channel);
   }
