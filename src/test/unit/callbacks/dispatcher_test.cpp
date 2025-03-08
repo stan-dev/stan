@@ -216,7 +216,8 @@ TEST_F(DispatcherTest, StructuredEigenValues) {
 TEST_F(DispatcherTest, UnregisteredChannel) {
   // Dispatch to unregistered channel should silently do nothing
   dispatcher.dispatch(info_type::ALGORITHM_STATE, std::string("Message"));
-  dispatcher.dispatch(info_type::ALGORITHM_STATE, std::vector<double>{1.0, 2.0});
+  dispatcher.dispatch(info_type::ALGORITHM_STATE,
+                      std::vector<double>{1.0, 2.0});
   dispatcher.begin_record(info_type::ALGORITHM_STATE);
   dispatcher.dispatch(info_type::ALGORITHM_STATE, "key", "value");
   dispatcher.end_record(info_type::ALGORITHM_STATE);
