@@ -164,7 +164,6 @@ class dispatcher {
     managed_resources_.push_back(std::move(resource));
   }
 
-
   /**
    * Add channel to map.
    * Assumes a 1:1 mapping between info type and callback.
@@ -187,7 +186,8 @@ class dispatcher {
   }
 
   /**
-   * Dispatches a vector of doubles to the writer associated with the given type.
+   * Dispatches a vector of doubles to the writer associated with the given
+   * type.
    *
    * @param[in] type The info_type identifying the channel to dispatch to
    * @param[in] value Vector of doubles to be written
@@ -198,7 +198,8 @@ class dispatcher {
   }
 
   /**
-   * Dispatches a vector of strings to the writer associated with the given type.
+   * Dispatches a vector of strings to the writer associated with the given
+   * type.
    *
    * @param[in] type The info_type identifying the channel to dispatch to
    * @param[in] value Vector of strings to be written
@@ -237,7 +238,8 @@ class dispatcher {
   }
 
   /**
-   * Dispatches a key-value pair to the structured writer associated with the given type.
+   * Dispatches a key-value pair to the structured writer associated with the
+   * given type.
    *
    * @tparam T Type of the value to be written
    * @param[in] type The info_type identifying the channel to dispatch to
@@ -261,7 +263,8 @@ class dispatcher {
   }
 
   /**
-   * Begins a named record in the structured writer associated with the given type.
+   * Begins a named record in the structured writer associated with the given
+   * type.
    *
    * @param[in] type The info_type identifying the channel to dispatch to
    * @param[in] key Name of the record to begin
