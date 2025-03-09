@@ -132,17 +132,15 @@ class dispatcher {
   std::unordered_map<info_type, std::unique_ptr<channel>, info_type_hash>
       channels_;
 
-  // Store managed resources to ensure they live as long as the dispatcher
+  // neccesary for proper handling of shared ptrs
   std::vector<std::shared_ptr<void>> managed_resources_;
 
  public:
   dispatcher() = default;
 
-  // Delete copy constructor and assignment operator since we have unique_ptrs
   dispatcher(const dispatcher&) = delete;
   dispatcher& operator=(const dispatcher&) = delete;
 
-  // Add move constructor and assignment operator
   dispatcher(dispatcher&& other) noexcept
       : channels_(std::move(other.channels_)),
         managed_resources_(std::move(other.managed_resources_)) {}
@@ -158,8 +156,7 @@ class dispatcher {
   ~dispatcher() = default;
 
   /**
-   * Add a resource to be managed by the dispatcher.
-   * The resource will be kept alive for the lifetime of the dispatcher.
+   * Managed resources are kept alive for the lifetime of the dispatcher.
    *
    * @param resource Shared pointer to the resource to manage
    */
@@ -167,39 +164,71 @@ class dispatcher {
     managed_resources_.push_back(std::move(resource));
   }
 
-  /* Add channel to map.
+
+  /**
+   * Add channel to map.
    * Assumes a 1:1 mapping between info type and callback.
+   *
+   * @param[in] type The info_type to associate with the channel
+   * @param[in] channel A unique_ptr to the channel to register
    */
   void register_channel(info_type type, std::unique_ptr<channel> channel) {
     channels_[type] = std::move(channel);
   }
 
-  // no-arg call to writer operator ()
+  /**
+   * Dispatches a no-argument call to the writer associated with the given type.
+   *
+   * @param[in] type The info_type identifying the channel to dispatch to
+   */
   void dispatch(info_type type) {
     if (auto* wc = find_channel<writer_channel>(type))
       wc->dispatch();
   }
 
-  // Dispatch for vector<double>
+  /**
+   * Dispatches a vector of doubles to the writer associated with the given type.
+   *
+   * @param[in] type The info_type identifying the channel to dispatch to
+   * @param[in] value Vector of doubles to be written
+   */
   void dispatch(info_type type, const std::vector<double>& value) {
     if (auto* wc = find_channel<writer_channel>(type))
       wc->dispatch(value);
   }
 
-  // Dispatch for vector<string>
+  /**
+   * Dispatches a vector of strings to the writer associated with the given type.
+   *
+   * @param[in] type The info_type identifying the channel to dispatch to
+   * @param[in] value Vector of strings to be written
+   */
   void dispatch(info_type type, const std::vector<std::string>& value) {
     if (auto* wc = find_channel<writer_channel>(type))
       wc->dispatch(value);
   }
 
-  // Value is Eigen vector or matrix
+  /**
+   * Dispatches an Eigen matrix to the writer associated with the given type.
+   *
+   * @tparam R Number of rows in the matrix (-1 for dynamic)
+   * @tparam C Number of columns in the matrix (-1 for dynamic)
+   * @param[in] type The info_type identifying the channel to dispatch to
+   * @param[in] value Eigen matrix to be written
+   */
   template <int R, int C>
   void dispatch(info_type type, const Eigen::Matrix<double, R, C>& value) {
     if (auto* wc = find_channel<writer_channel>(type))
       wc->dispatch(value);
   }
 
-  // Value is std::string
+  /**
+   * Dispatches a string to the writer associated with the given type.
+   * For structured writers, the string is treated as a key.
+   *
+   * @param[in] type The info_type identifying the channel to dispatch to
+   * @param[in] value String to be written
+   */
   void dispatch(info_type type, const std::string& value) {
     if (auto* wc = find_channel<writer_channel>(type))
       wc->dispatch(value);
@@ -207,24 +236,46 @@ class dispatcher {
       sw->dispatch(value);  // (sic: actually the key part of k-v pair)
   }
 
-  // Key-value pairs (forward to structured writers)
+  /**
+   * Dispatches a key-value pair to the structured writer associated with the given type.
+   *
+   * @tparam T Type of the value to be written
+   * @param[in] type The info_type identifying the channel to dispatch to
+   * @param[in] key Key string for the key-value pair
+   * @param[in] value Value to be written
+   */
   template <typename T>
   void dispatch(info_type type, const std::string& key, T&& value) {
     if (auto* sw = find_channel<structured_writer_channel>(type))
       sw->dispatch(key, std::forward<T>(value));
   }
 
-  // Record operations
+  /**
+   * Begins a record in the structured writer associated with the given type.
+   *
+   * @param[in] type The info_type identifying the channel to dispatch to
+   */
   void begin_record(info_type type) {
     if (auto* sw = find_channel<structured_writer_channel>(type))
       sw->begin_record();
   }
 
+  /**
+   * Begins a named record in the structured writer associated with the given type.
+   *
+   * @param[in] type The info_type identifying the channel to dispatch to
+   * @param[in] key Name of the record to begin
+   */
   void begin_record(info_type type, const std::string& key) {
     if (auto* sw = find_channel<structured_writer_channel>(type))
       sw->begin_record(key);
   }
 
+  /**
+   * Ends a record in the structured writer associated with the given type.
+   *
+   * @param[in] type The info_type identifying the channel to dispatch to
+   */
   void end_record(info_type type) {
     if (auto* sw = find_channel<structured_writer_channel>(type))
       sw->end_record();
