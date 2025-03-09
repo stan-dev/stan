@@ -31,8 +31,8 @@ enum class info_type {
   SAMPLE,      // draw from posterior
   SAMPLE_RAW,  // draw from posterior
   METRIC,      // struct with kv pairs 'metric_type', 'stepsize', 'inv_metric'
-  ALGORITHM_STATE,  // sampler state for returned draw
-  DIAGNOSTIC,  // parameter gradients
+  ALGORITHM_STATE,     // sampler state for returned draw
+  DIAGNOSTIC,          // parameter gradients
   UNCONSTRAINED_INITS  // unconstrained parameter values
 };
 
@@ -120,7 +120,7 @@ class dispatcher {
  private:
   /* Lookup registered channels for info_type.
    * Returns nullptr if no channel found.
-   */ 
+   */
   template <typename channel_type>
   channel_type* find_channel(info_type type) {
     auto it = channels_.find(type);
@@ -131,22 +131,22 @@ class dispatcher {
 
   std::unordered_map<info_type, std::unique_ptr<channel>, info_type_hash>
       channels_;
-      
+
   // Store managed resources to ensure they live as long as the dispatcher
   std::vector<std::shared_ptr<void>> managed_resources_;
 
  public:
   dispatcher() = default;
-  
+
   // Delete copy constructor and assignment operator since we have unique_ptrs
   dispatcher(const dispatcher&) = delete;
   dispatcher& operator=(const dispatcher&) = delete;
-  
+
   // Add move constructor and assignment operator
-  dispatcher(dispatcher&& other) noexcept 
+  dispatcher(dispatcher&& other) noexcept
       : channels_(std::move(other.channels_)),
         managed_resources_(std::move(other.managed_resources_)) {}
-  
+
   dispatcher& operator=(dispatcher&& other) noexcept {
     if (this != &other) {
       channels_ = std::move(other.channels_);
@@ -154,13 +154,13 @@ class dispatcher {
     }
     return *this;
   }
-  
+
   ~dispatcher() = default;
 
   /**
    * Add a resource to be managed by the dispatcher.
    * The resource will be kept alive for the lifetime of the dispatcher.
-   * 
+   *
    * @param resource Shared pointer to the resource to manage
    */
   void add_managed_resource(std::shared_ptr<void> resource) {
@@ -169,7 +169,7 @@ class dispatcher {
 
   /* Add channel to map.
    * Assumes a 1:1 mapping between info type and callback.
-   */ 
+   */
   void register_channel(info_type type, std::unique_ptr<channel> channel) {
     channels_[type] = std::move(channel);
   }

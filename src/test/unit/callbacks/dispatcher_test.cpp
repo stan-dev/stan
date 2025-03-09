@@ -20,15 +20,12 @@ struct deleter_noop {
 
 class DispatcherTest : public ::testing::Test {
  public:
-  DispatcherTest()
-      : ss_sample(),
-        ss_config(),
-        ss_metric(),
-        dispatcher() {
+  DispatcherTest() : ss_sample(), ss_config(), ss_metric(), dispatcher() {
     // Create shared writers
     writer_sample = std::make_shared<stan::callbacks::stream_writer>(ss_sample);
     writer_config = std::make_shared<stan::callbacks::stream_writer>(ss_config);
-    writer_metric = std::make_shared<stan::callbacks::json_writer<std::stringstream, deleter_noop>>(
+    writer_metric = std::make_shared<
+        stan::callbacks::json_writer<std::stringstream, deleter_noop>>(
         std::unique_ptr<std::stringstream, deleter_noop>(&ss_metric));
   }
 
@@ -50,16 +47,16 @@ class DispatcherTest : public ::testing::Test {
         info_type::CONFIG,
         std::unique_ptr<stan::callbacks::channel>(
             new stan::callbacks::writer_channel(writer_config.get())));
-    
+
     dispatcher.register_channel(
         info_type::SAMPLE,
         std::unique_ptr<stan::callbacks::channel>(
             new stan::callbacks::writer_channel(writer_sample.get())));
-    
+
     dispatcher.register_channel(
-        info_type::METRIC,
-        std::unique_ptr<stan::callbacks::channel>(
-            new stan::callbacks::structured_writer_channel(writer_metric.get())));
+        info_type::METRIC, std::unique_ptr<stan::callbacks::channel>(
+                               new stan::callbacks::structured_writer_channel(
+                                   writer_metric.get())));
   }
 
   void TearDown() {}
@@ -67,14 +64,14 @@ class DispatcherTest : public ::testing::Test {
   std::stringstream ss_sample;
   std::stringstream ss_config;
   std::stringstream ss_metric;
-  
+
   std::shared_ptr<stan::callbacks::stream_writer> writer_sample;
   std::shared_ptr<stan::callbacks::stream_writer> writer_config;
-  std::shared_ptr<stan::callbacks::json_writer<std::stringstream, deleter_noop>> writer_metric;
-  
+  std::shared_ptr<stan::callbacks::json_writer<std::stringstream, deleter_noop>>
+      writer_metric;
+
   stan::callbacks::dispatcher dispatcher;
 };
-
 
 // Test basic string dispatch to plain writer
 TEST_F(DispatcherTest, StringDispatch) {
