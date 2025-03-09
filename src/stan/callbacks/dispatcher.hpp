@@ -32,6 +32,8 @@ enum class info_type {
   SAMPLE_RAW,  // draw from posterior
   METRIC,      // struct with kv pairs 'metric_type', 'stepsize', 'inv_metric'
   ALGORITHM_STATE,  // sampler state for returned draw
+  DIAGNOSTIC,  // parameter gradients
+  UNCONSTRAINED_INITS  // unconstrained parameter values
 };
 
 /**
@@ -118,7 +120,7 @@ class dispatcher {
  private:
   /* Lookup registered channels for info_type.
    * Returns nullptr if no channel found.
-   */
+   */ 
   template <typename channel_type>
   channel_type* find_channel(info_type type) {
     auto it = channels_.find(type);
@@ -129,14 +131,45 @@ class dispatcher {
 
   std::unordered_map<info_type, std::unique_ptr<channel>, info_type_hash>
       channels_;
+      
+  // Store managed resources to ensure they live as long as the dispatcher
+  std::vector<std::shared_ptr<void>> managed_resources_;
 
  public:
   dispatcher() = default;
+  
+  // Delete copy constructor and assignment operator since we have unique_ptrs
+  dispatcher(const dispatcher&) = delete;
+  dispatcher& operator=(const dispatcher&) = delete;
+  
+  // Add move constructor and assignment operator
+  dispatcher(dispatcher&& other) noexcept 
+      : channels_(std::move(other.channels_)),
+        managed_resources_(std::move(other.managed_resources_)) {}
+  
+  dispatcher& operator=(dispatcher&& other) noexcept {
+    if (this != &other) {
+      channels_ = std::move(other.channels_);
+      managed_resources_ = std::move(other.managed_resources_);
+    }
+    return *this;
+  }
+  
   ~dispatcher() = default;
+
+  /**
+   * Add a resource to be managed by the dispatcher.
+   * The resource will be kept alive for the lifetime of the dispatcher.
+   * 
+   * @param resource Shared pointer to the resource to manage
+   */
+  void add_managed_resource(std::shared_ptr<void> resource) {
+    managed_resources_.push_back(std::move(resource));
+  }
 
   /* Add channel to map.
    * Assumes a 1:1 mapping between info type and callback.
-   */
+   */ 
   void register_channel(info_type type, std::unique_ptr<channel> channel) {
     channels_[type] = std::move(channel);
   }
@@ -147,16 +180,16 @@ class dispatcher {
       wc->dispatch();
   }
 
-  // Value is std::vector<double>, or std::vector<std::string>
-  // clang-format off
-  template <typename T,
-            typename = std::enable_if_t<
-              std::is_same_v<std::decay_t<T>, std::vector<double>>
-              || std::is_same_v<std::decay_t<T>, std::vector<std::string>>>>  // NOLINT
-  // clang-format on
-  void dispatch(info_type type, T&& value) {
+  // Dispatch for vector<double>
+  void dispatch(info_type type, const std::vector<double>& value) {
     if (auto* wc = find_channel<writer_channel>(type))
-      wc->dispatch(std::forward<T>(value));
+      wc->dispatch(value);
+  }
+
+  // Dispatch for vector<string>
+  void dispatch(info_type type, const std::vector<std::string>& value) {
+    if (auto* wc = find_channel<writer_channel>(type))
+      wc->dispatch(value);
   }
 
   // Value is Eigen vector or matrix
