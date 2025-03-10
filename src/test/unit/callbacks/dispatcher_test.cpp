@@ -10,9 +10,9 @@
 #include <iostream>
 #include <Eigen/Dense>
 
+using stan::callbacks::deleter_noop;
 using stan::callbacks::dispatcher;
 using stan::callbacks::info_type;
-using stan::callbacks::deleter_noop;
 
 class DispatcherTest : public ::testing::Test {
  public:
