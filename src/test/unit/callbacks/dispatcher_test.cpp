@@ -12,11 +12,7 @@
 
 using stan::callbacks::dispatcher;
 using stan::callbacks::info_type;
-
-struct deleter_noop {
-  template <typename T>
-  constexpr void operator()(T* arg) const {}
-};
+using stan::callbacks::deleter_noop;
 
 class DispatcherTest : public ::testing::Test {
  public:

@@ -19,6 +19,251 @@ namespace stan {
 namespace services {
 namespace sample {
 
+/* ** New methods, use dispatcher ** */
+
+/**
+ * Creates a unit diagonal inverse metric of appropriate size.
+ *
+ * @param[in] num_params Number of parameters in the model
+ * @return A var_context containing a unit diagonal inverse metric
+ */
+inline stan::io::array_var_context create_default_inv_metric(
+    size_t num_params) {
+  return util::create_unit_e_diag_inv_metric(num_params);
+}
+
+/**
+ * Runs HMC with NUTS with adaptation using diagonal Euclidean metric.
+ *
+ * @tparam Model Model class
+ * @param[in] model Input model (with data already instantiated)
+ * @param[in] init var context for initialization
+ * @param[in] init_inv_metric var context exposing an initial diagonal
+ *            inverse Euclidean metric (must be positive definite).
+ *            If null, a unit diagonal metric will be used.
+ * @param[in] random_seed random seed for the random number generator
+ * @param[in] chain chain id to advance the pseudo random number generator
+ * @param[in] init_radius radius to initialize
+ * @param[in] num_warmup Number of warmup samples
+ * @param[in] num_samples Number of samples
+ * @param[in] num_thin Number to thin the samples
+ * @param[in] save_warmup Indicates whether to save the warmup iterations
+ * @param[in] refresh Controls the output
+ * @param[in] stepsize initial stepsize for discrete evolution
+ * @param[in] stepsize_jitter uniform random jitter of stepsize
+ * @param[in] max_depth Maximum tree depth
+ * @param[in] delta adaptation target acceptance statistic
+ * @param[in] gamma adaptation regularization scale
+ * @param[in] kappa adaptation relaxation exponent
+ * @param[in] t0 adaptation iteration offset
+ * @param[in] init_buffer width of initial fast adaptation interval
+ * @param[in] term_buffer width of final fast adaptation interval
+ * @param[in] window initial width of slow adaptation interval
+ * @param[in,out] interrupt Callback for interrupts
+ * @param[in,out] logger Logger for messages
+ * @param[in,out] dispatcher Dispatcher for all outputs
+ * @return error_codes::OK if successful
+ */
+template <class Model>
+int hmc_nuts_diag_e_adapt(
+    Model& model, const stan::io::var_context& init,
+    const stan::io::var_context* init_inv_metric = nullptr,
+    unsigned int random_seed = 0, unsigned int chain = 1,
+    double init_radius = 0, int num_warmup = 1000, int num_samples = 1000,
+    int num_thin = 1, bool save_warmup = false, int refresh = 100,
+    double stepsize = 1.0, double stepsize_jitter = 0.0, int max_depth = 10,
+    double delta = 0.8, double gamma = 0.05, double kappa = 0.75,
+    double t0 = 10.0, unsigned int init_buffer = 75,
+    unsigned int term_buffer = 50, unsigned int window = 25,
+    callbacks::interrupt* interrupt_ptr = nullptr,
+    callbacks::logger* logger_ptr = nullptr,
+    callbacks::dispatcher* dispatcher_ptr = nullptr) {
+  // default callbacks, in case callback args are nullptr
+  callbacks::interrupt default_interrupt;
+  callbacks::logger default_logger;
+  callbacks::dispatcher default_dispatcher;
+
+  callbacks::interrupt& interrupt
+      = interrupt_ptr ? *interrupt_ptr : default_interrupt;
+  callbacks::logger& logger = logger_ptr ? *logger_ptr : default_logger;
+  callbacks::dispatcher& dispatcher
+      = dispatcher_ptr ? *dispatcher_ptr : default_dispatcher;
+
+  stan::rng_t rng = util::create_rng(random_seed, chain);
+  std::vector<double> cont_vector;
+  Eigen::VectorXd inv_metric;
+
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   dispatcher);
+    // locally-scoped default metric
+    stan::io::array_var_context default_metric
+        = create_default_inv_metric(model.num_params_r());
+    if (init_inv_metric) {
+      inv_metric = util::read_diag_inv_metric(*init_inv_metric,
+                                              model.num_params_r(), logger);
+    } else {
+      inv_metric = util::read_diag_inv_metric(default_metric,
+                                              model.num_params_r(), logger);
+    }
+    util::validate_diag_inv_metric(inv_metric, logger);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
+
+  stan::mcmc::adapt_diag_e_nuts<Model, stan::rng_t> sampler(model, rng);
+  sampler.set_metric(inv_metric);
+  sampler.set_nominal_stepsize(stepsize);
+  sampler.set_stepsize_jitter(stepsize_jitter);
+  sampler.set_max_depth(max_depth);
+  sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
+  sampler.get_stepsize_adaptation().set_delta(delta);
+  sampler.get_stepsize_adaptation().set_gamma(gamma);
+  sampler.get_stepsize_adaptation().set_kappa(kappa);
+  sampler.get_stepsize_adaptation().set_t0(t0);
+  sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
+                            logger);
+
+  // Run the sampler
+  try {
+    util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
+                               num_samples, num_thin, refresh, save_warmup, rng,
+                               interrupt, logger, dispatcher, chain, 1);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
+
+  return error_codes::OK;
+}
+
+/**
+ * Multi-chain version of HMC with NUTS with adaptation
+ */
+template <class Model>
+int hmc_nuts_diag_e_adapt(
+    Model& model, size_t num_chains,
+    const std::vector<const stan::io::var_context*>& init,
+    const std::vector<const stan::io::var_context*>* init_inv_metric = nullptr,
+    unsigned int random_seed = 0, unsigned int init_chain_id = 1,
+    double init_radius = 0, int num_warmup = 1000, int num_samples = 1000,
+    int num_thin = 1, bool save_warmup = false, int refresh = 100,
+    double stepsize = 1.0, double stepsize_jitter = 0.0, int max_depth = 10,
+    double delta = 0.8, double gamma = 0.05, double kappa = 0.75,
+    double t0 = 10.0, unsigned int init_buffer = 75,
+    unsigned int term_buffer = 50, unsigned int window = 25,
+    callbacks::interrupt* interrupt_ptr = nullptr,
+    callbacks::logger* logger_ptr = nullptr,
+    std::vector<callbacks::dispatcher>* dispatchers_ptr = nullptr) {
+  // default callbacks, in case callback args are nullptr
+  callbacks::interrupt default_interrupt;
+  callbacks::logger default_logger;
+  std::vector<callbacks::dispatcher> default_dispatchers(num_chains);
+
+  callbacks::interrupt& interrupt
+      = interrupt_ptr ? *interrupt_ptr : default_interrupt;
+  callbacks::logger& logger = logger_ptr ? *logger_ptr : default_logger;
+  std::vector<callbacks::dispatcher>& dispatchers
+      = dispatchers_ptr ? *dispatchers_ptr : default_dispatchers;
+
+  // Create default metrics if none provided
+  std::vector<std::unique_ptr<stan::io::array_var_context>> default_metrics;
+  std::vector<const stan::io::var_context*> metrics_to_use;
+
+  if (!init_inv_metric) {
+    // No metrics provided, create default unit metrics
+    default_metrics.reserve(num_chains);
+    metrics_to_use.reserve(num_chains);
+
+    for (size_t i = 0; i < num_chains; ++i) {
+      default_metrics.emplace_back(
+          std::make_unique<stan::io::array_var_context>(
+              create_default_inv_metric(model.num_params_r())));
+      metrics_to_use.push_back(default_metrics.back().get());
+    }
+  } else {
+    // Use the provided metrics
+    metrics_to_use = *init_inv_metric;
+  }
+
+  if (num_chains == 1) {
+    return hmc_nuts_diag_e_adapt(
+        model, *init[0], metrics_to_use[0], random_seed, init_chain_id,
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, &interrupt, &logger, &dispatchers[0]);
+  }
+
+  // Ensure we have a dispatcher for each chain
+  if (dispatchers.size() < num_chains) {
+    std::stringstream ss;
+    ss << "Number of dispatchers (" << dispatchers.size()
+       << ") is less than number of chains (" << num_chains << ")";
+    throw std::invalid_argument(ss.str());
+  }
+
+  using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, stan::rng_t>;
+  std::vector<stan::rng_t> rngs;
+  rngs.reserve(num_chains);
+  std::vector<std::vector<double>> cont_vectors;
+  cont_vectors.reserve(num_chains);
+  std::vector<sample_t> samplers;
+  samplers.reserve(num_chains);
+
+  try {
+    for (size_t i = 0; i < num_chains; ++i) {
+      rngs.emplace_back(util::create_rng(random_seed, init_chain_id + i));
+      cont_vectors.emplace_back(util::initialize(
+          model, *init[i], rngs[i], init_radius, true, logger, dispatchers[i]));
+      samplers.emplace_back(model, rngs[i]);
+
+      Eigen::VectorXd inv_metric = util::read_diag_inv_metric(
+          *metrics_to_use[i], model.num_params_r(), logger);
+      util::validate_diag_inv_metric(inv_metric, logger);
+
+      samplers[i].set_metric(inv_metric);
+      samplers[i].set_nominal_stepsize(stepsize);
+      samplers[i].set_stepsize_jitter(stepsize_jitter);
+      samplers[i].set_max_depth(max_depth);
+
+      samplers[i].get_stepsize_adaptation().set_mu(log(10 * stepsize));
+      samplers[i].get_stepsize_adaptation().set_delta(delta);
+      samplers[i].get_stepsize_adaptation().set_gamma(gamma);
+      samplers[i].get_stepsize_adaptation().set_kappa(kappa);
+      samplers[i].get_stepsize_adaptation().set_t0(t0);
+      samplers[i].set_window_params(num_warmup, init_buffer, term_buffer,
+                                    window, logger);
+    }
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
+
+  try {
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, num_chains, 1),
+        [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
+         init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
+         &dispatchers, &cont_vectors](const tbb::blocked_range<size_t>& r) {
+          for (size_t i = r.begin(); i != r.end(); ++i) {
+            util::run_adaptive_sampler(
+                samplers[i], model, cont_vectors[i], num_warmup, num_samples,
+                num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
+                dispatchers[i], init_chain_id + i, num_chains);
+          }
+        },
+        tbb::simple_partitioner());
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::SOFTWARE;
+  }
+
+  return error_codes::OK;
+}
+
+/* ** Old methods, per-arg writer ** */
+
 /**
  * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
  * with a pre-specified diagonal metric and saves adapted tuning parameters.

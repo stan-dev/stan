@@ -66,6 +66,8 @@ class base_hmc : public base_mcmc {
 
   /**
    * write stepsize and elements of mass matrix as a JSON object
+   *
+   * @param[in,out] struct_writer structured_writer
    */
   void write_sampler_state_struct(callbacks::structured_writer& struct_writer) {
     struct_writer.begin_record();
@@ -73,6 +75,22 @@ class base_hmc : public base_mcmc {
     struct_writer.write("metric_type", z_.metric_type());
     struct_writer.write("inv_metric", z_.inv_e_metric_);
     struct_writer.end_record();
+  }
+
+  /**
+   * write stepsize and elements of mass matrix as a JSON object
+   *
+   * @param[in,out] dispatcher The dispatcher to write to
+   */
+  void dispatch_sampler_state(callbacks::dispatcher& dispatcher) {
+    dispatcher.begin_record(callbacks::info_type::METRIC);
+    dispatcher.dispatch(callbacks::info_type::METRIC, "stepsize",
+                        get_nominal_stepsize());
+    dispatcher.dispatch(callbacks::info_type::METRIC, "metric_type",
+                        z_.metric_type());
+    dispatcher.dispatch(callbacks::info_type::METRIC, "inv_metric",
+                        z_.inv_e_metric_);
+    dispatcher.end_record(callbacks::info_type::METRIC);
   }
 
   void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
