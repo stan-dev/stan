@@ -54,8 +54,6 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
 
-  std::cout << "run sampler" << std::endl;
-
   sampler.engage_adaptation();
   try {
     sampler.z().q = cont_params;
@@ -65,16 +63,13 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
     logger.error(e.what());
     return;
   }
-  std::cout << "initialized stepsize" << std::endl;
 
   stan::mcmc::sample s(cont_params, 0, 0);
   size_t num_model_values = 0;
 
   stan::services::util::write_sample_header(s, sampler, model, dispatcher,
                                             num_model_values);
-  std::cout << "wrote header" << std::endl;
   stan::services::util::write_diagnostics_header(s, sampler, model, dispatcher);
-  std::cout << "wrote diagnoatics header" << std::endl;
 
   auto start_warm = std::chrono::steady_clock::now();
 
@@ -89,8 +84,6 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                             .count()
                         / 1000.0;
   sampler.disengage_adaptation();
-  std::cout << "adaptation finished" << std::endl;
-
   util::write_adapt_finish(dispatcher);
   sampler.dispatch_sampler_state(dispatcher);
 

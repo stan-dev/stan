@@ -23,6 +23,20 @@ namespace callbacks {
  */
 
 /**
+ * Custom deleter that doesn't delete the pointer.
+ *
+ * This is used to create unique_ptr wrappers around stream pointers that are
+ * already managed by shared_ptr objects. The writers need to take ownership
+ * via unique_ptr, but we don't want double-deletion when the dispatcher is
+ * destroyed. Safe because the shared_ptr in output_streams maintains the
+ * actual ownership and controls the lifetime of these streams.
+ */
+struct deleter_noop {
+  template <typename T>
+  void operator()(T* ptr) const {}
+};
+
+/**
  * Enum `info_type` holds output type labels which are used by
  * the dispatcher class to map outputs to output channels.
  */

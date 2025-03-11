@@ -317,32 +317,24 @@ TEST_F(DispatcherFunctionsTest, HMCNUTSDiagEAdapt) {
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       &interrupt, &logger, &dispatcher);
-  // std::vector<std::string> logs = logger.return_all_logs();
-  // for (std::string log : logs) {
-  //   std::cout << log << std::endl;
-  // }
 
   // Check that sampling completed successfully
   EXPECT_EQ(result, stan::services::error_codes::OK);
 
   // Check that we have output in the init stream
   std::string init_output = init_stream->str();
-  std::cout << "inits" << std::endl << init_output << std::endl;
   EXPECT_FALSE(init_output.empty());
 
   // Check that we have output in the sample stream
   std::string sample_output = sample_stream->str();
-  std::cout << "sample" << std::endl << sample_output << std::endl;
   EXPECT_FALSE(sample_output.empty());
 
   // Check that we have output in the diagnostic stream
   std::string diag_output = diagnostic_stream->str();
-  std::cout << "diags" << std::endl << diag_output << std::endl;
   EXPECT_FALSE(diag_output.empty());
 
   // Check that we have metric output
   std::string metric_output = metric_stream->str();
-  std::cout << "metric" << std::endl << metric_output << std::endl;
   EXPECT_FALSE(metric_output.empty());
 
   // Count the number of lines in the sample output
