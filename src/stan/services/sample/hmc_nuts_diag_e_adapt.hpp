@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DIAG_E_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DIAG_E_ADAPT_HPP
 
+#include <stan/callbacks/dispatcher.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/structured_writer.hpp>
@@ -94,8 +95,8 @@ int hmc_nuts_diag_e_adapt(
   Eigen::VectorXd inv_metric;
 
   try {
-    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
-                                   dispatcher);
+    cont_vector = util::initialize_dispatch(model, init, rng, init_radius, true,
+                                            logger, dispatcher);
     // locally-scoped default metric
     stan::io::array_var_context default_metric
         = create_default_inv_metric(model.num_params_r());
@@ -214,7 +215,7 @@ int hmc_nuts_diag_e_adapt(
   try {
     for (size_t i = 0; i < num_chains; ++i) {
       rngs.emplace_back(util::create_rng(random_seed, init_chain_id + i));
-      cont_vectors.emplace_back(util::initialize(
+      cont_vectors.emplace_back(util::initialize_dispatch(
           model, *init[i], rngs[i], init_radius, true, logger, dispatchers[i]));
       samplers.emplace_back(model, rngs[i]);
 

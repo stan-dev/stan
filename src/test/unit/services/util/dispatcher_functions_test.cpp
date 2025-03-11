@@ -62,7 +62,7 @@ TEST_F(DispatcherFunctionsTest, WriteSampleHeader) {
 
   stan::rng_t rng = stan::services::util::create_rng(seed, chain);
 
-  std::vector<double> cont_vector = stan::services::util::initialize(
+  std::vector<double> cont_vector = stan::services::util::initialize_dispatch(
       model, context, rng, init_radius, false, logger, dispatcher);
 
   stan::mcmc::adapt_diag_e_nuts<stan_model, stan::rng_t> sampler(model, rng);
@@ -97,7 +97,7 @@ TEST_F(DispatcherFunctionsTest, WriteSample) {
 
   stan::rng_t rng = stan::services::util::create_rng(seed, chain);
 
-  std::vector<double> cont_vector = stan::services::util::initialize(
+  std::vector<double> cont_vector = stan::services::util::initialize_dispatch(
       model, context, rng, init_radius, false, logger, dispatcher);
 
   stan::mcmc::adapt_diag_e_nuts<stan_model, stan::rng_t> sampler(model, rng);
@@ -152,7 +152,7 @@ TEST_F(DispatcherFunctionsTest, WriteDiagnostic) {
 
   stan::rng_t rng = stan::services::util::create_rng(seed, chain);
 
-  std::vector<double> cont_vector = stan::services::util::initialize(
+  std::vector<double> cont_vector = stan::services::util::initialize_dispatch(
       model, context, rng, init_radius, false, logger, dispatcher);
 
   stan::mcmc::adapt_diag_e_nuts<stan_model, stan::rng_t> sampler(model, rng);
@@ -242,7 +242,7 @@ TEST_F(DispatcherFunctionsTest, GenerateTransitions) {
 
   stan::rng_t rng = stan::services::util::create_rng(seed, chain);
 
-  std::vector<double> cont_vector = stan::services::util::initialize(
+  std::vector<double> cont_vector = stan::services::util::initialize_dispatch(
       model, context, rng, init_radius, false, logger, dispatcher);
 
   stan::mcmc::adapt_diag_e_nuts<stan_model, stan::rng_t> sampler(model, rng);
