@@ -143,7 +143,8 @@ void log_initialization_failure(bool is_fully_initialized, bool any_initialized,
   } else {
     std::stringstream msg;
     msg << "Initialization between (-" << init_radius << ", " << init_radius
-        << ") failed after" << " " << max_init_tries << " attempts. ";
+        << ") failed after"
+        << " " << max_init_tries << " attempts. ";
     logger.error(msg);
     logger.error(
         " Try specifying initial values,"
