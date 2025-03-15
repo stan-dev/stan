@@ -1,10 +1,9 @@
-#ifndef STAN_RUN_FIT_DEFAULTS_HPP
-#define STAN_RUN_FIT_DEFAULTS_HPP
+#ifndef STAN_RUN_MCMC_ITER_DEFAULTS_HPP
+#define STAN_RUN_MCMC_ITER_DEFAULTS_HPP
 
 #include <stan/run/config.hpp>
 #include <string>
 #include <stdexcept>
-#include <cmath>
 
 namespace stan {
 namespace run {

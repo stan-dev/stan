@@ -2,10 +2,8 @@
 #define STAN_RUN_NUTS_HMC_DEFAULTS_HPP
 
 #include <stan/run/config.hpp>
-#include <stan/run/nuts_hmc_defaults.hpp>
 #include <string>
 #include <stdexcept>
-#include <cmath>
 
 namespace stan {
 namespace run {

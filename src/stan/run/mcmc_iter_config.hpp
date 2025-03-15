@@ -1,8 +1,8 @@
-#ifndef STAN_RUN_ITERATION_CONFIG_HPP
-#define STAN_RUN_ITERATION_CONFIG_HPP
+#ifndef STAN_RUN_MCMC_ITER_CONFIG_HPP
+#define STAN_RUN_MCMC_ITER_CONFIG_HPP
 
 #include <stan/callbacks/logger.hpp>
-#include <stan/run/iteration_defaults.hpp>
+#include <stan/run/mcmc_iter_defaults.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -12,17 +12,17 @@ namespace stan {
 namespace run {
 
 /**
- * Configuration class for sampling iterations parameters.
+ * Configuration class for mcmc sampler iterations parameters.
  * 
  * This class holds all configuration parameters related to
  * iteration counts, thinning, and output frequency.
  */
-class iteration_config {
+class mcmc_iter_config {
  public:
   /**
    * Default constructor with default values from parameter classes
    */
-  iteration_config() 
+  mcmc_iter_config() 
     : num_warmup_param_(),
       num_samples_param_(),
       save_warmup_param_(),
@@ -33,7 +33,7 @@ class iteration_config {
   /**
    * Constructor for a completely specified configuration
    */
-  iteration_config(
+  mcmc_iter_config(
       int num_warmup,
       int num_samples,
       bool save_warmup,
@@ -49,14 +49,14 @@ class iteration_config {
   /**
    * Creates a configuration with specified parameters
    */
-  static iteration_config create(
+  static mcmc_iter_config create(
       int num_warmup = num_warmup::default_value(),
       int num_samples = num_samples::default_value(),
       bool save_warmup = save_warmup::default_value(),
       int thin = thin::default_value(),
       int refresh = refresh::default_value()) {
     
-    return iteration_config(num_warmup, num_samples, save_warmup, thin, refresh);
+    return mcmc_iter_config(num_warmup, num_samples, save_warmup, thin, refresh);
   }
 
   /**

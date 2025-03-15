@@ -1,9 +1,9 @@
-#include <stan/run/iteration_config.hpp>
+#include <stan/run/mcmc_iter_config.hpp>
 #include <gtest/gtest.h>
 #include <memory>
 #include <sstream>
 
-class IterationConfigTest : public ::testing::Test {
+class McmcIterConfigTest : public ::testing::Test {
  protected:
   void SetUp() override {
     // Set up a logger for consistency check tests
@@ -27,11 +27,11 @@ class IterationConfigTest : public ::testing::Test {
   std::shared_ptr<std::stringstream> logger_stream;
 };
 
-TEST_F(IterationConfigTest, DefaultConstructor) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, DefaultConstructor) {
+  using stan::run::mcmc_iter_config;
   
   // Create config with default constructor
-  iteration_config config;
+  mcmc_iter_config config;
 
   // Verify all defaults are set correctly
   EXPECT_EQ(1000, config.num_warmup());
@@ -48,11 +48,11 @@ TEST_F(IterationConfigTest, DefaultConstructor) {
   EXPECT_EQ("Period between status output messages.", config.refresh_description());
 }
 
-TEST_F(IterationConfigTest, FullConstructor) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, FullConstructor) {
+  using stan::run::mcmc_iter_config;
   
   // Create config with the full constructor
-  iteration_config config(
+  mcmc_iter_config config(
       500,     // num_warmup
       2000,    // num_samples
       true,    // save_warmup
@@ -68,11 +68,11 @@ TEST_F(IterationConfigTest, FullConstructor) {
   EXPECT_EQ(250, config.refresh());
 }
 
-TEST_F(IterationConfigTest, CreateFactoryMethod) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, CreateFactoryMethod) {
+  using stan::run::mcmc_iter_config;
   
   // Create using factory method with some custom values
-  auto config = iteration_config::create(
+  auto config = mcmc_iter_config::create(
       750,     // num_warmup
       1500,    // num_samples
       true,    // save_warmup
@@ -88,11 +88,11 @@ TEST_F(IterationConfigTest, CreateFactoryMethod) {
   EXPECT_EQ(200, config.refresh());
 }
 
-TEST_F(IterationConfigTest, CreateFactoryMethodDefaults) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, CreateFactoryMethodDefaults) {
+  using stan::run::mcmc_iter_config;
   
   // Create using factory method with defaults
-  auto config = iteration_config::create();
+  auto config = mcmc_iter_config::create();
   
   // Verify settings match defaults
   EXPECT_EQ(1000, config.num_warmup());
@@ -102,11 +102,11 @@ TEST_F(IterationConfigTest, CreateFactoryMethodDefaults) {
   EXPECT_EQ(100, config.refresh());
 }
 
-TEST_F(IterationConfigTest, Setters) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, Setters) {
+  using stan::run::mcmc_iter_config;
   
   // Create default config
-  iteration_config config;
+  mcmc_iter_config config;
   
   // Use setters to modify values
   config.set_num_warmup(250);
@@ -123,11 +123,11 @@ TEST_F(IterationConfigTest, Setters) {
   EXPECT_EQ(25, config.refresh());
 }
 
-TEST_F(IterationConfigTest, ParameterValidationOnSetter) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, ParameterValidationOnSetter) {
+  using stan::run::mcmc_iter_config;
   
   // Create default config
-  iteration_config config;
+  mcmc_iter_config config;
   
   // Test setter validation - Invalid values should throw immediately
   EXPECT_THROW(config.set_num_warmup(-1), std::invalid_argument);
@@ -139,11 +139,11 @@ TEST_F(IterationConfigTest, ParameterValidationOnSetter) {
   EXPECT_NO_THROW(config.set_refresh(-1));
 }
 
-TEST_F(IterationConfigTest, CheckConsistencyWithHighIterations) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, CheckConsistencyWithHighIterations) {
+  using stan::run::mcmc_iter_config;
   
   // Create config with very high iteration count
-  iteration_config config;
+  mcmc_iter_config config;
   config.set_num_warmup(500000);
   config.set_num_samples(1000000);
   
@@ -158,11 +158,11 @@ TEST_F(IterationConfigTest, CheckConsistencyWithHighIterations) {
   EXPECT_NE(std::string::npos, log_output.find("Total number of iterations is very large"));
 }
 
-TEST_F(IterationConfigTest, CheckConsistencyWithHighThinning) {
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, CheckConsistencyWithHighThinning) {
+  using stan::run::mcmc_iter_config;
   
   // Create config with high thinning relative to samples
-  iteration_config config;
+  mcmc_iter_config config;
   config.set_num_samples(100);
   config.set_thin(20);
   
@@ -178,11 +178,11 @@ TEST_F(IterationConfigTest, CheckConsistencyWithHighThinning) {
   EXPECT_NE(std::string::npos, log_output.find("is large relative to number of samples"));
 }
 
-TEST_F(IterationConfigTest, DefaultValuesMatchParamClasses) {
-  // Test that default values in iteration_config match those in parameter classes
-  using stan::run::iteration_config;
+TEST_F(McmcIterConfigTest, DefaultValuesMatchParamClasses) {
+  // Test that default values in mcmc_iter_config match those in parameter classes
+  using stan::run::mcmc_iter_config;
   
-  iteration_config config;
+  mcmc_iter_config config;
   
   EXPECT_EQ(stan::run::num_warmup::default_value(), config.num_warmup());
   EXPECT_EQ(stan::run::num_samples::default_value(), config.num_samples());
