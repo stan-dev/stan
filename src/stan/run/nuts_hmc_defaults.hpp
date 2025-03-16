@@ -9,6 +9,39 @@ namespace stan {
 namespace run {
 
 /**
+ * Initial radius for parameter initialization.
+ */
+class init_radius : public config<double> {
+public:
+  init_radius() 
+    : config<double>(
+        2.0,  // default value
+        "Initial radius for parameter initialization.",
+        [](const double& value) {  // validator
+          if (!(value > 0)) {
+            throw std::invalid_argument("init_radius must be greater than 0.");
+          }
+        }
+      ) {}
+      
+  explicit init_radius(double value) 
+    : config<double>(
+        value,
+        "Initial radius for parameter initialization.",
+        [](const double& value) {
+          if (!(value > 0)) {
+            throw std::invalid_argument("init_radius must be greater than 0.");
+          }
+        }
+      ) {}
+
+  // Static access to default value for use in other constructors
+  static double default_value() { return 2.0; }
+};
+
+
+  
+/**
  * Step size for discrete evolution.
  */
 class stepsize : public config<double> {

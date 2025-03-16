@@ -37,6 +37,7 @@ class nuts_hmc_config {
   nuts_hmc_config() 
     : metric_type_(metric_t::DIAG_E),
       init_inv_metric_(nullptr),
+      init_radius_param_(),
       stepsize_param_(),
       stepsize_jitter_param_(),
       max_depth_param_(),
@@ -55,6 +56,8 @@ class nuts_hmc_config {
    */
   nuts_hmc_config(
       metric_t metric_type,
+      std::shared_ptr<const stan::io::var_context> init_inv_metric,
+      double init_radius,
       double stepsize,
       double stepsize_jitter,
       int max_depth,
@@ -65,10 +68,10 @@ class nuts_hmc_config {
       unsigned int init_buffer,
       unsigned int term_buffer,
       unsigned int window,
-      bool adaptation_engaged,
-      std::shared_ptr<const stan::io::var_context> init_inv_metric = nullptr)
+      bool adaptation_engaged)
     : metric_type_(metric_type),
       init_inv_metric_(init_inv_metric),
+      init_radius_param_(init_radius),
       stepsize_param_(stepsize),
       stepsize_jitter_param_(stepsize_jitter),
       max_depth_param_(max_depth),
@@ -87,12 +90,14 @@ class nuts_hmc_config {
    */
   void configure_sampler(
       metric_t metric_type,
+      std::shared_ptr<const stan::io::var_context> init_inv_metric = nullptr,
+      double init_radius = init_radius::default_value(),
       double stepsize = stepsize::default_value(),
       double stepsize_jitter = stepsize_jitter::default_value(),
-      int max_depth = max_depth::default_value(),
-      std::shared_ptr<const stan::io::var_context> init_inv_metric = nullptr) {
+      int max_depth = max_depth::default_value()) {
     metric_type_ = metric_type;
     init_inv_metric_ = init_inv_metric;
+    init_radius_param_.set_value(init_radius);
     stepsize_param_.set_value(stepsize);
     stepsize_jitter_param_.set_value(stepsize_jitter);
     max_depth_param_.set_value(max_depth);
@@ -125,12 +130,14 @@ class nuts_hmc_config {
    */
   static nuts_hmc_config non_adaptive(
       metric_t metric_type,
+      std::shared_ptr<const stan::io::var_context> init_inv_metric = nullptr,
+      double init_radius = init_radius::default_value(),
       double stepsize = stepsize::default_value(),
       double stepsize_jitter = stepsize_jitter::default_value(),
-      int max_depth = max_depth::default_value(),
-      std::shared_ptr<const stan::io::var_context> init_inv_metric = nullptr) {
+      int max_depth = max_depth::default_value()) {
     nuts_hmc_config config;
-    config.configure_sampler(metric_type, stepsize, stepsize_jitter, max_depth, init_inv_metric);
+    config.configure_sampler(metric_type, init_inv_metric, init_radius,
+			     stepsize, stepsize_jitter, max_depth);
     return config;
   }
 
@@ -139,6 +146,8 @@ class nuts_hmc_config {
    */
   static nuts_hmc_config adaptive(
       metric_t metric_type,
+      std::shared_ptr<const stan::io::var_context> init_inv_metric = nullptr,
+      double init_radius = init_radius::default_value(),
       double stepsize = stepsize::default_value(),
       double stepsize_jitter = stepsize_jitter::default_value(),
       int max_depth = max_depth::default_value(),
@@ -148,10 +157,10 @@ class nuts_hmc_config {
       double t0 = t0::default_value(),
       unsigned int init_buffer = init_buffer::default_value(),
       unsigned int term_buffer = term_buffer::default_value(),
-      unsigned int window = window::default_value(),
-      std::shared_ptr<const stan::io::var_context> init_inv_metric = nullptr) {
+      unsigned int window = window::default_value()) {
     nuts_hmc_config config;
-    config.configure_sampler(metric_type, stepsize, stepsize_jitter, max_depth, init_inv_metric);
+    config.configure_sampler(metric_type, init_inv_metric, init_radius,
+			     stepsize, stepsize_jitter, max_depth);
     config.configure_adaptation(delta, gamma, kappa, t0, init_buffer, 
                                term_buffer, window);
     return config;
@@ -181,6 +190,7 @@ class nuts_hmc_config {
   std::shared_ptr<const stan::io::var_context> init_inv_metric() const { 
     return init_inv_metric_; 
   }
+  double init_radius() const { return init_radius_param_.value(); }
   double stepsize() const { return stepsize_param_.value(); }
   double stepsize_jitter() const { return stepsize_jitter_param_.value(); }
   int max_depth() const { return max_depth_param_.value(); }
@@ -194,6 +204,7 @@ class nuts_hmc_config {
   bool adaptation_engaged() const { return adaptation_engaged_param_.value(); }
   
   // Parameter description getters
+  std::string init_radius_description() const { return init_radius_param_.description(); }
   std::string stepsize_description() const { return stepsize_param_.description(); }
   std::string stepsize_jitter_description() const { return stepsize_jitter_param_.description(); }
   std::string max_depth_description() const { return max_depth_param_.description(); }
@@ -213,6 +224,7 @@ class nuts_hmc_config {
   }
   void set_stepsize(double stepsize) { stepsize_param_.set_value(stepsize); }
   void set_stepsize_jitter(double stepsize_jitter) { stepsize_jitter_param_.set_value(stepsize_jitter); }
+  void set_init_radius(double init_radius) { init_radius_param_.set_value(init_radius); }
   void set_max_depth(int max_depth) { max_depth_param_.set_value(max_depth); }
   void set_delta(double delta) { delta_param_.set_value(delta); }
   void set_gamma(double gamma) { gamma_param_.set_value(gamma); }
@@ -228,6 +240,7 @@ class nuts_hmc_config {
   std::shared_ptr<const stan::io::var_context> init_inv_metric_;
   
   // Parameter objects that encapsulate default values, validation, and descriptions
+  stan::run::init_radius init_radius_param_;
   stan::run::stepsize stepsize_param_;
   stan::run::stepsize_jitter stepsize_jitter_param_;
   stan::run::max_depth max_depth_param_;
