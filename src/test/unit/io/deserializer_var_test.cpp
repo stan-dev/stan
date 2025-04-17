@@ -640,6 +640,50 @@ TEST(deserializer_vector, sum_to_zero_jacobian) {
   }
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
 }
+
+TEST(deserializer_matrix, sum_to_zero_constrain) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp = 0;
+  Eigen::Matrix<stan::math::var, Eigen::Dynamic, Eigen::Dynamic> reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_matrix(theta, 2, 2));
+  Eigen::Matrix<stan::math::var, Eigen::Dynamic, Eigen::Dynamic> phi(
+      deserializer.read_constrain_sum_to_zero<
+          Eigen::Matrix<stan::math::var, Eigen::Dynamic, Eigen::Dynamic>,
+          false>(lp, 3, 3));
+  for (int n = 0; n < phi.size(); ++n) {
+    EXPECT_FLOAT_EQ(reference(n).val(), phi(n).val());
+  }
+}
+
+TEST(deserializer_matrix, sum_to_zero_jacobian) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp = 0.0;
+  stan::math::var lp_ref = 0.0;
+  Eigen::Matrix<stan::math::var, Eigen::Dynamic, Eigen::Dynamic> reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_matrix(theta, 2, 2),
+                                          lp_ref);
+  Eigen::Matrix<stan::math::var, Eigen::Dynamic, Eigen::Dynamic> phi(
+      deserializer.read_constrain_sum_to_zero<
+          Eigen::Matrix<stan::math::var, Eigen::Dynamic, Eigen::Dynamic>, true>(
+          lp, 3, 3));
+  for (int n = 0; n < phi.size(); ++n) {
+    EXPECT_FLOAT_EQ(reference(n).val(), phi(n).val());
+  }
+  EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
+}
+
 // ordered
 
 TEST(deserializer_vector, ordered_constrain) {

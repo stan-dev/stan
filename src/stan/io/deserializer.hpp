@@ -583,20 +583,19 @@ class deserializer {
 
   /**
    * Return the next zero sum vector of the specified size (using one fewer
-   * unconstrained scalars), incrementing the specified reference with the
-   * log absolute Jacobian determinant (no adjustment, in this case).
+   * unconstrained scalars). This particular transformation is linear, not
+   * requiring a Jacobian adjustment.
    *
-   * <p>See <code>stan::math::sum_to_zero_constrain(Eigen::Matrix,T&)</code>.
+   * <p>See <code>stan::math::sum_to_zero_constrain(Eigen::Matrix, T&)</code>.
    *
    * @tparam Ret The type to return.
    * @tparam Jacobian Whether to increment the log of the absolute Jacobian
    * determinant of the transform.
    * @tparam LP Type of log probability.
-   * @tparam Sizes A parameter pack of integral types.
-   * @param lp The reference to the variable holding the log
+   * @param lp (Unused) The reference to the variable holding the log density.
    * @param size Number of cells in zero sum vector to generate.
    * @return The next zero sum of the specified size.
-   * @throws std::invalid_argument if number of dimensions (`k`) is zero
+   * @throws std::invalid_argument if `size` is zero
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr>
@@ -607,9 +606,36 @@ class deserializer {
   }
 
   /**
+   * Return the next zero sum matrix of the specified dimensions (requires
+   * (N - 1) * (M - 1) unconstrained scalars).
+   * This particular transformation is linear, not requiring a Jacobian
+   * adjustment.
+   *
+   * <p>See <code>stan::math::sum_to_zero_constrain(Eigen::Matrix, T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @param lp (Unused) The reference to the variable holding the log density.
+   * @param N Number of rows in zero sum matrix to generate.
+   * @param M Number of columns in zero sum matrix to generate.
+   * @return The next zero sum of the specified size.
+   * @throws std::invalid_argument either `N` or `M` is zero
+   */
+  template <typename Ret, bool Jacobian, typename LP,
+            require_matrix_t<Ret>* = nullptr>
+  inline auto read_constrain_sum_to_zero(LP& lp, size_t N, size_t M) {
+    stan::math::check_positive("read_sum_to_zero", "N", N);
+    stan::math::check_positive("read_sum_to_zero", "M", M);
+    return stan::math::sum_to_zero_constrain<Jacobian>(
+        this->read<conditional_var_val_t<Ret, matrix_t>>(N - 1, M - 1), lp);
+  }
+
+  /**
    * Return the next zero sum vector of the specified size (using one fewer
-   * unconstrained scalars), incrementing the specified reference with the
-   * log absolute Jacobian determinant (no adjustment, in this case).
+   * unconstrained scalars). This particular transformation is linear, not
+   * requiring a Jacobian adjustment.
    *
    * <p>See <code>stan::math::sum_to_zero_constrain(Eigen::Matrix,T&)</code>.
    *
@@ -1219,10 +1245,11 @@ class deserializer {
   }
 
   /**
-   * Read a serialized sum_to_zero vector and unconstrain it
+   * Read a serialized sum_to_zero vector and unconstrain it.
    *
    * @tparam Ret Type of output
-   * @return Unconstrained vector
+   * @param size Vector size
+   * @return Unconstrained vector of length (size - 1)
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
   inline auto read_free_sum_to_zero(size_t size) {
@@ -1230,7 +1257,20 @@ class deserializer {
   }
 
   /**
-   * Read serialized zero-sum vectors and unconstrain them
+   * Read a serialized sum_to_zero matrix and unconstrain it.
+   *
+   * @tparam Ret Type of output
+   * @param N Rows of matrix
+   * @param M Cols of matrix
+   * @return Unconstrained matrix of size (N-1) x (M-1)
+   */
+  template <typename Ret, require_matrix_t<Ret>* = nullptr>
+  inline auto read_free_sum_to_zero(size_t N, size_t M) {
+    return stan::math::sum_to_zero_free(this->read<Ret>(N, M));
+  }
+
+  /**
+   * Read serialized zero-sum vectors and unconstrain them.
    *
    * @tparam Ret Type of output
    * @tparam Sizes Types of dimensions of output

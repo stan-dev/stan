@@ -522,6 +522,15 @@ TEST(serializer_vectorized, write_free_sum_to_zero) {
                   SumToZeroConstrain>(std::make_tuple(3, 2, 4));
 }
 
+TEST(serializer_vectorized, write_free_sum_to_zero_mat) {
+  using stan::test::serializer_test;
+  serializer_test<Eigen::MatrixXd, SumToZeroConstrain>(std::make_tuple(4, 5));
+  serializer_test<std::vector<Eigen::MatrixXd>, SumToZeroConstrain>(
+      std::make_tuple(2, 4, 3));
+  serializer_test<std::vector<std::vector<Eigen::MatrixXd>>,
+                  SumToZeroConstrain>(std::make_tuple(3, 2, 4, 2));
+}
+
 // ordered
 
 template <typename Ret>
@@ -692,7 +701,7 @@ struct StochasticCol {
     };
   }
 };
-TEST(deserializer_vector, read_stochastic_column_matrix) {
+TEST(serializer_vectorized, read_stochastic_column_matrix) {
   using stan::test::serializer_test;
   serializer_test<Eigen::MatrixXd, StochasticCol>(std::make_tuple(3, 3));
   serializer_test<std::vector<Eigen::MatrixXd>, StochasticCol>(
@@ -716,7 +725,7 @@ struct StochasticRow {
     };
   }
 };
-TEST(deserializer_vector, read_stochastic_row_matrix) {
+TEST(serializer_vectorized, read_stochastic_row_matrix) {
   using stan::test::serializer_test;
   serializer_test<Eigen::MatrixXd, StochasticRow>(std::make_tuple(3, 3));
   serializer_test<std::vector<Eigen::MatrixXd>, StochasticRow>(
