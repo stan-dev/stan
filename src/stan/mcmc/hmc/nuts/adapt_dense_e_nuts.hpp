@@ -32,7 +32,7 @@ class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
       bool update = this->covar_adaptation_.learn_covariance(
           this->z_.inv_e_metric_, this->z_.q);
 
-      if (update) {
+      if (update && this->covar_adaptation_.adapt_term_buffer_ > 0) {
         this->init_stepsize(logger);
 
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
