@@ -114,7 +114,7 @@ class windowed_adaptation : public base_adaptation {
   unsigned int adapt_term_buffer_;
   unsigned int adapt_base_window_;
 
-protected:
+ protected:
   std::string estimator_name_;
 
   unsigned int adapt_window_counter_;
