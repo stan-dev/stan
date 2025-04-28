@@ -85,7 +85,7 @@ class windowed_adaptation : public base_adaptation {
 
   bool end_adaptation_window() {
     return (adapt_window_counter_ == adapt_next_window_)
-           && (adapt_window_counter_ != num_warmup_);
+      && (adapt_window_counter_ != num_warmup_ - 1);
   }
 
   void compute_next_window() {
@@ -109,13 +109,13 @@ class windowed_adaptation : public base_adaptation {
     }
   }
 
+protected:
+  std::string estimator_name_;
+
   unsigned int num_warmup_;
   unsigned int adapt_init_buffer_;
   unsigned int adapt_term_buffer_;
   unsigned int adapt_base_window_;
-
-protected:
-  std::string estimator_name_;
 
   unsigned int adapt_window_counter_;
   unsigned int adapt_next_window_;
