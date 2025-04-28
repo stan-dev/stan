@@ -225,6 +225,9 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, term_buffer_0) {
       logger, init, parameter, diagnostic);
 
   EXPECT_EQ(0, logger.call_count_error());
+  int num_output_lines = (num_warmup + num_samples) / num_thin;
+  EXPECT_EQ(num_output_lines, parameter.call_count("vector_double"));
+
   std::vector<std::string> messages = parameter.string_values();
   for (auto msg : messages) {
     if (msg.find("Step size") != std::string::npos) {
