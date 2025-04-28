@@ -315,3 +315,43 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, no_stepsize_adapt) {
     }
   }
 }
+
+TEST_F(ServicesSampleHmcNutsDiagEAdapt, no_stepsize_adapt_stretch) {
+  unsigned int random_seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int num_warmup = 150;
+  int num_samples = 10;
+  int num_thin = 1;
+  bool save_warmup = true;
+  int refresh = 0;
+  double stepsize = 1.0;
+  double stepsize_jitter = 0.0;
+  int max_depth = 10;
+  double delta = .8;
+  double gamma = .05;
+  double kappa = .75;
+  double t0 = 10;
+  unsigned int init_buffer = 0;
+  unsigned int term_buffer = 0;
+  unsigned int window = 40;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+
+  stan::services::sample::hmc_nuts_diag_e_adapt(
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+      logger, init, parameter, diagnostic);
+
+  EXPECT_EQ(0, logger.call_count_error());
+  int num_output_lines = (num_warmup + num_samples) / num_thin;
+  EXPECT_EQ(num_output_lines, parameter.call_count("vector_double"));
+
+  std::vector<std::string> messages = parameter.string_values();
+  for (auto msg : messages) {
+    if (msg.find("Step size") != std::string::npos) {
+      EXPECT_NE("Step size = 1", msg);
+    }
+  }
+}
