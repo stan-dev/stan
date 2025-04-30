@@ -2,20 +2,50 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <gtest/gtest.h>
 
-TEST(McmcWindowedAdaptation, set_window_params1) {
+TEST(McmcWindowedAdaptation, sampler_defaults) {
   stan::test::unit::instrumented_logger logger;
-
   stan::mcmc::windowed_adaptation adapter("test");
 
-  adapter.set_window_params(10, 1, 1, 1, logger);
-  ASSERT_EQ(logger.call_count(), logger.call_count_info());
-  EXPECT_EQ(1, logger.find_info("WARNING: No test estimation is"));
-  EXPECT_EQ(1, logger.find_info("performed for num_warmup < 20"));
+  adapter.set_window_params(1000, 75, 50, 25, logger);
+  ASSERT_EQ(0, logger.call_count());
+  ASSERT_EQ(0, logger.call_count_info());
+  EXPECT_FALSE(adapter.in_phase2_window());
+  EXPECT_FALSE(adapter.end_phase2_window());
 }
 
-TEST(McmcWindowedAdaptation, set_window_params2) {
+TEST(McmcWindowedAdaptation, num_warmup_10) {
   stan::test::unit::instrumented_logger logger;
+  stan::mcmc::windowed_adaptation adapter("test");
+  adapter.set_window_params(10, 1, 1, 1, logger);
+  ASSERT_EQ(0, logger.call_count());
+  ASSERT_EQ(0, logger.call_count_info());
 
+  EXPECT_FALSE(adapter.in_phase2_window());
+  EXPECT_FALSE(adapter.end_phase2_window());
+}
+
+TEST(McmcWindowedAdaptation, num_warmup_10_reduce) {
+  stan::test::unit::instrumented_logger logger;
+  stan::mcmc::windowed_adaptation adapter("test");
+  adapter.set_window_params(10, 75, 25, 50, logger);
+  ASSERT_EQ(logger.call_count(), logger.call_count_info());
+
+  EXPECT_FALSE(adapter.in_phase2_window());
+  EXPECT_FALSE(adapter.end_phase2_window());
+}
+
+TEST(McmcWindowedAdaptation, num_warmup_1) {
+  stan::test::unit::instrumented_logger logger;
+  stan::mcmc::windowed_adaptation adapter("test");
+  adapter.set_window_params(1, 75, 25, 50, logger);
+
+  EXPECT_FALSE(adapter.in_phase2_window());
+  EXPECT_TRUE(adapter.end_phase2_window());
+}
+
+
+TEST(McmcWindowedAdaptation, sampler_defaults_100) {
+  stan::test::unit::instrumented_logger logger;
   stan::mcmc::windowed_adaptation adapter("test");
 
   adapter.set_window_params(100, 75, 50, 25, logger);
@@ -34,15 +64,4 @@ TEST(McmcWindowedAdaptation, set_window_params2) {
   EXPECT_EQ(1, logger.find_info("           init_buffer = 15"));
   EXPECT_EQ(1, logger.find_info("           adapt_window = 75"));
   EXPECT_EQ(1, logger.find_info("           term_buffer = 10"));
-}
-
-TEST(McmcWindowedAdaptation, set_window_params3) {
-  stan::test::unit::instrumented_logger logger;
-
-  stan::mcmc::windowed_adaptation adapter("test");
-
-  adapter.set_window_params(1000, 75, 50, 25, logger);
-
-  ASSERT_EQ(0, logger.call_count());
-  ASSERT_EQ(0, logger.call_count_info());
 }

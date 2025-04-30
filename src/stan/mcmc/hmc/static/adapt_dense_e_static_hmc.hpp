@@ -32,16 +32,17 @@ class adapt_dense_e_static_hmc : public dense_e_static_hmc<Model, BaseRNG>,
                                                 s.accept_stat());
       this->update_L_();
 
-      bool update = this->covar_adaptation_.learn_covariance(
-          this->z_.inv_e_metric_, this->z_.q);
+      if (this->covar_adaptation_.in_phase2_window())
+        this->covar_adaptation_.learn_covariance(this->z_.inv_e_metric_,
+                                                 this->z_.q);
 
-      if (update) {
+      if (this->covar_adaptation_.end_phase2_window()) {
         this->init_stepsize(logger);
         this->update_L_();
-
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
-        this->stepsize_adaptation_.restart();
+        this->covar_adaptation_.compute_next_window();
       }
+      this->covar_adaptation_.cur_iter_++;
     }
     return s;
   }

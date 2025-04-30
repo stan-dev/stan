@@ -14,13 +14,11 @@ class var_adaptation : public windowed_adaptation {
   explicit var_adaptation(int n)
       : windowed_adaptation("variance"), estimator_(n) {}
 
-  bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
-    if (adaptation_window())
+  void learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
+    if (in_phase2_window())
       estimator_.add_sample(q);
 
-    if (end_adaptation_window()) {
-      compute_next_window();
-
+    if (end_phase2_window()) {
       estimator_.sample_variance(var);
 
       double n = static_cast<double>(estimator_.num_samples());
@@ -34,15 +32,7 @@ class var_adaptation : public windowed_adaptation {
             "unconstrained space; this may happen when the posterior density "
             "function is too wide or improper. "
             "There may be problems with your model specification.");
-
-      estimator_.restart();
-
-      ++adapt_window_counter_;
-      return true;
     }
-
-    ++adapt_window_counter_;
-    return false;
   }
 
  protected:
