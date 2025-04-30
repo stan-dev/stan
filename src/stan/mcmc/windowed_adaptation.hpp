@@ -46,14 +46,16 @@ class windowed_adaptation : public base_adaptation {
       logger.info(
           "WARNING: There aren't enough warmup "
           "iterations to fit the");
-      logger.info("         three stages of adaptation as currently"
-                  " configured.");
+      logger.info(
+          "         three stages of adaptation as currently"
+          " configured.");
 
       num_warmup_ = num_warmup;
       end_phase1_ = 0.15 * num_warmup;  // C++ rounds down
       start_phase3_ = num_warmup - (0.10 * num_warmup);
-      cur_phase2_ = (base_window <= 0.75 * num_warmup) ?
-                     base_window : start_phase3_ - end_phase1_;
+      cur_phase2_ = (base_window <= 0.75 * num_warmup)
+                        ? base_window
+                        : start_phase3_ - end_phase1_;
       cur_phase2_end_ = end_phase1_ + cur_phase2_;
 
       logger.info(
@@ -83,9 +85,7 @@ class windowed_adaptation : public base_adaptation {
     return (cur_iter_ > end_phase1_ && cur_iter_ < start_phase3_);
   }
 
-  bool end_phase2_window() {
-    return (cur_iter_ == cur_phase2_end_);
-  }
+  bool end_phase2_window() { return (cur_iter_ == cur_phase2_end_); }
 
   // find next window endpoint
   // double window size if possible, else use remaining phase2 iters
