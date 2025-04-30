@@ -43,7 +43,6 @@ TEST(McmcWindowedAdaptation, num_warmup_1) {
   EXPECT_TRUE(adapter.end_phase2_window());
 }
 
-
 TEST(McmcWindowedAdaptation, sampler_defaults_100) {
   stan::test::unit::instrumented_logger logger;
   stan::mcmc::windowed_adaptation adapter("test");

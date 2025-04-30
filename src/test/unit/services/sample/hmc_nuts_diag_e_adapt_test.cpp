@@ -83,13 +83,13 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, parameter_checks) {
       delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
       logger, init, parameter, diagnostic);
 
-  std::vector<std::vector<std::string> > parameter_names;
+  std::vector<std::vector<std::string>> parameter_names;
   parameter_names = parameter.vector_string_values();
-  std::vector<std::vector<double> > parameter_values;
+  std::vector<std::vector<double>> parameter_values;
   parameter_values = parameter.vector_double_values();
-  std::vector<std::vector<std::string> > diagnostic_names;
+  std::vector<std::vector<std::string>> diagnostic_names;
   diagnostic_names = diagnostic.vector_string_values();
-  std::vector<std::vector<double> > diagnostic_values;
+  std::vector<std::vector<double>> diagnostic_values;
   diagnostic_values = diagnostic.vector_double_values();
 
   // Expectations of parameter parameter names.
@@ -144,13 +144,13 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_sizes) {
       delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
       logger, init, parameter, diagnostic);
 
-  std::vector<std::vector<std::string> > parameter_names;
+  std::vector<std::vector<std::string>> parameter_names;
   parameter_names = parameter.vector_string_values();
-  std::vector<std::vector<double> > parameter_values;
+  std::vector<std::vector<double>> parameter_values;
   parameter_values = parameter.vector_double_values();
-  std::vector<std::vector<std::string> > diagnostic_names;
+  std::vector<std::vector<std::string>> diagnostic_names;
   diagnostic_names = diagnostic.vector_string_values();
-  std::vector<std::vector<double> > diagnostic_values;
+  std::vector<std::vector<double>> diagnostic_values;
   diagnostic_values = diagnostic.vector_double_values();
 
   EXPECT_EQ(return_code, 0);
