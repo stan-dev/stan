@@ -25,6 +25,12 @@ TEST(HmcConfigTest, Constructor_2) {
 }
 
 TEST(HmcConfigTest, Constructor_bad) {
+  EXPECT_THROW(auto hmc_config = stan::run::hmc_config::create()
+	       .stepsize(-0.1).max_depth(-11).build(),
+	       std::invalid_argument);
+}
+
+TEST(HmcConfigTest, setters_bad) {
   auto hmc_config = stan::run::hmc_config::create();
   EXPECT_THROW(hmc_config.stepsize(0.-1), std::invalid_argument);
   EXPECT_THROW(hmc_config.stepsize_jitter(0.-1), std::invalid_argument);

@@ -15,28 +15,28 @@ namespace run {
 
 /**
  * Configuration class for output channels in Stan.
- * 
+ *
  * This class organizes output streams for both single-chain and multi-chain
- * sampling runs. It handles loggers and writers for samples, diagnostics, 
+ * sampling runs. It handles loggers and writers for samples, diagnostics,
  * initialization values, and metric parameters.
- * 
+ *
  * The writers are expected to be unique_stream_writer instances, and
  * the metric writer is expected to be a json_writer.
  */
-template <typename Stream = std::ostream, 
+template <typename Stream = std::ostream,
           typename Deleter = std::default_delete<Stream>>
 class output_config {
  public:
   // Define type aliases for our writers
   using writer_type = callbacks::unique_stream_writer<Stream, Deleter>;
   using metric_writer_type = callbacks::json_writer<Stream, Deleter>;
-  
+
   /**
    * Default constructor for a single-chain configuration.
    * Sets all writers to nullptr. Users must set required writers
    * before using the configuration.
    */
-  output_config() 
+  output_config()
     : num_chains_(1),
       logger_(nullptr) {
   }
@@ -59,7 +59,6 @@ class output_config {
       metric_writer_type* metric_writer = nullptr)
     : num_chains_(1),
       logger_(logger) {
-    
     if (init_writer) init_writers_.push_back(init_writer);
     if (sample_writer) sample_writers_.push_back(sample_writer);
     if (diagnostic_writer) diagnostic_writers_.push_back(diagnostic_writer);
@@ -87,25 +86,20 @@ class output_config {
       const std::vector<metric_writer_type*>& metric_writers = std::vector<metric_writer_type*>())
     : num_chains_(num_chains),
       logger_(logger) {
-      
-    validate_writer_sizes(num_chains, init_writers.size(), 
+    validate_writer_sizes(num_chains, init_writers.size(),
                           sample_writers.size(), diagnostic_writers.size());
-
     init_writers_.resize(num_chains);
     sample_writers_.resize(num_chains);
     diagnostic_writers_.resize(num_chains);
-
     for (size_t i = 0; i < num_chains; ++i) {
       init_writers_[i] = init_writers[i];
       sample_writers_[i] = sample_writers[i];
       diagnostic_writers_[i] = diagnostic_writers[i];
     }
-    
     if (!metric_writers.empty()) {
       if (metric_writers.size() != num_chains) {
         throw std::invalid_argument("Metric writer vector size must match num_chains");
       }
-      
       metric_writers_.resize(num_chains);
       for (size_t i = 0; i < num_chains; ++i) {
         metric_writers_[i] = metric_writers[i];
@@ -129,8 +123,8 @@ class output_config {
       writer_type* sample_writer = nullptr,
       writer_type* diagnostic_writer = nullptr,
       metric_writer_type* metric_writer = nullptr) {
-    
-    return output_config(logger, init_writer, sample_writer, 
+   
+    return output_config(logger, init_writer, sample_writer,
                         diagnostic_writer, metric_writer);
   }
 
@@ -152,14 +146,14 @@ class output_config {
       const std::vector<writer_type*>& sample_writers,
       const std::vector<writer_type*>& diagnostic_writers,
       const std::vector<metric_writer_type*>& metric_writers = std::vector<metric_writer_type*>()) {
-    
-    return output_config(num_chains, logger, init_writers, 
+   
+    return output_config(num_chains, logger, init_writers,
                         sample_writers, diagnostic_writers, metric_writers);
   }
 
   /**
    * Check if this configuration is for multiple chains.
-   * 
+   *
    * @return true if configured for multiple chains (num_chains > 1)
    */
   bool is_multichain() const {
@@ -168,11 +162,11 @@ class output_config {
 
   /**
    * Check if all required writers are configured.
-   * 
+   *
    * @return true if logger and all required writers are set
    */
   bool is_valid() const {
-    if (!logger_ || init_writers_.empty() || 
+    if (!logger_ || init_writers_.empty() ||
         sample_writers_.empty() || diagnostic_writers_.empty()) {
       return false;
     }
@@ -187,12 +181,12 @@ class output_config {
 
   /**
    * Check if the configuration has metric writers.
-   * 
+   *
    * @return true if metric writers are configured
    */
   bool has_metric_writer() const {
-    return !metric_writers_.empty() && 
-           std::any_of(metric_writers_.begin(), metric_writers_.end(), 
+    return !metric_writers_.empty() &&
+           std::any_of(metric_writers_.begin(), metric_writers_.end(),
                        [](auto* ptr) { return ptr != nullptr; });
   }
 
@@ -209,7 +203,7 @@ class output_config {
     if (is_multichain()) {
       throw std::logic_error("Cannot use single writer setters with multi-chain configuration");
     }
-    
+   
     if (writers.empty()) {
       writers.push_back(writer);
     } else {
@@ -225,48 +219,48 @@ class output_config {
   void set_logger(callbacks::logger* logger) { logger_ = logger; }
 
   // Single chain getters (throw if multi-chain)
-  writer_type* init_writer() const { 
+  writer_type* init_writer() const {
     if (is_multichain()) {
       throw std::logic_error("Cannot use single writer getters with multi-chain configuration");
     }
-    return init_writers_.empty() ? nullptr : init_writers_[0]; 
+    return init_writers_.empty() ? nullptr : init_writers_[0];
   }
-  
-  writer_type* sample_writer() const { 
+ 
+  writer_type* sample_writer() const {
     if (is_multichain()) {
       throw std::logic_error("Cannot use single writer getters with multi-chain configuration");
     }
-    return sample_writers_.empty() ? nullptr : sample_writers_[0]; 
+    return sample_writers_.empty() ? nullptr : sample_writers_[0];
   }
-  
-  writer_type* diagnostic_writer() const { 
+ 
+  writer_type* diagnostic_writer() const {
     if (is_multichain()) {
       throw std::logic_error("Cannot use single writer getters with multi-chain configuration");
     }
-    return diagnostic_writers_.empty() ? nullptr : diagnostic_writers_[0]; 
+    return diagnostic_writers_.empty() ? nullptr : diagnostic_writers_[0];
   }
-  
-  metric_writer_type* metric_writer() const { 
+ 
+  metric_writer_type* metric_writer() const {
     if (is_multichain()) {
       throw std::logic_error("Cannot use single writer getters with multi-chain configuration");
     }
-    return metric_writers_.empty() ? nullptr : metric_writers_[0]; 
+    return metric_writers_.empty() ? nullptr : metric_writers_[0];
   }
 
   // Single chain setters (throw if multi-chain)
-  void set_init_writer(writer_type* init_writer) { 
+  void set_init_writer(writer_type* init_writer) {
     set_single_writer(init_writer, init_writers_);
   }
-  
-  void set_sample_writer(writer_type* sample_writer) { 
+ 
+  void set_sample_writer(writer_type* sample_writer) {
     set_single_writer(sample_writer, sample_writers_);
   }
-  
-  void set_diagnostic_writer(writer_type* diagnostic_writer) { 
+ 
+  void set_diagnostic_writer(writer_type* diagnostic_writer) {
     set_single_writer(diagnostic_writer, diagnostic_writers_);
   }
-  
-  void set_metric_writer(metric_writer_type* metric_writer) { 
+ 
+  void set_metric_writer(metric_writer_type* metric_writer) {
     set_single_writer(metric_writer, metric_writers_);
   }
 
@@ -277,24 +271,24 @@ class output_config {
   const std::vector<metric_writer_type*>& metric_writers() const { return metric_writers_; }
 
   // Individual chain getters
-  writer_type* init_writer(size_t chain_idx) const { 
+  writer_type* init_writer(size_t chain_idx) const {
     validate_chain_idx(chain_idx);
-    return init_writers_[chain_idx]; 
+    return init_writers_[chain_idx];
   }
-  
-  writer_type* sample_writer(size_t chain_idx) const { 
+ 
+  writer_type* sample_writer(size_t chain_idx) const {
     validate_chain_idx(chain_idx);
-    return sample_writers_[chain_idx]; 
+    return sample_writers_[chain_idx];
   }
-  
-  writer_type* diagnostic_writer(size_t chain_idx) const { 
+ 
+  writer_type* diagnostic_writer(size_t chain_idx) const {
     validate_chain_idx(chain_idx);
-    return diagnostic_writers_[chain_idx]; 
+    return diagnostic_writers_[chain_idx];
   }
-  
-  metric_writer_type* metric_writer(size_t chain_idx) const { 
+ 
+  metric_writer_type* metric_writer(size_t chain_idx) const {
     validate_chain_idx(chain_idx);
-    return chain_idx < metric_writers_.size() ? metric_writers_[chain_idx] : nullptr; 
+    return chain_idx < metric_writers_.size() ? metric_writers_[chain_idx] : nullptr;
   }
 
   // Individual chain setters
@@ -302,17 +296,17 @@ class output_config {
     validate_chain_idx(chain_idx);
     init_writers_[chain_idx] = init_writer;
   }
-  
+ 
   void set_sample_writer(size_t chain_idx, writer_type* sample_writer) {
     validate_chain_idx(chain_idx);
     sample_writers_[chain_idx] = sample_writer;
   }
-  
+ 
   void set_diagnostic_writer(size_t chain_idx, writer_type* diagnostic_writer) {
     validate_chain_idx(chain_idx);
     diagnostic_writers_[chain_idx] = diagnostic_writer;
   }
-  
+ 
   void set_metric_writer(size_t chain_idx, metric_writer_type* metric_writer) {
     validate_chain_idx(chain_idx);
     if (metric_writers_.size() <= chain_idx) {
