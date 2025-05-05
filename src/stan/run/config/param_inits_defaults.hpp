@@ -12,31 +12,23 @@ namespace run {
  * Initial radius for parameter initialization.
  */
 class init_radius : public config<double> {
-public:
-  init_radius()
-    : config<double>(
-        2.0,  // default value
-        "Initial radius for parameter initialization.",
-        [](const double& value) {  // validator
-          if (!(value > 0)) {
-            throw std::invalid_argument("init_radius must be greater than 0.");
-          }
-        }
-      ) {}
+private:
+  static const std::string description_;
+  static void validator(const double& value) {
+    if (!(value > 0)) {
+      throw std::invalid_argument("init_radius must be greater than 0.");
+    }
+  }
 
-  explicit init_radius(double value)
-    : config<double>(
-        value,
-        "Initial radius for parameter initialization.",
-        [](const double& value) {
-          if (!(value > 0)) {
-            throw std::invalid_argument("init_radius must be greater than 0.");
-          }
-        }
-      ) {}
+public:
+  init_radius() : config<double>(2.0, description_, validator) {}
+
+  explicit init_radius(double value) : config<double>(value, description_, validator) {}
 
   static double default_value() { return 2.0; }
 };
+
+const std::string init_radius::description_ = "Initial radius for parameter initialization.";
 
 }  // namespace run
 }  // namespace stan
