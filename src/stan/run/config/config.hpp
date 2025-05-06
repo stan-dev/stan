@@ -1,5 +1,5 @@
-#ifndef STAN_RUN_CONFIG_HPP
-#define STAN_RUN_CONFIG_HPP
+#ifndef STAN_RUN_CONFIG_BASE_HPP
+#define STAN_RUN_CONFIG_BASE_HPP
 
 #include <string>
 #include <stdexcept>
