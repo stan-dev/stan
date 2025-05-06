@@ -1,377 +1,314 @@
-#include <stan/run/output_config.hpp>
+#include <stan/run/config/output_config.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <gtest/gtest.h>
-#include <memory>
 #include <sstream>
-#include <functional>
+#include <vector>
+  
+// Create a deleter_noop struct for the json_writer
+struct deleter_noop {
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
+};
 
-class OutputConfigTest : public ::testing::Test {
- protected:
+class OutputConfigTest : public testing::Test {
+protected:
   void SetUp() override {
-    // Set up a logger for testing
-    logger_stream = std::make_shared<std::stringstream>();
-    logger = std::make_shared<TestLogger>(logger_stream);
+    // Create the logger that writes to all streams
+    logger = std::make_unique<stan::callbacks::stream_logger>(
+        logger_stream, logger_stream, logger_stream, logger_stream, logger_stream);
+    
+    // Create writers
+    init_writer = std::make_unique<stan::callbacks::stream_writer>(init_stream);
+    sample_writer = std::make_unique<stan::callbacks::stream_writer>(sample_stream);
+    diagnostic_writer = std::make_unique<stan::callbacks::stream_writer>(diagnostic_stream);
   }
 
-  /**
-   * Custom deleter that doesn't delete the pointer.
-   */
-  struct deleter_noop {
-    template <typename T>
-    void operator()(T* ptr) const {}
-  };
-
-  class TestLogger : public stan::callbacks::logger {
-   public:
-    explicit TestLogger(std::shared_ptr<std::stringstream> stream)
-        : stream_(stream) {}
-
-    void info(const std::string& message) override { *stream_ << message << std::endl; }
-    void error(const std::string& message) override { *stream_ << "ERROR: " << message << std::endl; }
-    void warn(const std::string& message) override { *stream_ << "WARNING: " << message << std::endl; }
-    void debug(const std::string& message) override { *stream_ << "DEBUG: " << message << std::endl; }
-    void fatal(const std::string& message) override { *stream_ << "FATAL: " << message << std::endl; }
-
-    void info(const std::stringstream& message) override { *stream_ << message.str() << std::endl; }
-    void error(const std::stringstream& message) override { *stream_ << "ERROR: " << message.str() << std::endl; }
-    void warn(const std::stringstream& message) override { *stream_ << "WARNING: " << message.str() << std::endl; }
-    void debug(const std::stringstream& message) override { *stream_ << "DEBUG: " << message.str() << std::endl; }
-    void fatal(const std::stringstream& message) override { *stream_ << "FATAL: " << message.str() << std::endl; }
-
-    std::shared_ptr<std::stringstream> stream_;
-  };
-
-  std::shared_ptr<std::stringstream> logger_stream;
-  std::shared_ptr<TestLogger> logger;
+  // Streams for output
+  std::stringstream logger_stream;
+  std::stringstream init_stream;
+  std::stringstream sample_stream;
+  std::stringstream diagnostic_stream;
   
-  // Create unique_stream_writer with noop deleter
-  std::unique_ptr<stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>> 
-  create_unique_writer() {
-    auto stream = std::make_unique<std::stringstream>();
-    std::stringstream* stream_ptr = stream.get();
-    
-    auto writer = std::make_unique<stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>>(
-        std::unique_ptr<std::stringstream, deleter_noop>(stream_ptr));
-    
-    // Don't delete the stream when test ends
-    stream.release();
-    
-    return writer;
-  }
-  
-  // Create json_writer with noop deleter
-  std::unique_ptr<stan::callbacks::json_writer<std::stringstream, deleter_noop>> 
-  create_json_writer() {
-    auto stream = std::make_unique<std::stringstream>();
-    std::stringstream* stream_ptr = stream.get();
-    
-    auto writer = std::make_unique<stan::callbacks::json_writer<std::stringstream, deleter_noop>>(
-        std::unique_ptr<std::stringstream, deleter_noop>(stream_ptr));
-    
-    // Don't delete the stream when test ends
-    stream.release();
-    
-    return writer;
-  }
-  
-  // Helper to check out of range access
-  template <typename Func>
-  void expect_out_of_range(Func func) {
-    try {
-      func();
-      FAIL() << "Expected std::out_of_range exception";
-    } catch(const std::out_of_range&) {
-      // Expected
-    } catch(...) {
-      FAIL() << "Expected std::out_of_range exception, got different exception";
-    }
-  }
+  // Writers and logger (using unique_ptr for automatic cleanup)
+  std::unique_ptr<stan::callbacks::stream_logger> logger;
+  std::unique_ptr<stan::callbacks::stream_writer> init_writer;
+  std::unique_ptr<stan::callbacks::stream_writer> sample_writer;
+  std::unique_ptr<stan::callbacks::stream_writer> diagnostic_writer;
 };
 
 TEST_F(OutputConfigTest, DefaultConstructor) {
-  using stan::run::output_config;
-  
-  // Create config with default constructor
-  output_config<std::stringstream, deleter_noop> config;
-
-  // Verify default values for single chain
-  EXPECT_EQ(1, config.num_chains());
-  EXPECT_FALSE(config.is_multichain());
-  
-  // All pointers should be null
-  EXPECT_EQ(nullptr, config.logger());
-  EXPECT_EQ(nullptr, config.init_writer());
-  EXPECT_EQ(nullptr, config.sample_writer());
-  EXPECT_EQ(nullptr, config.diagnostic_writer());
-  EXPECT_EQ(nullptr, config.metric_writer());
-  
-  // Config should not be valid
-  EXPECT_FALSE(config.is_valid());
-  EXPECT_FALSE(config.has_metric_writer());
+  // The default constructor should create an invalid configuration
+  // that will throw when build() is called due to missing required components
+  EXPECT_THROW(stan::run::output_config<>::create().build(),
+               std::invalid_argument);
 }
 
 TEST_F(OutputConfigTest, SingleChainConstructor) {
-  using config_t = stan::run::output_config<std::stringstream, deleter_noop>;
-  using writer_t = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
+  // Create a valid configuration with a single chain
+  auto output_config = stan::run::output_config<>::create()
+    .logger(logger.get())
+    .init_writer(init_writer.get())
+    .sample_writer(sample_writer.get())
+    .diagnostic_writer(diagnostic_writer.get())
+    .build();
   
-  // Create test objects
-  auto init_writer = create_unique_writer();
-  auto sample_writer = create_unique_writer();
-  auto diagnostic_writer = create_unique_writer();
-  
-  // Create config with only required writers
-  config_t config(logger.get(), init_writer.get(), 
-                 sample_writer.get(), diagnostic_writer.get());
-
-  // Verify configuration is single chain
-  EXPECT_EQ(1, config.num_chains());
-  EXPECT_FALSE(config.is_multichain());
-  
-  // Verify all required pointers are set
-  EXPECT_EQ(logger.get(), config.logger());
-  EXPECT_EQ(init_writer.get(), config.init_writer());
-  EXPECT_EQ(sample_writer.get(), config.sample_writer());
-  EXPECT_EQ(diagnostic_writer.get(), config.diagnostic_writer());
-  EXPECT_EQ(nullptr, config.metric_writer());
-  
-  // Verify we can access via chain index methods too
-  EXPECT_EQ(init_writer.get(), config.init_writer(0));
-  EXPECT_EQ(sample_writer.get(), config.sample_writer(0));
-  EXPECT_EQ(diagnostic_writer.get(), config.diagnostic_writer(0));
-  EXPECT_EQ(nullptr, config.metric_writer(0));
-  
-  // Verify we can access via vector getters
-  EXPECT_EQ(1, config.init_writers().size());
-  EXPECT_EQ(init_writer.get(), config.init_writers()[0]);
-  
-  // Config should be valid but without metric writer
-  EXPECT_TRUE(config.is_valid());
-  EXPECT_FALSE(config.has_metric_writer());
+  // Verify the configuration
+  EXPECT_EQ(1, output_config.num_chains());
+  EXPECT_EQ(logger.get(), output_config.logger());
+  EXPECT_EQ(init_writer.get(), output_config.init_writer());
+  EXPECT_EQ(sample_writer.get(), output_config.sample_writer());
+  EXPECT_EQ(diagnostic_writer.get(), output_config.diagnostic_writer());
+  EXPECT_EQ(nullptr, output_config.metric_writer());
+  EXPECT_FALSE(output_config.is_multichain());
+  EXPECT_FALSE(output_config.has_metric_writer());
 }
 
-TEST_F(OutputConfigTest, SingleChainWithMetricConstructor) {
-  using config_t = stan::run::output_config<std::stringstream, deleter_noop>;
-  using writer_t = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
-  using json_writer_t = stan::callbacks::json_writer<std::stringstream, deleter_noop>;
-  
-  // Create test objects
-  auto init_writer = create_unique_writer();
-  auto sample_writer = create_unique_writer();
-  auto diagnostic_writer = create_unique_writer();
-  auto metric_writer = create_json_writer();
-  
-  // Create config with all writers including metric writer
-  config_t config(logger.get(), init_writer.get(), sample_writer.get(), 
-                 diagnostic_writer.get(), metric_writer.get());
 
-  // Verify configuration is single chain
-  EXPECT_EQ(1, config.num_chains());
-  EXPECT_FALSE(config.is_multichain());
-  
-  // Verify all writers are set
-  EXPECT_EQ(logger.get(), config.logger());
-  EXPECT_EQ(init_writer.get(), config.init_writer());
-  EXPECT_EQ(sample_writer.get(), config.sample_writer());
-  EXPECT_EQ(diagnostic_writer.get(), config.diagnostic_writer());
-  EXPECT_EQ(metric_writer.get(), config.metric_writer());
-  
-  // Config should be valid with metric writer
-  EXPECT_TRUE(config.is_valid());
-  EXPECT_TRUE(config.has_metric_writer());
-}
 
-TEST_F(OutputConfigTest, SingleChainWithNullValues) {
-  using config_t = stan::run::output_config<std::stringstream, deleter_noop>;
-  
-  // Test with only logger provided, other writers null
-  config_t config(logger.get());
-  
-  EXPECT_EQ(logger.get(), config.logger());
-  EXPECT_EQ(nullptr, config.init_writer());
-  EXPECT_EQ(nullptr, config.sample_writer());
-  EXPECT_EQ(nullptr, config.diagnostic_writer());
-  EXPECT_EQ(nullptr, config.metric_writer());
-  
-  // Config should not be valid without required writers
-  EXPECT_FALSE(config.is_valid());
-}
-
-TEST_F(OutputConfigTest, MultiChainConstructor) {
-  using config_t = stan::run::output_config<std::stringstream, deleter_noop>;
-  using writer_t = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
-  
-  // Create test objects
-  const size_t num_chains = 3;
-  std::vector<writer_t*> init_writers;
-  std::vector<writer_t*> sample_writers;
-  std::vector<writer_t*> diagnostic_writers;
-  
-  std::vector<std::unique_ptr<writer_t>> init_writer_ptrs;
-  std::vector<std::unique_ptr<writer_t>> sample_writer_ptrs;
-  std::vector<std::unique_ptr<writer_t>> diagnostic_writer_ptrs;
-  
-  for (size_t i = 0; i < num_chains; ++i) {
-    init_writer_ptrs.push_back(create_unique_writer());
-    sample_writer_ptrs.push_back(create_unique_writer());
-    diagnostic_writer_ptrs.push_back(create_unique_writer());
+class OutputConfigMultiChainTest : public testing::Test {
+protected:
+  void SetUp() override {
+    // Create the logger that writes to all streams
+    logger = std::make_unique<stan::callbacks::stream_logger>(
+        logger_stream, logger_stream, logger_stream, logger_stream, logger_stream);
     
-    init_writers.push_back(init_writer_ptrs.back().get());
-    sample_writers.push_back(sample_writer_ptrs.back().get());
-    diagnostic_writers.push_back(diagnostic_writer_ptrs.back().get());
+    // Create 4 separate streams for each type of writer and each chain
+    init_streams.resize(num_chains);
+    sample_streams.resize(num_chains);
+    diagnostic_streams.resize(num_chains);
+    
+    // Create writers for each chain
+    for (size_t i = 0; i < num_chains; ++i) {
+      init_writers.emplace_back(std::make_unique<stan::callbacks::stream_writer>(init_streams[i]));
+      sample_writers.emplace_back(std::make_unique<stan::callbacks::stream_writer>(sample_streams[i]));
+      diagnostic_writers.emplace_back(std::make_unique<stan::callbacks::stream_writer>(diagnostic_streams[i]));
+    }
+    
+    // Prepare raw pointer vectors for the configuration
+    init_raw_writers.resize(num_chains);
+    sample_raw_writers.resize(num_chains);
+    diagnostic_raw_writers.resize(num_chains);
+    
+    for (size_t i = 0; i < num_chains; ++i) {
+      init_raw_writers[i] = init_writers[i].get();
+      sample_raw_writers[i] = sample_writers[i].get();
+      diagnostic_raw_writers[i] = diagnostic_writers[i].get();
+    }
   }
-  
-  // Create config with multi-chain constructor
-  config_t config(num_chains, logger.get(), init_writers, 
-                 sample_writers, diagnostic_writers);
 
-  // Verify configuration is multi-chain
-  EXPECT_EQ(num_chains, config.num_chains());
-  EXPECT_TRUE(config.is_multichain());
+  const size_t num_chains = 4;
   
-  // Verify logger and writer vectors are set
-  EXPECT_EQ(logger.get(), config.logger());
-  EXPECT_EQ(num_chains, config.init_writers().size());
-  EXPECT_EQ(num_chains, config.sample_writers().size());
-  EXPECT_EQ(num_chains, config.diagnostic_writers().size());
-  EXPECT_TRUE(config.metric_writers().empty());
+  // Single stream for logger
+  std::stringstream logger_stream;
   
-  // Verify individual chain writers are accessible
+  // Vectors of streams for each chain
+  std::vector<std::stringstream> init_streams;
+  std::vector<std::stringstream> sample_streams;
+  std::vector<std::stringstream> diagnostic_streams;
+  
+  // Logger (using unique_ptr for automatic cleanup)
+  std::unique_ptr<stan::callbacks::stream_logger> logger;
+  
+  // Vectors of unique_ptr writers for ownership
+  std::vector<std::unique_ptr<stan::callbacks::stream_writer>> init_writers;
+  std::vector<std::unique_ptr<stan::callbacks::stream_writer>> sample_writers;
+  std::vector<std::unique_ptr<stan::callbacks::stream_writer>> diagnostic_writers;
+  
+  // Vectors of raw pointers for the configuration
+  std::vector<stan::callbacks::writer*> init_raw_writers;
+  std::vector<stan::callbacks::writer*> sample_raw_writers;
+  std::vector<stan::callbacks::writer*> diagnostic_raw_writers;
+};
+
+TEST_F(OutputConfigMultiChainTest, MultiChainConstructor) {
+  // Create a valid configuration with multiple chains
+  auto output_config = stan::run::output_config<>::create()
+    .num_chains(num_chains)
+    .logger(logger.get())
+    .init_writers(init_raw_writers)
+    .sample_writers(sample_raw_writers)
+    .diagnostic_writers(diagnostic_raw_writers)
+    .build();
+  
+  // Verify the configuration
+  EXPECT_EQ(num_chains, output_config.num_chains());
+  EXPECT_EQ(logger.get(), output_config.logger());
+  EXPECT_TRUE(output_config.is_multichain());
+  EXPECT_FALSE(output_config.has_metric_writer());
+  
+  // Verify individual chain writers
   for (size_t i = 0; i < num_chains; ++i) {
-    EXPECT_EQ(init_writers[i], config.init_writer(i));
-    EXPECT_EQ(sample_writers[i], config.sample_writer(i));
-    EXPECT_EQ(diagnostic_writers[i], config.diagnostic_writer(i));
-    EXPECT_EQ(nullptr, config.metric_writer(i));
+    EXPECT_EQ(init_raw_writers[i], output_config.init_writer(i));
+    EXPECT_EQ(sample_raw_writers[i], output_config.sample_writer(i));
+    EXPECT_EQ(diagnostic_raw_writers[i], output_config.diagnostic_writer(i));
+    EXPECT_EQ(nullptr, output_config.metric_writer(i));
   }
   
-  // Should not be able to use single-chain getters
-  EXPECT_THROW(config.init_writer(), std::logic_error);
-  EXPECT_THROW(config.sample_writer(), std::logic_error);
-  EXPECT_THROW(config.diagnostic_writer(), std::logic_error);
-  EXPECT_THROW(config.metric_writer(), std::logic_error);
-  
-  // Config should be valid but without metric writers
-  EXPECT_TRUE(config.is_valid());
-  EXPECT_FALSE(config.has_metric_writer());
+  // Verify that single-chain getters throw logic_error
+  EXPECT_THROW(output_config.init_writer(), std::logic_error);
+  EXPECT_THROW(output_config.sample_writer(), std::logic_error);
+  EXPECT_THROW(output_config.diagnostic_writer(), std::logic_error);
+  EXPECT_THROW(output_config.metric_writer(), std::logic_error);
 }
 
-TEST_F(OutputConfigTest, MultiChainWithMetricConstructor) {
-  using config_t = stan::run::output_config<std::stringstream, deleter_noop>;
-  using writer_t = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
-  using json_writer_t = stan::callbacks::json_writer<std::stringstream, deleter_noop>;
+// Test that individual missing writers cause validation to fail
+TEST_F(OutputConfigTest, MissingIndividualWriters) {
+  // Missing init_writer
+  EXPECT_THROW(
+    stan::run::output_config<>::create()
+      .logger(logger.get())
+      .sample_writer(sample_writer.get())
+      .diagnostic_writer(diagnostic_writer.get())
+      .build(),
+    std::invalid_argument
+  );
   
-  // Create test objects
-  const size_t num_chains = 3;
-  std::vector<writer_t*> init_writers;
-  std::vector<writer_t*> sample_writers;
-  std::vector<writer_t*> diagnostic_writers;
-  std::vector<json_writer_t*> metric_writers;
+  // Missing sample_writer
+  EXPECT_THROW(
+    stan::run::output_config<>::create()
+      .logger(logger.get())
+      .init_writer(init_writer.get())
+      .diagnostic_writer(diagnostic_writer.get())
+      .build(),
+    std::invalid_argument
+  );
   
-  std::vector<std::unique_ptr<writer_t>> init_writer_ptrs;
-  std::vector<std::unique_ptr<writer_t>> sample_writer_ptrs;
-  std::vector<std::unique_ptr<writer_t>> diagnostic_writer_ptrs;
-  std::vector<std::unique_ptr<json_writer_t>> metric_writer_ptrs;
+  // Missing diagnostic_writer
+  EXPECT_THROW(
+    stan::run::output_config<>::create()
+      .logger(logger.get())
+      .init_writer(init_writer.get())
+      .sample_writer(sample_writer.get())
+      .build(),
+    std::invalid_argument
+  );
   
-  for (size_t i = 0; i < num_chains; ++i) {
-    init_writer_ptrs.push_back(create_unique_writer());
-    sample_writer_ptrs.push_back(create_unique_writer());
-    diagnostic_writer_ptrs.push_back(create_unique_writer());
-    metric_writer_ptrs.push_back(create_json_writer());
-    
-    init_writers.push_back(init_writer_ptrs.back().get());
-    sample_writers.push_back(sample_writer_ptrs.back().get());
-    diagnostic_writers.push_back(diagnostic_writer_ptrs.back().get());
-    metric_writers.push_back(metric_writer_ptrs.back().get());
-  }
-  
-  // Create config with multi-chain constructor including metric writers
-  config_t config(num_chains, logger.get(), init_writers, 
-                 sample_writers, diagnostic_writers, metric_writers);
-
-  // Verify configuration is multi-chain
-  EXPECT_EQ(num_chains, config.num_chains());
-  EXPECT_TRUE(config.is_multichain());
-  
-  // Verify logger and writer vectors are set
-  EXPECT_EQ(logger.get(), config.logger());
-  EXPECT_EQ(num_chains, config.init_writers().size());
-  EXPECT_EQ(num_chains, config.sample_writers().size());
-  EXPECT_EQ(num_chains, config.diagnostic_writers().size());
-  EXPECT_EQ(num_chains, config.metric_writers().size());
-  
-  // Verify individual chain writers are accessible
-  for (size_t i = 0; i < num_chains; ++i) {
-    EXPECT_EQ(init_writers[i], config.init_writer(i));
-    EXPECT_EQ(sample_writers[i], config.sample_writer(i));
-    EXPECT_EQ(diagnostic_writers[i], config.diagnostic_writer(i));
-    EXPECT_EQ(metric_writers[i], config.metric_writer(i));
-  }
-  
-  // Config should be valid with metric writers
-  EXPECT_TRUE(config.is_valid());
-  EXPECT_TRUE(config.has_metric_writer());
+  // Missing logger
+  EXPECT_THROW(
+    stan::run::output_config<>::create()
+      .init_writer(init_writer.get())
+      .sample_writer(sample_writer.get())
+      .diagnostic_writer(diagnostic_writer.get())
+      .build(),
+    std::invalid_argument
+  );
 }
 
-TEST_F(OutputConfigTest, FactoryMethods) {
-  using config_t = stan::run::output_config<std::stringstream, deleter_noop>;
-  using writer_t = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
-  using json_writer_t = stan::callbacks::json_writer<std::stringstream, deleter_noop>;
+// Test that out-of-bounds chain indices throw exceptions
+TEST_F(OutputConfigMultiChainTest, InvalidChainIndex) {
+  auto output_config = stan::run::output_config<>::create()
+    .num_chains(num_chains)
+    .logger(logger.get())
+    .init_writers(init_raw_writers)
+    .sample_writers(sample_raw_writers)
+    .diagnostic_writers(diagnostic_raw_writers)
+    .build();
   
-  // Create test objects for single chain
-  auto init_writer = create_unique_writer();
-  auto sample_writer = create_unique_writer();
-  auto diagnostic_writer = create_unique_writer();
-  auto metric_writer = create_json_writer();
+  // Using an out-of-bounds index should throw
+  size_t invalid_index = num_chains;
+  EXPECT_THROW(output_config.init_writer(invalid_index), std::out_of_range);
+  EXPECT_THROW(output_config.sample_writer(invalid_index), std::out_of_range);
+  EXPECT_THROW(output_config.diagnostic_writer(invalid_index), std::out_of_range);
+  EXPECT_THROW(output_config.metric_writer(invalid_index), std::out_of_range);
+}
+
+// Test setting writers for individual chains
+TEST_F(OutputConfigMultiChainTest, IndividualChainSetters) {
+  auto builder = stan::run::output_config<>::create()
+    .num_chains(num_chains)
+    .logger(logger.get());
   
-  // Test create factory method - no metric
-  auto config1 = config_t::create(
-      logger.get(), init_writer.get(), sample_writer.get(), diagnostic_writer.get());
-  
-  EXPECT_FALSE(config1.is_multichain());
-  EXPECT_FALSE(config1.has_metric_writer());
-  
-  // Test create factory method - with metric
-  auto config2 = config_t::create(
-      logger.get(), init_writer.get(), sample_writer.get(), 
-      diagnostic_writer.get(), metric_writer.get());
-  
-  EXPECT_FALSE(config2.is_multichain());
-  EXPECT_TRUE(config2.has_metric_writer());
-  
-  // Create test objects for multi-chain
-  const size_t num_chains = 2;
-  std::vector<writer_t*> init_writers;
-  std::vector<writer_t*> sample_writers;
-  std::vector<writer_t*> diagnostic_writers;
-  std::vector<json_writer_t*> metric_writers;
-  
-  std::vector<std::unique_ptr<writer_t>> init_writer_ptrs;
-  std::vector<std::unique_ptr<writer_t>> sample_writer_ptrs;
-  std::vector<std::unique_ptr<writer_t>> diagnostic_writer_ptrs;
-  std::vector<std::unique_ptr<json_writer_t>> metric_writer_ptrs;
-  
+  // Set writers for each chain individually
   for (size_t i = 0; i < num_chains; ++i) {
-    init_writer_ptrs.push_back(create_unique_writer());
-    sample_writer_ptrs.push_back(create_unique_writer());
-    diagnostic_writer_ptrs.push_back(create_unique_writer());
-    metric_writer_ptrs.push_back(create_json_writer());
-    
-    init_writers.push_back(init_writer_ptrs.back().get());
-    sample_writers.push_back(sample_writer_ptrs.back().get());
-    diagnostic_writers.push_back(diagnostic_writer_ptrs.back().get());
-    metric_writers.push_back(metric_writer_ptrs.back().get());
+    builder.init_writer(i, init_raw_writers[i])
+           .sample_writer(i, sample_raw_writers[i])
+           .diagnostic_writer(i, diagnostic_raw_writers[i]);
   }
   
-  // Test create_multi factory method - no metrics
-  auto config3 = config_t::create_multi(
-      num_chains, logger.get(), init_writers, sample_writers, diagnostic_writers);
+  auto output_config = builder.build();
   
-  EXPECT_TRUE(config3.is_multichain());
-  EXPECT_FALSE(config3.has_metric_writer());
+  // Verify each chain's writers
+  for (size_t i = 0; i < num_chains; ++i) {
+    EXPECT_EQ(init_raw_writers[i], output_config.init_writer(i));
+    EXPECT_EQ(sample_raw_writers[i], output_config.sample_writer(i));
+    EXPECT_EQ(diagnostic_raw_writers[i], output_config.diagnostic_writer(i));
+  }
+}
+
+// Test vector size validation
+TEST_F(OutputConfigMultiChainTest, VectorSizeValidation) {
+  auto builder = stan::run::output_config<>::create()
+    .num_chains(num_chains)
+    .logger(logger.get());
   
-  // Test create_multi factory method - with metrics
-  auto config4 = config_t::create_multi(
-      num_chains, logger.get(), init_writers, sample_writers, 
-      diagnostic_writers, metric_writers);
+  // Create undersized vectors
+  std::vector<stan::callbacks::writer*> undersized = {init_raw_writers[0], init_raw_writers[1]};
+  ASSERT_LT(undersized.size(), num_chains);
   
-  EXPECT_TRUE(config4.is_multichain());
-  EXPECT_TRUE(config4.has_metric_writer());
+  // Creating with an undersized vector should throw
+  EXPECT_THROW(builder.init_writers(undersized), std::invalid_argument);
+  EXPECT_THROW(builder.sample_writers(undersized), std::invalid_argument);
+  EXPECT_THROW(builder.diagnostic_writers(undersized), std::invalid_argument);
+  
+  // Create oversized vectors
+  std::vector<stan::callbacks::writer*> oversized = init_raw_writers;
+  oversized.push_back(init_raw_writers[0]);
+  ASSERT_GT(oversized.size(), num_chains);
+  
+  // Creating with an oversized vector should throw
+  EXPECT_THROW(builder.init_writers(oversized), std::invalid_argument);
+  EXPECT_THROW(builder.sample_writers(oversized), std::invalid_argument);
+  EXPECT_THROW(builder.diagnostic_writers(oversized), std::invalid_argument);
+}
+
+// Test multi-chain getters return correct vectors
+TEST_F(OutputConfigMultiChainTest, MultiChainGetters) {
+  auto output_config = stan::run::output_config<>::create()
+    .num_chains(num_chains)
+    .logger(logger.get())
+    .init_writers(init_raw_writers)
+    .sample_writers(sample_raw_writers)
+    .diagnostic_writers(diagnostic_raw_writers)
+    .build();
+  
+  // Check that the vectors returned by the getters match what we set
+  EXPECT_EQ(init_raw_writers, output_config.init_writers());
+  EXPECT_EQ(sample_raw_writers, output_config.sample_writers());
+  EXPECT_EQ(diagnostic_raw_writers, output_config.diagnostic_writers());
+}
+
+// Test optional metric writer
+TEST_F(OutputConfigTest, OptionalMetricWriter) {
+  // Add metric_stream to the test fixture
+  std::stringstream metric_stream;
+  
+  // Create a metric writer as json_writer using the noop deleter pattern
+  auto metric_writer = std::make_unique<stan::callbacks::json_writer<std::stringstream, deleter_noop>>(
+      std::unique_ptr<std::stringstream, deleter_noop>(&metric_stream));
+  
+  // Test with metric writer
+  auto config_with_metric = stan::run::output_config<stan::callbacks::writer, stan::callbacks::structured_writer>::create()
+    .logger(logger.get())
+    .init_writer(init_writer.get())
+    .sample_writer(sample_writer.get())
+    .diagnostic_writer(diagnostic_writer.get())
+    .metric_writer(metric_writer.get())
+    .build();
+  
+  EXPECT_TRUE(config_with_metric.has_metric_writer());
+  EXPECT_EQ(metric_writer.get(), config_with_metric.metric_writer());
+  
+  // Test without metric writer
+  auto config_without_metric = stan::run::output_config<>::create()
+    .logger(logger.get())
+    .init_writer(init_writer.get())
+    .sample_writer(sample_writer.get())
+    .diagnostic_writer(diagnostic_writer.get())
+    .build();
+  
+  EXPECT_FALSE(config_without_metric.has_metric_writer());
+  EXPECT_EQ(nullptr, config_without_metric.metric_writer());
 }
