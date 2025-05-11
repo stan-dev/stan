@@ -67,6 +67,7 @@ stan.kdev4
 
 # clangd compiler database
 compile_commands.json
+compile_flags.txt
 
 # gdb
 .gdb_history

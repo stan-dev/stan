@@ -18,19 +18,13 @@ on:
 jobs:
   run-tests:
     name: run stan tests
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-        python-version: [3.8]
-      fail-fast: false
+    runs-on: ubuntu-24.04
+    container: stanorg/ci:gpu
     steps:
       - name: Check out source code
         uses: actions/checkout@v3
         with:
           submodules:  true
-      - name: Install clang++
-        run: sudo apt-get install clang-${{ env.clangppVersion }}++
       - name: Run tests
         run: |
           echo "CXX=clang++-${{ env.clangppVersion }}" >> make/local
@@ -39,19 +33,13 @@ jobs:
 
   run-fvar-var-tests:
     name: run stan fvar-var model tests
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-        python-version: [3.8]
-      fail-fast: false
+    runs-on: ubuntu-24.04
+    container: stanorg/ci:gpu
     steps:
       - name: Check out source code
         uses: actions/checkout@v3
         with:
           submodules:  true
-      - name: Install clang++
-        run: sudo apt-get install clang-${{ env.clangppVersion }}++
       - name: Run tests
         run: |
           echo "CXX=clang++-${{ env.clangppVersion }}" >> make/local
