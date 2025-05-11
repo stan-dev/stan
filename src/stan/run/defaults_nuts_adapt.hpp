@@ -1,5 +1,5 @@
-#ifndef STAN_RUN_NUTS_ADAPT_DEFAULTS_HPP
-#define STAN_RUN_NUTS_ADAPT_DEFAULTS_HPP
+#ifndef STAN_RUN_DEFAULTS_NUTS_ADAPT_HPP
+#define STAN_RUN_DEFAULTS_NUTS_ADAPT_HPP
 
 #include <stan/run/config.hpp>
 #include <string>
