@@ -1,5 +1,5 @@
-#ifndef STAN_RUN_PARAM_INITS_DEFAULTS_HPP
-#define STAN_RUN_PARAM_INITS_DEFAULTS_HPP
+#ifndef STAN_RUN_DEFAULTS_PARAM_INITS_HPP
+#define STAN_RUN_DEFAULTS_PARAM_INITS_HPP
 
 #include <stan/run/config.hpp>
 #include <string>

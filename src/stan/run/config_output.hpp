@@ -1,10 +1,10 @@
-#ifndef STAN_RUN_OUTPUT_CONFIG_HPP
-#define STAN_RUN_OUTPUT_CONFIG_HPP
+#ifndef STAN_RUN_CONFIG_OUTPUT_HPP
+#define STAN_RUN_CONFIG_OUTPUT_HPP
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/structured_writer.hpp>
-#include <stan/run/output_defaults.hpp>
+#include <stan/run/defaults_output.hpp>
 #include <memory>
 #include <vector>
 #include <string>
@@ -23,11 +23,11 @@ namespace run {
  */
 template <typename WriterType = callbacks::writer,
           typename MetricWriterType = callbacks::structured_writer>
-class output_config {
+class config_output {
 public:
-  // output_config_builder class embedded as friend
-  class output_config_builder {
-    friend class output_config;
+  // config_output_builder class embedded as friend
+  class config_output_builder {
+    friend class config_output;
     num_chains_config num_chains_;
     logger_config logger_;
     std::vector<WriterType*> init_writers_;
@@ -36,7 +36,7 @@ public:
     std::vector<MetricWriterType*> metric_writers_;
 
   public:
-    output_config_builder() : 
+    config_output_builder() : 
       num_chains_(),
       logger_(),
       init_writers_(1, nullptr),
@@ -45,7 +45,7 @@ public:
       metric_writers_(1, nullptr) {}
 
     // Set number of chains
-    output_config_builder& num_chains(size_t chains) {
+    config_output_builder& num_chains(size_t chains) {
       num_chains_ = num_chains_config(chains);
       init_writers_.resize(chains, nullptr);
       sample_writers_.resize(chains, nullptr);
@@ -55,13 +55,13 @@ public:
     }
 
     // Set logger
-    output_config_builder& logger(callbacks::logger* log) {
+    config_output_builder& logger(callbacks::logger* log) {
       logger_ = logger_config(log);
       return *this;
     }
 
     // Single chain setters
-    output_config_builder& init_writer(WriterType* writer) {
+    config_output_builder& init_writer(WriterType* writer) {
       if (num_chains_.value() != 1) {
         throw std::logic_error("Cannot use single writer setters with multi-chain configuration");
       }
@@ -69,7 +69,7 @@ public:
       return *this;
     }
 
-    output_config_builder& sample_writer(WriterType* writer) {
+    config_output_builder& sample_writer(WriterType* writer) {
       if (num_chains_.value() != 1) {
         throw std::logic_error("Cannot use single writer setters with multi-chain configuration");
       }
@@ -77,7 +77,7 @@ public:
       return *this;
     }
 
-    output_config_builder& diagnostic_writer(WriterType* writer) {
+    config_output_builder& diagnostic_writer(WriterType* writer) {
       if (num_chains_.value() != 1) {
         throw std::logic_error("Cannot use single writer setters with multi-chain configuration");
       }
@@ -85,7 +85,7 @@ public:
       return *this;
     }
 
-    output_config_builder& metric_writer(MetricWriterType* writer) {
+    config_output_builder& metric_writer(MetricWriterType* writer) {
       if (num_chains_.value() != 1) {
         throw std::logic_error("Cannot use single writer setters with multi-chain configuration");
       }
@@ -94,7 +94,7 @@ public:
     }
 
     // Multi-chain setters
-    output_config_builder& init_writers(const std::vector<WriterType*>& writers) {
+    config_output_builder& init_writers(const std::vector<WriterType*>& writers) {
       if (writers.size() != num_chains_.value()) {
         throw std::invalid_argument("Writer vector sizes must match num_chains");
       }
@@ -102,7 +102,7 @@ public:
       return *this;
     }
 
-    output_config_builder& sample_writers(const std::vector<WriterType*>& writers) {
+    config_output_builder& sample_writers(const std::vector<WriterType*>& writers) {
       if (writers.size() != num_chains_.value()) {
         throw std::invalid_argument("Writer vector sizes must match num_chains");
       }
@@ -110,7 +110,7 @@ public:
       return *this;
     }
 
-    output_config_builder& diagnostic_writers(const std::vector<WriterType*>& writers) {
+    config_output_builder& diagnostic_writers(const std::vector<WriterType*>& writers) {
       if (writers.size() != num_chains_.value()) {
         throw std::invalid_argument("Writer vector sizes must match num_chains");
       }
@@ -118,7 +118,7 @@ public:
       return *this;
     }
 
-    output_config_builder& metric_writers(const std::vector<MetricWriterType*>& writers) {
+    config_output_builder& metric_writers(const std::vector<MetricWriterType*>& writers) {
       if (writers.size() != num_chains_.value()) {
         throw std::invalid_argument("Writer vector sizes must match num_chains");
       }
@@ -127,7 +127,7 @@ public:
     }
 
     // Individual chain setters
-    output_config_builder& init_writer(size_t chain_idx, WriterType* writer) {
+    config_output_builder& init_writer(size_t chain_idx, WriterType* writer) {
       if (chain_idx >= num_chains_.value()) {
         throw std::out_of_range("Chain index out of range");
       }
@@ -135,7 +135,7 @@ public:
       return *this;
     }
 
-    output_config_builder& sample_writer(size_t chain_idx, WriterType* writer) {
+    config_output_builder& sample_writer(size_t chain_idx, WriterType* writer) {
       if (chain_idx >= num_chains_.value()) {
         throw std::out_of_range("Chain index out of range");
       }
@@ -143,7 +143,7 @@ public:
       return *this;
     }
 
-    output_config_builder& diagnostic_writer(size_t chain_idx, WriterType* writer) {
+    config_output_builder& diagnostic_writer(size_t chain_idx, WriterType* writer) {
       if (chain_idx >= num_chains_.value()) {
         throw std::out_of_range("Chain index out of range");
       }
@@ -151,7 +151,7 @@ public:
       return *this;
     }
 
-    output_config_builder& metric_writer(size_t chain_idx, MetricWriterType* writer) {
+    config_output_builder& metric_writer(size_t chain_idx, MetricWriterType* writer) {
       if (chain_idx >= num_chains_.value()) {
         throw std::out_of_range("Chain index out of range");
       }
@@ -159,9 +159,9 @@ public:
       return *this;
     }
 
-    output_config build() {
+    config_output build() {
       validate();
-      return output_config(*this);
+      return config_output(*this);
     }
 
     void validate() const {
@@ -186,8 +186,8 @@ public:
     }
   };
 
-  static output_config_builder create() {
-    return output_config_builder();
+  static config_output_builder create() {
+    return config_output_builder();
   }
 
   /**
@@ -279,7 +279,7 @@ private:
     }
   }
 
-  explicit output_config(const output_config_builder& builder) : 
+  explicit config_output(const config_output_builder& builder) : 
     num_chains_(builder.num_chains_),
     logger_(builder.logger_),
     init_writers_(builder.init_writers_),

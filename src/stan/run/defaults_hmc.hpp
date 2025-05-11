@@ -78,7 +78,7 @@ const std::string max_depth::description_ = "Maximum tree depth.";
 /**
  * Metric type for the Hamiltonian.
  */
-class metric_type_config : public config<metric_t> {
+class config_metric_type : public config<metric_t> {
 private:
   static const std::string description_;
   static void validator(const metric_t& value) {
@@ -86,14 +86,14 @@ private:
   }
 
 public:
-  metric_type_config() : config<metric_t>(metric_t::DIAG_E, description_, validator) {}
+  config_metric_type() : config<metric_t>(metric_t::DIAG_E, description_, validator) {}
 
-  explicit metric_type_config(metric_t value) : config<metric_t>(value, description_, validator) {}
+  explicit config_metric_type(metric_t value) : config<metric_t>(value, description_, validator) {}
 
   static metric_t default_value() { return metric_t::DIAG_E; }
 };
 
-const std::string metric_type_config::description_ = "Type of metric to use in Hamiltonian dynamics.";
+const std::string config_metric_type::description_ = "Type of metric to use in Hamiltonian dynamics.";
 
 }  // namespace run
 }  // namespace stan

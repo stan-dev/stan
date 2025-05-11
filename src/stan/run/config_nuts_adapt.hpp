@@ -1,18 +1,18 @@
-#ifndef STAN_RUN_NUTS_ADAPT_CONFIG_HPP
-#define STAN_RUN_NUTS_ADAPT_CONFIG_HPP
+#ifndef STAN_RUN_CONFIG_NUTS_ADAPT_HPP
+#define STAN_RUN_CONFIG_NUTS_ADAPT_HPP
 
 #include <stan/io/var_context.hpp>
-#include <stan/run/nuts_adapt_defaults.hpp>
+#include <stan/run/defaults_nuts_adapt.hpp>
 #include <memory>
 
 namespace stan {
 namespace run {
 
-class nuts_adapt_config {
+class config_nuts_adapt {
 public:
-  // nuts_adapt_config_builder class embedded as friend
-  class nuts_adapt_config_builder {
-    friend class nuts_adapt_config;
+  // config_nuts_adapt_builder class embedded as friend
+  class config_nuts_adapt_builder {
+    friend class config_nuts_adapt;
     stan::run::delta delta_;
     stan::run::gamma gamma_;
     stan::run::kappa kappa_;
@@ -22,7 +22,7 @@ public:
     stan::run::window window_;
 
   public:
-    nuts_adapt_config_builder() : 
+    config_nuts_adapt_builder() : 
       delta_(),
       gamma_(),
       kappa_(),
@@ -31,44 +31,44 @@ public:
       term_buffer_(),
       window_() {}
 
-    nuts_adapt_config_builder& delta(double d) {
+    config_nuts_adapt_builder& delta(double d) {
       delta_ = stan::run::delta(d);
       return *this;
     }
     
-    nuts_adapt_config_builder& gamma(double g) {
+    config_nuts_adapt_builder& gamma(double g) {
       gamma_ = stan::run::gamma(g);
       return *this;
     }
     
-    nuts_adapt_config_builder& kappa(double k) {
+    config_nuts_adapt_builder& kappa(double k) {
       kappa_ = stan::run::kappa(k);
       return *this;
     }
     
-    nuts_adapt_config_builder& t0(double t) {
+    config_nuts_adapt_builder& t0(double t) {
       t0_ = stan::run::t0(t);
       return *this;
     }
     
-    nuts_adapt_config_builder& init_buffer(unsigned int buffer) {
+    config_nuts_adapt_builder& init_buffer(unsigned int buffer) {
       init_buffer_ = stan::run::init_buffer(buffer);
       return *this;
     }
     
-    nuts_adapt_config_builder& term_buffer(unsigned int buffer) {
+    config_nuts_adapt_builder& term_buffer(unsigned int buffer) {
       term_buffer_ = stan::run::term_buffer(buffer);
       return *this;
     }
     
-    nuts_adapt_config_builder& window(unsigned int w) {
+    config_nuts_adapt_builder& window(unsigned int w) {
       window_ = stan::run::window(w);
       return *this;
     }
 
-    nuts_adapt_config build() {
+    config_nuts_adapt build() {
       validate();
-      return nuts_adapt_config(*this);
+      return config_nuts_adapt(*this);
     }
 
     void validate() const {
@@ -77,8 +77,8 @@ public:
     }
   };
 
-  static nuts_adapt_config_builder create() {
-    return nuts_adapt_config_builder();
+  static config_nuts_adapt_builder create() {
+    return config_nuts_adapt_builder();
   }
 
   // Getters
@@ -91,7 +91,7 @@ public:
   unsigned int window() const { return window_.value(); }
 
 private:
-  explicit nuts_adapt_config(const nuts_adapt_config_builder& builder) : 
+  explicit config_nuts_adapt(const config_nuts_adapt_builder& builder) : 
     delta_(builder.delta_),
     gamma_(builder.gamma_),
     kappa_(builder.kappa_),

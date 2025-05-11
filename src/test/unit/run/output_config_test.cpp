@@ -1,4 +1,4 @@
-#include <stan/run/output_config.hpp>
+#include <stan/run/config_output.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
@@ -42,13 +42,13 @@ protected:
 TEST_F(OutputConfigTest, DefaultConstructor) {
   // The default constructor should create an invalid configuration
   // that will throw when build() is called due to missing required components
-  EXPECT_THROW(stan::run::output_config<>::create().build(),
+  EXPECT_THROW(stan::run::config_output<>::create().build(),
                std::invalid_argument);
 }
 
 TEST_F(OutputConfigTest, SingleChainConstructor) {
   // Create a valid configuration with a single chain
-  auto output_config = stan::run::output_config<>::create()
+  auto config_output = stan::run::config_output<>::create()
     .logger(logger.get())
     .init_writer(init_writer.get())
     .sample_writer(sample_writer.get())
@@ -56,14 +56,14 @@ TEST_F(OutputConfigTest, SingleChainConstructor) {
     .build();
   
   // Verify the configuration
-  EXPECT_EQ(1, output_config.num_chains());
-  EXPECT_EQ(logger.get(), output_config.logger());
-  EXPECT_EQ(init_writer.get(), output_config.init_writer());
-  EXPECT_EQ(sample_writer.get(), output_config.sample_writer());
-  EXPECT_EQ(diagnostic_writer.get(), output_config.diagnostic_writer());
-  EXPECT_EQ(nullptr, output_config.metric_writer());
-  EXPECT_FALSE(output_config.is_multichain());
-  EXPECT_FALSE(output_config.has_metric_writer());
+  EXPECT_EQ(1, config_output.num_chains());
+  EXPECT_EQ(logger.get(), config_output.logger());
+  EXPECT_EQ(init_writer.get(), config_output.init_writer());
+  EXPECT_EQ(sample_writer.get(), config_output.sample_writer());
+  EXPECT_EQ(diagnostic_writer.get(), config_output.diagnostic_writer());
+  EXPECT_EQ(nullptr, config_output.metric_writer());
+  EXPECT_FALSE(config_output.is_multichain());
+  EXPECT_FALSE(config_output.has_metric_writer());
 }
 
 
@@ -125,7 +125,7 @@ protected:
 
 TEST_F(OutputConfigMultiChainTest, MultiChainConstructor) {
   // Create a valid configuration with multiple chains
-  auto output_config = stan::run::output_config<>::create()
+  auto config_output = stan::run::config_output<>::create()
     .num_chains(num_chains)
     .logger(logger.get())
     .init_writers(init_raw_writers)
@@ -134,31 +134,31 @@ TEST_F(OutputConfigMultiChainTest, MultiChainConstructor) {
     .build();
   
   // Verify the configuration
-  EXPECT_EQ(num_chains, output_config.num_chains());
-  EXPECT_EQ(logger.get(), output_config.logger());
-  EXPECT_TRUE(output_config.is_multichain());
-  EXPECT_FALSE(output_config.has_metric_writer());
+  EXPECT_EQ(num_chains, config_output.num_chains());
+  EXPECT_EQ(logger.get(), config_output.logger());
+  EXPECT_TRUE(config_output.is_multichain());
+  EXPECT_FALSE(config_output.has_metric_writer());
   
   // Verify individual chain writers
   for (size_t i = 0; i < num_chains; ++i) {
-    EXPECT_EQ(init_raw_writers[i], output_config.init_writer(i));
-    EXPECT_EQ(sample_raw_writers[i], output_config.sample_writer(i));
-    EXPECT_EQ(diagnostic_raw_writers[i], output_config.diagnostic_writer(i));
-    EXPECT_EQ(nullptr, output_config.metric_writer(i));
+    EXPECT_EQ(init_raw_writers[i], config_output.init_writer(i));
+    EXPECT_EQ(sample_raw_writers[i], config_output.sample_writer(i));
+    EXPECT_EQ(diagnostic_raw_writers[i], config_output.diagnostic_writer(i));
+    EXPECT_EQ(nullptr, config_output.metric_writer(i));
   }
   
   // Verify that single-chain getters throw logic_error
-  EXPECT_THROW(output_config.init_writer(), std::logic_error);
-  EXPECT_THROW(output_config.sample_writer(), std::logic_error);
-  EXPECT_THROW(output_config.diagnostic_writer(), std::logic_error);
-  EXPECT_THROW(output_config.metric_writer(), std::logic_error);
+  EXPECT_THROW(config_output.init_writer(), std::logic_error);
+  EXPECT_THROW(config_output.sample_writer(), std::logic_error);
+  EXPECT_THROW(config_output.diagnostic_writer(), std::logic_error);
+  EXPECT_THROW(config_output.metric_writer(), std::logic_error);
 }
 
 // Test that individual missing writers cause validation to fail
 TEST_F(OutputConfigTest, MissingIndividualWriters) {
   // Missing init_writer
   EXPECT_THROW(
-    stan::run::output_config<>::create()
+    stan::run::config_output<>::create()
       .logger(logger.get())
       .sample_writer(sample_writer.get())
       .diagnostic_writer(diagnostic_writer.get())
@@ -168,7 +168,7 @@ TEST_F(OutputConfigTest, MissingIndividualWriters) {
   
   // Missing sample_writer
   EXPECT_THROW(
-    stan::run::output_config<>::create()
+    stan::run::config_output<>::create()
       .logger(logger.get())
       .init_writer(init_writer.get())
       .diagnostic_writer(diagnostic_writer.get())
@@ -178,7 +178,7 @@ TEST_F(OutputConfigTest, MissingIndividualWriters) {
   
   // Missing diagnostic_writer
   EXPECT_THROW(
-    stan::run::output_config<>::create()
+    stan::run::config_output<>::create()
       .logger(logger.get())
       .init_writer(init_writer.get())
       .sample_writer(sample_writer.get())
@@ -188,7 +188,7 @@ TEST_F(OutputConfigTest, MissingIndividualWriters) {
   
   // Missing logger
   EXPECT_THROW(
-    stan::run::output_config<>::create()
+    stan::run::config_output<>::create()
       .init_writer(init_writer.get())
       .sample_writer(sample_writer.get())
       .diagnostic_writer(diagnostic_writer.get())
@@ -199,7 +199,7 @@ TEST_F(OutputConfigTest, MissingIndividualWriters) {
 
 // Test that out-of-bounds chain indices throw exceptions
 TEST_F(OutputConfigMultiChainTest, InvalidChainIndex) {
-  auto output_config = stan::run::output_config<>::create()
+  auto config_output = stan::run::config_output<>::create()
     .num_chains(num_chains)
     .logger(logger.get())
     .init_writers(init_raw_writers)
@@ -209,15 +209,15 @@ TEST_F(OutputConfigMultiChainTest, InvalidChainIndex) {
   
   // Using an out-of-bounds index should throw
   size_t invalid_index = num_chains;
-  EXPECT_THROW(output_config.init_writer(invalid_index), std::out_of_range);
-  EXPECT_THROW(output_config.sample_writer(invalid_index), std::out_of_range);
-  EXPECT_THROW(output_config.diagnostic_writer(invalid_index), std::out_of_range);
-  EXPECT_THROW(output_config.metric_writer(invalid_index), std::out_of_range);
+  EXPECT_THROW(config_output.init_writer(invalid_index), std::out_of_range);
+  EXPECT_THROW(config_output.sample_writer(invalid_index), std::out_of_range);
+  EXPECT_THROW(config_output.diagnostic_writer(invalid_index), std::out_of_range);
+  EXPECT_THROW(config_output.metric_writer(invalid_index), std::out_of_range);
 }
 
 // Test setting writers for individual chains
 TEST_F(OutputConfigMultiChainTest, IndividualChainSetters) {
-  auto builder = stan::run::output_config<>::create()
+  auto builder = stan::run::config_output<>::create()
     .num_chains(num_chains)
     .logger(logger.get());
   
@@ -228,19 +228,19 @@ TEST_F(OutputConfigMultiChainTest, IndividualChainSetters) {
            .diagnostic_writer(i, diagnostic_raw_writers[i]);
   }
   
-  auto output_config = builder.build();
+  auto config_output = builder.build();
   
   // Verify each chain's writers
   for (size_t i = 0; i < num_chains; ++i) {
-    EXPECT_EQ(init_raw_writers[i], output_config.init_writer(i));
-    EXPECT_EQ(sample_raw_writers[i], output_config.sample_writer(i));
-    EXPECT_EQ(diagnostic_raw_writers[i], output_config.diagnostic_writer(i));
+    EXPECT_EQ(init_raw_writers[i], config_output.init_writer(i));
+    EXPECT_EQ(sample_raw_writers[i], config_output.sample_writer(i));
+    EXPECT_EQ(diagnostic_raw_writers[i], config_output.diagnostic_writer(i));
   }
 }
 
 // Test vector size validation
 TEST_F(OutputConfigMultiChainTest, VectorSizeValidation) {
-  auto builder = stan::run::output_config<>::create()
+  auto builder = stan::run::config_output<>::create()
     .num_chains(num_chains)
     .logger(logger.get());
   
@@ -266,7 +266,7 @@ TEST_F(OutputConfigMultiChainTest, VectorSizeValidation) {
 
 // Test multi-chain getters return correct vectors
 TEST_F(OutputConfigMultiChainTest, MultiChainGetters) {
-  auto output_config = stan::run::output_config<>::create()
+  auto config_output = stan::run::config_output<>::create()
     .num_chains(num_chains)
     .logger(logger.get())
     .init_writers(init_raw_writers)
@@ -275,9 +275,9 @@ TEST_F(OutputConfigMultiChainTest, MultiChainGetters) {
     .build();
   
   // Check that the vectors returned by the getters match what we set
-  EXPECT_EQ(init_raw_writers, output_config.init_writers());
-  EXPECT_EQ(sample_raw_writers, output_config.sample_writers());
-  EXPECT_EQ(diagnostic_raw_writers, output_config.diagnostic_writers());
+  EXPECT_EQ(init_raw_writers, config_output.init_writers());
+  EXPECT_EQ(sample_raw_writers, config_output.sample_writers());
+  EXPECT_EQ(diagnostic_raw_writers, config_output.diagnostic_writers());
 }
 
 // Test optional metric writer
@@ -290,7 +290,7 @@ TEST_F(OutputConfigTest, OptionalMetricWriter) {
       std::unique_ptr<std::stringstream, deleter_noop>(&metric_stream));
   
   // Test with metric writer
-  auto config_with_metric = stan::run::output_config<stan::callbacks::writer, stan::callbacks::structured_writer>::create()
+  auto config_with_metric = stan::run::config_output<stan::callbacks::writer, stan::callbacks::structured_writer>::create()
     .logger(logger.get())
     .init_writer(init_writer.get())
     .sample_writer(sample_writer.get())
@@ -302,7 +302,7 @@ TEST_F(OutputConfigTest, OptionalMetricWriter) {
   EXPECT_EQ(metric_writer.get(), config_with_metric.metric_writer());
   
   // Test without metric writer
-  auto config_without_metric = stan::run::output_config<>::create()
+  auto config_without_metric = stan::run::config_output<>::create()
     .logger(logger.get())
     .init_writer(init_writer.get())
     .sample_writer(sample_writer.get())

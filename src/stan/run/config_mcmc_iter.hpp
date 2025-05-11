@@ -1,7 +1,7 @@
-#ifndef STAN_RUN_MCMC_ITER_CONFIG_HPP
-#define STAN_RUN_MCMC_ITER_CONFIG_HPP
+#ifndef STAN_RUN_CONFIG_MCMC_ITER_HPP
+#define STAN_RUN_CONFIG_MCMC_ITER_HPP
 
-#include <stan/run/mcmc_iter_defaults.hpp>
+#include <stan/run/defaults_mcmc_iter.hpp>
 #include <sstream>
 
 namespace stan {
@@ -13,11 +13,11 @@ namespace run {
  * This class holds all configuration parameters related to
  * iteration counts, thinning, and output frequency.
  */
-class mcmc_iter_config {
+class config_mcmc_iter {
 public:
-  // mcmc_iter_config_builder class embedded as friend
-  class mcmc_iter_config_builder {
-    friend class mcmc_iter_config;
+  // config_mcmc_iter_builder class embedded as friend
+  class config_mcmc_iter_builder {
+    friend class config_mcmc_iter;
 
     stan::run::num_warmup num_warmup_;
     stan::run::num_samples num_samples_;
@@ -26,41 +26,41 @@ public:
     stan::run::refresh refresh_;
 
   public:
-    mcmc_iter_config_builder() : 
+    config_mcmc_iter_builder() : 
       num_warmup_(),
       num_samples_(),
       save_warmup_(),
       thin_(),
       refresh_() {}
 
-    mcmc_iter_config_builder& num_warmup(int warmup) {
+    config_mcmc_iter_builder& num_warmup(int warmup) {
       num_warmup_ = stan::run::num_warmup(warmup);
       return *this;
     }
     
-    mcmc_iter_config_builder& num_samples(int samples) {
+    config_mcmc_iter_builder& num_samples(int samples) {
       num_samples_ = stan::run::num_samples(samples);
       return *this;
     }
     
-    mcmc_iter_config_builder& save_warmup(bool save) {
+    config_mcmc_iter_builder& save_warmup(bool save) {
       save_warmup_ = stan::run::save_warmup(save);
       return *this;
     }
     
-    mcmc_iter_config_builder& thin(int thin_value) {
+    config_mcmc_iter_builder& thin(int thin_value) {
       thin_ = stan::run::thin(thin_value);
       return *this;
     }
     
-    mcmc_iter_config_builder& refresh(int refresh_value) {
+    config_mcmc_iter_builder& refresh(int refresh_value) {
       refresh_ = stan::run::refresh(refresh_value);
       return *this;
     }
 
-    mcmc_iter_config build() {
+    config_mcmc_iter build() {
       validate();
-      return mcmc_iter_config(*this);
+      return config_mcmc_iter(*this);
     }
 
     void validate() const {
@@ -74,8 +74,8 @@ public:
     }
   };
 
-  static mcmc_iter_config_builder create() {
-    return mcmc_iter_config_builder();
+  static config_mcmc_iter_builder create() {
+    return config_mcmc_iter_builder();
   }
   
   // Getters 
@@ -86,7 +86,7 @@ public:
   int refresh() const { return refresh_.value(); }
 
 private:
-  explicit mcmc_iter_config(const mcmc_iter_config_builder& builder) : 
+  explicit config_mcmc_iter(const config_mcmc_iter_builder& builder) : 
     num_warmup_(builder.num_warmup_),
     num_samples_(builder.num_samples_),
     save_warmup_(builder.save_warmup_),
