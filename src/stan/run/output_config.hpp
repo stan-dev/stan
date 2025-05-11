@@ -4,7 +4,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/structured_writer.hpp>
-#include <stan/run/config/output_defaults.hpp>
+#include <stan/run/output_defaults.hpp>
 #include <memory>
 #include <vector>
 #include <string>

@@ -1,4 +1,4 @@
-#include <stan/run/config/param_inits_config.hpp>
+#include <stan/run/param_inits_config.hpp>
 #include <gtest/gtest.h>
 
 

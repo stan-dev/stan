@@ -3,7 +3,7 @@
 
 #include <stan/io/var_context.hpp>
 #include <stan/run/metric_type.hpp>
-#include <stan/run/config/hmc_defaults.hpp>
+#include <stan/run/hmc_defaults.hpp>
 #include <memory>
 
 namespace stan {

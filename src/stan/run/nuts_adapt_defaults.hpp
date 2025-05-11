@@ -1,7 +1,7 @@
 #ifndef STAN_RUN_NUTS_ADAPT_DEFAULTS_HPP
 #define STAN_RUN_NUTS_ADAPT_DEFAULTS_HPP
 
-#include <stan/run/config/config.hpp>
+#include <stan/run/config.hpp>
 #include <string>
 #include <stdexcept>
 

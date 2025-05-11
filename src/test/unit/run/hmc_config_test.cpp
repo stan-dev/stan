@@ -1,4 +1,4 @@
-#include <stan/run/config/hmc_config.hpp>
+#include <stan/run/hmc_config.hpp>
 #include <stan/run/metric_type.hpp>
 #include <gtest/gtest.h>
 

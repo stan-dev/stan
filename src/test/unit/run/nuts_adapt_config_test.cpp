@@ -1,4 +1,4 @@
-#include <stan/run/config/nuts_adapt_config.hpp>
+#include <stan/run/nuts_adapt_config.hpp>
 #include <gtest/gtest.h>
 
 TEST(NutsAdaptConfigTest, DefaultConstructor) {

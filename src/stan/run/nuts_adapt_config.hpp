@@ -2,7 +2,7 @@
 #define STAN_RUN_NUTS_ADAPT_CONFIG_HPP
 
 #include <stan/io/var_context.hpp>
-#include <stan/run/config/nuts_adapt_defaults.hpp>
+#include <stan/run/nuts_adapt_defaults.hpp>
 #include <memory>
 
 namespace stan {

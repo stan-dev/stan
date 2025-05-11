@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/run/config/param_inits_defaults.hpp>
+#include <stan/run/param_inits_defaults.hpp>
 #include <memory>
 
 namespace stan {

@@ -1,7 +1,7 @@
 #ifndef STAN_RUN_PARAM_INITS_DEFAULTS_HPP
 #define STAN_RUN_PARAM_INITS_DEFAULTS_HPP
 
-#include <stan/run/config/config.hpp>
+#include <stan/run/config.hpp>
 #include <string>
 #include <stdexcept>
 

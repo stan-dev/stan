@@ -1,4 +1,4 @@
-#include <stan/run/config/mcmc_iter_config.hpp>
+#include <stan/run/mcmc_iter_config.hpp>
 #include <gtest/gtest.h>
 
 

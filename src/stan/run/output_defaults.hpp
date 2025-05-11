@@ -1,7 +1,7 @@
 #ifndef STAN_RUN_OUTPUT_DEFAULTS_HPP
 #define STAN_RUN_OUTPUT_DEFAULTS_HPP
 
-#include <stan/run/config/config.hpp>
+#include <stan/run/config.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>

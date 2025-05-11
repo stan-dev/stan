@@ -2,7 +2,7 @@
 #define STAN_RUN_HMC_DEFAULTS_HPP
 
 #include <stan/run/metric_type.hpp>
-#include <stan/run/config/config.hpp>
+#include <stan/run/config.hpp>
 #include <string>
 #include <stdexcept>
 

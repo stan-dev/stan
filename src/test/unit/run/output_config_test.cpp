@@ -1,4 +1,4 @@
-#include <stan/run/config/output_config.hpp>
+#include <stan/run/output_config.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>

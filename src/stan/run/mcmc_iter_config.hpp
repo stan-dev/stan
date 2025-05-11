@@ -1,7 +1,7 @@
 #ifndef STAN_RUN_MCMC_ITER_CONFIG_HPP
 #define STAN_RUN_MCMC_ITER_CONFIG_HPP
 
-#include <stan/run/config/mcmc_iter_defaults.hpp>
+#include <stan/run/mcmc_iter_defaults.hpp>
 #include <sstream>
 
 namespace stan {
