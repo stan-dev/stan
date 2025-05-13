@@ -73,12 +73,12 @@ public:
   int max_depth() const { return max_depth_.value(); }
 
 private:
-  explicit config_hmc(const config_hmc_builder& config_hmc_builder) : 
-    metric_type_(config_hmc_builder.metric_type_),
-    init_inv_metric_(config_hmc_builder.init_inv_metric_),
-    stepsize_(config_hmc_builder.stepsize_),
-    stepsize_jitter_(config_hmc_builder.stepsize_jitter_),
-    max_depth_(config_hmc_builder.max_depth_) {
+  explicit config_hmc(const config_hmc_builder& builder) : 
+    metric_type_(builder.metric_type_),
+    init_inv_metric_(builder.init_inv_metric_),
+    stepsize_(builder.stepsize_),
+    stepsize_jitter_(builder.stepsize_jitter_),
+    max_depth_(builder.max_depth_) {
   }
 
   stan::run::config_metric_type metric_type_;
