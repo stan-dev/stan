@@ -4,7 +4,7 @@
 
 TEST(ParamInitsConfigTest, DefaultConstructor) {
   auto config_param_inits = stan::run::config_param_inits::create().build();
-  EXPECT_EQ(stan::run::init_radius().value(), config_param_inits.init_radius());
+  EXPECT_EQ(stan::run::init_radius_config().value(), config_param_inits.init_radius());
   EXPECT_EQ(nullptr, config_param_inits.init_params());
 }
 

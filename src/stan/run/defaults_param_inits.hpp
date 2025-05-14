@@ -11,7 +11,7 @@ namespace run {
 /**
  * Initial radius for parameter initialization.
  */
-class init_radius : public config<double> {
+class init_radius_config : public config<double> {
 private:
   static const std::string description_;
   static void validator(const double& value) {
@@ -21,14 +21,16 @@ private:
   }
 
 public:
-  init_radius() : config<double>(2.0, description_, validator) {}
+  init_radius_config() : config<double>(2.0, description_, validator) {}
 
-  explicit init_radius(double value) : config<double>(value, description_, validator) {}
+  explicit init_radius_config(double value) :
+    config<double>(value, description_, validator) {}
 
   static double default_value() { return 2.0; }
 };
 
-const std::string init_radius::description_ = "Initial radius for parameter initialization.";
+const std::string init_radius_config::description_ =
+  "Initial radius for parameter initialization.";
 
 }  // namespace run
 }  // namespace stan

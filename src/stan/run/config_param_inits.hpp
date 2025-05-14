@@ -17,14 +17,14 @@ public:
   // config_param_inits_builder class embedded as friend
   class config_param_inits_builder {
     friend class config_param_inits;
-    stan::run::init_radius init_radius_;
+    stan::run::init_radius_config init_radius_;
     std::shared_ptr<const stan::io::var_context> init_params_ = nullptr;
 
   public:
     config_param_inits_builder() : init_radius_() {}
 
     config_param_inits_builder& init_radius(double radius) {
-      init_radius_ = stan::run::init_radius(radius);
+      init_radius_ = stan::run::init_radius_config(radius);
       return *this;
     }
 
@@ -59,7 +59,7 @@ private:
     init_params_(builder.init_params_) {
   }
 
-  stan::run::init_radius init_radius_;
+  stan::run::init_radius_config init_radius_;
   std::shared_ptr<const stan::io::var_context> init_params_;
 };
 
