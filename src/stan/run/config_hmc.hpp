@@ -15,7 +15,7 @@ public:
   // config_hmc_builder class embedded as friend
   class config_hmc_builder {
     friend class config_hmc;
-    stan::run::config_metric_type metric_type_;
+    stan::run::metric_type_config metric_type_;
     std::shared_ptr<const stan::io::var_context> init_inv_metric_ = nullptr;
     stan::run::stepsize stepsize_;
     stan::run::stepsize_jitter stepsize_jitter_;
@@ -29,7 +29,7 @@ public:
       max_depth_() {}
 
     config_hmc_builder& metric_type(metric_t metric_type) {
-      metric_type_ = stan::run::config_metric_type(metric_type);
+      metric_type_ = stan::run::metric_type_config(metric_type);
       return *this;
     }
     config_hmc_builder& init_inv_metric(std::shared_ptr<const stan::io::var_context> inv_metric) {
@@ -81,7 +81,7 @@ private:
     max_depth_(builder.max_depth_) {
   }
 
-  stan::run::config_metric_type metric_type_;
+  stan::run::metric_type_config metric_type_;
   std::shared_ptr<const stan::io::var_context> init_inv_metric_;
   stan::run::stepsize stepsize_;
   stan::run::stepsize_jitter stepsize_jitter_;
