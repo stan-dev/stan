@@ -21,9 +21,9 @@ public:
   // config_algorithm_builder class embedded as friend
   class config_algorithm_builder {
     friend class config_algorithm;
-    stan::run::config_algorithm_type algorithm_type_;
-    stan::run::num_chains num_chains_;
-    stan::run::random_seed random_seed_;
+    stan::run::algorithm_type_config algorithm_type_;
+    stan::run::num_chains_config num_chains_;
+    stan::run::random_seed_config random_seed_;
     
    public:
     config_algorithm_builder() :
@@ -32,17 +32,17 @@ public:
       random_seed_() {}
     
     config_algorithm_builder& algorithm_type(algorithm_t algorithm) {
-      algorithm_type_ = stan::run::config_algorithm_type(algorithm);
+      algorithm_type_ = stan::run::algorithm_type_config(algorithm);
       return *this;
     }
     
     config_algorithm_builder& num_chains(size_t num_chains) {
-      num_chains_ = stan::run::num_chains(num_chains);
+      num_chains_ = stan::run::num_chains_config(num_chains);
       return *this;
     }
     
     config_algorithm_builder& random_seed(unsigned int seed) {
-      random_seed_ = stan::run::random_seed(seed);
+      random_seed_ = stan::run::random_seed_config(seed);
       return *this;
     }
     
@@ -92,9 +92,9 @@ private:
        random_seed_(builder.random_seed_) {
   }
   
-  stan::run::config_algorithm_type algorithm_type_;
-  stan::run::num_chains num_chains_;
-  stan::run::random_seed random_seed_;
+  stan::run::algorithm_type_config algorithm_type_;
+  stan::run::num_chains_config num_chains_;
+  stan::run::random_seed_config random_seed_;
 };
 
 }  // namespace run

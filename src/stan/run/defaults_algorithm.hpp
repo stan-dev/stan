@@ -11,7 +11,7 @@ namespace run {
 /**
  * Default number of chains configuration.
  */
-class num_chains : public config<size_t> {
+class num_chains_config : public config<size_t> {
 private:
   static const std::string description_;
   static void validator(const size_t& value) {
@@ -21,23 +21,19 @@ private:
   }
 
 public:
-  num_chains() : config<size_t>(1, description_, validator) {}
+  num_chains_config() : config<size_t>(1, description_, validator) {}
   
-  explicit num_chains(size_t value) : config<size_t>(value, description_, validator) {}
+  explicit num_chains_config(size_t value) : config<size_t>(value, description_, validator) {}
 
   static size_t default_value() { return 1; }
 };
 
-const std::string num_chains::description_ = "Number of Markov chains to run.";
+const std::string num_chains_config::description_ = "Number of Markov chains to run.";
 
 /**
  * Random seed for initialization.
- * 
- * This class wraps the random seed parameter with description.
- * Unlike other configuration parameters, there is no default
- * value - the random seed must be explicitly specified.
  */
-class random_seed : public config<unsigned int> {
+class random_seed_config : public config<unsigned int> {
 private:
   static const std::string description_;
   static void validator(const unsigned int& value) {
@@ -45,20 +41,20 @@ private:
   }
 
 public:
-  random_seed() : config<unsigned int>(1, description_, validator) {}
+  random_seed_config() : config<unsigned int>(1, description_, validator) {}
 
-  explicit random_seed(unsigned int value) : config<unsigned int>(value, description_) {}
+  explicit random_seed_config(unsigned int value) : config<unsigned int>(value, description_) {}
 
   static unsigned int default_value() { return 1; }
 };
 
-const std::string random_seed::description_ = "Random seed for initialization.";
+const std::string random_seed_config::description_ = "Random seed for initialization.";
 
   
 /**
  * Inference algorithm type.
  */
-class config_algorithm_type : public config<algorithm_t> {
+class algorithm_type_config : public config<algorithm_t> {
 private:
   static const std::string description_;
   static void validator(const algorithm_t& value) {
@@ -66,14 +62,14 @@ private:
   }
 
 public:
-  config_algorithm_type() : config<algorithm_t>(algorithm_t::STAN2_HMC, description_, validator) {}
+  algorithm_type_config() : config<algorithm_t>(algorithm_t::STAN2_HMC, description_, validator) {}
 
-  explicit config_algorithm_type(algorithm_t value) : config<algorithm_t>(value, description_, validator) {}
+  explicit algorithm_type_config(algorithm_t value) : config<algorithm_t>(value, description_, validator) {}
 
   static algorithm_t default_value() { return algorithm_t::STAN2_HMC; }
 };
 
-const std::string config_algorithm_type::description_ = "Inference algorithm to run.";
+const std::string algorithm_type_config::description_ = "Inference algorithm to run.";
 
 }  // namespace run
 }  // namespace stan

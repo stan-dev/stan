@@ -135,15 +135,6 @@ private:
     }
   }
 
-public:
-  num_chains_config() : config<size_t>(1, description_, validator) {}
-  
-  explicit num_chains_config(size_t value) : config<size_t>(value, description_, validator) {}
-
-  static size_t default_value() { return 1; }
-};
-
-const std::string num_chains_config::description_ = "Number of Markov chains to run.";
 
 }  // namespace run
 }  // namespace stan
