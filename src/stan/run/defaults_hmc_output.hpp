@@ -2,7 +2,6 @@
 #define STAN_RUN_OUTPUT_DEFAULTS_HPP
 
 #include <stan/run/config.hpp>
-#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <string>
@@ -10,26 +9,6 @@
 
 namespace stan {
 namespace run {
-
-/**
- * Default logger configuration.
- */
-class logger_config : public config<callbacks::logger*> {
-private:
-  static const std::string description_;
-  static void validator(const callbacks::logger* const& value) {
-    // No validation needed - nullptr is a valid value
-  }
-
-public:
-  logger_config() : config<callbacks::logger*>(nullptr, description_, validator) {}
-  
-  explicit logger_config(callbacks::logger* value) : config<callbacks::logger*>(value, description_, validator) {}
-
-  static callbacks::logger* default_value() { return nullptr; }
-};
-
-const std::string logger_config::description_ = "Logger for messages, warnings, and errors.";
 
 /**
  * Default initialization writer configuration.
@@ -134,7 +113,9 @@ private:
       throw std::invalid_argument("num_chains must be at least 1");
     }
   }
+};
 
+const std::string num_chains_config::description_ = "Number of chains to run.";
 
 }  // namespace run
 }  // namespace stan

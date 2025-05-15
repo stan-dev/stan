@@ -2,6 +2,7 @@
 #define STAN_RUN_DEFAULTS_ALGORITHM_HPP
 
 #include <stan/run/config.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <string>
 #include <stdexcept>
 
@@ -71,6 +72,26 @@ public:
 
 const std::string algorithm_type_config::description_ = "Inference algorithm to run.";
 
+/**
+ * Default logger configuration.
+ */
+class logger_config : public config<callbacks::logger*> {
+private:
+  static const std::string description_;
+  static void validator(const callbacks::logger* const& value) {
+    // No validation needed - nullptr is a valid value
+  }
+
+public:
+  logger_config() : config<callbacks::logger*>(nullptr, description_, validator) {}
+  
+  explicit logger_config(callbacks::logger* value) : config<callbacks::logger*>(value, description_, validator) {}
+
+  static callbacks::logger* default_value() { return nullptr; }
+};
+
+const std::string logger_config::description_ = "Logger for messages, warnings, and errors.";
+  
 }  // namespace run
 }  // namespace stan
 

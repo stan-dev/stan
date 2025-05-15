@@ -3,6 +3,7 @@
 
 #include <stan/run/algorithm_type.hpp>
 #include <stan/run/defaults_algorithm.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <boost/random/mixmax.hpp>
 #include <vector>
 
@@ -24,12 +25,14 @@ public:
     stan::run::algorithm_type_config algorithm_type_;
     stan::run::num_chains_config num_chains_;
     stan::run::random_seed_config random_seed_;
+    stan::run::logger_config logger_;
     
    public:
     config_algorithm_builder() :
       algorithm_type_(),
       num_chains_(),
-      random_seed_() {}
+      random_seed_(),
+      logger_() {}
     
     config_algorithm_builder& algorithm_type(algorithm_t algorithm) {
       algorithm_type_ = stan::run::algorithm_type_config(algorithm);
@@ -43,6 +46,11 @@ public:
     
     config_algorithm_builder& random_seed(unsigned int seed) {
       random_seed_ = stan::run::random_seed_config(seed);
+      return *this;
+    }
+    
+    config_algorithm_builder& logger(callbacks::logger* logger) {
+      logger_ = stan::run::logger_config(logger);
       return *this;
     }
     
@@ -64,37 +72,20 @@ public:
   algorithm_t algorithm_type() const { return algorithm_type_.value(); }
   size_t num_chains() const { return num_chains_.value(); }
   unsigned int random_seed() const { return random_seed_.value(); }
-  
-  // /**
-  //  * Create a random number generator using the specified seed.
-  //  */
-  // boost::random::mixmax rng() const {
-  //   return boost::random::mixmax(random_seed_.value());
-  // }
-  
-  // /**
-  //  * Get per-chain seeds for multi-chain sampling.
-  //  * Each chain receives a different seed derived from the base seed.
-  //  */
-  // std::vector<unsigned int> chain_seeds() const {
-  //   std::vector<unsigned int> seeds;
-  //   seeds.reserve(num_chains_.value());
-  //   for (int i = 0; i < num_chains_.value(); ++i) {
-  //     seeds.push_back(random_seed_.value() + i);
-  //   }
-  //   return seeds;
-  // }
+  callbacks::logger* logger() const {return logger_.value(); }
   
 private:
   explicit config_algorithm(const config_algorithm_builder& builder) :
        algorithm_type_(builder.algorithm_type_),
        num_chains_(builder.num_chains_),
-       random_seed_(builder.random_seed_) {
+       random_seed_(builder.random_seed_),
+       logger_(builder.logger_){
   }
   
   stan::run::algorithm_type_config algorithm_type_;
   stan::run::num_chains_config num_chains_;
   stan::run::random_seed_config random_seed_;
+  stan::run::logger_config logger_;
 };
 
 }  // namespace run
