@@ -83,7 +83,6 @@ TEST(AlgorithmConfigTest, LoggerFunctionality) {
   // SECOND TEST: Verify direct logger usage works
   logger.info("Direct info message");
   std::string stream_content = log_stream.str();
-  std::cout << "Direct logger output: '" << stream_content << "'" << std::endl;
   EXPECT_TRUE(stream_content.find("Direct info message") != std::string::npos);
   
   // Clear the stream for the next test
@@ -92,6 +91,5 @@ TEST(AlgorithmConfigTest, LoggerFunctionality) {
   // THIRD TEST: Now test through the config object
   config.logger()->info("Config info message");
   stream_content = log_stream.str();
-  std::cout << "Config logger output: '" << stream_content << "'" << std::endl;
   EXPECT_TRUE(stream_content.find("Config info message") != std::string::npos);
 }

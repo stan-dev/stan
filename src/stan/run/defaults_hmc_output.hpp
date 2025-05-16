@@ -102,21 +102,6 @@ public:
 template <typename Stream, typename Deleter>
 const std::string metric_writer_config<Stream, Deleter>::description_ = "Structured writer for sampler metrics.";
 
-/**
- * Default number of chains configuration.
- */
-class num_chains_config : public config<size_t> {
-private:
-  static const std::string description_;
-  static void validator(const size_t& value) {
-    if (value < 1) {
-      throw std::invalid_argument("num_chains must be at least 1");
-    }
-  }
-};
-
-const std::string num_chains_config::description_ = "Number of chains to run.";
-
 }  // namespace run
 }  // namespace stan
 
