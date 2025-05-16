@@ -55,24 +55,6 @@ public:
 const std::string num_samples::description_ = "Number of sampling iterations.";
 
 /**
- * Save warmup iterations to output.
- */
-class save_warmup : public config<bool> {
-private:
-  static const std::string description_;
-  // No validator needed for bool
-
-public:
-  save_warmup() : config<bool>(false, description_) {}
-  
-  explicit save_warmup(bool value) : config<bool>(value, description_) {}
-
-  static bool default_value() { return false; }
-};
-
-const std::string save_warmup::description_ = "Save warmup iterations to output.";
-
-/**
  * Period between saved samples.
  */
 class thin : public config<int> {

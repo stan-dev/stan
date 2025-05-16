@@ -17,7 +17,6 @@ public:
     friend class config_hmc;
     stan::run::num_warmup num_warmup_;
     stan::run::num_samples num_samples_;
-    stan::run::save_warmup save_warmup_;
     stan::run::thin thin_;
     stan::run::refresh refresh_;
     stan::run::metric_type_config metric_type_;
@@ -30,7 +29,6 @@ public:
     config_hmc_builder() : 
       num_warmup_(),
       num_samples_(),
-      save_warmup_(),
       thin_(),
       refresh_(),
       metric_type_(),
@@ -45,11 +43,6 @@ public:
     
     config_hmc_builder& num_samples(int samples) {
       num_samples_ = stan::run::num_samples(samples);
-      return *this;
-    }
-    
-    config_hmc_builder& save_warmup(bool save) {
-      save_warmup_ = stan::run::save_warmup(save);
       return *this;
     }
     
@@ -106,7 +99,6 @@ public:
   // Getters
   int num_warmup() const { return num_warmup_.value(); }
   int num_samples() const { return num_samples_.value(); }
-  bool save_warmup() const { return save_warmup_.value(); }
   int thin() const { return thin_.value(); }
   int refresh() const { return refresh_.value(); }
   metric_t metric_type() const { return metric_type_.value(); }
@@ -121,7 +113,6 @@ private:
   explicit config_hmc(const config_hmc_builder& builder) : 
     num_warmup_(builder.num_warmup_),
     num_samples_(builder.num_samples_),
-    save_warmup_(builder.save_warmup_),
     thin_(builder.thin_),
     refresh_(builder.refresh_),
     metric_type_(builder.metric_type_),
@@ -133,7 +124,6 @@ private:
 
   stan::run::num_warmup num_warmup_;
   stan::run::num_samples num_samples_;
-  stan::run::save_warmup save_warmup_;
   stan::run::thin thin_;
   stan::run::refresh refresh_;
   stan::run::metric_type_config metric_type_;

@@ -7,7 +7,6 @@ TEST(HmcConfigTest, DefaultConstructor) {
   auto config_hmc = stan::run::config_hmc::create().build();
   EXPECT_EQ(stan::run::num_warmup().value(), config_hmc.num_warmup());
   EXPECT_EQ(stan::run::num_samples().value(), config_hmc.num_samples());
-  EXPECT_EQ(stan::run::save_warmup().value(), config_hmc.save_warmup());
   EXPECT_EQ(stan::run::thin().value(), config_hmc.thin());
   EXPECT_EQ(stan::run::refresh().value(), config_hmc.refresh());
   EXPECT_FLOAT_EQ(stan::run::stepsize().value(), config_hmc.stepsize());
