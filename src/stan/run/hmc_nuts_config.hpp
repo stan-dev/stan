@@ -21,13 +21,13 @@ class hmc_nuts_config {
 public:
   /**
    * Builder class for constructing HMC NUTS configuration.
-   * 
-   * Provides fluent interface that forwards method calls to the
-   * appropriate sub-builders and handles cross-component validation.
+   * Forwards method calls to the  appropriate sub-builders.
    */
   class hmc_nuts_config_builder {
     friend class hmc_nuts_config;
+    
     num_chains_config num_chains_;
+    mutable size_t chains_;  // need local copy for hmc_builder_.validate
     process_config::process_config_builder process_builder_;
     hmc_config::hmc_config_builder hmc_builder_;
     nuts_adapt_config::nuts_adapt_config_builder adapt_builder_;
@@ -40,15 +40,12 @@ public:
 
   public:
     hmc_nuts_config_builder() : 
-      process_builder_(), hmc_builder_(), adapt_builder_() {}
+      chains_(1), process_builder_(), hmc_builder_(), adapt_builder_() {}
 
-    hmc_nuts_config_builder& num_chains(size_t num_chains) {
-      num_chains_ = num_chains_config(num_chains);
-      return *this;
-    }
     // Process configuration methods
     hmc_nuts_config_builder& num_chains(size_t num_chains) {
       process_builder_.num_chains(num_chains);
+      chains_ = num_chains;
       return *this;
     }
 
@@ -73,13 +70,13 @@ public:
     }
 
     // HMC configuration methods
-    hmc_nuts_config_builder& num_warmup(int warmup) {
-      hmc_builder_.num_warmup(warmup);
+    hmc_nuts_config_builder& warmup(int warmup) {
+      hmc_builder_.warmup(warmup);
       return *this;
     }
 
-    hmc_nuts_config_builder& num_samples(int samples) {
-      hmc_builder_.num_samples(samples);
+    hmc_nuts_config_builder& samples(int samples) {
+      hmc_builder_.samples(samples);
       return *this;
     }
 
@@ -98,9 +95,9 @@ public:
       return *this;
     }
 
-    hmc_nuts_config_builder& init_inv_metric(
-        std::shared_ptr<const stan::io::var_context> inv_metric) {
-      hmc_builder_.init_inv_metric(inv_metric);
+    hmc_nuts_config_builder& init_metric(
+        const std::vector<std::string>& metric_filenames) {
+      hmc_builder_.init_metric(metric_filenames);
       return *this;
     }
 
@@ -186,48 +183,12 @@ public:
     }
 
     /**
-     * Validates the composed configuration.
-     * Checks individual component validity and cross-component constraints.
+     * Checks individual component validity.
      */
     void validate() const {
-      // Validate individual components
       process_builder_.validate();
-      hmc_builder_.validate();
+      hmc_builder_.validate(chains_);
       adapt_builder_.validate();
-      
-      // Cross-component validation
-      validate_adaptation_schedule();
-    }
-
-  private:
-    /**
-     * Validates that adaptation schedule is consistent with sampling schedule.
-     */
-    void validate_adaptation_schedule() const {
-      // Build temporary configs to access values for validation
-      auto temp_hmc = hmc_builder_;
-      temp_hmc.validate();  // This might throw, but that's OK
-      auto hmc_config_temp = hmc_config(temp_hmc);
-      
-      auto temp_adapt = adapt_builder_;
-      auto adapt_config = nuts_adapt_config(temp_adapt);
-      
-      int total_warmup = hmc_config_temp.num_warmup();
-      unsigned int init_buffer = adapt_config.init_buffer();
-      unsigned int term_buffer = adapt_config.term_buffer();
-      unsigned int window = adapt_config.window();
-      
-      // Check that adaptation schedule fits within warmup
-      if (init_buffer + term_buffer + window > static_cast<unsigned int>(total_warmup)) {
-        std::stringstream msg;
-        msg << "Adaptation schedule exceeds warmup iterations. "
-            << "init_buffer(" << init_buffer << ") + "
-            << "term_buffer(" << term_buffer << ") + "
-            << "window(" << window << ") = "
-            << (init_buffer + term_buffer + window)
-            << " > num_warmup(" << total_warmup << ")";
-        throw std::invalid_argument(msg.str());
-      }
     }
   };
 
@@ -251,9 +212,9 @@ public:
   double init_radius() const { return process_.init_radius(); }
   bool has_init_params() const { return process_.has_init_params(); }
 
-  // HMC-level  
-  int num_warmup() const { return hmc_.num_warmup(); }
-  int num_samples() const { return hmc_.num_samples(); }
+  // HMC-level
+  int warmup() const { return hmc_.warmup(); }
+  int samples() const { return hmc_.samples(); }
   int thin() const { return hmc_.thin(); }
   double stepsize() const { return hmc_.stepsize(); }
   metric_t metric_type() const { return hmc_.metric_type(); }
@@ -273,7 +234,7 @@ private:
   /**
    * Private constructor that builds from the builder.
    */
-  explicit hmc_nuts_config(const hmc_nuts_config_builder& builder) :
+  explicit hmc_nuts_config(hmc_nuts_config_builder& builder) :
       process_(builder.process_builder_.build()),
       hmc_(builder.hmc_builder_.build()),
       adaptation_(builder.adapt_builder_.build()),

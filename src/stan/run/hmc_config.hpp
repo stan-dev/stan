@@ -92,8 +92,7 @@ public:
       return *this;
     }
 
-    hmc_config build(size_t num_chains) {
-      validate(num_chains);
+    hmc_config build() {
       return hmc_config(*this);
     }
 
