@@ -1,7 +1,7 @@
-#ifndef STAN3_LOAD_MODEL_HPP
+#ifndef STAN_RUN_LOAD_MODEL_HPP
 #define STAN_RUN_LOAD_MODEL_HPP
 
-#include <stan_run/model_config.hpp>
+#include <stan/run/model_config.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/model/model_base.hpp>
 
