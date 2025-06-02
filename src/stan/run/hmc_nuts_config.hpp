@@ -205,24 +205,31 @@ public:
   const nuts_adapt_config& adaptation() const { return adaptation_; }
 
   // Convenience getters for commonly used values
-  // Process-level
+  // Process
   size_t num_chains() const { return process_.num_chains(); }
   unsigned int seed() const { return process_.seed(); }
   const std::string& output_dir() const { return process_.output_dir(); }
   double init_radius() const { return process_.init_radius(); }
   bool has_init_params() const { return process_.has_init_params(); }
 
-  // HMC-level
+  // HMC
   int warmup() const { return hmc_.warmup(); }
   int samples() const { return hmc_.samples(); }
   int thin() const { return hmc_.thin(); }
   double stepsize() const { return hmc_.stepsize(); }
   metric_t metric_type() const { return hmc_.metric_type(); }
+  int refresh() const { return hmc_.refresh(); }
+  double stepsize_jitter() const { return hmc_.stepsize_jitter(); }  
+  int max_depth() const { return hmc_.max_depth(); }
 
-  // NUTS adaptation
+  // NUTS
   double delta() const { return adaptation_.delta(); }
   double gamma() const { return adaptation_.gamma(); }
   unsigned int init_buffer() const { return adaptation_.init_buffer(); }
+  double kappa() const { return adaptation_.kappa(); }
+  double t0() const { return adaptation_.t0(); }
+  unsigned int term_buffer() const { return adaptation_.term_buffer(); }
+  unsigned int window() const { return adaptation_.window(); }
 
   // Output options
   bool save_start_params() const { return save_start_params_; }
