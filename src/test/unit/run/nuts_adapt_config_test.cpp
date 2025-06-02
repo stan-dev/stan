@@ -1,35 +1,123 @@
-#include <stan/run/config_nuts_adapt.hpp>
+#include <stan/run/nuts_adapt_config.hpp>
 #include <gtest/gtest.h>
 
 TEST(NutsAdaptConfigTest, DefaultConstructor) {
-  auto config_nuts_adapt = stan::run::config_nuts_adapt::create().build();
-  EXPECT_FLOAT_EQ(stan::run::delta().value(), config_nuts_adapt.delta());
-  EXPECT_FLOAT_EQ(stan::run::gamma().value(), config_nuts_adapt.gamma());
-  EXPECT_FLOAT_EQ(stan::run::kappa().value(), config_nuts_adapt.kappa());
-  EXPECT_FLOAT_EQ(stan::run::t0().value(), config_nuts_adapt.t0());
-  EXPECT_EQ(stan::run::init_buffer().value(), config_nuts_adapt.init_buffer());
-  EXPECT_EQ(stan::run::term_buffer().value(), config_nuts_adapt.term_buffer());
-  EXPECT_EQ(stan::run::window().value(), config_nuts_adapt.window());
+  auto config = stan::run::nuts_adapt_config::create().build();
+  
+  EXPECT_DOUBLE_EQ(0.8, config.delta());
+  EXPECT_DOUBLE_EQ(0.05, config.gamma());
+  EXPECT_DOUBLE_EQ(0.75, config.kappa());
+  EXPECT_DOUBLE_EQ(10.0, config.t0());
+  EXPECT_EQ(75u, config.init_buffer());
+  EXPECT_EQ(50u, config.term_buffer());
+  EXPECT_EQ(25u, config.window());
 }
 
-TEST(McmcIterConfigTest, Constructor_2) {
-  auto config_nuts_adapt = stan::run::config_nuts_adapt::create()
-    .init_buffer(3).window(5).term_buffer(0).build();
-  EXPECT_EQ(3, config_nuts_adapt.init_buffer());
-  EXPECT_EQ(0, config_nuts_adapt.term_buffer());
-  EXPECT_EQ(5, config_nuts_adapt.window());
+TEST(NutsAdaptConfigTest, CustomValues) {
+  auto config = stan::run::nuts_adapt_config::create()
+    .delta(0.9)
+    .gamma(0.1)
+    .kappa(0.5)
+    .t0(20.0)
+    .init_buffer(100)
+    .term_buffer(75)
+    .window(50)
+    .build();
+  
+  EXPECT_DOUBLE_EQ(0.9, config.delta());
+  EXPECT_DOUBLE_EQ(0.1, config.gamma());
+  EXPECT_DOUBLE_EQ(0.5, config.kappa());
+  EXPECT_DOUBLE_EQ(20.0, config.t0());
+  EXPECT_EQ(100u, config.init_buffer());
+  EXPECT_EQ(75u, config.term_buffer());
+  EXPECT_EQ(50u, config.window());
 }
 
-TEST(McmcIterConfigTest, Constructor_bad) {
+TEST(NutsAdaptConfigTest, InvalidDeltaTooLow) {
   EXPECT_THROW(
-	       auto config_nuts_adapt = stan::run::config_nuts_adapt::create()
-	       .delta(-3).gamma(-4).kappa(-5).build(),
-	       std::invalid_argument);
+    stan::run::nuts_adapt_config::create()
+      .delta(0.0)
+      .build(),
+    std::invalid_argument);
 }
 
-TEST(McmcIterConfigTest, setters_bad) {
-  auto config_nuts_adapt = stan::run::config_nuts_adapt::create();
-  EXPECT_THROW(config_nuts_adapt.delta(-1), std::invalid_argument);
-  EXPECT_THROW(config_nuts_adapt.gamma(-1), std::invalid_argument);
-  EXPECT_THROW(config_nuts_adapt.kappa(-1), std::invalid_argument);
+TEST(NutsAdaptConfigTest, InvalidDeltaTooHigh) {
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .delta(1.0)
+      .build(),
+    std::invalid_argument);
+}
+
+TEST(NutsAdaptConfigTest, InvalidDeltaNegative) {
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .delta(-0.1)
+      .build(),
+    std::invalid_argument);
+}
+
+TEST(NutsAdaptConfigTest, InvalidGamma) {
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .gamma(0.0)
+      .build(),
+    std::invalid_argument);
+  
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .gamma(-0.1)
+      .build(),
+    std::invalid_argument);
+}
+
+TEST(NutsAdaptConfigTest, InvalidKappa) {
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .kappa(0.0)
+      .build(),
+    std::invalid_argument);
+  
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .kappa(-0.1)
+      .build(),
+    std::invalid_argument);
+}
+
+TEST(NutsAdaptConfigTest, InvalidT0) {
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .t0(0.0)
+      .build(),
+    std::invalid_argument);
+  
+  EXPECT_THROW(
+    stan::run::nuts_adapt_config::create()
+      .t0(-1.0)
+      .build(),
+    std::invalid_argument);
+}
+
+TEST(NutsAdaptConfigTest, ValidBoundaryValues) {
+  // Test valid boundary values
+  auto config = stan::run::nuts_adapt_config::create()
+    .delta(0.01)  // Very small but valid
+    .gamma(0.001) // Very small but valid
+    .kappa(0.001) // Very small but valid
+    .t0(0.001)    // Very small but valid
+    .build();
+  
+  EXPECT_DOUBLE_EQ(0.01, config.delta());
+  EXPECT_DOUBLE_EQ(0.001, config.gamma());
+  EXPECT_DOUBLE_EQ(0.001, config.kappa());
+  EXPECT_DOUBLE_EQ(0.001, config.t0());
+}
+
+TEST(NutsAdaptConfigTest, ValidUpperBoundaryDelta) {
+  auto config = stan::run::nuts_adapt_config::create()
+    .delta(0.99)  // Close to 1 but valid
+    .build();
+  
+  EXPECT_DOUBLE_EQ(0.99, config.delta());
 }

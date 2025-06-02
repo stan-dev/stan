@@ -1,60 +1,167 @@
-#include <stan/run/config_hmc.hpp>
-#include <stan/run/metric_type.hpp>
+#include <stan/run/hmc_config.hpp>
 #include <gtest/gtest.h>
 
-
 TEST(HmcConfigTest, DefaultConstructor) {
-  auto config_hmc = stan::run::config_hmc::create().build();
-  EXPECT_EQ(stan::run::num_warmup().value(), config_hmc.num_warmup());
-  EXPECT_EQ(stan::run::num_samples().value(), config_hmc.num_samples());
-  EXPECT_EQ(stan::run::thin().value(), config_hmc.thin());
-  EXPECT_EQ(stan::run::refresh().value(), config_hmc.refresh());
-  EXPECT_FLOAT_EQ(stan::run::stepsize().value(), config_hmc.stepsize());
-  EXPECT_FLOAT_EQ(stan::run::stepsize_jitter().value(), config_hmc.stepsize_jitter());
-  EXPECT_EQ(stan::run::max_depth().value(), config_hmc.max_depth());
-  EXPECT_EQ(stan::run::metric_t::DIAG_E, config_hmc.metric_type());
-  EXPECT_EQ(nullptr, config_hmc.init_inv_metric());
+  size_t num_chains = 1;
+  auto config = stan::run::hmc_config::create().build(num_chains);
+  
+  EXPECT_EQ(1000, config.warmup());
+  EXPECT_EQ(1000, config.samples());
+  EXPECT_EQ(1, config.thin());
+  EXPECT_EQ(100, config.refresh());
+  EXPECT_DOUBLE_EQ(1.0, config.stepsize());
+  EXPECT_DOUBLE_EQ(0.0, config.stepsize_jitter());
+  EXPECT_EQ(10, config.max_depth());
+  EXPECT_EQ(0, config.init_metric().size());
 }
 
-TEST(HmcConfigTest, Constructor_2) {
-  auto config_hmc = stan::run::config_hmc::create()
-    .metric_type(stan::run::metric_t::DENSE_E)
+TEST(HmcConfigTest, CustomValues) {
+  size_t num_chains = 1;
+  auto config = stan::run::hmc_config::create()
+    .warmup(500)
+    .samples(2000)
+    .thin(2)
+    .refresh(50)
     .stepsize(0.1)
-    .max_depth(11)
-    .build();
-  EXPECT_FLOAT_EQ(0.1, config_hmc.stepsize());
-  EXPECT_FLOAT_EQ(stan::run::stepsize_jitter().value(), config_hmc.stepsize_jitter());
-  EXPECT_EQ(11, config_hmc.max_depth());
-  EXPECT_EQ(stan::run::metric_t::DENSE_E, config_hmc.metric_type());
+    .stepsize_jitter(0.1)
+    .max_depth(15)
+    .build(num_chains);
+  
+  EXPECT_EQ(500, config.warmup());
+  EXPECT_EQ(2000, config.samples());
+  EXPECT_EQ(2, config.thin());
+  EXPECT_EQ(50, config.refresh());
+  EXPECT_DOUBLE_EQ(0.1, config.stepsize());
+  EXPECT_DOUBLE_EQ(0.1, config.stepsize_jitter());
+  EXPECT_EQ(15, config.max_depth());
 }
 
-TEST(HmcConfigTest, Constructor_bad) {
-  EXPECT_THROW(auto config_hmc = stan::run::config_hmc::create()
-	       .max_depth(-11).build(),
-	       std::invalid_argument);
-  EXPECT_THROW(auto config_hmc = stan::run::config_hmc::create()
-	       .stepsize(-0.1).build(),
-	       std::invalid_argument);
+TEST(HmcConfigTest, InvalidWarmup) {
+  size_t num_chains = 1;
   EXPECT_THROW(
-	       auto config_hmc = stan::run::config_hmc::create()
-	       .num_warmup(-5).build(),
-	       std::invalid_argument);
-  EXPECT_THROW(
-	       auto config_hmc = stan::run::config_hmc::create()
-	       .num_samples(-10).build(),
-	       std::invalid_argument);
-  EXPECT_THROW(
-	       auto config_hmc = stan::run::config_hmc::create()
-	       .thin(-2).build(),
-	       std::invalid_argument);
+    stan::run::hmc_config::create()
+      .warmup(-1)
+      .build(num_chains),
+    std::invalid_argument);
 }
 
-TEST(HmcConfigTest, setters_bad) {
-  auto config_hmc = stan::run::config_hmc::create();
-  EXPECT_THROW(config_hmc.num_warmup(-1), std::invalid_argument);
-  EXPECT_THROW(config_hmc.num_samples(-1), std::invalid_argument);
-  EXPECT_THROW(config_hmc.thin(-1), std::invalid_argument);
-  EXPECT_THROW(config_hmc.stepsize(0.-1), std::invalid_argument);
-  EXPECT_THROW(config_hmc.stepsize_jitter(0.-1), std::invalid_argument);
-  EXPECT_THROW(config_hmc.max_depth(-1), std::invalid_argument);
+TEST(HmcConfigTest, ValidZeroWarmup) {
+  size_t num_chains = 1;
+  auto config = stan::run::hmc_config::create()
+    .warmup(0)
+    .build(num_chains);
+  
+  EXPECT_EQ(0, config.warmup());
+}
+
+TEST(HmcConfigTest, InvalidSamples) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .samples(-1)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, ValidZeroSamples) {
+  size_t num_chains = 1;
+  auto config = stan::run::hmc_config::create()
+    .samples(0)
+    .build(num_chains);
+  
+  EXPECT_EQ(0, config.samples());
+}
+
+TEST(HmcConfigTest, InvalidThinZero) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .thin(0)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, InvalidThinNegative) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .thin(-1)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, InvalidStepsizeZero) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .stepsize(0.0)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, InvalidStepsizeNegative) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .stepsize(-0.1)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, InvalidStepsizeJitterTooLow) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .stepsize_jitter(-0.1)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, InvalidStepsizeJitterTooHigh) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .stepsize_jitter(1.1)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, ValidStepsizeJitterBoundaries) {
+  size_t num_chains = 1;
+  auto config1 = stan::run::hmc_config::create()
+    .stepsize_jitter(0.0)
+    .build(num_chains);
+  EXPECT_DOUBLE_EQ(0.0, config1.stepsize_jitter());
+  
+  auto config2 = stan::run::hmc_config::create()
+    .stepsize_jitter(1.0)
+    .build(num_chains);
+  EXPECT_DOUBLE_EQ(1.0, config2.stepsize_jitter());
+}
+
+TEST(HmcConfigTest, InvalidMaxDepthZero) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .max_depth(0)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, InvalidMaxDepthNegative) {
+  size_t num_chains = 1;
+  EXPECT_THROW(
+    stan::run::hmc_config::create()
+      .max_depth(-1)
+      .build(num_chains),
+    std::invalid_argument);
+}
+
+TEST(HmcConfigTest, RefreshNegativeAllowed) {
+  size_t num_chains = 1;
+  auto config = stan::run::hmc_config::create()
+    .refresh(-1)
+    .build(num_chains);
+  
+  EXPECT_EQ(-1, config.refresh());
 }
