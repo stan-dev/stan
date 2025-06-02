@@ -30,7 +30,7 @@ public:
     stan::run::thin thin_;
     stan::run::refresh refresh_;
     stan::run::metric_type_config metric_type_;
-    std::vector<std::string> metric_filenames_;
+    mutable std::vector<std::string> metric_filenames_;
     mutable std::vector<std::shared_ptr<const stan::io::var_context>> init_metric_;
     stan::run::stepsize stepsize_;
     stan::run::stepsize_jitter stepsize_jitter_;
@@ -96,32 +96,45 @@ public:
       return hmc_config(*this);
     }
 
+    /** 
+     * Validate init_metric files and create vector of contexts.
+     * Current interface allows user to specify either a single
+     * or per-chain metric files.  Validation routine creates
+     * vector of contexts, either empty or valid.
+     */
     void validate(size_t num_chains) const {
-      if (!metric_filenames_.empty()) {
-	init_metric_.reserve(num_chains);
-        if (metric_filenames_.size() > 1 && 
-	    metric_filenames_.size() != num_chains) {
-          std::stringstream err_msg;
-          err_msg << "Wrong number of metric files, expecting " 
-                  << num_chains << " filenames but found "
-                  << metric_filenames_.size();
-          throw std::invalid_argument(err_msg.str());
-        }
-        for (size_t i = 0; i < metric_filenames_.size(); ++i) {
-          try {
-            auto init_context = read_json_data(metric_filenames_[i]);
-            init_metric_.push_back(init_context);
-          } catch (const std::exception& e) {
-            std::stringstream err_msg;
-            err_msg << "Error reading metric file "
-                    << metric_filenames_[i] << " for chain " << i
-                    << ": " << e.what();
-            throw std::runtime_error(err_msg.str());
-          }
-        }
+      std::string empty_str;
+      init_metric_.reserve(num_chains);
+      if (metric_filenames_.empty()) {
+	for (size_t i = 0; i < num_chains; ++i) {
+	  metric_filenames_.push_back(empty_str);
+	}
+      } else if (metric_filenames_.size() == 1 && num_chains > 1) {
+	for (size_t i = 1; i < num_chains; ++i) {
+	  metric_filenames_.push_back(metric_filenames_[0]);
+	}
+      } else if (metric_filenames_.size() > 1 && 
+	  metric_filenames_.size() != num_chains) {
+	std::stringstream err_msg;
+	err_msg << "Wrong number of metric files, expecting " 
+		<< num_chains << " filenames but found "
+		<< metric_filenames_.size();
+	throw std::invalid_argument(err_msg.str());
       }
-
+      for (size_t i = 0; i < metric_filenames_.size(); ++i) {
+	try {
+	  auto init_context = read_json_data(metric_filenames_[i]);
+	  init_metric_.push_back(init_context);
+	} catch (const std::exception& e) {
+	  std::stringstream err_msg;
+	  err_msg << "Error reading metric file "
+		  << metric_filenames_[i] << " for chain " << i
+		  << ": " << e.what();
+	  throw std::runtime_error(err_msg.str());
+	}
+      }
     }
+
   };
 
   static hmc_config_builder create() {
