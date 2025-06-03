@@ -352,7 +352,20 @@ TEST_F(HmcNutsTest, HmcNuts_EmptyOutputDir) {
   int result = stan::run::hmc_nuts(config, *model_);
   
   EXPECT_EQ(result, 0);
-  // Note: Files will be created in current directory, which is expected behavior
+  
+  // Clean up files created in current directory
+  std::string model_name = model_->model_name();
+  for (const auto& entry : std::filesystem::directory_iterator(".")) {
+    std::string filename = entry.path().filename().string();
+    if (filename.find(model_name) != std::string::npos && 
+        entry.path().extension() == ".csv") {
+      std::filesystem::remove(entry.path());
+    }
+    if (filename.find(model_name) != std::string::npos && 
+        entry.path().extension() == ".json") {
+      std::filesystem::remove(entry.path());
+    }
+  }
 }
 
 // Test error handling with invalid configuration
@@ -484,8 +497,6 @@ TEST_F(HmcNutsTest, HmcNuts_ContextValidation) {
     }
   }
 }
-
-
 // Test with configuration that has save options disabled
 TEST_F(HmcNutsTest, HmcNuts_MinimalOutput) {
   auto config = stan::run::hmc_nuts_config::create()
