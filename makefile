@@ -20,6 +20,8 @@ include make/doxygen                      # doxygen
 include make/cpplint                      # cpplint
 include make/tests                        # tests
 include make/clang-tidy
+include make/shared_library
+
 
 INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I ./src/ -I $(RAPIDJSON)
 
@@ -85,6 +87,10 @@ help:
 	@echo ' Clang Format'
 	@echo ' - clang-format     : runs clang-format over all the .hpp and .cpp files.'
 	@echo '                      in src.'
+	@echo ''
+	@echo 'Shared Libraries:'
+	@echo ' - modelname_model.so : Build shared library for modelname.stan for Python/R use'
+	@echo ' - shared-lib-help    : Show detailed shared library build options'
 	@echo ''
 	@echo 'Clean:'
 	@echo '  - clean         : Basic clean. Leaves doc and compiled libraries intact.'
