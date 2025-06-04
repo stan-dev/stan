@@ -150,7 +150,7 @@ stan::run::hmc_nuts_config build_hmc_nuts_config(const char* const* keys,
 
 extern "C" {
 
-void* stan3_load_model(const char* data_filename, 
+void* stosh_load_model(const char* data_filename, 
                        unsigned int seed,
                        char* error_message, 
                        size_t error_message_size) {
@@ -180,7 +180,7 @@ void* stan3_load_model(const char* data_filename,
   }
 }
 
-int stan3_run_samplers(void* handle_ptr,
+int stosh_run_samplers(void* handle_ptr,
                        const char* const* keys,
                        const char* const* values,
                        int num_params,
@@ -190,7 +190,7 @@ int stan3_run_samplers(void* handle_ptr,
                        size_t error_message_size) {
   try {
     if (!handle_ptr) {
-      copy_error_message("Invalid model handle. Call stan3_load_model first.", 
+      copy_error_message("Invalid model handle. Call stosh_load_model first.", 
                         error_message, error_message_size);
       return STANRUN_ERROR_INVALID_ARGS;
     }
@@ -234,13 +234,13 @@ int stan3_run_samplers(void* handle_ptr,
   }
 }
 
-void stan3_free_model(void* handle_ptr) {
+void stosh_free_model(void* handle_ptr) {
   if (handle_ptr) {
     delete static_cast<model_handle*>(handle_ptr);
   }
 }
 
-const char* stan3_get_model_name(void* handle_ptr) {
+const char* stosh_get_model_name(void* handle_ptr) {
   if (handle_ptr) {
     auto* handle = static_cast<model_handle*>(handle_ptr);
     return handle->model_name.c_str();

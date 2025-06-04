@@ -38,14 +38,14 @@ extern "C" {
  * @param error_message_size Size of error message buffer
  * @return Opaque model handle on success, NULL on failure
  */
-STANRUN_API void* stan3_load_model(const char* data_filename, 
+STANRUN_API void* stosh_load_model(const char* data_filename, 
                                    unsigned int seed,
                                    char* error_message, 
                                    size_t error_message_size);
 
 /* Run samplers on a loaded model using key-value parameter pairs
  * 
- * @param handle_ptr Handle returned from stan3_load_model
+ * @param handle_ptr Handle returned from stosh_load_model
  * @param keys Array of parameter name strings
  * @param values Array of parameter value strings (parallel to keys)
  * @param num_params Number of key-value pairs
@@ -55,7 +55,7 @@ STANRUN_API void* stan3_load_model(const char* data_filename,
  * @param error_message_size Size of error message buffer
  * @return STANRUN_SUCCESS on success, error code on failure
  */
-STANRUN_API int stan3_run_samplers(void* handle_ptr,
+STANRUN_API int stosh_run_samplers(void* handle_ptr,
                                    const char* const* keys,
                                    const char* const* values,
                                    int num_params,
@@ -66,16 +66,16 @@ STANRUN_API int stan3_run_samplers(void* handle_ptr,
 
 /* Free a model handle and associated resources
  * 
- * @param handle_ptr Handle returned from stan3_load_model
+ * @param handle_ptr Handle returned from stosh_load_model
  */
-STANRUN_API void stan3_free_model(void* handle_ptr);
+STANRUN_API void stosh_free_model(void* handle_ptr);
 
 /* Get the name of a loaded model
  * 
- * @param handle_ptr Handle returned from stan3_load_model
+ * @param handle_ptr Handle returned from stosh_load_model
  * @return Model name string, or NULL if handle is invalid
  */
-STANRUN_API const char* stan3_get_model_name(void* handle_ptr);
+STANRUN_API const char* stosh_get_model_name(void* handle_ptr);
 
 #ifdef __cplusplus
 }
