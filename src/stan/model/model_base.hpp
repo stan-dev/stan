@@ -636,7 +636,40 @@ class model_base : public prob_grad {
    */
   virtual void unconstrain_array(
       const std::vector<double>& params_r_constrained,
-      std::vector<double>& params_r, std::ostream* msgs = nullptr) const = 0;
+
+  /** Returns a string containing a JSON representation of
+   * the model's constrained outputs.
+   *
+   * This is a list where each element is an object with the following
+   * keys:
+   * - "name": the name of the parameter
+   * - "type": the type of the parameter. This is also an object,
+   *   which contains at least "name". Depending on the type, it may also
+   *   include "length" (arrays, vectors, row vectors), "rows" and "cols"
+   *   (matrices), "element_type" (arrays),  or "num_elements" and
+   *   "element_types" (tuples). "element_type" and "element_types" follow
+   *   the same structure recursively.
+   * - "block": the block the constrained parameter belongs to (e.g.,
+   *   "parameters", "transformed parameters", "generated quantities")
+   */
+  virtual std::string get_constrained_sizedtypes() const = 0;
+
+  /** Returns a string containing a JSON representation of
+   * the model's unconstrained outputs.
+   *
+   * This is a list where each element is an object with the following
+   * keys:
+   * - "name": the name of the parameter
+   * - "type": the type of the parameter. This is also an object,
+   *   which contains at least "name". Depending on the type, it may also
+   *   include "length" (arrays, vectors, row vectors), "rows" and "cols"
+   *   (matrices), "element_type" (arrays),  or "num_elements" and
+   *   "element_types" (tuples). "element_type" and "element_types" follow
+   *   the same structure recursively.
+   * - "block": the block the parameter belongs to (e.g.,
+   *   "parameters", "transformed parameters", "generated quantities")
+   */
+  virtual std::string get_unconstrained_sizedtypes() const = 0;
 
 #ifdef STAN_MODEL_FVAR_VAR
 
