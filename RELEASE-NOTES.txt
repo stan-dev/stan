@@ -5,6 +5,15 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.37.0 (2 September 2025)
+======================================================================
+
+ - Fixed a memory leak in `laplace_sample`. (#3324)
+ - Dramatically reduce the memory footprint of Pathfinder when PSIS resampling is disabled. Note that this change involves changes to thread scheduling that may result in the same seed returning draws in a different order when multiple threads are used, but the unordered set of draws should be unchanged. (#3325)
+ - Fixed a missing size check by directing all std::vector assigns through size-aware version. (#3352) 
+ - Implemented serialization and deserializtion for `sum_to_zero` matrix. (#3342)
+ - Fixed stepsize adaption being completely reset when passing `0` for the size of `term_buffer`. (#3346)
+
 v2.36.0 (10 December 2024)
 ======================================================================
 
