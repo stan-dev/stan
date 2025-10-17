@@ -651,7 +651,9 @@ TEST(deserializer_vector, simplex_constrain) {
   double lp = 0;
   Eigen::VectorXd reference
       = stan::math::simplex_constrain(stan::math::to_vector(theta));
-  EXPECT_THROW((deserializer.read_constrain_simplex<Eigen::VectorXd, false>(lp, 0)), std::domain_error);
+  EXPECT_THROW(
+      (deserializer.read_constrain_simplex<Eigen::VectorXd, false>(lp, 0)),
+      std::domain_error);
   Eigen::VectorXd phi(
       deserializer.read_constrain_simplex<Eigen::VectorXd, false>(
           lp, theta.size() + 1));
@@ -692,7 +694,9 @@ TEST(deserializer_vector, sum_to_zero_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  EXPECT_THROW((deserializer.read_constrain_sum_to_zero<Eigen::VectorXd, false>(lp, 0)), std::domain_error);
+  EXPECT_THROW(
+      (deserializer.read_constrain_sum_to_zero<Eigen::VectorXd, false>(lp, 0)),
+      std::domain_error);
   Eigen::VectorXd reference
       = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta));
   Eigen::VectorXd phi(
@@ -733,8 +737,12 @@ TEST(deserializer_matrix, sum_to_zero_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0.0;
-  EXPECT_THROW((deserializer.read_constrain_sum_to_zero<Eigen::MatrixXd, false>(lp, 0, 1)), std::domain_error);
-  EXPECT_THROW((deserializer.read_constrain_sum_to_zero<Eigen::MatrixXd, false>(lp, 1, 0)), std::domain_error);
+  EXPECT_THROW((deserializer.read_constrain_sum_to_zero<Eigen::MatrixXd, false>(
+                   lp, 0, 1)),
+               std::domain_error);
+  EXPECT_THROW((deserializer.read_constrain_sum_to_zero<Eigen::MatrixXd, false>(
+                   lp, 1, 0)),
+               std::domain_error);
   Eigen::MatrixXd reference
       = stan::math::sum_to_zero_constrain(stan::math::to_matrix(theta, 2, 2));
   Eigen::MatrixXd phi(
@@ -886,8 +894,13 @@ TEST(deserializer_matrix, cholesky_factor_cov_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  EXPECT_THROW((deserializer.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 0, 1)), std::domain_error);
-  EXPECT_NO_THROW((deserializer.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 0, 0)));
+  EXPECT_THROW(
+      (deserializer.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, false>(
+          lp, 0, 1)),
+      std::domain_error);
+  EXPECT_NO_THROW(
+      (deserializer.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, false>(
+          lp, 0, 0)));
   Eigen::MatrixXd reference = stan::math::cholesky_factor_constrain(
       stan::math::to_vector(theta).segment(0, 6), 3, 3);
   Eigen::MatrixXd L(
@@ -970,7 +983,9 @@ TEST(deserializer_matrix, cholesky_factor_corr_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  EXPECT_NO_THROW((deserializer.read_constrain_cholesky_factor_corr<Eigen::MatrixXd, false>(lp, 0)));
+  EXPECT_NO_THROW(
+      (deserializer.read_constrain_cholesky_factor_corr<Eigen::MatrixXd, false>(
+          lp, 0)));
   Eigen::MatrixXd reference = stan::math::cholesky_corr_constrain(
       stan::math::to_vector(theta).segment(0, 3), 3);
   Eigen::MatrixXd L(
@@ -1017,7 +1032,8 @@ TEST(deserializer_matrix, cov_matrix_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  EXPECT_NO_THROW((deserializer.read_constrain_cov_matrix<Eigen::MatrixXd, false>(lp, 0)));
+  EXPECT_NO_THROW(
+      (deserializer.read_constrain_cov_matrix<Eigen::MatrixXd, false>(lp, 0)));
   Eigen::MatrixXd reference = stan::math::cov_matrix_constrain(
       stan::math::to_vector(theta).segment(0, 6), 3);
   Eigen::MatrixXd L(
@@ -1058,7 +1074,8 @@ TEST(deserializer_matrix, corr_matrix_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  EXPECT_NO_THROW((deserializer.read_constrain_corr_matrix<Eigen::MatrixXd, false>(lp, 0)));
+  EXPECT_NO_THROW(
+      (deserializer.read_constrain_corr_matrix<Eigen::MatrixXd, false>(lp, 0)));
   Eigen::MatrixXd reference = stan::math::corr_matrix_constrain(
       stan::math::to_vector(theta).segment(0, 3), 3);
   Eigen::MatrixXd L(
@@ -1078,7 +1095,8 @@ TEST(deserializer_matrix, corr_matrix_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp_ref = 0.0;
   double lp = 0.0;
-  EXPECT_NO_THROW((deserializer.read_constrain_corr_matrix<Eigen::MatrixXd, true>(lp, 0)));
+  EXPECT_NO_THROW(
+      (deserializer.read_constrain_corr_matrix<Eigen::MatrixXd, true>(lp, 0)));
   Eigen::MatrixXd reference = stan::math::corr_matrix_constrain(
       stan::math::to_vector(theta).segment(0, 3), 3, lp_ref);
   Eigen::MatrixXd L(

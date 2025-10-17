@@ -807,11 +807,11 @@ class deserializer {
   inline auto read_constrain_cholesky_factor_cov(LP& lp, Eigen::Index M,
                                                  Eigen::Index N) {
     stan::math::check_greater_or_equal("read_constrain_cholesky_factor_cov",
-                                  "M", M, N);
-    const Eigen::Index size = (M == 0 || N == 0) ? 0 : (N * (N + 1)) / 2 + (M - N) * N;
+                                       "M", M, N);
+    const Eigen::Index size
+        = (M == 0 || N == 0) ? 0 : (N * (N + 1)) / 2 + (M - N) * N;
     return stan::math::cholesky_factor_constrain<Jacobian>(
-        this->read<conditional_var_val_t<Ret, vector_t>>(size),
-        M, N, lp);
+        this->read<conditional_var_val_t<Ret, vector_t>>(size), M, N, lp);
   }
 
   /**
