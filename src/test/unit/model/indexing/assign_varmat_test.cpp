@@ -77,7 +77,7 @@ void test_nil_vec() {
   EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
   stan::math::sum(x).grad();
   auto check_all = [](int i) { return true; };
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
     check_adjs(check_all, x, "lhs", 1);
     check_adjs(check_all, y, "rhs", 1);
@@ -205,14 +205,14 @@ void test_omni_vec() {
   EXPECT_FLOAT_EQ(y_val[3], x.val()[3]);
   EXPECT_FLOAT_EQ(y_val[4], x.val()[4]);
   sum(x).grad();
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), y_val);
     EXPECT_MATRIX_EQ(x_copy.val(), x_val);
   } else {
     EXPECT_MATRIX_EQ(x.val(), x_val);
   }
   auto check_i = [](int i) { return true; };
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     check_adjs(check_i, x, "lhs", 1.0);
   } else {
     check_adjs(check_i, x, "lhs", 0.0);
@@ -963,7 +963,7 @@ void omni_matrix_test() {
   Eigen::MatrixXd x_val = x.val();
   auto y = conditionally_generate_linear_var_matrix<RhsScalar>(5, 5, 10);
   assign(x, y, "", index_omni());
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(value_of(y), x.val());
   } else {
     EXPECT_MATRIX_EQ(value_of(y), x.val());
@@ -971,7 +971,7 @@ void omni_matrix_test() {
   }
   sum(x).grad();
   auto check_all = [](int /* i */) { return true; };
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), value_of(y));
     check_adjs(check_all, check_all, x, "lhs");
     check_adjs(check_all, check_all, y, "rhs");
@@ -1009,7 +1009,7 @@ void omni_omni_matrix_test() {
   stan::math::var lp = sum(x_copy);
   lp.adj() = 1;
   assign(x, y, "", index_omni(), index_omni());
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(value_of(y), x.val());
   } else {
     EXPECT_MATRIX_EQ(value_of(y), x.val());
@@ -1017,7 +1017,7 @@ void omni_omni_matrix_test() {
   }
   sum(x).grad();
   auto check_all = [](int /* i */) { return true; };
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), value_of(y));
     check_adjs(check_all, check_all, x, "lhs");
     check_adjs(check_all, check_all, y, "rhs");
@@ -1494,7 +1494,7 @@ void nil_matrix() {
   EXPECT_MATRIX_EQ(stan::math::value_of(y), x.val());
   sum(x).grad();
   auto check_all = [](int /* i */) { return true; };
-  if (stan::is_var<RhsScalar>::value) {
+  if constexpr (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
     check_adjs(check_all, check_all, x, "lhs");
     check_adjs(check_all, check_all, y, "rhs");
@@ -1550,8 +1550,8 @@ inline void assign_tester(T1&& x, const I1& idx1, const I2& idx2) {
   stan::math::sum(stan::math::add(x1, x2)).grad();
   // Since this just moves the pointer x1 omni is diff than
   // multi
-  if (!std::is_same<I1, index_omni>::value
-      && !std::is_same<I2, index_omni>::value) {
+  if constexpr (!std::is_same<I1, index_omni>::value
+                && !std::is_same<I2, index_omni>::value) {
     EXPECT_MATRIX_EQ(x1.val(), x2.val());
     EXPECT_MATRIX_EQ(x1.adj(), x2.adj());
     EXPECT_MATRIX_EQ(y.adj(),

@@ -325,14 +325,16 @@ class model_base : public prob_grad {
   template <bool propto, bool jacobian, typename T>
   inline T log_prob(Eigen::Matrix<T, -1, 1>& params_r,
                     std::ostream* msgs) const {
-    if (propto && jacobian)
+    if constexpr (propto && jacobian) {
       return log_prob_propto_jacobian(params_r, msgs);
-    else if (propto && !jacobian)
+    } else if constexpr (propto && !jacobian) {
       return log_prob_propto(params_r, msgs);
-    else if (!propto && jacobian)
+    } else if constexpr (!propto && jacobian) {
       return log_prob_jacobian(params_r, msgs);
-    else  // if (!propto && !jacobian)
+    } else {
+      // if (!propto && !jacobian)
       return log_prob(params_r, msgs);
+    }
   }
 
   /**
@@ -570,14 +572,15 @@ class model_base : public prob_grad {
   template <bool propto, bool jacobian, typename T>
   inline T log_prob(std::vector<T>& params_r, std::vector<int>& params_i,
                     std::ostream* msgs) const {
-    if (propto && jacobian)
+    if constexpr (propto && jacobian) {
       return log_prob_propto_jacobian(params_r, params_i, msgs);
-    else if (propto && !jacobian)
+    } else if constexpr (propto && !jacobian) {
       return log_prob_propto(params_r, params_i, msgs);
-    else if (!propto && jacobian)
+    } else if constexpr (!propto && jacobian) {
       return log_prob_jacobian(params_r, params_i, msgs);
-    else  // if (!propto && !jacobian)
+    } else {  // if (!propto && !jacobian)
       return log_prob(params_r, params_i, msgs);
+    }
   }
 
   /**

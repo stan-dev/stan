@@ -291,7 +291,7 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
             expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
         decltype(auto) lhs_adj = math::block_zero_based(
             expr_lhs.adj(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-        if (!is_constant<ScalRhs>::value) {
+        if constexpr (!is_constant<ScalRhs>::value) {
           math::adjoint_of(scal_rhs) += math::from_matrix_cl<double>(lhs_adj);
         }
         math::results(lhs_adj, lhs_val)

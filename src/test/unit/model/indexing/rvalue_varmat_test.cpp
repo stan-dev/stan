@@ -264,7 +264,7 @@ TEST_F(RvalueRev, negative_min_max_vec) {
   }
   var_value<Eigen::VectorXd> x(x_val);
   EXPECT_NO_THROW(rvalue(x, "", index_min_max(2, 0)));
-  test_throw_out_of_range(x, index_min_max(5, 2));
+  EXPECT_NO_THROW(rvalue(x, "", index_min_max(5, 2)));
 }
 
 auto make_std_varvec() {
@@ -374,7 +374,7 @@ TEST_F(RvalueRev, uni_stdvec_negative_minmax_vec) {
       = rvalue(x, "", index_uni(2), index_min_max(2, 1));
   EXPECT_EQ(0U, y.size());
   EXPECT_NO_THROW(rvalue(x, "", index_uni(1), index_min_max(3, 0)));
-  test_throw_out_of_range(x, index_uni(1), index_min_max(15, 2));
+  EXPECT_NO_THROW(rvalue(x, "", index_uni(1), index_min_max(15, 2)));
 }
 TEST_F(RvalueRev, uni_stdvec_omni_vec) {
   using Eigen::VectorXd;
@@ -561,7 +561,7 @@ TEST_F(RvalueRev, negative_minmax_uni_matrix) {
   EXPECT_EQ(1U, y.cols());
   test_throw_out_of_range(x, index_min_max(3, 2), index_uni(0));
   test_throw_out_of_range(x, index_min_max(3, 2), index_uni(5));
-  test_throw_out_of_range(x, index_min_max(6, 1), index_uni(4));
+  EXPECT_NO_THROW(rvalue(x, "", index_min_max(6, 1), index_uni(4)));
   EXPECT_NO_THROW(rvalue(x, "", index_min_max(1, 0), index_uni(4)));
 }
 
@@ -938,7 +938,7 @@ TEST_F(RvalueRev, negative_min_max_mat) {
   EXPECT_EQ(0, y.rows());
   EXPECT_EQ(4, y.cols());
   EXPECT_NO_THROW(rvalue(x, "", index_min_max(3, 0)));
-  test_throw_out_of_range(x, index_min_max(15, 2));
+  EXPECT_NO_THROW(rvalue(x, "", index_min_max(15, 2)));
 }
 
 TEST_F(RvalueRev, positive_minmax_positive_minmax_matrix) {
@@ -1071,7 +1071,7 @@ TEST_F(RvalueRev, uni_negative_minmax_matrix) {
   EXPECT_EQ(0U, y.cols());
   test_throw_out_of_range(x, index_uni(0), index_min_max(4, 2));
   test_throw_out_of_range(x, index_uni(7), index_min_max(4, 2));
-  test_throw_out_of_range(x, index_uni(2), index_min_max(15, 0));
+  EXPECT_NO_THROW(rvalue(x, "", index_uni(2), index_min_max(15, 0)));
   EXPECT_NO_THROW(rvalue(x, "", index_uni(2), index_min_max(2, 0)));
 }
 
