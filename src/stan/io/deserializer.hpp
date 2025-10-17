@@ -180,6 +180,7 @@ class deserializer {
       return map_vector_t(nullptr, m);
     } else {
       check_r_capacity(m);
+      stan::math::check_nonnegative("read", "size", m);
       return map_vector_t(&scalar_ptr_increment(m), m);
     }
   }
@@ -195,6 +196,7 @@ class deserializer {
     if (unlikely(m == 0)) {
       return Ret(map_vector_t(nullptr, m));
     } else {
+      stan::math::check_nonnegative("read", "size", m);
       check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
@@ -217,6 +219,7 @@ class deserializer {
     if (unlikely(m == 0)) {
       return map_row_vector_t(nullptr, m);
     } else {
+      stan::math::check_nonnegative("read", "size", m);
       check_r_capacity(m);
       return map_row_vector_t(&scalar_ptr_increment(m), m);
     }
@@ -233,6 +236,7 @@ class deserializer {
     if (unlikely(m == 0)) {
       return Ret(map_row_vector_t(nullptr, m));
     } else {
+      stan::math::check_nonnegative("read", "size", m);
       check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
@@ -256,6 +260,8 @@ class deserializer {
     if (rows == 0 || cols == 0) {
       return map_matrix_t(nullptr, rows, cols);
     } else {
+      stan::math::check_nonnegative("read", "rows", rows);
+      stan::math::check_nonnegative("read", "cols", cols);
       check_r_capacity(rows * cols);
       return map_matrix_t(&scalar_ptr_increment(rows * cols), rows, cols);
     }
@@ -273,6 +279,8 @@ class deserializer {
     if (rows == 0 || cols == 0) {
       return Ret(map_matrix_t(nullptr, rows, cols));
     } else {
+      stan::math::check_nonnegative("read", "rows", rows);
+      stan::math::check_nonnegative("read", "cols", cols);
       check_r_capacity(2 * rows * cols);
       Ret ret(rows, cols);
       for (Eigen::Index i = 0; i < rows * cols; ++i) {
@@ -798,9 +806,11 @@ class deserializer {
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_cholesky_factor_cov(LP& lp, Eigen::Index M,
                                                  Eigen::Index N) {
+    stan::math::check_greater_or_equal("read_constrain_cholesky_factor_cov",
+                                  "M", M, N);
+    const Eigen::Index size = (M == 0 || N == 0) ? 0 : (N * (N + 1)) / 2 + (M - N) * N;
     return stan::math::cholesky_factor_constrain<Jacobian>(
-        this->read<conditional_var_val_t<Ret, vector_t>>((N * (N + 1)) / 2
-                                                         + (M - N) * N),
+        this->read<conditional_var_val_t<Ret, vector_t>>(size),
         M, N, lp);
   }
 
@@ -857,9 +867,10 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_cholesky_factor_corr(LP& lp, Eigen::Index K) {
+    // If K is 0, we want to read 0 elements to form a 0x0 matrix
+    const Eigen::Index size = (K == 0) ? 0 : (K * (K - 1)) / 2;
     return stan::math::cholesky_corr_constrain<Jacobian>(
-        this->read<conditional_var_val_t<Ret, vector_t>>((K * (K - 1)) / 2), K,
-        lp);
+        this->read<conditional_var_val_t<Ret, vector_t>>(size), K, lp);
   }
 
   /**
@@ -914,9 +925,9 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_cov_matrix(LP& lp, Eigen::Index k) {
+    const Eigen::Index size = (k == 0) ? 0 : (k * (k - 1)) / 2;
     return stan::math::cov_matrix_constrain<Jacobian>(
-        this->read<conditional_var_val_t<Ret, vector_t>>(k + (k * (k - 1)) / 2),
-        k, lp);
+        this->read<conditional_var_val_t<Ret, vector_t>>(k + size), k, lp);
   }
 
   /**
@@ -969,9 +980,9 @@ class deserializer {
             require_not_std_vector_t<Ret>* = nullptr,
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_corr_matrix(LP& lp, Eigen::Index k) {
+    const Eigen::Index size = (k == 0) ? 0 : (k * (k - 1)) / 2;
     return stan::math::corr_matrix_constrain<Jacobian>(
-        this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2), k,
-        lp);
+        this->read<conditional_var_val_t<Ret, vector_t>>(size), k, lp);
   }
 
   /**
@@ -1024,6 +1035,7 @@ class deserializer {
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_stochastic_column(LP& lp, Eigen::Index rows,
                                                Eigen::Index cols) {
+    stan::math::check_positive("read_stochastic_column", "rows", rows);
     return stan::math::stochastic_column_constrain<Jacobian>(
         this->read<conditional_var_val_t<Ret, matrix_t>>(rows - 1, cols), lp);
   }
@@ -1080,6 +1092,7 @@ class deserializer {
             require_matrix_t<Ret>* = nullptr>
   inline auto read_constrain_stochastic_row(LP& lp, Eigen::Index rows,
                                             Eigen::Index cols) {
+    stan::math::check_positive("read_stochastic_row", "cols", cols);
     return stan::math::stochastic_row_constrain<Jacobian>(
         this->read<conditional_var_val_t<Ret, matrix_t>>(rows, cols - 1), lp);
   }
