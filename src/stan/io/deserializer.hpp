@@ -33,16 +33,16 @@ class deserializer {
  private:
   Eigen::Map<const Eigen::Matrix<T, -1, 1>> map_r_;    // map of reals.
   Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;  // map of integers.
-  size_t r_size_{0};  // size of reals available.
-  size_t i_size_{0};  // size of integers available.
-  size_t pos_r_{0};   // current position in map of reals.
-  size_t pos_i_{0};   // current position in map of integers.
+  int64_t r_size_{0};  // size of reals available.
+  int64_t i_size_{0};  // size of integers available.
+  int64_t pos_r_{0};   // current position in map of reals.
+  int64_t pos_i_{0};   // current position in map of integers.
 
   /**
    * Return reference to current scalar and increment the internal counter.
    * @param m amount to move `pos_r_` up.
    */
-  inline const T& scalar_ptr_increment(size_t m) {
+  inline const T& scalar_ptr_increment(int64_t m) {
     pos_r_ += m;
     return map_r_.coeffRef(pos_r_ - m);
   }
@@ -52,7 +52,7 @@ class deserializer {
    * @param m Number of reals to read
    * @throws std::runtime_error if there aren't at least m reals left
    */
-  void check_r_capacity(size_t m) const {
+  void check_r_capacity(int64_t m) const {
     STAN_NO_RANGE_CHECKS_RETURN;
     if (pos_r_ + m > r_size_) {
       []() STAN_COLD_PATH {
@@ -66,7 +66,7 @@ class deserializer {
    * @param m Number of integers to read
    * @throws std::runtime_error if there aren't at least m integers left
    */
-  void check_i_capacity(size_t m) const {
+  void check_i_capacity(int64_t m) const {
     STAN_NO_RANGE_CHECKS_RETURN;
     if (pos_i_ + m > i_size_) {
       []() STAN_COLD_PATH {
@@ -124,14 +124,14 @@ class deserializer {
    *
    * @return Number of scalars left to read.
    */
-  inline size_t available() const noexcept { return r_size_ - pos_r_; }
+  inline int64_t available() const noexcept { return r_size_ - pos_r_; }
 
   /**
    * Return the number of integers remaining to be read.
    *
    * @return Number of integers left to read.
    */
-  inline size_t available_i() const noexcept { return i_size_ - pos_i_; }
+  inline int64_t available_i() const noexcept { return i_size_ - pos_i_; }
 
   /**
    * Return the next object in the sequence.
@@ -334,7 +334,7 @@ class deserializer {
     } else {
       std::decay_t<Ret> ret_vec;
       ret_vec.reserve(m);
-      for (size_t i = 0; i < m; ++i) {
+      for (int64_t i = 0; i < m; ++i) {
         ret_vec.emplace_back(this->read<value_type_t<Ret>>(dims...));
       }
       return ret_vec;
@@ -511,11 +511,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_unit_vector(LP& lp, const size_t vecsize,
+  inline auto read_constrain_unit_vector(LP& lp, const int64_t vecsize,
                                          Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_unit_vector<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -542,7 +542,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_simplex(LP& lp, size_t size) {
+  inline auto read_constrain_simplex(LP& lp, int64_t size) {
     stan::math::check_positive("read_simplex", "size", size);
     return stan::math::simplex_constrain<Jacobian>(this->read<Ret>(size - 1),
                                                    lp);
@@ -569,11 +569,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_simplex(LP& lp, const size_t vecsize,
+  inline auto read_constrain_simplex(LP& lp, const int64_t vecsize,
                                      Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_simplex<value_type_t<Ret>, Jacobian>(lp,
                                                                     sizes...));
@@ -599,7 +599,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_sum_to_zero(LP& lp, size_t size) {
+  inline auto read_constrain_sum_to_zero(LP& lp, int64_t size) {
     stan::math::check_positive("read_sum_to_zero", "size", size);
     return stan::math::sum_to_zero_constrain<Jacobian>(
         this->read<Ret>(size - 1), lp);
@@ -625,7 +625,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
-  inline auto read_constrain_sum_to_zero(LP& lp, size_t N, size_t M) {
+  inline auto read_constrain_sum_to_zero(LP& lp, int64_t N, int64_t M) {
     stan::math::check_positive("read_sum_to_zero", "N", N);
     stan::math::check_positive("read_sum_to_zero", "M", M);
     return stan::math::sum_to_zero_constrain<Jacobian>(
@@ -653,11 +653,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_sum_to_zero(LP& lp, const size_t vecsize,
+  inline auto read_constrain_sum_to_zero(LP& lp, const int64_t vecsize,
                                          Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_sum_to_zero<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -709,11 +709,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_ordered(LP& lp, const size_t vecsize,
+  inline auto read_constrain_ordered(LP& lp, const int64_t vecsize,
                                      Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_ordered<value_type_t<Ret>, Jacobian>(lp,
                                                                     sizes...));
@@ -765,11 +765,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_positive_ordered(LP& lp, const size_t vecsize,
+  inline auto read_constrain_positive_ordered(LP& lp, const int64_t vecsize,
                                               Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_positive_ordered<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -825,11 +825,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_cholesky_factor_cov(LP& lp, const size_t vecsize,
+  inline auto read_constrain_cholesky_factor_cov(LP& lp, const int64_t vecsize,
                                                  Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_cholesky_factor_cov<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -884,11 +884,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_cholesky_factor_corr(LP& lp, const size_t vecsize,
+  inline auto read_constrain_cholesky_factor_corr(LP& lp, const int64_t vecsize,
                                                   Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_cholesky_factor_corr<value_type_t<Ret>,
                                                     Jacobian>(lp, sizes...));
@@ -939,10 +939,10 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  auto read_constrain_cov_matrix(LP& lp, const size_t vecsize, Sizes... sizes) {
+  auto read_constrain_cov_matrix(LP& lp, const int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_cov_matrix<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -992,11 +992,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_corr_matrix(LP& lp, const size_t vecsize,
+  inline auto read_constrain_corr_matrix(LP& lp, const int64_t vecsize,
                                          Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_corr_matrix<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -1048,11 +1048,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_stochastic_column(LP& lp, const size_t vecsize,
+  inline auto read_constrain_stochastic_column(LP& lp, const int64_t vecsize,
                                                Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_stochastic_column<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -1104,11 +1104,11 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_constrain_stochastic_row(LP& lp, const size_t vecsize,
+  inline auto read_constrain_stochastic_row(LP& lp, const int64_t vecsize,
                                             Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_constrain_stochastic_row<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
@@ -1189,7 +1189,7 @@ class deserializer {
    * @return Unconstrained vector
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_unit_vector(size_t size) {
+  inline auto read_free_unit_vector(int64_t size) {
     return stan::math::unit_vector_free(this->read<Ret>(size));
   }
 
@@ -1204,10 +1204,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_unit_vector(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_unit_vector(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_unit_vector<value_type_t<Ret>>(sizes...));
     }
     return ret;
@@ -1220,7 +1220,7 @@ class deserializer {
    * @return Unconstrained vector
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_simplex(size_t size) {
+  inline auto read_free_simplex(int64_t size) {
     return stan::math::simplex_free(this->read<Ret>(size));
   }
 
@@ -1235,10 +1235,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_simplex(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_simplex(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_simplex<value_type_t<Ret>>(sizes...));
     }
     return ret;
@@ -1252,7 +1252,7 @@ class deserializer {
    * @return Unconstrained vector of length (size - 1)
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_sum_to_zero(size_t size) {
+  inline auto read_free_sum_to_zero(int64_t size) {
     return stan::math::sum_to_zero_free(this->read<Ret>(size));
   }
 
@@ -1265,7 +1265,7 @@ class deserializer {
    * @return Unconstrained matrix of size (N-1) x (M-1)
    */
   template <typename Ret, require_matrix_t<Ret>* = nullptr>
-  inline auto read_free_sum_to_zero(size_t N, size_t M) {
+  inline auto read_free_sum_to_zero(int64_t N, int64_t M) {
     return stan::math::sum_to_zero_free(this->read<Ret>(N, M));
   }
 
@@ -1280,10 +1280,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_sum_to_zero(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_sum_to_zero(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_sum_to_zero<value_type_t<Ret>>(sizes...));
     }
     return ret;
@@ -1296,7 +1296,7 @@ class deserializer {
    * @return Unconstrained vector
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_ordered(size_t size) {
+  inline auto read_free_ordered(int64_t size) {
     return stan::math::ordered_free(this->read<Ret>(size));
   }
 
@@ -1311,10 +1311,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_ordered(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_ordered(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_ordered<value_type_t<Ret>>(sizes...));
     }
     return ret;
@@ -1327,7 +1327,7 @@ class deserializer {
    * @return Unconstrained vector
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_positive_ordered(size_t size) {
+  inline auto read_free_positive_ordered(int64_t size) {
     return stan::math::positive_ordered_free(this->read<Ret>(size));
   }
 
@@ -1342,10 +1342,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_positive_ordered(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_positive_ordered(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_positive_ordered<value_type_t<Ret>>(sizes...));
     }
     return ret;
@@ -1375,10 +1375,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_cholesky_factor_cov(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_cholesky_factor_cov(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           read_free_cholesky_factor_cov<value_type_t<Ret>>(sizes...));
     }
@@ -1393,7 +1393,7 @@ class deserializer {
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_cholesky_factor_corr(size_t M) {
+  inline auto read_free_cholesky_factor_corr(int64_t M) {
     return stan::math::cholesky_corr_free(this->read<Ret>(M, M));
   }
 
@@ -1408,10 +1408,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_cholesky_factor_corr(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_cholesky_factor_corr(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           read_free_cholesky_factor_corr<value_type_t<Ret>>(sizes...));
     }
@@ -1426,7 +1426,7 @@ class deserializer {
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_cov_matrix(size_t M) {
+  inline auto read_free_cov_matrix(int64_t M) {
     return stan::math::cov_matrix_free(this->read<Ret>(M, M));
   }
 
@@ -1441,10 +1441,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_cov_matrix(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_cov_matrix(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_cov_matrix<value_type_t<Ret>>(sizes...));
     }
     return ret;
@@ -1458,7 +1458,7 @@ class deserializer {
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_corr_matrix(size_t M) {
+  inline auto read_free_corr_matrix(int64_t M) {
     return stan::math::corr_matrix_free(this->read<Ret>(M, M));
   }
 
@@ -1473,10 +1473,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_corr_matrix(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_corr_matrix(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_corr_matrix<value_type_t<Ret>>(sizes...));
     }
     return ret;
@@ -1491,7 +1491,7 @@ class deserializer {
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_stochastic_column(size_t rows, size_t cols) {
+  inline auto read_free_stochastic_column(int64_t rows, int64_t cols) {
     return stan::math::stochastic_column_free(this->read<Ret>(rows, cols));
   }
 
@@ -1506,10 +1506,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_stochastic_column(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_stochastic_column(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           read_free_stochastic_column<value_type_t<Ret>>(sizes...));
     }
@@ -1525,7 +1525,7 @@ class deserializer {
    * @return Unconstrained matrix
    */
   template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_stochastic_row(size_t rows, size_t cols) {
+  inline auto read_free_stochastic_row(int64_t rows, int64_t cols) {
     return stan::math::stochastic_row_free(this->read<Ret>(rows, cols));
   }
 
@@ -1540,10 +1540,10 @@ class deserializer {
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_free_stochastic_row(size_t vecsize, Sizes... sizes) {
+  inline auto read_free_stochastic_row(int64_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (int64_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(read_free_stochastic_row<value_type_t<Ret>>(sizes...));
     }
     return ret;

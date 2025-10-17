@@ -39,9 +39,9 @@ namespace analyze {
 template <typename T, typename DerivedA, typename DerivedB>
 void autocorrelation(const Eigen::MatrixBase<DerivedA>& y,
                      Eigen::MatrixBase<DerivedB>& ac, Eigen::FFT<T>& fft) {
-  size_t N = y.size();
-  size_t M = math::internal::fft_next_good_size(N);
-  size_t Mt2 = 2 * M;
+  auto N = y.size();
+  auto M = math::internal::fft_next_good_size(N);
+  auto Mt2 = 2 * M;
 
   // centered_signal = y-mean(y) followed by N zeros
   Eigen::Matrix<T, Eigen::Dynamic, 1> centered_signal(Mt2);
@@ -121,7 +121,7 @@ void autocovariance(const Eigen::MatrixBase<DerivedA>& y,
  */
 template <typename T>
 void autocovariance(const std::vector<T>& y, std::vector<T>& acov) {
-  size_t N = y.size();
+  auto N = y.size();
   acov.resize(N);
 
   const Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1>> y_map(&y[0], N);

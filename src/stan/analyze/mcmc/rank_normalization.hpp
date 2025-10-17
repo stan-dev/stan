@@ -21,11 +21,11 @@ namespace analyze {
  * @return normal scores for average ranks of draws
  */
 inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {
-  const Eigen::Index rows = chains.rows();
-  const Eigen::Index cols = chains.cols();
-  const Eigen::Index size = rows * cols;
+  const auto rows = chains.rows();
+  const auto cols = chains.cols();
+  const auto size = rows * cols;
 
-  std::vector<std::pair<double, int>> value_with_index(size);
+  std::vector<std::pair<double, Eigen::Index>> value_with_index(size);
   for (Eigen::Index i = 0; i < size; ++i) {
     value_with_index[i] = {chains(i), i};
   }
@@ -35,9 +35,9 @@ inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {
   // Assigning average ranks
   for (Eigen::Index i = 0; i < size; ++i) {
     // Handle ties by averaging ranks
-    Eigen::Index j = i + 1;
+    auto j = i + 1;
     double sum_ranks = j;
-    Eigen::Index count = 1;
+    auto count = 1;
 
     while (j < size && value_with_index[j].first == value_with_index[i].first) {
       sum_ranks += j + 1;  // Rank starts from 1
@@ -46,7 +46,7 @@ inline Eigen::MatrixXd rank_transform(const Eigen::MatrixXd& chains) {
     }
     double avg_rank = sum_ranks / count;
     boost::math::normal_distribution<double> dist;
-    for (std::size_t k = i; k < j; ++k) {
+    for (Eigen::Index k = i; k < j; ++k) {
       double p = (avg_rank - 0.375) / (size + 0.25);
       const Eigen::Index index = value_with_index[k].second;
       rank_matrix(index) = boost::math::quantile(dist, p);

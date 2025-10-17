@@ -672,7 +672,25 @@ TEST(deserializer_vector, simplex_jacobian) {
   EXPECT_FLOAT_EQ(lp_ref, lp);
 }
 
-// sum_to_zero
+// issue 3366
+TEST(deserializer_vector, sum_to_zero_constrain_size_0) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 0;
+  Eigen::VectorXd reference
+      = stan::math::sum_to_zero_constrain(stan::math::to_vector(theta));
+  Eigen::VectorXd phi(
+      deserializer.read_constrain_sum_to_zero<Eigen::VectorXd, false>(
+          lp, 0));
+  for (size_t i = 0; i < phi.size(); ++i) {
+    EXPECT_FLOAT_EQ(reference(i), phi[i]);
+  }
+}
 
 TEST(deserializer_vector, sum_to_zero_constrain) {
   std::vector<int> theta_i;

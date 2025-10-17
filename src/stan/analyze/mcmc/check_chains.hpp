@@ -23,7 +23,7 @@ inline bool is_finite_and_varies(const Eigen::MatrixXd chains) {
   Eigen::VectorXd first_draws = Eigen::VectorXd::Zero(num_chains);
   for (std::size_t i = 0; i < num_chains; ++i) {
     first_draws(i) = chains.col(i)(0);
-    for (int j = 0; j < num_samples; ++j) {
+    for (std::size_t j = 0; j < num_samples; ++j) {
       if (!std::isfinite(chains.col(i)(j)))
         return false;
     }

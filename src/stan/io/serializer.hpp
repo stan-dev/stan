@@ -2,6 +2,7 @@
 #define STAN_IO_SERIALIZER_HPP
 
 #include <stan/math/rev.hpp>
+#include <cstdint>
 
 namespace stan {
 namespace io {
@@ -18,8 +19,8 @@ template <typename T>
 class serializer {
  private:
   Eigen::Map<Eigen::Matrix<T, -1, 1>> map_r_;  // map of reals.
-  size_t r_size_{0};                           // size of reals available.
-  size_t pos_r_{0};  // current position in map of reals.
+  int64_t r_size_{0};                           // size of reals available.
+  int64_t pos_r_{0};  // current position in map of reals.
 
   /**
    * Check there is room for at least m more reals to store
@@ -27,7 +28,7 @@ class serializer {
    * @param m Number of reals to Write
    * @throws std::runtime_error if there isn't room for m reals
    */
-  void check_r_capacity(size_t m) const {
+  void check_r_capacity(int64_t m) const {
     if (pos_r_ + m > r_size_) {
       [](auto r_size_, auto pos_r_, auto m)
           STAN_COLD_PATH {
@@ -80,7 +81,7 @@ class serializer {
   /**
    * Return the number of scalars available to be written to.
    */
-  inline size_t available() const noexcept { return r_size_ - pos_r_; }
+  inline int64_t available() const noexcept { return r_size_ - pos_r_; }
 
   /**
    * Write a scalar to storage
