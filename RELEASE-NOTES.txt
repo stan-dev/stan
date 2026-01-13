@@ -5,7 +5,7 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
-v2.38.0 (6 January 2026)
+v2.38.0 (13 January 2026)
 ======================================================================
 
  - Allow `min:max` indexing to always succeed if it is an empty selection. (#3362)
