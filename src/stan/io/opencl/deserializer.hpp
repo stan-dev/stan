@@ -37,8 +37,9 @@ namespace io {
  */
 template <>
 class deserializer<stan::math::matrix_cl<double>> {
+ using mat_t = stan::math::matrix_cl<double>;
  private:
-  const stan::math::matrix_cl<double>& data_r_;
+  const mat_t& data_r_;
   Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;
   size_t r_size_{0};
   size_t i_size_{0};
@@ -91,11 +92,11 @@ class deserializer<stan::math::matrix_cl<double>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  inline stan::math::matrix_cl<double> read_matrix_cl_(size_t size, int rows,
+  inline mat_t read_matrix_cl_(size_t size, int rows,
                                                        int cols) {
     align_pos();
     if (size == 0) {
-      return stan::math::matrix_cl<double>(rows, cols);
+      return mat_t(rows, cols);
     }
     check_r_capacity(size);
     const size_t origin_bytes = pos_r_ * sizeof(double);
@@ -106,7 +107,7 @@ class deserializer<stan::math::matrix_cl<double>> {
         CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region);
     pos_r_ += size;
     align_pos();
-    return stan::math::matrix_cl<double>(sub, rows, cols);
+    return mat_t(sub, rows, cols);
   }
 
  public:
@@ -135,7 +136,7 @@ class deserializer<stan::math::matrix_cl<double>> {
    * @param align_elems Alignment in elements.
    */
   template <typename IntVec, require_vector_like_t<IntVec>* = nullptr>
-  deserializer(const stan::math::matrix_cl<double>& data_r, const IntVec& data_i,
+  deserializer(const mat_t& data_r, const IntVec& data_i,
                size_t align_elems)
       : data_r_(data_r),
         map_i_(data_i.data(), data_i.size()),
@@ -361,9 +362,10 @@ class deserializer<stan::math::matrix_cl<double>> {
  */
 template <>
 class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
+ using mat_t = stan::math::matrix_cl<double>;
  private:
-  const stan::math::matrix_cl<double>& val_;
-  const stan::math::matrix_cl<double>& adj_;
+  std::reference_wrapper<mat_t> val_;
+  std::reference_wrapper<mat_t> adj_;
   Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;
   size_t r_size_{0};
   size_t i_size_{0};
@@ -416,33 +418,31 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  inline stan::math::var_value<stan::math::matrix_cl<double>>
+  inline stan::math::var_value<mat_t>
   read_var_matrix_cl_(size_t size, int rows, int cols) {
     align_pos();
     if (size == 0) {
-      stan::math::matrix_cl<double> empty_val(rows, cols);
-      stan::math::matrix_cl<double> empty_adj(rows, cols);
-      auto* vi = new stan::math::vari_value<stan::math::matrix_cl<double>>(
+      mat_t empty_val(rows, cols);
+      mat_t empty_adj(rows, cols);
+      auto* vi = new stan::math::vari_value<mat_t>(
           std::move(empty_val), std::move(empty_adj));
-      return stan::math::var_value<stan::math::matrix_cl<double>>(vi);
+      return stan::math::var_value<mat_t>(vi);
     }
     check_r_capacity(size);
     const size_t origin_bytes = pos_r_ * sizeof(double);
     const size_t size_bytes = size * sizeof(double);
     cl_buffer_region region{origin_bytes, size_bytes};
-    cl::Buffer parent_val = val_.buffer();
-    cl::Buffer parent_adj = adj_.buffer();
-    cl::Buffer sub_val = parent_val.createSubBuffer(
+    cl::Buffer sub_val = val_.get().buffer().createSubBuffer(
         CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region);
-    cl::Buffer sub_adj = parent_adj.createSubBuffer(
+    cl::Buffer sub_adj = adj_.get().buffer().createSubBuffer(
         CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &region);
     pos_r_ += size;
     align_pos();
-    stan::math::matrix_cl<double> val_mat(sub_val, rows, cols);
-    stan::math::matrix_cl<double> adj_mat(sub_adj, rows, cols);
-    auto* vi = new stan::math::vari_value<stan::math::matrix_cl<double>>(
+    mat_t val_mat(std::move(sub_val), rows, cols);
+    mat_t adj_mat(std::move(sub_adj), rows, cols);
+    auto* vi = new stan::math::vari_value<mat_t>(
         std::move(val_mat), std::move(adj_mat));
-    return stan::math::var_value<stan::math::matrix_cl<double>>(vi);
+    return stan::math::var_value<mat_t>(vi);
   }
 
  public:
@@ -455,7 +455,7 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @param align_elems Alignment in elements.
    */
   template <typename IntVec, require_vector_like_t<IntVec>* = nullptr>
-  deserializer(const stan::math::var_value<stan::math::matrix_cl<double>>& data_r,
+  deserializer(const stan::math::var_value<mat_t>& data_r,
                const IntVec& data_i, size_t align_elems)
       : val_(data_r.val()),
         adj_(data_r.adj()),
@@ -529,7 +529,7 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
   template <typename Ret,
             require_t<std::is_same<
                 Ret,
-                stan::math::var_value<stan::math::matrix_cl<double>>>>* = nullptr>
+                stan::math::var_value<mat_t>>>* = nullptr>
   inline Ret read(Eigen::Index rows, Eigen::Index cols) {
     return read_var_matrix_cl_(static_cast<size_t>(rows * cols),
                                static_cast<int>(rows),
@@ -548,7 +548,7 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
   template <typename Ret,
             require_t<std::is_same<
                 Ret,
-                stan::math::var_value<stan::math::matrix_cl<double>>>>* = nullptr>
+                stan::math::var_value<mat_t>>>* = nullptr>
   inline Ret read(Eigen::Index m) {
     return read_var_matrix_cl_(static_cast<size_t>(m), static_cast<int>(m), 1);
   }
