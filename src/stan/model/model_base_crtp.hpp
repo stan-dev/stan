@@ -53,6 +53,19 @@ namespace model {
  *                  std::ostream* msgs = 0) const
  * ```
  *
+ * When STAN_OPENCL is defined, the derived class may also implement
+ * the OpenCL overloads to enable OpenCL deserialization:
+ *
+ * ```
+ * math::var log_prob(math::matrix_cl<double>& params_r,
+ *                    std::ostream* msgs = 0) const;
+ * math::var log_prob(math::var_value<math::matrix_cl<double>>& params_r,
+ *                    std::ostream* msgs = 0) const;
+ * ```
+ *
+ * If these overloads are not provided, calling the OpenCL log_prob overload
+ * will throw at runtime.
+ *
  * <p>The derived class `M` must be declared following the curiously
  * recursive template pattern, for example, if `M` is `foo_model`,
  * then `foo_model` should be declared as

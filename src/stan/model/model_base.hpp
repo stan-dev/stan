@@ -6,9 +6,13 @@
 #endif
 #include <stan/io/var_context.hpp>
 #include <stan/math/rev/core.hpp>
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/matrix_cl.hpp>
+#endif
 #include <stan/model/prob_grad.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -202,6 +206,41 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob(Eigen::Matrix<math::var, -1, 1>& params_r,
                              std::ostream* msgs) const = 0;
+
+#ifdef STAN_OPENCL
+  /**
+   * Return the log density for the specified OpenCL unconstrained parameters,
+   * without Jacobian and with normalizing constants for probability functions.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::var log_prob(math::matrix_cl<double>& params_r,
+                             std::ostream* msgs) const {
+    static_cast<void>(params_r);
+    static_cast<void>(msgs);
+    throw std::runtime_error(
+        "OpenCL log_prob not implemented for this model.");
+  }
+
+  /**
+   * Return the log density for the specified OpenCL unconstrained parameters,
+   * without Jacobian and with normalizing constants for probability functions.
+   *
+   * @param[in] params_r unconstrained parameters on the device with adjoints
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::var log_prob(
+      math::var_value<math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const {
+    static_cast<void>(params_r);
+    static_cast<void>(msgs);
+    throw std::runtime_error(
+        "OpenCL log_prob not implemented for this model.");
+  }
+#endif
 
   /**
    * Return the log density for the specified unconstrained

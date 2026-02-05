@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include <stan/model/model_base.hpp>
 #include <stan/model/model_base_crtp.hpp>
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/matrix_cl.hpp>
+#endif
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -56,6 +59,19 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
         return 8;
     }
   }
+
+#ifdef STAN_OPENCL
+  stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
+                           std::ostream* msgs) const override {
+    return 9;
+  }
+
+  stan::math::var log_prob(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const override {
+    return 10;
+  }
+#endif
 
   void transform_inits(const stan::io::var_context& context,
                        Eigen::VectorXd& params_r,

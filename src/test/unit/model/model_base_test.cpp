@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/model/model_base.hpp>
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/matrix_cl.hpp>
+#endif
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -41,6 +44,19 @@ struct mock_model : public stan::model::model_base {
                            std::ostream* msgs) const override {
     return 2;
   }
+
+#ifdef STAN_OPENCL
+  stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
+                           std::ostream* msgs) const override {
+    return 9;
+  }
+
+  stan::math::var log_prob(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const override {
+    return 10;
+  }
+#endif
 
   double log_prob_jacobian(Eigen::VectorXd& params_r,
                            std::ostream* msgs) const override {

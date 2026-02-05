@@ -7,6 +7,9 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/matrix_cl.hpp>
+#endif
 
 namespace test {
 // mock_throwing_model_in_write_array throws exception in the write_array()
@@ -38,6 +41,20 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
                       std::ostream* pstream__ = nullptr) const {
     return 0.0;
   }  // log_prob()
+
+#ifdef STAN_OPENCL
+  inline stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
+                                  std::ostream* pstream__ = nullptr) const
+      override {
+    return 0.0;
+  }
+
+  inline stan::math::var log_prob(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* pstream__ = nullptr) const override {
+    return 0.0;
+  }
+#endif
 
   template <typename RNG>
   void write_array(RNG& base_rng__, std::vector<double>& params_r__,
