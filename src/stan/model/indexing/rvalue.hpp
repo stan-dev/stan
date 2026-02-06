@@ -280,7 +280,7 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& idx) {
       [](auto&& x_ref, auto&& idx_inner) {
         using vec_map = Eigen::Map<const Eigen::Array<int, -1, 1>>;
         return x_ref((vec_map(idx_inner.ns_.data(), idx_inner.ns_.size()) - 1),
-                     Eigen::all);
+                     Eigen::placeholders::all);
       },
       stan::math::to_ref(std::forward<EigMat>(x)),
       std::forward<MultiIndex>(idx));
@@ -591,7 +591,7 @@ inline auto rvalue(EigMat&& x, const char* name, Idx&& row_idx,
       [name](auto&& x_ref, auto&& row_idx_inner, auto&& col_idx_inner) {
         using vec_map = Eigen::Map<const Eigen::Array<int, -1, 1>>;
         return rvalue(
-            x_ref(Eigen::all,
+            x_ref(Eigen::placeholders::all,
                   (vec_map(col_idx_inner.ns_.data(), col_idx_inner.ns_.size())
                    - 1)),
             name, std::forward<decltype(row_idx_inner)>(row_idx_inner));

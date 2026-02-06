@@ -101,7 +101,7 @@ TEST_F(ServicesPathfinderGLM, single) {
     EXPECT_EQ(x_i, stride_id);
   }
 
-  auto param_tmp = param_vals(Eigen::all, param_indices);
+  auto param_tmp = param_vals(Eigen::placeholders::all, param_indices);
   auto mean_sd_pair = stan::test::get_mean_sd(param_tmp);
   auto&& mean_vals = mean_sd_pair.first;
   auto&& sd_vals = mean_sd_pair.second;
@@ -240,7 +240,7 @@ TEST_F(ServicesPathfinderGLM, multi_null_unique) {
     EXPECT_GE(param_vals.col(2)(i), 0);
     EXPECT_LE(param_vals.col(2)(i), num_paths);
   }
-  auto param_tmp = param_vals(Eigen::all, param_indices);
+  auto param_tmp = param_vals(Eigen::placeholders::all, param_indices);
   auto mean_sd_pair = stan::test::get_mean_sd(param_tmp);
   auto&& mean_vals = mean_sd_pair.first;
   auto&& sd_vals = mean_sd_pair.second;
@@ -318,7 +318,7 @@ TEST_F(ServicesPathfinderGLM, multi) {
     EXPECT_GE(param_vals.col(2)(i), 0);
     EXPECT_LE(param_vals.col(2)(i), num_paths);
   }
-  auto param_tmp = param_vals(Eigen::all, param_indices);
+  auto param_tmp = param_vals(Eigen::placeholders::all, param_indices);
   auto mean_sd_pair = stan::test::get_mean_sd(param_tmp);
   auto&& mean_vals = mean_sd_pair.first;
   auto&& sd_vals = mean_sd_pair.second;
