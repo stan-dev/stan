@@ -124,7 +124,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
     EXPECT_GE(param_vals.col(2)(i), 0);
     EXPECT_LE(param_vals.col(2)(i), num_paths);
   }
-  auto param_tmp = param_vals(Eigen::placeholders::all, param_indices);
+  auto param_tmp = param_vals(Eigen::indexing::all, param_indices);
   auto mean_sd_pair = stan::test::get_mean_sd(param_tmp);
   auto&& mean_vals = mean_sd_pair.first;
   auto&& sd_vals = mean_sd_pair.second;
@@ -448,7 +448,7 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   for (auto&& x_i : param_vals.col(2)) {
     EXPECT_EQ(x_i, stride_id);
   }
-  auto param_tmp = param_vals(Eigen::placeholders::all, param_indices);
+  auto param_tmp = param_vals(Eigen::indexing::all, param_indices);
   auto mean_sd_pair = stan::test::get_mean_sd(param_tmp);
   auto&& mean_vals = mean_sd_pair.first;
   auto&& sd_vals = mean_sd_pair.second;
