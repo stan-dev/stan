@@ -54,7 +54,8 @@ TEST_F(ServicesUtilGQWriter, timing) {
   writer.write_timing(4.31);
   // model test_gq.stan generates 4 values, 3 commas
   EXPECT_EQ(count_matches("4.31 seconds", logger_ss.str()), 1);
-  EXPECT_EQ(count_matches("4.31 seconds", sample_ss.str()), 1) << sample_ss.str();
+  EXPECT_EQ(count_matches("4.31 seconds", sample_ss.str()), 1)
+      << sample_ss.str();
 }
 
 TEST_F(ServicesUtilGQWriter, TestExceptions) {
