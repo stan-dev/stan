@@ -67,6 +67,8 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
 
   std::vector<double> unconstrained_params_r;
   std::vector<double> row(draws.cols());
+  auto start = std::chrono::steady_clock::now();
+
   try {
     for (size_t i = 0; i < draws.rows(); ++i) {
       Eigen::Map<Eigen::VectorXd>(&row[0], draws.cols()) = draws.row(i);
@@ -85,6 +87,13 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
     logger.error(e.what());
     return error_codes::SOFTWARE;
   }
+  auto end = std::chrono::steady_clock::now();
+  double gq_delta_t
+      = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count()
+        / 1000.0;
+  writer.write_timing(gq_delta_t);
+
   return error_codes::OK;
 }
 
@@ -161,6 +170,7 @@ int standalone_generate(const Model &model, const int num_chains,
           std::stringstream msg;
           for (size_t slice_idx = r.begin(); slice_idx != r.end();
                ++slice_idx) {
+            auto start = std::chrono::steady_clock::now();
             for (size_t i = 0; i < draws[slice_idx].rows(); ++i) {
               if (error_any)
                 return;
@@ -178,6 +188,13 @@ int standalone_generate(const Model &model, const int num_chains,
               writers[slice_idx].write_gq_values(model, rngs[slice_idx],
                                                  unconstrained_params_r);
             }
+            auto end = std::chrono::steady_clock::now();
+            double gq_delta_t
+                = std::chrono::duration_cast<std::chrono::milliseconds>(end
+                                                                        - start)
+                      .count()
+                  / 1000.0;
+            writers[slice_idx].write_timing(gq_delta_t);
           }
         },
         tbb::simple_partitioner());

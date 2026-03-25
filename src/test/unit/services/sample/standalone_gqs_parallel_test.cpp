@@ -74,7 +74,7 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   for (int i = 0; i < num_chains; i++) {
     EXPECT_EQ(count_matches("mu", sample_ss[i].str()), 1);
     EXPECT_EQ(count_matches("y_rep", sample_ss[i].str()), 10);
-    EXPECT_EQ(count_matches("\n", sample_ss[i].str()), 1001);
+    EXPECT_EQ(count_matches("\n", sample_ss[i].str()), 1004);
     match_csv_columns(bern_csv.samples, sample_ss[i].str(), 1000, 1, 8);
   }
 }
