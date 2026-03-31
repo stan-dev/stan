@@ -245,7 +245,7 @@ namespace stan {
 
         // now wire up the fwd and bck build of the trees which
         // depends on single-core or multi-core run
-        const bool run_serial = stan::math::internal::get_num_threads() == 1;
+        const bool run_serial = stan::math::internal::get_num_threads() == 4;
 
         std::size_t fwd_idx = 0;
         std::size_t bck_idx = 0;
