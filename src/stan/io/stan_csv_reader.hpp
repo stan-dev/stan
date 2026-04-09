@@ -300,7 +300,9 @@ class stan_csv_reader {
           double warmup;
           std::stringstream(line.substr(left, right - left)) >> warmup;
           timing.warmup += warmup;
-        } else if (line.find("(Sampling)") != std::string::npos) {
+        } else if (line.find("(Sampling)") != std::string::npos
+                   || line.find("(Generated Quantities)")
+                          != std::string::npos) {
           int left = 17;
           int right = line.find(" seconds");
           double sampling;
