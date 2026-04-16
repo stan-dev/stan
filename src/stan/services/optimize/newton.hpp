@@ -85,7 +85,9 @@ int newton(Model& model, const stan::io::var_context& init,
   logger.info(msg);
 
   std::vector<std::string> names;
+
   names.push_back("lp__");
+  names.push_back("converged__");
   model.constrained_param_names(names, true, true);
   parameter_writer(names);
 
@@ -97,7 +99,7 @@ int newton(Model& model, const stan::io::var_context& init,
       model.write_array(rng, cont_vector, disc_vector, values, true, true, &ss);
       if (ss.str().length() > 0)
         logger.info(ss);
-      values.insert(values.begin(), lp);
+      values.insert(values.begin(), {lp, 0});
       parameter_writer(values);
     }
     interrupt();
@@ -121,7 +123,7 @@ int newton(Model& model, const stan::io::var_context& init,
     model.write_array(rng, cont_vector, disc_vector, values, true, true, &ss);
     if (ss.str().length() > 0)
       logger.info(ss);
-    values.insert(values.begin(), lp);
+    values.insert(values.begin(), {lp, 0});
     parameter_writer(values);
   }
   return error_codes::OK;

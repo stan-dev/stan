@@ -83,6 +83,7 @@ int bfgs(Model& model, const stan::io::var_context& init,
   bfgs._conv_opts.maxIts = num_iterations;
 
   double lp = bfgs.logp();
+  int ret = 0;
 
   std::stringstream initial_msg;
   initial_msg << "Initial log joint probability = " << lp;
@@ -90,6 +91,7 @@ int bfgs(Model& model, const stan::io::var_context& init,
 
   std::vector<std::string> names;
   names.push_back("lp__");
+  names.push_back("converged__");
   model.constrained_param_names(names, true, true);
   parameter_writer(names);
 
@@ -109,10 +111,9 @@ int bfgs(Model& model, const stan::io::var_context& init,
     if (msg.str().length() > 0)
       logger.info(msg);
 
-    values.insert(values.begin(), lp);
+    values.insert(values.begin(), {lp, static_cast<double>(ret)});
     parameter_writer(values);
   }
-  int ret = 0;
 
   try {
     while (ret == 0) {
@@ -168,7 +169,7 @@ int bfgs(Model& model, const stan::io::var_context& init,
         if (msg.str().length() > 0)
           logger.info(msg);
 
-        values.insert(values.begin(), lp);
+        values.insert(values.begin(), {lp, static_cast<double>(ret)});
         parameter_writer(values);
       }
     }
@@ -192,7 +193,7 @@ int bfgs(Model& model, const stan::io::var_context& init,
     }
     if (msg.str().length() > 0)
       logger.info(msg);
-    values.insert(values.begin(), lp);
+    values.insert(values.begin(), {lp, static_cast<double>(ret)});
     parameter_writer(values);
   }
 
