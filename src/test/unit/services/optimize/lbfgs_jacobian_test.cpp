@@ -35,10 +35,11 @@ TEST_F(ServicesOptimize, with_jacobian) {
   EXPECT_TRUE(logger.find("Optimization terminated normally: "));
   EXPECT_FLOAT_EQ(return_code, 0);
 
-  ASSERT_EQ(2, parameter.names_.size());
+  ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("sigma", parameter.names_[1]);
-  EXPECT_NEAR((3 + std::sqrt(13)) / 2, parameter.states_.back()[1], 0.0001);
+  EXPECT_EQ("converged__", parameter.names_[1]);
+  EXPECT_EQ("sigma", parameter.names_[2]);
+  EXPECT_NEAR((3 + std::sqrt(13)) / 2, parameter.states_.back()[2], 0.0001);
 }
 
 TEST_F(ServicesOptimize, without_jacobian) {
@@ -58,8 +59,9 @@ TEST_F(ServicesOptimize, without_jacobian) {
   EXPECT_TRUE(logger.find("Optimization terminated normally: "));
   EXPECT_FLOAT_EQ(return_code, 0);
 
-  ASSERT_EQ(2, parameter.names_.size());
+  ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("sigma", parameter.names_[1]);
-  EXPECT_NEAR(3, parameter.states_.back()[1], 0.0001);
+  EXPECT_EQ("converged__", parameter.names_[1]);
+  EXPECT_EQ("sigma", parameter.names_[2]);
+  EXPECT_NEAR(3, parameter.states_.back()[2], 0.0001);
 }
