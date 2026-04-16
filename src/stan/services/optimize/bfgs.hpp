@@ -201,10 +201,12 @@ int bfgs(Model& model, const stan::io::var_context& init,
   if (ret >= 0) {
     logger.info("Optimization terminated normally: ");
     logger.info("  " + error_string);
+    parameter_writer("Optimization terminated normally: " + error_string);
     return_code = error_codes::OK;
   } else {
     logger.error("Optimization terminated with error: ");
     logger.error("  " + error_string);
+    parameter_writer("Optimization terminated with error: " + error_string);
     return_code = error_codes::SOFTWARE;
   }
 
