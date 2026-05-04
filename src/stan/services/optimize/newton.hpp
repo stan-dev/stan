@@ -5,6 +5,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
+#include <stan/optimization/bfgs.hpp>
 #include <stan/optimization/newton.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -92,6 +93,8 @@ int newton(Model& model, const stan::io::var_context& init,
   parameter_writer(names);
 
   double lastlp = lp;
+  int ret = 0;
+
   for (int m = 0; m < num_iterations; m++) {
     if (save_iterations) {
       std::vector<double> values;
@@ -99,7 +102,7 @@ int newton(Model& model, const stan::io::var_context& init,
       model.write_array(rng, cont_vector, disc_vector, values, true, true, &ss);
       if (ss.str().length() > 0)
         logger.info(ss);
-      values.insert(values.begin(), {lp, 0});
+      values.insert(values.begin(), {lp, static_cast<double>(ret)});
       parameter_writer(values);
     }
     interrupt();
@@ -117,13 +120,19 @@ int newton(Model& model, const stan::io::var_context& init,
       break;
   }
 
+  if (std::fabs(lp - lastlp) <= 1e-8) {
+    ret = optimization::TERM_ABSF;
+  } else {
+    ret = optimization::TERM_MAXIT;
+  }
+
   {
     std::vector<double> values;
     std::stringstream ss;
     model.write_array(rng, cont_vector, disc_vector, values, true, true, &ss);
     if (ss.str().length() > 0)
       logger.info(ss);
-    values.insert(values.begin(), {lp, 0});
+    values.insert(values.begin(), {lp, static_cast<double>(ret)});
     parameter_writer(values);
   }
   return error_codes::OK;
