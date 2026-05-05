@@ -36,19 +36,20 @@ TEST_F(ServicesOptimize, rosenbrock) {
   EXPECT_EQ(1, logger.find("Initial log joint probability = -1"));
   EXPECT_EQ(1, logger.find("Iteration  1. Log joint probability ="));
 
-  ASSERT_EQ(3, parameter.names_.size());
+  ASSERT_EQ(4, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("x", parameter.names_[1]);
-  EXPECT_EQ("y", parameter.names_[2]);
+  EXPECT_EQ("converged__", parameter.names_[1]);
+  EXPECT_EQ("x", parameter.names_[2]);
+  EXPECT_EQ("y", parameter.names_[3]);
 
   EXPECT_GT(parameter.states_.size(), 0);
-  EXPECT_FLOAT_EQ(0, parameter.states_.front()[1])
-      << "initial value should be (0, 0)";
   EXPECT_FLOAT_EQ(0, parameter.states_.front()[2])
       << "initial value should be (0, 0)";
-  EXPECT_NEAR(1, parameter.states_.back()[1], 1e-3)
-      << "optimal value should be (1, 1)";
+  EXPECT_FLOAT_EQ(0, parameter.states_.front()[3])
+      << "initial value should be (0, 0)";
   EXPECT_NEAR(1, parameter.states_.back()[2], 1e-3)
+      << "optimal value should be (1, 1)";
+  EXPECT_NEAR(1, parameter.states_.back()[3], 1e-3)
       << "optimal value should be (1, 1)";
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_LT(0, interrupt.call_count());
@@ -75,15 +76,16 @@ TEST_F(ServicesOptimize, rosenbrock_no_save_iterations) {
 
   EXPECT_EQ("0,0\n", init_ss.str());
 
-  ASSERT_EQ(3, parameter.names_.size());
+  ASSERT_EQ(4, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("x", parameter.names_[1]);
-  EXPECT_EQ("y", parameter.names_[2]);
+  EXPECT_EQ("converged__", parameter.names_[1]);
+  EXPECT_EQ("x", parameter.names_[2]);
+  EXPECT_EQ("y", parameter.names_[3]);
 
   EXPECT_EQ(1, parameter.states_.size());
-  EXPECT_NEAR(1, parameter.states_.back()[1], 1e-3)
-      << "optimal value should be (1, 1)";
   EXPECT_NEAR(1, parameter.states_.back()[2], 1e-3)
+      << "optimal value should be (1, 1)";
+  EXPECT_NEAR(1, parameter.states_.back()[3], 1e-3)
       << "optimal value should be (1, 1)";
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_LT(0, interrupt.call_count());
