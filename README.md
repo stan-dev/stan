@@ -15,7 +15,7 @@ It is built on top of the [Stan Math library](https://github.com/stan-dev/math),
 
 There are interfaces available in R, Python, MATLAB, Julia, Stata, Mathematica, and for the command line.
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1101116.svg)](https://doi.org/10.5281/zenodo.1101116)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.597268-blue)](https://doi.org/10.5281/zenodo.597268)
 
 Home Page
 ---------
