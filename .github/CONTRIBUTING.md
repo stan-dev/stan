@@ -50,3 +50,4 @@ If you suspect a problem or would like to see something added to the web site (h
 
 * [Stan Web Pages](https://github.com/stan-dev/stan-dev.github.io/issues)
 
+All contributions must follow the [Stan AI Contribution Policy](https://github.com/stan-dev/stan/wiki/AI-Contribution-Policy).
