@@ -5,6 +5,16 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.39.0 (19 May 2026)
+======================================================================
+
+ - Added timing information to the output of standalone generated quantities. (#3373, #3377)
+ - Added a `converged__` column to the output of the optimization algorithms,
+   which documents why the optimization algorithm halted. A string explanation
+   is also added as a comment. (#3379)
+ - Changes for compatibility with Eigen 5.0.1. (#3371)
+ - Fixed an issue where memory was being re-allocated unnecessarily. (#3392)
+
 v2.38.0 (13 January 2026)
 ======================================================================
 
