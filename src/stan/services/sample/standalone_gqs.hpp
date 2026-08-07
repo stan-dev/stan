@@ -75,8 +75,7 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
       try {
         model.unconstrain_array(row, unconstrained_params_r, &msg);
       } catch (const std::exception &e) {
-        if (msg.str().length() > 0)
-          logger.error(msg);
+        log_if_nonempty(logger, msg);
         logger.error(e.what());
         return error_codes::DATAERR;
       }
@@ -178,8 +177,7 @@ int standalone_generate(const Model &model, const int num_chains,
                 row = draws[slice_idx].row(i);
                 model.unconstrain_array(row, unconstrained_params_r, &msg);
               } catch (const std::domain_error &e) {
-                if (msg.str().length() > 0)
-                  logger.error(msg);
+                log_if_nonempty(logger, msg);
                 logger.error(e.what());
                 error_any = true;
                 return;
