@@ -78,3 +78,83 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
     match_csv_columns(bern_csv.samples, sample_ss[i].str(), 1000, 1, 8);
   }
 }
+
+namespace {
+
+Eigen::MatrixXd bernoulli_fit_draws() {
+  std::stringstream out;
+  std::ifstream csv_stream;
+  csv_stream.open("src/test/test-models/good/services/bernoulli_fit.csv");
+  stan::io::stan_csv bern_csv
+      = stan::io::stan_csv_reader::parse(csv_stream, &out);
+  csv_stream.close();
+  return bern_csv.samples.middleCols<1>(7);
+}
+
+// drop the timing-dependent " Elapsed Time" line, which the test writers
+// emit without a comment prefix
+std::string data_lines(const std::string& csv) {
+  std::stringstream in(csv), out;
+  std::string line;
+  while (std::getline(in, line)) {
+    if (!line.empty() && line[0] == '#')
+      continue;
+    if (line.find("Elapsed Time") != std::string::npos)
+      continue;
+    out << line << "\n";
+  }
+  return out.str();
+}
+
+using test_writer
+    = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
+
+}  // namespace
+
+// The chain id must reach the RNG: two runs of the same draws that differ
+// only in chain id must not share a random number stream.
+TEST_F(ServicesStandaloneGQ, genDraws_bernoulli_chain_id_rng) {
+  Eigen::MatrixXd draws = bernoulli_fit_draws();
+  auto gq = [&](unsigned int chain) {
+    std::stringstream ss;
+    test_writer writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss),
+                       "");
+    EXPECT_EQ(stan::services::standalone_generate(
+                  model, draws, 12345, interrupt, logger, writer, chain),
+              stan::services::error_codes::OK);
+    return data_lines(ss.str());
+  };
+  std::string chain_1 = gq(1);
+  EXPECT_NE(chain_1, gq(2));
+  EXPECT_EQ(chain_1, gq(1));  // reproducible given the same chain id
+}
+
+// init_chain_id must offset the per-chain streams: chains started at 3 must
+// match chains 3 and 4 of a run started at 1.
+TEST_F(ServicesStandaloneGQ, genDraws_bernoulli_init_chain_id_offset) {
+  Eigen::MatrixXd draws = bernoulli_fit_draws();
+  auto gq = [&](int n_chains, unsigned int init_chain_id) {
+    std::vector<std::stringstream> ss(n_chains);
+    std::vector<test_writer> writers;
+    writers.reserve(n_chains);
+    std::vector<Eigen::MatrixXd> draws_vec;
+    for (int i = 0; i < n_chains; i++) {
+      writers.emplace_back(
+          std::unique_ptr<std::stringstream, deleter_noop>(&ss[i]), "");
+      draws_vec.push_back(draws);
+    }
+    EXPECT_EQ(stan::services::standalone_generate(model, n_chains, draws_vec,
+                                                  12345, interrupt, logger,
+                                                  writers, init_chain_id),
+              stan::services::error_codes::OK);
+    std::vector<std::string> out;
+    for (int i = 0; i < n_chains; i++)
+      out.push_back(data_lines(ss[i].str()));
+    return out;
+  };
+  std::vector<std::string> from_1 = gq(4, 1);
+  std::vector<std::string> from_3 = gq(2, 3);
+  EXPECT_EQ(from_3[0], from_1[2]);
+  EXPECT_EQ(from_3[1], from_1[3]);
+  EXPECT_NE(from_1[0], from_1[1]);
+}
