@@ -92,7 +92,9 @@ Eigen::MatrixXd bernoulli_fit_draws() {
 }
 
 // drop the timing-dependent " Elapsed Time" line, which the test writers
-// emit without a comment prefix
+// emit without a comment prefix, and normalize the separator: the Eigen
+// writer path emits ", " where the std::vector path emits ",", which the
+// cross-path test below has to see through
 std::string data_lines(const std::string& csv) {
   std::stringstream in(csv), out;
   std::string line;
@@ -101,6 +103,7 @@ std::string data_lines(const std::string& csv) {
       continue;
     if (line.find("Elapsed Time") != std::string::npos)
       continue;
+    line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
     out << line << "\n";
   }
   return out.str();
@@ -194,5 +197,32 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli_multi_chain_column_count) {
       rows++;
     }
     EXPECT_EQ(rows, 1000);
+  }
+}
+
+// Cross-path check: the multi-chain and single-chain code paths must agree.
+TEST_F(ServicesStandaloneGQ, genDraws_bernoulli_multi_chain_matches_single) {
+  Eigen::MatrixXd draws = bernoulli_fit_draws();
+  std::vector<std::stringstream> sample_ss(num_chains);
+  std::vector<test_writer> sample_writer;
+  sample_writer.reserve(num_chains);
+  std::vector<Eigen::MatrixXd> draws_vec;
+  for (int i = 0; i < num_chains; i++) {
+    sample_writer.emplace_back(
+        std::unique_ptr<std::stringstream, deleter_noop>(&sample_ss[i]), "");
+    draws_vec.push_back(draws);
+  }
+  EXPECT_EQ(
+      stan::services::standalone_generate(model, num_chains, draws_vec, 12345,
+                                          interrupt, logger, sample_writer),
+      stan::services::error_codes::OK);
+  for (int i = 0; i < num_chains; i++) {
+    std::stringstream single_ss;
+    test_writer single_writer(
+        std::unique_ptr<std::stringstream, deleter_noop>(&single_ss), "");
+    EXPECT_EQ(stan::services::standalone_generate(
+                  model, draws, 12345, interrupt, logger, single_writer, 1 + i),
+              stan::services::error_codes::OK);
+    EXPECT_EQ(data_lines(single_ss.str()), data_lines(sample_ss[i].str()));
   }
 }
