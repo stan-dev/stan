@@ -148,7 +148,10 @@ class gq_writer {
       logger_.info(e.what());
       throw;
     }
-    sample_writer_(values);
+    // drop the constrained parameters, as the std::vector overload does
+    plain_type_t<EigVec> gq_values
+        = values.tail(values.size() - num_constrained_params_);
+    sample_writer_(gq_values);
   }
 
   /**
