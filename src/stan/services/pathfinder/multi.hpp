@@ -17,7 +17,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/concurrent_vector.h>
 #include <tbb/concurrent_queue.h>
-#include <boost/random/discrete_distribution.hpp>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -230,14 +230,12 @@ inline int pathfinder_lbfgs_multi(
   Eigen::Array<double, Eigen::Dynamic, 1> weight_vals
       = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
   stan::rng_t rng = util::create_rng(random_seed, stride_id);
-  using discrete_dist_t
-      = boost::random::discrete_distribution<Eigen::Index, double>;
-  boost::variate_generator<stan::rng_t&, discrete_dist_t> rand_psis_idx(
-      rng, discrete_dist_t(boost::iterator_range<double*>(
-               weight_vals.data(), weight_vals.data() + weight_vals.size())));
+  using discrete_dist_t = std::discrete_distribution<Eigen::Index>;
+  discrete_dist_t rand_psis_idx(weight_vals.data(),
+                                weight_vals.data() + weight_vals.size());
   Eigen::Matrix<Eigen::Index, -1, 1> psis_draw_idxs(num_multi_draws);
   for (size_t i = 0; i <= num_multi_draws - 1; ++i) {
-    psis_draw_idxs.coeffRef(i) = rand_psis_idx();
+    psis_draw_idxs.coeffRef(i) = rand_psis_idx(rng);
   }
   /**
    * The sort helps two main things

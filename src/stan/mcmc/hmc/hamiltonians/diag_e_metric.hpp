@@ -4,8 +4,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/normal_distribution.hpp>
+#include <random>
 
 namespace stan {
 namespace mcmc {
@@ -42,11 +41,10 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
   }
 
   void sample_p(diag_e_point& z, BaseRNG& rng) {
-    boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
-        rand_diag_gaus(rng, boost::normal_distribution<>());
+    std::normal_distribution<> rand_diag_gaus;
 
     for (int i = 0; i < z.p.size(); ++i)
-      z.p(i) = rand_diag_gaus() / sqrt(z.inv_e_metric_(i));
+      z.p(i) = rand_diag_gaus(rng) / sqrt(z.inv_e_metric_(i));
   }
 };
 

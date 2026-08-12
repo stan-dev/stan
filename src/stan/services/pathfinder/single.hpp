@@ -16,6 +16,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/concurrent_queue.h>
 #include <tbb/task_group.h>
+#include <random>
 #include <string>
 #include <vector>
 #include <atomic>
@@ -213,8 +214,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, RNG&& rng,
                                    size_t num_samples, const EigVec& alpha,
                                    const std::string& iter_msg, Logger&& logger,
                                    bool calculate_lp = true) {
-  boost::variate_generator<stan::rng_t&, boost::normal_distribution<>>
-      rand_unit_gaus(rng, boost::normal_distribution<>());
+  std::normal_distribution<> unit_gaus_dist;
+  auto rand_unit_gaus = [&rng, &unit_gaus_dist]() { return unit_gaus_dist(rng); };
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls = 0;
   Eigen::MatrixXd unit_samps
