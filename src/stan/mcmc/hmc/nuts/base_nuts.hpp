@@ -128,7 +128,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       bool valid_subtree = false;
       double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
 
-      if (this->rand_uniform_() > 0.5) {
+      if (this->rand_uniform_(this->rand_int_) > 0.5) {
         // Extend the current trajectory forward
         this->z_.ps_point::operator=(z_fwd);
         rho_bck = rho;
@@ -164,7 +164,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
         z_sample = z_propose;
       } else {
         double accept_prob = std::exp(log_sum_weight_subtree - log_sum_weight);
-        if (this->rand_uniform_() < accept_prob)
+        if (this->rand_uniform_(this->rand_int_) < accept_prob)
           z_sample = z_propose;
       }
 
@@ -328,7 +328,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     } else {
       double accept_prob
           = std::exp(log_sum_weight_final - log_sum_weight_subtree);
-      if (this->rand_uniform_() < accept_prob)
+      if (this->rand_uniform_(this->rand_int_) < accept_prob)
         z_propose = z_propose_final;
     }
 

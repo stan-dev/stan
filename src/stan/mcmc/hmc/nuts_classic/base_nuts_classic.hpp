@@ -84,7 +84,7 @@ class base_nuts_classic
     util.H0 = this->hamiltonian_.H(this->z_);
 
     // Sample the slice variable
-    util.log_u = std::log(this->rand_uniform_());
+    util.log_u = std::log(this->rand_uniform_(this->rand_int_));
 
     // Build a balanced binary tree until the NUTS criterion fails
     util.criterion = true;
@@ -101,7 +101,7 @@ class base_nuts_classic
       ps_point* z = 0;
       Eigen::VectorXd* rho = 0;
 
-      if (this->rand_uniform_() > 0.5) {
+      if (this->rand_uniform_(this->rand_int_) > 0.5) {
         z = &z_plus;
         rho = &rho_plus;
         util.sign = 1;
@@ -133,7 +133,7 @@ class base_nuts_classic
         subtree_prob = n_valid_subtree ? 1 : 0;
       }
 
-      if (this->rand_uniform_() < subtree_prob)
+      if (this->rand_uniform_(this->rand_int_) < subtree_prob)
         z_sample = z_propose;
 
       n_valid += n_valid_subtree;
@@ -227,7 +227,7 @@ class base_nuts_classic
       double accept_prob
           = static_cast<double>(n2) / static_cast<double>(n1 + n2);
 
-      if (util.criterion && (this->rand_uniform_() < accept_prob))
+      if (util.criterion && (this->rand_uniform_(this->rand_int_) < accept_prob))
         z_propose = z_propose_right;
 
       Eigen::VectorXd& subtree_rho = left_subtree_rho;

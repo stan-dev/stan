@@ -41,9 +41,9 @@ TEST(McmcStaticUniform, unit_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0920367, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.59627211, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99985325, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1713549, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.68603611, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99829161, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -78,9 +78,9 @@ TEST(McmcStaticUniform, diag_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0920367, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.59627211, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99985325, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1713549, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.68603611, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99829161, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -115,9 +115,9 @@ TEST(McmcStaticUniform, dense_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0920367, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.59627211, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99985325, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1713549, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.68603611, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99829161, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -152,9 +152,9 @@ TEST(McmcStaticUniform, softabs_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0826443, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.58605933, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99989599, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1500958, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.6613602, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99884379, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -189,9 +189,9 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0920367, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.59627211, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99985325, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1713549, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.68603611, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99829161, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -226,9 +226,9 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0920367, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.59627211, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99985325, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1713549, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.68603611, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99829161, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -263,9 +263,9 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0920367, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.59627211, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99985325, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1713549, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.68603611, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99829161, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
@@ -300,9 +300,9 @@ TEST(McmcStaticUniform, adapt_softabs_e_transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(1.0826443, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.58605933, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99989599, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.1500958, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.6613602, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99884379, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
