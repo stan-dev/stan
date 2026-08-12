@@ -6,14 +6,6 @@
 #include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
 #include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
 #include <stan/analyze/mcmc/split_rank_normalized_rhat.hpp>
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/tail_quantile.hpp>
-#include <boost/accumulators/statistics/p_square_quantile.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
-#include <boost/accumulators/statistics/covariance.hpp>
-#include <boost/accumulators/statistics/variates/covariate.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -65,109 +57,35 @@ class chains {
                            std::ostream* err = 0) {
     if (x.rows() != y.rows() && err)
       *err << "warning: covariance of different length chains";
-    using boost::accumulators::accumulator_set;
-    using boost::accumulators::stats;
-    using boost::accumulators::tag::covariance;
-    using boost::accumulators::tag::covariate1;
-    using boost::accumulators::tag::variance;
-
-    accumulator_set<double, stats<covariance<double, covariate1> > > acc;
 
     int M = std::min(x.size(), y.size());
-    for (int i = 0; i < M; i++)
-      acc(x(i), boost::accumulators::covariate1 = y(i));
-
-    return boost::accumulators::covariance(acc) * M / (M - 1);
+    double mx = x.head(M).mean();
+    double my = y.head(M).mean();
+    return ((x.head(M).array() - mx) * (y.head(M).array() - my)).sum()
+           / (M - 1.0);
   }
 
   static double correlation(const Eigen::VectorXd& x, const Eigen::VectorXd& y,
                             std::ostream* err = 0) {
     if (x.rows() != y.rows() && err)
       *err << "warning: covariance of different length chains";
-    using boost::accumulators::accumulator_set;
-    using boost::accumulators::stats;
-    using boost::accumulators::tag::covariance;
-    using boost::accumulators::tag::covariate1;
-    using boost::accumulators::tag::variance;
-
-    accumulator_set<double, stats<variance, covariance<double, covariate1> > >
-        acc_xy;
-    accumulator_set<double, stats<variance> > acc_y;
 
     int M = std::min(x.size(), y.size());
-    for (int i = 0; i < M; i++) {
-      acc_xy(x(i), boost::accumulators::covariate1 = y(i));
-      acc_y(y(i));
-    }
-
-    double cov = boost::accumulators::covariance(acc_xy);
+    double cov = covariance(x, y);
     if (cov > -1e-8 && cov < 1e-8)
       return cov;
-    return cov
-           / std::sqrt(boost::accumulators::variance(acc_xy)
-                       * boost::accumulators::variance(acc_y));
+    return cov / std::sqrt(variance(x.head(M)) * variance(y.head(M)));
   }
 
   static double quantile(const Eigen::VectorXd& x, const double prob) {
-    using boost::accumulators::accumulator_set;
-    using boost::accumulators::left;
-    using boost::accumulators::quantile;
-    using boost::accumulators::quantile_probability;
-    using boost::accumulators::right;
-    using boost::accumulators::stats;
-    using boost::accumulators::tag::tail;
-    using boost::accumulators::tag::tail_quantile;
-    double M = x.rows();
-    // size_t cache_size = std::min(prob, 1-prob)*M + 2;
-    size_t cache_size = M;
-
-    if (prob < 0.5) {
-      accumulator_set<double, stats<tail_quantile<left> > > acc(
-          tail<left>::cache_size = cache_size);
-      for (int i = 0; i < M; i++)
-        acc(x(i));
-      return quantile(acc, quantile_probability = prob);
-    }
-    accumulator_set<double, stats<tail_quantile<right> > > acc(
-        tail<right>::cache_size = cache_size);
-    for (int i = 0; i < M; i++)
-      acc(x(i));
-    return quantile(acc, quantile_probability = prob);
+    return stan::math::quantile(x, prob);
   }
 
   static Eigen::VectorXd quantiles(const Eigen::VectorXd& x,
                                    const Eigen::VectorXd& probs) {
-    using boost::accumulators::accumulator_set;
-    using boost::accumulators::left;
-    using boost::accumulators::quantile;
-    using boost::accumulators::quantile_probability;
-    using boost::accumulators::right;
-    using boost::accumulators::stats;
-    using boost::accumulators::tag::tail;
-    using boost::accumulators::tag::tail_quantile;
-    double M = x.rows();
-
-    // size_t cache_size = M/2 + 2;
-    size_t cache_size = M;  // 2 + 2;
-
-    accumulator_set<double, stats<tail_quantile<left> > > acc_left(
-        tail<left>::cache_size = cache_size);
-    accumulator_set<double, stats<tail_quantile<right> > > acc_right(
-        tail<right>::cache_size = cache_size);
-
-    for (int i = 0; i < M; i++) {
-      acc_left(x(i));
-      acc_right(x(i));
-    }
-
-    Eigen::VectorXd q(probs.size());
-    for (int i = 0; i < probs.size(); i++) {
-      if (probs(i) < 0.5)
-        q(i) = quantile(acc_left, quantile_probability = probs(i));
-      else
-        q(i) = quantile(acc_right, quantile_probability = probs(i));
-    }
-    return q;
+    std::vector<double> probs_vec(probs.data(), probs.data() + probs.size());
+    std::vector<double> q = stan::math::quantile(x, probs_vec);
+    return Eigen::Map<const Eigen::VectorXd>(q.data(), q.size());
   }
 
   static Eigen::VectorXd autocorrelation(const Eigen::VectorXd& x) {

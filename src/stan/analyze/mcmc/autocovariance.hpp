@@ -2,9 +2,6 @@
 #define STAN_ANALYZE_MCMC_AUTOCOVARIANCE_HPP
 
 #include <stan/math/prim.hpp>
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
 #include <unsupported/Eigen/FFT>
 #include <complex>
 #include <vector>
@@ -87,16 +84,9 @@ void autocovariance(const Eigen::MatrixBase<DerivedA>& y,
   Eigen::FFT<T> fft;
   autocorrelation(y, acov, fft);
 
-  using boost::accumulators::accumulator_set;
-  using boost::accumulators::stats;
-  using boost::accumulators::tag::variance;
+  double variance = (y.array() - y.mean()).matrix().squaredNorm() / y.size();
 
-  accumulator_set<double, stats<variance>> acc;
-  for (int n = 0; n < y.size(); ++n) {
-    acc(y(n));
-  }
-
-  acov = acov.array() * boost::accumulators::variance(acc);
+  acov = acov.array() * variance;
 }
 
 /**

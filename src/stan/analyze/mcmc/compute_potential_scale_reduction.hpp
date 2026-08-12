@@ -4,11 +4,6 @@
 #include <stan/math/prim.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/split_chains.hpp>
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
-#include <boost/math/distributions/normal.hpp>
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -74,30 +69,22 @@ inline double compute_potential_scale_reduction(
     }
   }
 
-  using boost::accumulators::accumulator_set;
-  using boost::accumulators::stats;
-  using boost::accumulators::tag::mean;
-  using boost::accumulators::tag::variance;
-
   Eigen::VectorXd chain_mean(num_chains);
-  accumulator_set<double, stats<variance>> acc_chain_mean;
   Eigen::VectorXd chain_var(num_chains);
-  double unbiased_var_scale = num_draws / (num_draws - 1.0);
 
   for (int chain = 0; chain < num_chains; ++chain) {
-    accumulator_set<double, stats<mean, variance>> acc_draw;
-    for (int n = 0; n < num_draws; ++n) {
-      acc_draw(draws[chain][n]);
-    }
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain], num_draws);
 
-    chain_mean(chain) = boost::accumulators::mean(acc_draw);
-    acc_chain_mean(chain_mean(chain));
-    chain_var(chain)
-        = boost::accumulators::variance(acc_draw) * unbiased_var_scale;
+    chain_mean(chain) = draw.mean();
+    chain_var(chain) = (draw.array() - chain_mean(chain)).matrix().squaredNorm()
+                       / (num_draws - 1.0);
   }
 
-  double var_between = num_draws * boost::accumulators::variance(acc_chain_mean)
-                       * num_chains / (num_chains - 1);
+  double var_between
+      = num_draws
+        * (chain_mean.array() - chain_mean.mean()).matrix().squaredNorm()
+        / (num_chains - 1.0);
   double var_within = chain_var.mean();
 
   return sqrt((var_between / var_within + num_draws - 1) / num_draws);
