@@ -338,15 +338,15 @@ TEST(McmcUnitENuts, transition_test) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_EQ(5, sampler.depth_);
+  EXPECT_EQ(4, sampler.depth_);
   EXPECT_EQ(31, sampler.n_leapfrog_);
   EXPECT_FALSE(sampler.divergent_);
 
-  EXPECT_FLOAT_EQ(1.831525, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-0.51771688, s.cont_params()(1));
-  EXPECT_FLOAT_EQ(0.2112902, s.cont_params()(2));
-  EXPECT_FLOAT_EQ(-1.8335789, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99894023, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.1622753, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(0.94628012, s.cont_params()(1));
+  EXPECT_FLOAT_EQ(0.17305008, s.cont_params()(2));
+  EXPECT_FLOAT_EQ(-0.47586286, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99870592, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());

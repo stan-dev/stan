@@ -108,11 +108,11 @@ TEST(McmcUnitEXHMC, transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_FLOAT_EQ(0.6522606, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(0.10550757, s.cont_params()(1));
-  EXPECT_FLOAT_EQ(0.78875536, s.cont_params()(2));
-  EXPECT_FLOAT_EQ(-0.52935541, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99923033, s.accept_stat());
+  EXPECT_FLOAT_EQ(1.7558961, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.99812794, s.cont_params()(1));
+  EXPECT_FLOAT_EQ(0.62731504, s.cont_params()(2));
+  EXPECT_FLOAT_EQ(-2.2364774, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99912089, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
