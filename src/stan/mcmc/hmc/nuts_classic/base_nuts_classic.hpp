@@ -227,7 +227,8 @@ class base_nuts_classic
       double accept_prob
           = static_cast<double>(n2) / static_cast<double>(n1 + n2);
 
-      if (util.criterion && (this->rand_uniform_(this->rand_int_) < accept_prob))
+      if (util.criterion
+          && (this->rand_uniform_(this->rand_int_) < accept_prob))
         z_propose = z_propose_right;
 
       Eigen::VectorXd& subtree_rho = left_subtree_rho;

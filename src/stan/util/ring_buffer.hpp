@@ -30,7 +30,10 @@ class ring_buffer {
    * @param capacity maximum number of elements retained at once
    */
   explicit ring_buffer(size_t capacity)
-      : buf_(capacity), capacity_(capacity), start_(0), size_(0),
+      : buf_(capacity),
+        capacity_(capacity),
+        start_(0),
+        size_(0),
         last_idx_(0) {}
 
   size_t size() const { return size_; }
@@ -76,9 +79,7 @@ class ring_buffer {
   const T& back() const { return buf_[last_idx_]; }
 
   T& operator[](size_t i) { return buf_[(start_ + i) % capacity_]; }
-  const T& operator[](size_t i) const {
-    return buf_[(start_ + i) % capacity_];
-  }
+  const T& operator[](size_t i) const { return buf_[(start_ + i) % capacity_]; }
 
   /**
    * Change the capacity, keeping the most-recently-pushed
@@ -105,8 +106,7 @@ class ring_buffer {
     using pointer = const T*;
     using reference = const T&;
 
-    const_iterator()
-        : buf_(nullptr), capacity_(0), idx_(0), pos_(0) {}
+    const_iterator() : buf_(nullptr), capacity_(0), idx_(0), pos_(0) {}
     const_iterator(const std::vector<T>* buf, size_t capacity, size_t idx,
                    size_t pos)
         : buf_(buf), capacity_(capacity), idx_(idx), pos_(pos) {}

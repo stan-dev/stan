@@ -195,9 +195,10 @@ class base_hmc : public base_mcmc {
   void sample_stepsize() {
     this->epsilon_ = this->nom_epsilon_;
     if (this->epsilon_jitter_)
-      this->epsilon_ *= 1.0
-                       + this->epsilon_jitter_
-                             * (2.0 * this->rand_uniform_(this->rand_int_) - 1.0);
+      this->epsilon_
+          *= 1.0
+             + this->epsilon_jitter_
+                   * (2.0 * this->rand_uniform_(this->rand_int_) - 1.0);
   }
 
  protected:

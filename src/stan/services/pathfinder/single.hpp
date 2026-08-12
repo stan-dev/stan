@@ -215,7 +215,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, RNG&& rng,
                                    const std::string& iter_msg, Logger&& logger,
                                    bool calculate_lp = true) {
   std::normal_distribution<> unit_gaus_dist;
-  auto rand_unit_gaus = [&rng, &unit_gaus_dist]() { return unit_gaus_dist(rng); };
+  auto rand_unit_gaus
+      = [&rng, &unit_gaus_dist]() { return unit_gaus_dist(rng); };
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls = 0;
   Eigen::MatrixXd unit_samps

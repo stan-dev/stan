@@ -146,9 +146,7 @@ class json_data_handler : public stan::json::json_handler {
     array_start_r = 0;
   }
 
-  inline std::string key_str() {
-    return stan::io::join(key_stack, ".");
-  }
+  inline std::string key_str() { return stan::io::join(key_stack, "."); }
 
   std::string outer_key_str() {
     std::string result;
