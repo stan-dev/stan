@@ -6,6 +6,7 @@
 #include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/string_utils.hpp>
 #include <stan/io/var_context.hpp>
+#include <algorithm>
 #include <cctype>
 #include <iostream>
 #include <ostream>
@@ -16,7 +17,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/regex.hpp>
 
 namespace stan {
 
@@ -172,8 +172,11 @@ class json_data_handler : public stan::json::json_handler {
    *  and contain only letters, numbers, or an underscore.
    */
   bool valid_varname(const std::string& name) {
-    static const boost::regex re("[a-zA-Z][a-zA-Z0-9_]*");
-    return boost::regex_match(name, re);
+    if (name.empty() || !std::isalpha(static_cast<unsigned char>(name[0])))
+      return false;
+    return std::all_of(name.begin() + 1, name.end(), [](unsigned char c) {
+      return std::isalnum(c) || c == '_';
+    });
   }
 
   bool is_array_tuples(const std::vector<std::string>& keys) {
