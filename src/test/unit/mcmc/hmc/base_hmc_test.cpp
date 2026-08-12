@@ -2,7 +2,6 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/services/util/create_rng.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 

@@ -7,12 +7,12 @@
 #include <test/unit/util.hpp>
 #include <test/unit/io/json/util.hpp>
 
-#include <boost/limits.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 #include <complex>
+#include <limits>
 
 TEST(ioJson, jsonData_scalar_int) {
   std::string txt = "{ \"foo\" : 1 }";
