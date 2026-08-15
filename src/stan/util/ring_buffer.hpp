@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -34,7 +36,10 @@ class ring_buffer {
         capacity_(capacity),
         start_(0),
         size_(0),
-        last_idx_(0) {}
+        last_idx_(0) {
+    if (capacity == 0)
+      throw std::domain_error("ring_buffer capacity must be > 0");
+  }
 
   size_t size() const { return size_; }
   size_t capacity() const { return capacity_; }
@@ -70,7 +75,8 @@ class ring_buffer {
    * temporary, so an rvalue expression (e.g. an Eigen expression template)
    * is evaluated straight into the slot's existing storage.
    */
-  template <typename U>
+  template <typename U,
+            typename = std::enable_if_t<std::is_assignable<T&, U&&>::value>>
   void push_back(U&& value) {
     push_back() = std::forward<U>(value);
   }
@@ -86,11 +92,17 @@ class ring_buffer {
    * `min(size(), new_capacity)` elements.
    */
   void rset_capacity(size_t new_capacity) {
+    if (new_capacity == 0)
+      throw std::domain_error("ring_buffer capacity must be > 0");
+    if (new_capacity == capacity_ && size_ == 0) {
+      start_ = 0;
+      return;
+    }
     std::vector<T> new_buf(new_capacity);
     size_t keep = std::min(size_, new_capacity);
     size_t old_first = (start_ + (size_ - keep)) % capacity_;
     for (size_t i = 0; i < keep; ++i)
-      new_buf[i] = buf_[(old_first + i) % capacity_];
+      new_buf[i] = std::move(buf_[(old_first + i) % capacity_]);
     buf_.swap(new_buf);
     capacity_ = new_capacity;
     start_ = 0;

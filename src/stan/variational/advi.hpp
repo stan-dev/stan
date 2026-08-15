@@ -529,13 +529,8 @@ class advi {
    * @return median of values in circular buffer.
    */
   double circ_buff_median(const stan::util::ring_buffer<double>& cb) const {
-    // FIXME: naive implementation; creates a copy as a vector
-    std::vector<double> v;
-    for (stan::util::ring_buffer<double>::const_iterator i = cb.begin();
-         i != cb.end(); ++i) {
-      v.push_back(*i);
-    }
-
+    // nth_element needs a mutable copy
+    std::vector<double> v(cb.begin(), cb.end());
     size_t n = v.size() / 2;
     std::nth_element(v.begin(), v.begin() + n, v.end());
     return v[n];
