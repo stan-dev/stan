@@ -3,7 +3,9 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace stan {
@@ -21,35 +23,35 @@ namespace io {
  * yields a single empty token at that end (matching the behavior of
  * boost::split with token_compress_on).
  *
- * @param s string to split
+ * @param s sequence to split
  * @param delims set of delimiter characters
  * @param compress_delims whether to collapse adjacent delimiters
  * @return the tokens found in `s`
  */
-inline std::vector<std::string> split(const std::string& s,
-                                      const std::string& delims,
+template <typename T>
+inline std::vector<std::string> split(T&& s, std::string_view delims,
                                       bool compress_delims = false) {
+  constexpr std::string_view::size_type npos = std::string_view::npos;
+  const std::string_view sv{s};
   std::vector<std::string> tokens;
-  size_t start = 0;
+  std::size_t start = 0;
   while (true) {
-    size_t pos = s.find_first_of(delims, start);
-    if (pos == std::string::npos) {
-      tokens.push_back(s.substr(start));
+    std::size_t end = sv.find_first_of(delims, start);
+    bool last = (end == npos);
+    std::size_t len = last ? sv.size() - start : end - start;
+    // when compressing, skip empty tokens but keep the first and last ones
+    if (last || !compress_delims || len > 0 || tokens.empty()) {
+      tokens.emplace_back(sv.substr(start, len));
+    }
+    if (last) {
       break;
     }
-    tokens.push_back(s.substr(start, pos - start));
-    start = pos + 1;
-  }
-  if (compress_delims) {
-    std::vector<std::string> compressed;
-    for (size_t i = 0; i < tokens.size(); ++i) {
-      // drop empty tokens produced by interior runs of delimiters,
-      // keeping a single empty token at either end
-      if (tokens[i].empty() && i > 0 && i + 1 < tokens.size())
-        continue;
-      compressed.push_back(std::move(tokens[i]));
+    start = end + 1;
+    if (compress_delims) {
+      // skip the rest of this run of delimiters in one search
+      std::size_t next = sv.find_first_not_of(delims, start);
+      start = (next == npos) ? sv.size() : next;
     }
-    tokens.swap(compressed);
   }
   return tokens;
 }
@@ -62,11 +64,19 @@ inline std::vector<std::string> split(const std::string& s,
  * @return the joined string
  */
 inline std::string join(const std::vector<std::string>& parts,
-                        const std::string& sep) {
+                        std::string_view sep) {
+  if (parts.empty()) {
+    return "";
+  }
+  std::size_t total = (parts.size() - 1) * sep.size();
+  for (const auto& part : parts) {
+    total += part.size();
+  }
   std::string result;
-  for (size_t i = 0; i < parts.size(); ++i) {
-    if (i > 0)
-      result += sep;
+  result.reserve(total);
+  result += parts[0];
+  for (std::size_t i = 1; i < parts.size(); ++i) {
+    result += sep;
     result += parts[i];
   }
   return result;
@@ -91,11 +101,12 @@ inline void trim(std::string& s) {
  * @param target substring to replace
  * @param replacement replacement text
  */
-inline void replace_first(std::string& s, const std::string& target,
-                          const std::string& replacement) {
-  size_t pos = s.find(target);
-  if (pos != std::string::npos)
-    s.replace(pos, target.size(), replacement);
+inline void replace_first(std::string& s, std::string_view target,
+                          std::string_view replacement) {
+  std::size_t pos = s.find(target);
+  if (pos != std::string::npos) {
+    s.replace(pos, target.size(), replacement.data(), replacement.size());
+  }
 }
 
 }  // namespace io
