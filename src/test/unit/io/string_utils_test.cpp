@@ -14,13 +14,11 @@ TEST(io_string_utils, split_simple) {
   EXPECT_EQ((std::vector<std::string>{"abc"}), split("abc", "."));
   EXPECT_EQ((std::vector<std::string>{""}), split("", "."));
   EXPECT_EQ((std::vector<std::string>{"a", "", "b"}), split("a,,b", ","));
-  EXPECT_EQ((std::vector<std::string>{"", "a", "b", ""}),
-            split(",a,b,", ","));
+  EXPECT_EQ((std::vector<std::string>{"", "a", "b", ""}), split(",a,b,", ","));
 }
 
 TEST(io_string_utils, split_multi_char_delims) {
-  EXPECT_EQ((std::vector<std::string>{"a", "b", "c"}),
-            split("a,b;c", ",;"));
+  EXPECT_EQ((std::vector<std::string>{"a", "b", "c"}), split("a,b;c", ",;"));
 }
 
 TEST(io_string_utils, split_accepts_views) {
@@ -34,8 +32,7 @@ TEST(io_string_utils, split_accepts_views) {
 
 TEST(io_string_utils, split_compress) {
   EXPECT_EQ((std::vector<std::string>{"a", "b"}), split("a,,b", ",", true));
-  EXPECT_EQ((std::vector<std::string>{"a", "b"}),
-            split("a,,,b", ",", true));
+  EXPECT_EQ((std::vector<std::string>{"a", "b"}), split("a,,,b", ",", true));
   EXPECT_EQ((std::vector<std::string>{"", "a", "b", ""}),
             split(",a,,b,", ",", true));
   EXPECT_EQ((std::vector<std::string>{"", ""}), split(",,", ",", true));

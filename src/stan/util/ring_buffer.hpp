@@ -32,11 +32,7 @@ class ring_buffer {
    * @param capacity maximum number of elements retained at once
    */
   explicit ring_buffer(size_t capacity)
-      : buf_(capacity),
-        capacity_(capacity),
-        start_(0),
-        size_(0),
-        last_idx_(0) {
+      : buf_(capacity), capacity_(capacity), start_(0), size_(0), last_idx_(0) {
     if (capacity == 0)
       throw std::domain_error("ring_buffer capacity must be > 0");
   }
