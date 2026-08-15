@@ -109,6 +109,28 @@ inline void replace_first(std::string& s, std::string_view target,
   }
 }
 
+/**
+ * Returns true if `s` contains `needle` as a substring.
+ *
+ * @param s string to search
+ * @param needle substring to search for
+ * @return true if `needle` is found in `s`
+ */
+inline bool contains(std::string_view s, std::string_view needle) {
+  return s.find(needle) != std::string_view::npos;
+}
+
+/**
+ * Returns true if `s` starts with `prefix`.
+ *
+ * @param s string to check
+ * @param prefix prefix to look for
+ * @return true if `s` starts with `prefix`
+ */
+inline bool starts_with(std::string_view s, std::string_view prefix) {
+  return s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0;
+}
+
 }  // namespace io
 }  // namespace stan
 #endif

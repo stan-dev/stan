@@ -4,9 +4,11 @@
 #include <string_view>
 #include <vector>
 
+using stan::io::contains;
 using stan::io::join;
 using stan::io::replace_first;
 using stan::io::split;
+using stan::io::starts_with;
 using stan::io::trim;
 
 TEST(io_string_utils, split_simple) {
@@ -70,4 +72,21 @@ TEST(io_string_utils, replace_first) {
   EXPECT_EQ("hello stan (Default)", s);
   replace_first(s, "hello", "");
   EXPECT_EQ(" stan (Default)", s);
+}
+
+TEST(io_string_utils, contains) {
+  EXPECT_TRUE(contains("hello world", "lo wo"));
+  EXPECT_TRUE(contains("hello world", ""));
+  EXPECT_TRUE(contains("hello world", "hello world"));
+  EXPECT_FALSE(contains("hello world", "missing"));
+  EXPECT_FALSE(contains("", "x"));
+}
+
+TEST(io_string_utils, starts_with) {
+  EXPECT_TRUE(starts_with("hello world", "hello"));
+  EXPECT_TRUE(starts_with("hello world", ""));
+  EXPECT_TRUE(starts_with("hello world", "hello world"));
+  EXPECT_FALSE(starts_with("hello world", "hello world!"));
+  EXPECT_FALSE(starts_with("hello world", "Hello"));
+  EXPECT_FALSE(starts_with("", "x"));
 }
