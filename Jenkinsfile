@@ -16,10 +16,11 @@ properties([
   ])
 ])
 
+def image = 'stanorg/ci:v1'
 def commit
 def runRemainingStages = false
 def runOpenCL = false
-def LINUX_CXX = 'clang++-6.0 -Werror -Wno-inconsistent-missing-override -Wno-error=return-type -Wno-error=division-by-zero'
+def LINUX_CXX = 'clang++-7 -Werror -Wno-inconsistent-missing-override -Wno-error=return-type -Wno-error=division-by-zero'
 def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds'
 def MAC_CXX = 'clang++' // -Werror -Wno-inconsistent-missing-override -Wno-unused-but-set-variable
 def WINSETENV = '''
@@ -35,7 +36,7 @@ catchError {
     'GIT_COMMITTER_NAME=Stan Jenkins',
     'GIT_COMMITTER_EMAIL=mc.stanislaw@gmail.com'
   ]) {
-    runPod(image: "stanorg/ci:gpu", cpus: 2) {
+    runPod(image: image, cpus: 2) {
       stage('Verify changes') {
         commit = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
         runRemainingStages = params.downstream || params.run_all || filesChanged(
@@ -124,7 +125,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
             }
           }
         }, linux: {
-          runPod(image: "stanorg/ci:gpu", gpus: 1) {
+          runPod(image: image, gpus: 1) {
             stage('Linux Unit') {
               runUnit(cxx: LINUX_CXX, local: """
 STAN_OPENCL=true
@@ -170,7 +171,7 @@ OPENCL_DEVICE_ID=0
         }
 
         parallel linux: {
-          runPod(image: 'stanorg/ci:gpu', checkout: false) {
+          runPod(image: image, checkout: false) {
             stage('Integration Linux') {
               checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/performance-tests-cmdstan']],
                 extensions: [cloneOption(shallow: true, depth: 2), submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
