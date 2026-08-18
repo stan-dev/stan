@@ -342,20 +342,11 @@ class chainset {
    */
   Eigen::VectorXd quantiles(const int index,
                             const Eigen::VectorXd& probs) const {
-    if (probs.size() == 0)
-      return Eigen::VectorXd::Zero(0);
-    Eigen::MatrixXd draws = samples(index);
-    Eigen::Map<Eigen::VectorXd> map(draws.data(), draws.size());
-    std::vector<double> probs_vec(probs.data(), probs.data() + probs.size());
-    std::vector<double> quantiles;
     try {
-      quantiles = stan::math::quantile(map, probs_vec);
+      return stan::math::quantile(samples(index).reshaped(), probs);
     } catch (const std::logic_error& e) {
-      Eigen::VectorXd nans(probs.size());
-      nans.setConstant(std::numeric_limits<double>::quiet_NaN());
-      return nans;
+      return Eigen::VectorXd::Constant(probs.size(), math::NOT_A_NUMBER);
     }
-    return Eigen::Map<Eigen::VectorXd>(quantiles.data(), quantiles.size());
   }
 
   /**
