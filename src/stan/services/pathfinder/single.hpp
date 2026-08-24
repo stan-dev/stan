@@ -218,8 +218,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, RNG&& rng,
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls = 0;
   Eigen::MatrixXd unit_samps
-      = generate_matrix([&]() { return rand_unit_gaus(rng); }, num_params,
-                        num_samples);
+      = generate_matrix([&rng, &rand_unit_gaus]() {
+        return rand_unit_gaus(rng); }, num_params, num_samples);
   Eigen::Array<double, Eigen::Dynamic, 2> lp_mat(num_samples, 2);
   lp_mat.col(0) = (-taylor_approx.logdetcholHk)
                   + -0.5

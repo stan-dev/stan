@@ -231,7 +231,7 @@ inline int pathfinder_lbfgs_multi(
       = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
   stan::rng_t rng = util::create_rng(random_seed, stride_id);
   std::discrete_distribution<Eigen::Index> rand_psis_idx(
-      weight_vals.data(), weight_vals.data() + weight_vals.size());
+      weight_vals.cbegin(), weight_vals.cend());
   Eigen::Matrix<Eigen::Index, -1, 1> psis_draw_idxs(num_multi_draws);
   for (size_t i = 0; i <= num_multi_draws - 1; ++i) {
     psis_draw_idxs.coeffRef(i) = rand_psis_idx(rng);
