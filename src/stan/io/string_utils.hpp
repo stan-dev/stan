@@ -102,7 +102,7 @@ inline void remove_first(std::string& input,
   }
 }
 
-}
-}
+}  // namespace io
+}  // namespace stan
 
 #endif
