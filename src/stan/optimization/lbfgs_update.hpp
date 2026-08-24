@@ -2,7 +2,7 @@
 #define STAN_OPTIMIZATION_LBFGS_UPDATE_HPP
 
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <boost/circular_buffer.hpp>
+#include <stan/util/ring_buffer.hpp>
 #include <tuple>
 #include <vector>
 
@@ -72,8 +72,8 @@ class LBFGSUpdate {
    **/
   inline void search_direction(VectorT &pk, const VectorT &gk) const {
     std::vector<Scalar> alphas(_buf.size());
-    typename boost::circular_buffer<UpdateT>::const_reverse_iterator buf_rit;
-    typename boost::circular_buffer<UpdateT>::const_iterator buf_it;
+    typename stan::util::ring_buffer<UpdateT>::const_reverse_iterator buf_rit;
+    typename stan::util::ring_buffer<UpdateT>::const_iterator buf_it;
     typename std::vector<Scalar>::const_iterator alpha_it;
     typename std::vector<Scalar>::reverse_iterator alpha_rit;
 
@@ -103,7 +103,7 @@ class LBFGSUpdate {
   }
 
  protected:
-  boost::circular_buffer<UpdateT> _buf;
+  stan::util::ring_buffer<UpdateT> _buf;
   Scalar _gammak;
 };
 }  // namespace optimization
