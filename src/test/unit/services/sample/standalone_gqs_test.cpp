@@ -1,4 +1,3 @@
-#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <stan/callbacks/stream_logger.hpp>

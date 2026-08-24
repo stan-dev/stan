@@ -5,6 +5,7 @@
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/var_context.hpp>
+#include <stan/io/string_utils.hpp>
 #include <cctype>
 #include <iostream>
 #include <ostream>
@@ -15,7 +16,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
 namespace stan {
@@ -147,7 +147,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   inline std::string key_str() {
-    return boost::algorithm::join(key_stack, ".");
+    return stan::io::join(key_stack, ".");
   }
 
   std::string outer_key_str() {
@@ -181,7 +181,7 @@ class json_data_handler : public stan::json::json_handler {
     std::string key;
     stack.pop_back();
     while (!stack.empty()) {
-      key = boost::algorithm::join(stack, ".");
+      key = stan::io::join(stack, ".");
       if (slot_types_map[key] == meta_type::ARRAY_OF_TUPLES)
         return true;
       stack.pop_back();
@@ -194,12 +194,12 @@ class json_data_handler : public stan::json::json_handler {
     std::string key;
     stack.pop_back();
     while (!stack.empty()) {
-      key = boost::algorithm::join(stack, ".");
+      key = stan::io::join(stack, ".");
       if (slot_dims_map.count(key) == 1)
         return slot_dims_map[key];
       stack.pop_back();
     }
-    key = boost::algorithm::join(keys, ".");
+    key = stan::io::join(keys, ".");
     if (slot_dims_map.count(key) != 1)
       unexpected_error(key, "not an array");
     return slot_dims_map[key];
@@ -210,13 +210,13 @@ class json_data_handler : public stan::json::json_handler {
     std::string key;
     stack.pop_back();
     while (!stack.empty()) {
-      key = boost::algorithm::join(stack, ".");
+      key = stan::io::join(stack, ".");
       if (slot_dims_map.count(key) == 1)
         break;
       stack.pop_back();
     }
     if (stack.empty()) {
-      key = boost::algorithm::join(key_stack, ".");
+      key = stan::io::join(key_stack, ".");
       unexpected_error(key, "ill-formed array");
     }
     slot_dims_map[key] = update;
@@ -354,8 +354,7 @@ class json_data_handler : public stan::json::json_handler {
         continue;
       }
       std::vector<size_t> all_dims;
-      std::vector<std::string> slots;
-      split(slots, var.first, boost::is_any_of("."), boost::token_compress_on);
+      std::vector<std::string> slots = stan::io::split(var.first, ".", true);
       std::string slot;
       for (size_t i = 0; i < slots.size(); ++i) {
         slot.append(slots[i]);
