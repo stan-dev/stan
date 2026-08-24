@@ -19,7 +19,6 @@ properties([
 def image = 'stanorg/ci:v1'
 def commit
 def runRemainingStages = false
-def runOpenCL = false
 def LINUX_CXX = 'clang++-7 -Werror -Wno-inconsistent-missing-override -Wno-error=return-type -Wno-error=division-by-zero'
 def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds'
 def MAC_CXX = 'clang++' // -Werror -Wno-inconsistent-missing-override -Wno-unused-but-set-variable
@@ -44,7 +43,6 @@ catchError {
           'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test',
           'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile',
           'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format')
-        runOpenCL = params.downstream || params.run_all || filesChanged('src/stan/model/indexing')
       }
 
       stage("Clang-format") {
@@ -131,6 +129,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
 STAN_OPENCL=true
 OPENCL_PLATFORM_ID=0
 OPENCL_DEVICE_ID=0
+LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
 """)
             }
           }
