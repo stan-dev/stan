@@ -6,9 +6,9 @@
 #include <stan/callbacks/structured_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-#include <boost/random/uniform_01.hpp>
 #include <cmath>
 #include <limits>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -35,7 +35,7 @@ class base_hmc : public base_mcmc {
         integrator_(),
         hamiltonian_(model),
         rand_int_(rng),
-        rand_uniform_(rand_int_),
+        rand_uniform_(),
         nom_epsilon_(0.1),
         epsilon_(nom_epsilon_),
         epsilon_jitter_(0.0) {}
@@ -196,7 +196,9 @@ class base_hmc : public base_mcmc {
     this->epsilon_ = this->nom_epsilon_;
     if (this->epsilon_jitter_)
       this->epsilon_
-          *= 1.0 + this->epsilon_jitter_ * (2.0 * this->rand_uniform_() - 1.0);
+          *= 1.0
+             + this->epsilon_jitter_
+                   * (2.0 * this->rand_uniform_(this->rand_int_) - 1.0);
   }
 
  protected:
@@ -207,7 +209,7 @@ class base_hmc : public base_mcmc {
   BaseRNG& rand_int_;
 
   // Uniform(0, 1) RNG
-  boost::uniform_01<BaseRNG&> rand_uniform_;
+  std::uniform_real_distribution<> rand_uniform_;
 
   double nom_epsilon_;
   double epsilon_;

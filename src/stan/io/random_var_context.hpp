@@ -3,9 +3,9 @@
 
 #include <stan/io/var_context.hpp>
 #include <stan/io/validate_dims.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
 #include <algorithm>
 #include <limits>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -50,8 +50,7 @@ class random_var_context : public var_context {
       for (size_t n = 0; n < num_unconstrained_; ++n)
         unconstrained_params_[n] = 0.0;
     } else {
-      boost::random::uniform_real_distribution<double> unif(-init_radius,
-                                                            init_radius);
+      std::uniform_real_distribution<double> unif(-init_radius, init_radius);
       for (size_t n = 0; n < num_unconstrained_; ++n)
         unconstrained_params_[n] = unif(rng);
     }

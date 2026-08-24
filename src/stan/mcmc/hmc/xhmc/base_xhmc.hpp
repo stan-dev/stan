@@ -82,7 +82,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       double ave_subtree = 0;
       double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
 
-      if (this->rand_uniform_() > 0.5) {
+      if (this->rand_uniform_(this->rand_int_) > 0.5) {
         this->z_.ps_point::operator=(z_plus);
         valid_subtree = build_tree(this->depth_, z_propose, ave_subtree,
                                    log_sum_weight_subtree, H0, 1, n_leapfrog,
@@ -105,7 +105,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       ++(this->depth_);
 
       double accept_prob = std::exp(log_sum_weight_subtree - log_sum_weight);
-      if (this->rand_uniform_() < accept_prob)
+      if (this->rand_uniform_(this->rand_int_) < accept_prob)
         z_sample = z_propose;
 
       // Break if exhaustion criterion is satisfied
@@ -224,7 +224,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
     double accept_prob
         = std::exp(log_sum_weight_right - log_sum_weight_subtree);
-    if (this->rand_uniform_() < accept_prob)
+    if (this->rand_uniform_(this->rand_int_) < accept_prob)
       z_propose = z_propose_right;
 
     return std::abs(ave_subtree) >= x_delta_;

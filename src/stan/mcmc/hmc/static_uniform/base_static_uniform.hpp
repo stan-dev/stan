@@ -4,9 +4,9 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
 #include <cmath>
 #include <limits>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -46,7 +46,7 @@ class base_static_uniform
     double sum_prob = 1;
     double sum_metro_prob = 1;
 
-    boost::random::uniform_int_distribution<> uniform(0, L_ - 1);
+    std::uniform_int_distribution<> uniform(0, L_ - 1);
     int Lp = uniform(this->rand_int_);
 
     for (int l = 0; l < Lp; ++l) {
@@ -61,7 +61,7 @@ class base_static_uniform
       sum_prob += prob;
       sum_metro_prob += prob > 1 ? 1 : prob;
 
-      if (this->rand_uniform_() < prob / sum_prob)
+      if (this->rand_uniform_(this->rand_int_) < prob / sum_prob)
         z_sample = this->z_;
     }
 
@@ -79,7 +79,7 @@ class base_static_uniform
       sum_prob += prob;
       sum_metro_prob += prob > 1 ? 1 : prob;
 
-      if (this->rand_uniform_() < prob / sum_prob)
+      if (this->rand_uniform_(this->rand_int_) < prob / sum_prob)
         z_sample = this->z_;
     }
 

@@ -4,8 +4,7 @@
 #include <stan/math/mix.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_point.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/normal_distribution.hpp>
+#include <random>
 
 namespace stan {
 namespace mcmc {
@@ -83,13 +82,12 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
   }
 
   void sample_p(softabs_point& z, BaseRNG& rng) {
-    boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
-        rand_unit_gaus(rng, boost::normal_distribution<>());
+    std::normal_distribution<> rand_unit_gaus;
 
     Eigen::VectorXd a(z.p.size());
 
     for (idx_t n = 0; n < z.p.size(); ++n)
-      a(n) = sqrt(z.softabs_lambda(n)) * rand_unit_gaus();
+      a(n) = sqrt(z.softabs_lambda(n)) * rand_unit_gaus(rng);
 
     z.p = z.eigen_deco.eigenvectors() * a;
   }
