@@ -171,7 +171,7 @@ class json_data_handler : public stan::json::json_handler {
    *  and contain only letters, numbers, or an underscore.
    */
   bool valid_varname(const std::string& name) {
-    static const std::locale locale;
+    static const std::locale locale = std::locale::classic();
     if (name.empty() || !std::isalpha(name[0], locale)) {
       return false;
     }
