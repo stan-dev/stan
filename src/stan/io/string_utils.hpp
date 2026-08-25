@@ -102,6 +102,60 @@ inline void remove_first(std::string& input,
   }
 }
 
+/**
+ * Replaces the first occurrence of a substring in a string in place.
+ *
+ * @param input string to modify
+ * @param substring substring to replace
+ * @param replacement replacement string
+ */
+inline void replace_first(std::string& input,
+                          const std::string_view& substring,
+                          const std::string_view& replacement) {
+  const std::size_t position = input.find(substring);
+  if (position != std::string::npos) {
+    input.replace(position, substring.size(), replacement);
+  }
+}
+
+/**
+ * Tests whether a string contains a substring.
+ *
+ * @param input string to test
+ * @param substring substring to look for
+ * @return true if input contains substring
+ */
+inline bool contains(const std::string_view& input,
+                     const std::string_view& substring) {
+  return input.find(substring) != std::string_view::npos;
+}
+
+/**
+ * Tests whether a string ends with a suffix.
+ *
+ * @param input string to test
+ * @param suffix suffix to look for
+ * @return true if input ends with suffix
+ */
+inline bool ends_with(const std::string_view& input,
+                      const std::string_view& suffix) {
+  return input.size() >= suffix.size()
+         && input.substr(input.size() - suffix.size()) == suffix;
+}
+
+/**
+ * Tests whether a string starts with a prefix.
+ *
+ * @param input string to test
+ * @param prefix prefix to look for
+ * @return true if input starts with prefix
+ */
+inline bool starts_with(const std::string_view& input,
+                        const std::string_view& prefix) {
+  return input.size() >= prefix.size()
+         && input.substr(0, prefix.size()) == prefix;
+}
+
 }  // namespace io
 }  // namespace stan
 
