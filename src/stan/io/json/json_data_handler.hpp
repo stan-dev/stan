@@ -6,7 +6,7 @@
 #include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/string_utils.hpp>
-#include <cctype>
+#include <algorithm>
 #include <iostream>
 #include <locale>
 #include <ostream>
