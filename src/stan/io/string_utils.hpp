@@ -109,8 +109,7 @@ inline void remove_first(std::string& input,
  * @param substring substring to replace
  * @param replacement replacement string
  */
-inline void replace_first(std::string& input,
-                          const std::string_view& substring,
+inline void replace_first(std::string& input, const std::string_view& substring,
                           const std::string_view& replacement) {
   const std::size_t position = input.find(substring);
   if (position != std::string::npos) {
