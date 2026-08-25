@@ -170,7 +170,7 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
         }
 
         parallel linux: {
-          runPod(image: image, checkout: false) {
+          runPod(image: image, checkout: false, cpus: 16, memory: '128Gi') {
             stage('Integration Linux') {
               checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/performance-tests-cmdstan']],
                 extensions: [cloneOption(shallow: true, depth: 2), submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
