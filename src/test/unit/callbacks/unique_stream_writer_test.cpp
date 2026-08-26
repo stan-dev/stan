@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <boost/lexical_cast.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
 
 struct deleter_noop {
@@ -51,7 +50,7 @@ TEST_F(StanInterfaceCallbacksStreamWriter, string_vector) {
   const int N = 5;
   std::vector<std::string> x;
   for (int n = 0; n < N; ++n)
-    x.push_back(boost::lexical_cast<std::string>(n));
+    x.push_back(std::to_string(n));
 
   EXPECT_NO_THROW(writer(x));
   EXPECT_EQ("0,1,2,3,4\n", ss.str());
