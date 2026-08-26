@@ -1,9 +1,9 @@
-#include <stan/io/string_utils.hpp>
+#include <stan/io/ends_with.hpp>
 #include <gtest/gtest.h>
 #include <string>
 
 void expect_ends(const std::string& p, const std::string& s, bool cond) {
-  EXPECT_EQ(cond, stan::io::ends_with(s, p));
+  EXPECT_EQ(cond, stan::io::ends_with(p, s));
 }
 
 TEST(Io, EndsWith) {

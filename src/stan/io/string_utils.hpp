@@ -130,19 +130,6 @@ inline bool contains(const std::string_view& input,
 }
 
 /**
- * Tests whether a string ends with a suffix.
- *
- * @param input string to test
- * @param suffix suffix to look for
- * @return true if input ends with suffix
- */
-inline bool ends_with(const std::string_view& input,
-                      const std::string_view& suffix) {
-  return input.size() >= suffix.size()
-         && input.substr(input.size() - suffix.size()) == suffix;
-}
-
-/**
  * Tests whether a string starts with a prefix.
  *
  * @param input string to test
