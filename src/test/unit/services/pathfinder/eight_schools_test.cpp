@@ -142,7 +142,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   all_mean_vals.row(2) = mean_vals - r_mean_vals;
   // This samples badly, but is a known issue with initialization.
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
-    EXPECT_NEAR(0, all_mean_vals(2, i), 1.5);
+    EXPECT_NEAR(0, all_mean_vals(2, i), 1);
   }
 
   Eigen::MatrixXd all_sd_vals(3, 20);

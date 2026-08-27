@@ -3,7 +3,8 @@
 
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
-#include <random>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/normal_distribution.hpp>
 
 namespace stan {
 namespace mcmc {
@@ -36,10 +37,11 @@ class unit_e_metric : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
   }
 
   void sample_p(unit_e_point& z, BaseRNG& rng) {
-    std::normal_distribution<> rand_unit_gaus;
+    boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
+        rand_unit_gaus(rng, boost::normal_distribution<>());
 
     for (int i = 0; i < z.p.size(); ++i)
-      z.p(i) = rand_unit_gaus(rng);
+      z.p(i) = rand_unit_gaus();
   }
 };
 

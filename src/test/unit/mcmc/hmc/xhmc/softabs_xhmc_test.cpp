@@ -112,7 +112,7 @@ TEST(McmcUnitEXHMC, transition) {
   EXPECT_FLOAT_EQ(-1, s.cont_params()(1));
   EXPECT_FLOAT_EQ(1, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-1.5, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99980384, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.99870497, s.accept_stat());
 
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
