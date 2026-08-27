@@ -5,7 +5,8 @@
 #include <stan/math/prim.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
-#include <random>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/normal_distribution.hpp>
 
 namespace stan {
 namespace mcmc {
@@ -41,12 +42,13 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
 
   void sample_p(dense_e_point& z, BaseRNG& rng) {
     typedef typename stan::math::index_type<Eigen::VectorXd>::type idx_t;
-    std::normal_distribution<> rand_dense_gaus;
+    boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
+        rand_dense_gaus(rng, boost::normal_distribution<>());
 
     Eigen::VectorXd u(z.p.size());
 
     for (idx_t i = 0; i < u.size(); ++i)
-      u(i) = rand_dense_gaus(rng);
+      u(i) = rand_dense_gaus();
 
     z.p = z.inv_e_metric_.llt().matrixU().solve(u);
   }
