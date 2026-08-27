@@ -150,11 +150,19 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
         def integration_tests_flags = params.compile_all_models ? '--no-ignore-models' : ''
         def runIntegration = { args ->
           def pre = args.pre ?: ''
+          deleteDir()
+          checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/performance-tests-cmdstan']],
+            extensions: [cloneOption(shallow: true, depth: 2), submodule(recursiveSubmodules: true, shallow: true, depth: 32)])
+          dir('stanc3') {
+            checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/stanc3']],
+              extensions: [cloneOption(shallow: true, depth: 8)])
+          }
+          checkoutPR('cmdstan', params.cmdstan_pr)
           dir('cmdstan/stan') {
             checkout scm
-            writeFile(file: 'make/local', text: stanc3_bin_url) // only used on linux
+            writeFile(file: 'make/local', text: stanc3_bin_url)
           }
-          writeFile(file: 'cmdstan/make/local', text: args.local)
+          writeFile(file: 'cmdstan/make/local', text: args.local+"\n$stanc3_bin_url")
           batsh pre + """
             make -C cmdstan -j\$PARALLEL build
             python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 stanc3/test/integration/good
@@ -172,32 +180,20 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
         parallel linux: {
           runPod(image: image, checkout: false, cpus: 16, memory: '128Gi') {
             stage('Integration Linux') {
-              checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/performance-tests-cmdstan']],
-                extensions: [cloneOption(shallow: true, depth: 2), submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
-              /* not sure why only linux does these: */
-              dir('stanc3') {
-                checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/stanc3']],
-                  extensions: [cloneOption(shallow: true, depth: 2)])
-              }
-              checkoutPR('cmdstan', params.cmdstan_pr)
-              runIntegration(local: "O=0\nCXX=${LINUX_CXX}\n$stanc3_bin_url")
+              runIntegration(local: "O=0\nCXX=${LINUX_CXX}")
             }
           }
         }, mac: {
           if (!params.downstream && (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'master') || params.run_tests_all_os) {
             node('macos') {
               stage('Integration Mac') {
-                checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/performance-tests-cmdstan']],
-                  extensions: [cleanBeforeCheckout(), cloneOption(shallow: true, depth: 2), submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
-                runIntegration(local: "O=0\nCXX=${MAC_CXX}\n")
+                runIntegration(local: "O=0\nCXX=${MAC_CXX}")
               }
             }
           }
         }, windows: {
           node('windows') {
             stage('Integration Windows') {
-              checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/performance-tests-cmdstan']],
-                extensions: [cleanBeforeCheckout(), cloneOption(shallow: true, depth: 2), submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
               withEnv(["PATH+TBB=${WORKSPACE}\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
                 runIntegration(local: "CXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
               }
