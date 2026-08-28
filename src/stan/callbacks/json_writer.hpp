@@ -228,6 +228,7 @@ class json_writer final : public structured_writer {
     } else {
       *output_ << "\n";
     }
+    output_->flush();
   }
 
   /**
