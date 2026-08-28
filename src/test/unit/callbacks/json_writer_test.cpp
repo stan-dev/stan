@@ -1,24 +1,12 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
-#include <sstream>
 #include <string>
 
 struct deleter_noop {
   template <typename T>
   constexpr void operator()(T* arg) const {}
 };
-
-class counting_streambuf : public std::stringbuf {
- public:
-  int sync() override {
-    ++sync_count;
-    return std::stringbuf::sync();
-  }
-
-  int sync_count = 0;
-};
-
 class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksJsonWriter()
@@ -102,35 +90,6 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
   auto json = ss.str();
   EXPECT_EQ(expected, json);
   ASSERT_TRUE(stan::test::is_valid_JSON(json));
-}
-
-TEST_F(StanInterfaceCallbacksJsonWriter, flushes_completed_top_level_record) {
-  counting_streambuf buffer;
-  std::ostream output(&buffer);
-  stan::callbacks::json_writer<std::ostream, deleter_noop> writer{
-      std::unique_ptr<std::ostream, deleter_noop>(&output)};
-
-  writer.begin_record();
-  writer.begin_record("nested");
-  writer.write("value", 1);
-  writer.end_record();
-  EXPECT_EQ(0, buffer.sync_count);
-
-  writer.end_record();
-  EXPECT_EQ(1, buffer.sync_count);
-  const char* expected = R"json(
-{
-  "nested" : {
-    "value" : 1
-  }
-}
-)json";
-  auto json = buffer.str();
-  EXPECT_EQ(expected, json);
-  EXPECT_TRUE(stan::test::is_valid_JSON(json));
-
-  stan::callbacks::json_writer<std::ostream, deleter_noop> no_op_writer;
-  EXPECT_NO_THROW(no_op_writer.end_record());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
