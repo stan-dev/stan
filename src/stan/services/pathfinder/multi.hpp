@@ -233,8 +233,7 @@ inline int pathfinder_lbfgs_multi(
   using discrete_dist_t
       = boost::random::discrete_distribution<Eigen::Index, double>;
   boost::variate_generator<stan::rng_t&, discrete_dist_t> rand_psis_idx(
-      rng, discrete_dist_t(boost::iterator_range<double*>(
-               weight_vals.data(), weight_vals.data() + weight_vals.size())));
+      rng, discrete_dist_t(weight_vals.cbegin(), weight_vals.cend()));
   Eigen::Matrix<Eigen::Index, -1, 1> psis_draw_idxs(num_multi_draws);
   for (size_t i = 0; i <= num_multi_draws - 1; ++i) {
     psis_draw_idxs.coeffRef(i) = rand_psis_idx();
