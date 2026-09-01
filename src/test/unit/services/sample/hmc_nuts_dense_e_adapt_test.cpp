@@ -184,3 +184,47 @@ TEST_F(ServicesSampleHmcNutsDenseEAdapt, output_regression) {
   EXPECT_EQ(1, logger.find_info("seconds (Total)"));
   EXPECT_EQ(0, logger.call_count_error());
 }
+
+TEST_F(ServicesSampleHmcNutsDenseEAdapt, no_timestep_reset) {
+  unsigned int random_seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int num_warmup = 70;
+  int num_samples = 100;
+  int num_thin = 5;
+  bool save_warmup = true;
+  int refresh = 0;
+  double stepsize = 0.1;
+  double stepsize_jitter = 0;
+  int max_depth = 8;
+  double delta = .1;
+  double gamma = .1;
+  double kappa = .1;
+  double t0 = .1;
+  unsigned int init_buffer = 0;
+  unsigned int term_buffer = 0;
+  unsigned int window = 10;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+
+  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+      logger, init, parameter, diagnostic);
+
+  std::vector<std::string> string_values = parameter.string_values();
+  bool found_step_size = false;
+  for (size_t i = 0; i < string_values.size(); i++) {
+    // Make sure the sampler wrote a Step size and that it is not reset to
+    // exactly 1
+    if (string_values[i].compare("Step size")) {
+      found_step_size = true;
+      EXPECT_NE(string_values[i].compare("Step size = 1"), 0);
+    }
+  }
+
+  EXPECT_TRUE(found_step_size);
+
+  EXPECT_EQ(return_code, 0);
+}
