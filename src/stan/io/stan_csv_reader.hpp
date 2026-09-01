@@ -1,7 +1,7 @@
 #ifndef STAN_IO_STAN_CSV_READER_HPP
 #define STAN_IO_STAN_CSV_READER_HPP
 
-#include <boost/algorithm/string.hpp>
+#include <stan/io/string_utils.hpp>
 #include <stan/math/prim.hpp>
 #include <cctype>
 #include <istream>
@@ -15,8 +15,7 @@ namespace io {
 
 inline void prettify_stan_csv_name(std::string& variable) {
   if (variable.find_first_of(":.") != std::string::npos) {
-    std::vector<std::string> parts;
-    boost::split(parts, variable, boost::is_any_of(":"));
+    std::vector<std::string> parts = stan::io::split(variable, ":");
     for (auto& part : parts) {
       int pos = part.find('.');
       if (pos > 0) {
@@ -25,7 +24,7 @@ inline void prettify_stan_csv_name(std::string& variable) {
         part += "]";
       }
     }
-    variable = boost::algorithm::join(parts, ".");
+    variable = stan::io::join(parts, ".");
   }
 }
 
@@ -126,10 +125,10 @@ class stan_csv_reader {
       size_t equal = lhs.find("=");
       if (equal != std::string::npos) {
         name = lhs.substr(0, equal);
-        boost::trim(name);
+        stan::io::trim(name);
         value = lhs.substr(equal + 1, lhs.size());
-        boost::trim(value);
-        boost::replace_first(value, " (Default)", "");
+        stan::io::trim(value);
+        stan::io::remove_first(value, " (Default)");
       } else {
         if (lhs.compare(" data") == 0) {
           ss >> comment;
@@ -138,9 +137,9 @@ class stan_csv_reader {
           size_t equal = lhs.find("=");
           if (equal != std::string::npos) {
             name = lhs.substr(0, equal);
-            boost::trim(name);
+            stan::io::trim(name);
             value = lhs.substr(equal + 2, lhs.size());
-            boost::replace_first(value, " (Default)", "");
+            stan::io::remove_first(value, " (Default)");
           }
 
           if (name.compare("file") == 0)
@@ -176,7 +175,7 @@ class stan_csv_reader {
         std::stringstream(value) >> metadata.chain_id;
       } else if (name.compare("init") == 0) {
         metadata.init = value;
-        boost::trim(metadata.init);
+        stan::io::trim(metadata.init);
       } else if (name.compare("seed") == 0) {
         std::stringstream(value) >> metadata.seed;
         metadata.random_seed = false;
@@ -209,7 +208,7 @@ class stan_csv_reader {
     while (ss.good()) {
       std::string token;
       std::getline(ss, token, ',');
-      boost::trim(token);
+      stan::io::trim(token);
 
       if (prettify_name) {
         prettify_stan_csv_name(token);
@@ -239,7 +238,7 @@ class stan_csv_reader {
 
     // parse stepsize
     std::getline(ss, line, '=');  // stepsize
-    boost::trim(line);
+    stan::io::trim(line);
     ss >> adaptation.step_size;
     if (lines == 2)  // ADVI reports stepsize, no metric
       return;
@@ -265,7 +264,7 @@ class stan_csv_reader {
       for (int col = 0; col < cols; col++) {
         std::string token;
         std::getline(line_ss, token, ',');
-        boost::trim(token);
+        stan::io::trim(token);
         std::stringstream(token) >> adaptation.metric(row, col);
       }
       std::getline(ss, line);
@@ -335,7 +334,7 @@ class stan_csv_reader {
         std::stringstream ls(line);
         for (int col = 0; col < cols; col++) {
           std::getline(ls, line, ',');
-          boost::trim(line);
+          stan::io::trim(line);
           try {
             samples(row, col) = static_cast<double>(std::stold(line));
             // If the value read is out of the range of representable values by

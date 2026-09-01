@@ -30,13 +30,15 @@ namespace services {
  * @param[in, out] interrupt called every iteration
  * @param[in, out] logger logger to which to write warning and error messages
  * @param[in, out] sample_writer writer to which draws are written
+ * @param[in] chain chain id to advance the pseudo random number generator
  * @return error code
  */
 template <class Model>
 int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
                         unsigned int seed, callbacks::interrupt &interrupt,
                         callbacks::logger &logger,
-                        callbacks::writer &sample_writer) {
+                        callbacks::writer &sample_writer,
+                        unsigned int chain = 1) {
   if (draws.size() == 0) {
     logger.error("Empty set of draws from fitted model.");
     return error_codes::DATAERR;
@@ -63,7 +65,7 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
   util::gq_writer writer(sample_writer, logger, p_names.size());
   writer.write_gq_names(model);
 
-  stan::rng_t rng = util::create_rng(seed, 1);
+  stan::rng_t rng = util::create_rng(seed, chain);
 
   std::vector<double> unconstrained_params_r;
   std::vector<double> row(draws.cols());
@@ -115,6 +117,9 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
  * @param[in, out] logger logger to which to write warning and error messages
  * @param[in, out] sample_writers A vector of writers to which draws for each
  * chain are written
+ * @param[in] init_chain_id first chain id. The pseudo random number generator
+ * will advance for each chain by an integer sequence from `init_chain_id` to
+ * `init_chain_id + num_chains - 1`
  * @return error code
  */
 template <typename Model, typename SampleWriter>
@@ -122,10 +127,11 @@ int standalone_generate(const Model &model, const int num_chains,
                         const std::vector<Eigen::MatrixXd> &draws,
                         unsigned int seed, callbacks::interrupt &interrupt,
                         callbacks::logger &logger,
-                        std::vector<SampleWriter> &sample_writers) {
+                        std::vector<SampleWriter> &sample_writers,
+                        unsigned int init_chain_id = 1) {
   if (num_chains == 1) {
     return standalone_generate(model, draws[0], seed, interrupt, logger,
-                               sample_writers[0]);
+                               sample_writers[0], init_chain_id);
   }
 
   std::vector<std::string> p_names;
@@ -157,7 +163,7 @@ int standalone_generate(const Model &model, const int num_chains,
     }
     writers.emplace_back(sample_writers[i], logger, p_names.size());
     writers[i].write_gq_names(model);
-    rngs.emplace_back(util::create_rng(seed, i + 1));
+    rngs.emplace_back(util::create_rng(seed, init_chain_id + i));
   }
   bool error_any = false;
   try {

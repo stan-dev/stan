@@ -24,7 +24,7 @@ namespace callbacks {
  * The writer doesn't try to validate the object's internal structure
  * or object completeness, only syntactic correctness.
  *
- * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Stream A type with a valid `operator<<(std::string)` and `flush()`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
  * output stream
  */
@@ -227,6 +227,7 @@ class json_writer final : public structured_writer {
       record_element_needs_comma_ = true;
     } else {
       *output_ << "\n";
+      output_->flush();
     }
   }
 

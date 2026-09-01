@@ -3,7 +3,6 @@
 
 #include <stan/io/stan_csv_reader.hpp>
 
-#include <boost/algorithm/string.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <gtest/gtest.h>
 #include <rapidjson/document.h>
@@ -49,7 +48,7 @@ void match_csv_columns(const Eigen::MatrixXd& samples,
       break;
     }
     cells.clear();
-    boost::algorithm::split(cells, line, boost::is_any_of(","));
+    cells = stan::io::split(line, ",");
     for (size_t i = 0; i < num_columns; ++i) {
       cell_ss.str(std::string());
       cell_ss.clear();
