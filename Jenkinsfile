@@ -1,5 +1,4 @@
-properties([
-  disableConcurrentBuilds(abortPrevious: !params.downstream),
+def props = [
   buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30')),
   parameters([
     string(defaultValue: '', name: 'math_pr', description: "Leave blank "
@@ -14,7 +13,13 @@ properties([
     booleanParam(defaultValue: false, name: 'compile_all_models', description: 'Run integration tests on the full test model suite.'),
     booleanParam(defaultValue: false, name: 'run_all', description: 'Pretend all files changes'),
   ])
-])
+]
+
+if (!params.downstream) {
+  props <<= disableConcurrentBuilds()
+}
+
+properties(props)
 
 def image = 'stanorg/ci:v1'
 def commit
