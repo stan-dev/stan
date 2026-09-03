@@ -37,7 +37,7 @@ TEST_F(ServicesLaplaceSample, values) {
   unsigned int seed = 1234;
   int refresh = 100;
   std::stringstream sample_ss;
-  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::stream_writer sample_writer(sample_ss, "# ");
   int return_code = stan::services::laplace_sample<true>(
       *model, theta_hat, draws, seed, refresh, interrupt, logger,
       sample_writer);
@@ -112,7 +112,7 @@ TEST_F(ServicesLaplaceSample, hessianOutput) {
   unsigned int seed = 1234;
   int refresh = 100;
   std::stringstream sample_ss;
-  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::stream_writer sample_writer(sample_ss, "# ");
 
   std::stringstream hessian_ss;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> hessian_writer{
@@ -137,7 +137,7 @@ TEST_F(ServicesLaplaceSample, noLP) {
   unsigned int seed = 1234;
   int refresh = 100;
   std::stringstream sample_ss;
-  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::stream_writer sample_writer(sample_ss, "# ");
   stan::callbacks::structured_writer dummy_hessian_writer;
 
   int draws = 11;
@@ -160,7 +160,7 @@ TEST_F(ServicesLaplaceSample, wrongSizeModeError) {
   unsigned int seed = 1234;
   int refresh = 1;
   std::stringstream sample_ss;
-  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::stream_writer sample_writer(sample_ss, "# ");
   int RC = stan::services::laplace_sample<true>(*model, theta_hat, draws, seed,
                                                 refresh, interrupt, logger,
                                                 sample_writer);
@@ -174,7 +174,7 @@ TEST_F(ServicesLaplaceSample, nonPositiveDrawsError) {
   unsigned int seed = 1234;
   int refresh = 1;
   std::stringstream sample_ss;
-  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::stream_writer sample_writer(sample_ss, "# ");
   int RC = stan::services::laplace_sample<true>(*model, theta_hat, draws, seed,
                                                 refresh, interrupt, logger,
                                                 sample_writer);
@@ -188,7 +188,7 @@ TEST_F(ServicesLaplaceSample, consoleOutput) {
   unsigned int seed = 1234;
   int refresh = 1;
   std::stringstream sample_ss;
-  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::stream_writer sample_writer(sample_ss, "# ");
   std::stringstream logger_ss;
   stan::callbacks::stream_logger sample_logger(logger_ss, logger_ss, logger_ss,
                                                logger_ss, logger_ss);
@@ -203,4 +203,25 @@ TEST_F(ServicesLaplaceSample, consoleOutput) {
                 console_str));
   EXPECT_EQ(1, count_matches("Generating draws\niteration: 0\niteration: 1",
                              console_str));
+}
+
+TEST_F(ServicesLaplaceSample, laplace_timing_info) {
+  Eigen::VectorXd theta_hat(2);
+  theta_hat << 2, 3;
+  int draws = 10;
+  unsigned int seed = 1234;
+  int refresh = 1;
+  std::stringstream sample_ss;
+  stan::callbacks::stream_writer sample_writer(sample_ss, "# ");
+  std::stringstream logger_ss;
+  stan::callbacks::stream_logger sample_logger(logger_ss, logger_ss, logger_ss,
+                                               logger_ss, logger_ss);
+  int return_code = stan::services::laplace_sample<true>(
+      *model, theta_hat, draws, seed, refresh, interrupt, sample_logger,
+      sample_writer);
+  EXPECT_EQ(stan::services::error_codes::OK, return_code);
+  EXPECT_TRUE(sample_ss.str().find("Elapsed Time:") != std::string::npos)
+      << "Should find 'Elapsed Time:' in sample_writer output";
+  EXPECT_TRUE(logger_ss.str().find("Elapsed Time:") != std::string::npos)
+      << "Should find 'Elapsed Time:' in logger output";
 }
