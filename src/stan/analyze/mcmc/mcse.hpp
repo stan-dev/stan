@@ -39,9 +39,9 @@ inline double mcse_mean(const Eigen::MatrixXd& chains) {
  * @return mcse
  */
 inline double mcse_sd(const Eigen::MatrixXd& chains) {
-  if (chains.rows() < 4 || !is_finite_and_varies(chains))
+  if (chains.rows() < 8 || !is_finite_and_varies(chains)) {
     return std::numeric_limits<double>::quiet_NaN();
-
+  }
   // center the data, take abs value
   Eigen::MatrixXd draws_ctr = (chains.array() - chains.mean()).abs().matrix();
 
