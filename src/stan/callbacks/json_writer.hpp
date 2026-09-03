@@ -372,8 +372,9 @@ class json_writer final : public structured_writer {
       for (auto it = values.begin(); it != last; ++it) {
         *output_ << process_string(*it) << ", ";
       }
+      *output_ << process_string(values.back());
     }
-    *output_ << values.back() << " ]";
+    *output_ << " ]";
   }
 
   /**
@@ -420,8 +421,9 @@ class json_writer final : public structured_writer {
       for (auto it = values.begin(); it != last; ++it) {
         *output_ << *it << ", ";
       }
+      *output_ << values.back();
     }
-    *output_ << values.back() << " ]";
+    *output_ << " ]";
   }
 
   /**
@@ -439,12 +441,13 @@ class json_writer final : public structured_writer {
 
     *output_ << "[ ";
     if (values.size() > 0) {
-      size_t last = values.size() - 1;
-      for (size_t i = 0; i < last; ++i) {
-        write_complex_value(values[i]);
+      auto last = values.end();
+      --last;
+      for (auto it = values.begin(); it != last; ++it) {
+        write_complex_value(*it);
         *output_ << ", ";
       }
-      write_complex_value(values[last]);
+      write_complex_value(values.back());
     }
     *output_ << " ]";
   }
