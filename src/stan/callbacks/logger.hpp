@@ -95,6 +95,19 @@ class logger {
    */
   virtual void fatal(const std::stringstream& message) {}
 };
+
+inline void log_if_nonempty(logger& log, const std::stringstream& message) {
+  if (message.str().length() > 0) {
+    log.info(message);
+  }
+}
+
+inline void log_if_nonempty(logger& log, const std::string& message) {
+  if (!message.empty()) {
+    log.info(message);
+  }
+}
+
 }  // namespace callbacks
 }  // namespace stan
 
