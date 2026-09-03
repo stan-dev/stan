@@ -253,7 +253,7 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
 
     x1.noalias() = x0 + alpha1 * p;
     ret = func(x1, func_val, gradx1);
-    if (ret != 0) {
+    if (ret != 0 || !std::isfinite(func_val) || !gradx1.allFinite()) {
       if (lsRestarts >= maxLSRestarts) {
         retCode = 1;
         break;
