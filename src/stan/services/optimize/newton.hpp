@@ -36,7 +36,8 @@ namespace optimize {
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] parameter_writer output for parameter values
- * @return error_codes::OK if successful
+ * @return error_codes::OK if successful, error_codes::SOFTWARE if the
+ *   final log probability or parameters are not finite
  */
 template <class Model, bool jacobian = false>
 int newton(Model& model, const stan::io::var_context& init,
@@ -120,7 +121,11 @@ int newton(Model& model, const stan::io::var_context& init,
       break;
   }
 
-  if (std::fabs(lp - lastlp) <= 1e-8) {
+  bool finite_result
+      = std::isfinite(lp) && optimization::all_finite(cont_vector);
+  if (!finite_result) {
+    ret = optimization::TERM_LSFAIL;
+  } else if (std::fabs(lp - lastlp) <= 1e-8) {
     ret = optimization::TERM_ABSF;
   } else {
     ret = optimization::TERM_MAXIT;
@@ -134,6 +139,13 @@ int newton(Model& model, const stan::io::var_context& init,
       logger.info(ss);
     values.insert(values.begin(), {lp, static_cast<double>(ret)});
     parameter_writer(values);
+  }
+
+  if (!finite_result) {
+    logger.error(
+        "Optimization terminated with error: "
+        "log probability or parameters are not finite.");
+    return error_codes::SOFTWARE;
   }
   return error_codes::OK;
 }
