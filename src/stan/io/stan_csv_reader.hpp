@@ -104,9 +104,9 @@ class stan_csv_reader {
     std::stringstream ss;
     std::string line;
 
-    if (in.peek() != '#')
+    if (in.peek() != '#' || !in.good())
       return;
-    while (in.peek() == '#') {
+    while (in.peek() == '#' && in.good()) {
       std::getline(in, line);
       ss << line << '\n';
     }
@@ -225,7 +225,7 @@ class stan_csv_reader {
     int lines = 0;
     if (in.peek() != '#' || in.good() == false)
       return;
-    while (in.peek() == '#') {
+    while (in.peek() == '#' && in.good()) {
       std::getline(in, line);
       ss << line << std::endl;
       lines++;
