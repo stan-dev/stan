@@ -24,6 +24,12 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, 1> vector_d;
  * from the solve, as in a pseudo-inverse. This keeps the step finite
  * when the target is flat along some direction.
  *
+ * The cutoff follows Eigen's rank-revealing decompositions: Higham's
+ * backward error bound for a factorization, ||dA|| <= c * n * u * ||A||,
+ * with u the unit roundoff and the constant c covered by a factor of 4,
+ * clamped below at the smallest normal double so that an all-zero
+ * Hessian still yields a positive cutoff.
+ *
  * @param[in] H Hessian of the log density
  * @param[in, out] g gradient on input, Newton step direction on output
  */
@@ -33,8 +39,9 @@ inline void make_negative_definite_and_solve(matrix_d& H, vector_d& g) {
   vector_d eigenvalues = solver.eigenvalues();
   vector_d eigenprojections = eigenvectors.transpose() * g;
   double max_abs_eigenvalue = eigenvalues.cwiseAbs().maxCoeff();
-  double tolerance
-      = max_abs_eigenvalue * H.rows() * std::numeric_limits<double>::epsilon();
+  double tolerance = std::fmax(max_abs_eigenvalue * 4 * H.rows()
+                                   * std::numeric_limits<double>::epsilon(),
+                               std::numeric_limits<double>::min());
   for (int i = 0; i < g.size(); i++) {
     double abs_eigenvalue = std::fabs(eigenvalues[i]);
     if (abs_eigenvalue <= tolerance) {

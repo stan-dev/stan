@@ -3,6 +3,7 @@
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/flat_target.hpp>
 #include <cmath>
+#include <limits>
 #include <vector>
 
 typedef flat_target_model_namespace::flat_target_model Model;
@@ -22,6 +23,34 @@ TEST(OptimizationNewton, flat_direction_keeps_parameters_finite) {
   ASSERT_EQ(1u, params_r.size());
   EXPECT_TRUE(std::isfinite(params_r[0]))
       << "newton_step produced non-finite parameter: " << params_r[0];
+}
+
+TEST(OptimizationNewton,
+     make_negative_definite_and_solve_drops_eigenvalue_within_4n_eps) {
+  const double eps = std::numeric_limits<double>::epsilon();
+  stan::optimization::matrix_d H = stan::optimization::matrix_d::Zero(2, 2);
+  H(0, 0) = -1.0;
+  H(1, 1) = -4.0 * eps;
+  stan::optimization::vector_d g = stan::optimization::vector_d::Ones(2);
+
+  stan::optimization::make_negative_definite_and_solve(H, g);
+
+  EXPECT_FLOAT_EQ(-1.0, g[0]);
+  EXPECT_EQ(0.0, g[1])
+      << "eigenvalue below 4 * n * eps * max should be dropped";
+}
+
+TEST(OptimizationNewton,
+     make_negative_definite_and_solve_zero_hessian_nonzero_gradient) {
+  stan::optimization::matrix_d H = stan::optimization::matrix_d::Zero(2, 2);
+  stan::optimization::vector_d g = stan::optimization::vector_d::Ones(2);
+
+  stan::optimization::make_negative_definite_and_solve(H, g);
+
+  for (int i = 0; i < g.size(); ++i) {
+    EXPECT_TRUE(std::isfinite(g[i]))
+        << "step direction has non-finite component " << i << ": " << g[i];
+  }
 }
 
 TEST(OptimizationNewton, make_negative_definite_and_solve_zero_hessian) {
