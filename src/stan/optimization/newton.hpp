@@ -19,16 +19,19 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, 1> vector_d;
  * definite, then solves Hu = g and stores the result into g.
  * Avoids problems due to non-log-concave distributions.
  *
- * Eigenvalues whose magnitude is negligible relative to the largest
- * eigenvalue are treated as zero and their directions are dropped
- * from the solve, as in a pseudo-inverse. This keeps the step finite
- * when the target is flat along some direction.
+ * Each eigenvalue magnitude is floored at delta before inverting, so the
+ * step along a direction with little or no curvature is a gradient step
+ * scaled by 1 / delta rather than an unbounded or undefined quantity.
+ * This "saturating inverse" is continuous in the eigenvalues and bounds
+ * the effective condition number of the solve by 1 / sqrt(u).
  *
- * The cutoff follows Eigen's rank-revealing decompositions: Higham's
- * backward error bound for a factorization, ||dA|| <= c * n * u * ||A||,
- * with u the unit roundoff and the constant c covered by a factor of 4,
- * clamped below at the smallest normal double so that an all-zero
- * Hessian still yields a positive cutoff.
+ * The floor is delta = max(sqrt(u) * max|lambda|, sqrt(u)), with u the
+ * unit roundoff. The relative term follows Nocedal and Wright, Numerical
+ * Optimization, 2nd ed., Section 3.4, which replaces problem eigenvalues
+ * with a delta of order sqrt(u). The absolute term is the same value
+ * under a well-scaled assumption and keeps an all-zero Hessian well
+ * defined. The backtracking line search in newton_step shortens any
+ * step that turns out too long.
  *
  * @param[in] H Hessian of the log density
  * @param[in, out] g gradient on input, Newton step direction on output
@@ -38,17 +41,12 @@ inline void make_negative_definite_and_solve(matrix_d& H, vector_d& g) {
   matrix_d eigenvectors = solver.eigenvectors();
   vector_d eigenvalues = solver.eigenvalues();
   vector_d eigenprojections = eigenvectors.transpose() * g;
+  const double sqrt_eps = std::sqrt(std::numeric_limits<double>::epsilon());
   double max_abs_eigenvalue = eigenvalues.cwiseAbs().maxCoeff();
-  double tolerance = std::fmax(max_abs_eigenvalue * 4 * H.rows()
-                                   * std::numeric_limits<double>::epsilon(),
-                               std::numeric_limits<double>::min());
+  double delta = std::fmax(sqrt_eps * max_abs_eigenvalue, sqrt_eps);
   for (int i = 0; i < g.size(); i++) {
-    double abs_eigenvalue = std::fabs(eigenvalues[i]);
-    if (abs_eigenvalue <= tolerance) {
-      eigenprojections[i] = 0;
-    } else {
-      eigenprojections[i] = -eigenprojections[i] / abs_eigenvalue;
-    }
+    eigenprojections[i]
+        = -eigenprojections[i] / std::fmax(std::fabs(eigenvalues[i]), delta);
   }
   g = eigenvectors * eigenprojections;
 }
