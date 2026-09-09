@@ -190,7 +190,7 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
           node('windows') {
             stage('Integration Windows') {
               withEnv(["PATH+TBB=${WORKSPACE}\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
-                runIntegration(local: "CXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
+                runIntegration(local: "O=0\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
               }
             }
           }
