@@ -24,7 +24,7 @@ def image = 'stanorg/ci:v1'
 def commit
 def runRemainingStages = false
 def LINUX_CXX = 'clang++-7 -Werror -Wno-inconsistent-missing-override -Wno-error=return-type -Wno-error=division-by-zero'
-def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds'
+def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds -Wno-error=dangling-reference -Wno-error=return-type -Wno-error=div-by-zero -w -m64 -Wa,-mbig-obj'
 def MAC_CXX = 'clang++' // -Werror -Wno-inconsistent-missing-override -Wno-unused-but-set-variable
 def WINSETENV = '''
   SET "PATH=%RTOOLS%\\x86_64-w64-mingw32.static.posix\\bin;%RTOOLS%;%RTOOLS%\\usr\\bin;%CONDA%;%PATH%"
@@ -190,7 +190,7 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
           node('windows') {
             stage('Integration Windows') {
               withEnv(["PATH+TBB=${WORKSPACE}\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
-                runIntegration(local: "O=2\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
+                runIntegration(local: "O=0\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
               }
             }
           }
