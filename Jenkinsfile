@@ -151,7 +151,9 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
               bat """$WINSETENV
                   make -f lib/stan_math/make/standalone math-libs
               """
-              runUnit(cxx: WIN_CXX, pre: WINSETENV)
+              withEnv(["PATH+TBB=$WORKSPACE\\lib\\stan_math\\lib\\tbb"]) {
+                runUnit(cxx: WIN_CXX, pre: WINSETENV)
+              }
             }
           }
         }, linuxUnit: {
@@ -187,7 +189,9 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
         }, windowsInt: {
           node('windows') {
             stage('Integration Windows') {
-              runIntegration(local: "O=1\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
+              withEnv(["PATH+TBB=${WORKSPACE}\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
+                runIntegration(local: "O=1\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
+              }
             }
           }
         }
