@@ -108,9 +108,8 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           def pre = args.pre ?: ''
           batsh(pre + 'make -j$PARALLEL test-headers')
           batsh(pre + 'python3 runTests.py -j$PARALLEL src/test/unit --make-only')
-          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-            batsh(pre + 'python3 runTests.py -j$PARALLEL src/test/unit')
-          }
+          batsh(pre + 'python3 runTests.py -j$PARALLEL src/test/unit')
+
           junit 'test/**/*.xml'
         }
 
@@ -144,7 +143,8 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           }
         }
 
-        parallel windowsUnit: {
+        parallel failFast: true,
+          windowsUnit: {
           node('windows') {
             stage('Windows Headers & Unit') {
               checkout scm
@@ -190,7 +190,7 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
           node('windows') {
             stage('Integration Windows') {
               withEnv(["PATH+TBB=${WORKSPACE}\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
-                runIntegration(local: "O=1\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
+                runIntegration(local: "O=2\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
               }
             }
           }
