@@ -122,7 +122,11 @@ int newton(Model& model, const stan::io::var_context& init,
   }
 
   bool finite_result
-      = std::isfinite(lp) && Eigen::Map<const vector_d>(cont_vector.data(), cont_vector.size()).array().isFinite().all();
+      = std::isfinite(lp)
+        && Eigen::Map<const vector_d>(cont_vector.data(), cont_vector.size())
+               .array()
+               .isFinite()
+               .all();
   if (!finite_result) {
     ret = optimization::TERM_LSFAIL;
   } else if (std::fabs(lp - lastlp) <= 1e-8) {
