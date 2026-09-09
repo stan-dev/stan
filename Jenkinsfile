@@ -129,17 +129,14 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
             writeFile(file: 'make/local', text: stanc3_bin_url)
           }
           writeFile(file: 'cmdstan/make/local', text: args.local+"\n$stanc3_bin_url")
-          batsh pre + """
-            make -C cmdstan -j\$PARALLEL build
-            python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 stanc3/test/integration/good
-            python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 example-models
-          """
+          batsh(pre + 'make -C cmdstan -j$PARALLEL build')
+          batsh(pre + "python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 stanc3/test/integration/good")
+          batsh(pre + "python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 example-models")
+
           dir('cmdstan/stan') {
-            batsh pre + """
-                python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
-                python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
-            """
+            batsh(pre + "python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp")
+            batsh(pre + "python3 ./runTests.py src/test/integration/standalone_functions_test.cpp")
+            batsh(pre + "python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp")
           }
         }
 
