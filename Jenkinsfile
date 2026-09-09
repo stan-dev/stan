@@ -15,7 +15,7 @@ def props = [
 ]
 
 if (!params.downstream) {
-  props <<= disableConcurrentBuilds()
+  props <<= disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != 'develop')
 }
 
 properties(props)
