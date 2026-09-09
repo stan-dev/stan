@@ -1,5 +1,5 @@
 def props = [
-  buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30')),
+  buildDiscarder(logRotator(numToKeepStr: '40', daysToKeepStr: '30')),
   parameters([
     string(defaultValue: '', name: 'math_pr', description: "Leave blank "
             + "unless testing against a specific math repo pull request, "
@@ -9,7 +9,6 @@ def props = [
     string(defaultValue: 'nightly', name: 'stanc3_bin_url',
       description: 'Custom stanc3 binary url'),
     booleanParam(defaultValue: false, name: 'downsteam', description: 'Run downstream tests from math (was previously downstream_hotfix/downstream_tests [develop])'),
-    booleanParam(defaultValue: false, name: 'run_tests_all_os', description: 'Run unit and integration tests on all OS.'),
     booleanParam(defaultValue: false, name: 'compile_all_models', description: 'Run integration tests on the full test model suite.'),
     booleanParam(defaultValue: false, name: 'run_all', description: 'Pretend all files changes'),
   ])
@@ -100,7 +99,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
     }
 
     if (runRemainingStages) {
-      stage('Unit tests') {
+      stage('Unit & integration tests') {
         def runUnit = { args ->
           def local = "CXX=$args.cxx\n$stanc3_bin_url"
           if (args.local)
@@ -115,43 +114,6 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           junit 'test/**/*.xml'
         }
 
-        parallel windows: {
-          node('windows') {
-            stage('Windows Headers & Unit') {
-              checkout scm
-              bat """$WINSETENV
-                  make -f lib/stan_math/make/standalone math-libs
-              """
-              withEnv(["PATH+TBB=$WORKSPACE\\lib\\stan_math\\lib\\tbb"]) {
-                runUnit(cxx: WIN_CXX, pre: WINSETENV)
-              }
-            }
-          }
-        }, linux: {
-          runPod(image: image, gpus: 1) {
-            stage('Linux Unit') {
-              runUnit(cxx: LINUX_CXX, local: """
-STAN_OPENCL=true
-OPENCL_PLATFORM_ID=0
-OPENCL_DEVICE_ID=0
-LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
-""")
-            }
-          }
-        }, mac: {
-          if (!params.downstream && (env.BRANCH_NAME == "develop" || env.BRANCH_NAME == "master") || params.run_tests_all_os) {
-            node('macos') {
-              stage('Mac Unit') {
-                checkout scm
-                runUnit(cxx: MAC_CXX)
-              }
-            }
-          }
-        }
-      }
-
-      stage('Integration') {
-        // TODO: this was disabled before
         def integration_tests_flags = params.compile_all_models ? '--no-ignore-models' : ''
         def runIntegration = { args ->
           def pre = args.pre ?: ''
@@ -182,21 +144,49 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
           }
         }
 
-        parallel linux: {
+        parallel windowsUnit: {
+          node('windows') {
+            stage('Windows Headers & Unit') {
+              checkout scm
+              bat """$WINSETENV
+                  make -f lib/stan_math/make/standalone math-libs
+              """
+              withEnv(["PATH+TBB=$WORKSPACE\\lib\\stan_math\\lib\\tbb"]) {
+                runUnit(cxx: WIN_CXX, pre: WINSETENV)
+              }
+            }
+          }
+        }, linuxUnit: {
+          runPod(image: image, gpus: 1) {
+            stage('Linux Unit') {
+              runUnit(cxx: LINUX_CXX, local: """
+STAN_OPENCL=true
+OPENCL_PLATFORM_ID=0
+OPENCL_DEVICE_ID=0
+LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
+""")
+            }
+          }
+        }, macUnit: {
+          node('macos') {
+            stage('Mac Unit') {
+              checkout scm
+              runUnit(cxx: MAC_CXX)
+            }
+          }
+        }, linuxInt: {
           runPod(image: image, checkout: false, cpus: 16, memory: '128Gi') {
             stage('Integration Linux') {
               runIntegration(local: "O=0\nCXX=${LINUX_CXX}")
             }
           }
-        }, mac: {
-          if (!params.downstream && (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'master') || params.run_tests_all_os) {
-            node('macos') {
-              stage('Integration Mac') {
-                runIntegration(local: "O=0\nCXX=${MAC_CXX}")
-              }
+        }, macInt: {
+          node('macos') {
+            stage('Integration Mac') {
+              runIntegration(local: "O=0\nCXX=${MAC_CXX}")
             }
           }
-        }, windows: {
+        }, windowsInt: {
           node('windows') {
             stage('Integration Windows') {
               withEnv(["PATH+TBB=${WORKSPACE}\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
