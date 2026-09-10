@@ -9,6 +9,9 @@
 #include <stan/optimization/bfgs.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <stan/services/util/duration_diff.hpp>
+#include <stan/services/util/write_timing.hpp>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -57,6 +60,7 @@ int bfgs(Model& model, const stan::io::var_context& init,
          bool save_iterations, int refresh, callbacks::interrupt& interrupt,
          callbacks::logger& logger, callbacks::writer& init_writer,
          callbacks::writer& parameter_writer) {
+  auto start_time = std::chrono::steady_clock::now();
   stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
@@ -210,6 +214,10 @@ int bfgs(Model& model, const stan::io::var_context& init,
     parameter_writer("Optimization terminated with error: " + error_string);
     return_code = error_codes::SOFTWARE;
   }
+
+  auto end_time = std::chrono::steady_clock::now();
+  util::write_timing(util::duration_diff(start_time, end_time), "Optimization",
+                     parameter_writer, logger);
 
   return return_code;
 }
