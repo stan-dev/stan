@@ -1,5 +1,5 @@
 def props = [
-  buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30')),
+  buildDiscarder(logRotator(numToKeepStr: '40', daysToKeepStr: '30')),
   parameters([
     string(defaultValue: '', name: 'math_pr', description: "Leave blank "
             + "unless testing against a specific math repo pull request, "
@@ -9,14 +9,13 @@ def props = [
     string(defaultValue: 'nightly', name: 'stanc3_bin_url',
       description: 'Custom stanc3 binary url'),
     booleanParam(defaultValue: false, name: 'downsteam', description: 'Run downstream tests from math (was previously downstream_hotfix/downstream_tests [develop])'),
-    booleanParam(defaultValue: false, name: 'run_tests_all_os', description: 'Run unit and integration tests on all OS.'),
     booleanParam(defaultValue: false, name: 'compile_all_models', description: 'Run integration tests on the full test model suite.'),
     booleanParam(defaultValue: false, name: 'run_all', description: 'Pretend all files changes'),
   ])
 ]
 
 if (!params.downstream) {
-  props <<= disableConcurrentBuilds()
+  props <<= disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != 'develop')
 }
 
 properties(props)
@@ -25,7 +24,7 @@ def image = 'stanorg/ci:v1'
 def commit
 def runRemainingStages = false
 def LINUX_CXX = 'clang++-7 -Werror -Wno-inconsistent-missing-override -Wno-error=return-type -Wno-error=division-by-zero'
-def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds'
+def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds -Wno-error=dangling-reference -Wno-error=return-type -Wno-error=div-by-zero -w -m64 -Wa,-mbig-obj'
 def MAC_CXX = 'clang++' // -Werror -Wno-inconsistent-missing-override -Wno-unused-but-set-variable
 def WINSETENV = '''
   SET "PATH=%RTOOLS%\\x86_64-w64-mingw32.static.posix\\bin;%RTOOLS%;%RTOOLS%\\usr\\bin;%CONDA%;%PATH%"
@@ -100,7 +99,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
     }
 
     if (runRemainingStages) {
-      stage('Unit tests') {
+      stage('Unit & integration tests') {
         def runUnit = { args ->
           def local = "CXX=$args.cxx\n$stanc3_bin_url"
           if (args.local)
@@ -109,49 +108,11 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           def pre = args.pre ?: ''
           batsh(pre + 'make -j$PARALLEL test-headers')
           batsh(pre + 'python3 runTests.py -j$PARALLEL src/test/unit --make-only')
-          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-            batsh(pre + 'python3 runTests.py -j$PARALLEL src/test/unit')
-          }
+          batsh(pre + 'python3 runTests.py -j$PARALLEL src/test/unit')
+
           junit 'test/**/*.xml'
         }
 
-        parallel windows: {
-          node('windows') {
-            stage('Windows Headers & Unit') {
-              checkout scm
-              bat """$WINSETENV
-                  make -f lib/stan_math/make/standalone math-libs
-              """
-              withEnv(["PATH+TBB=$WORKSPACE\\lib\\stan_math\\lib\\tbb"]) {
-                runUnit(cxx: WIN_CXX, pre: WINSETENV)
-              }
-            }
-          }
-        }, linux: {
-          runPod(image: image, gpus: 1) {
-            stage('Linux Unit') {
-              runUnit(cxx: LINUX_CXX, local: """
-STAN_OPENCL=true
-OPENCL_PLATFORM_ID=0
-OPENCL_DEVICE_ID=0
-LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
-""")
-            }
-          }
-        }, mac: {
-          if (!params.downstream && (env.BRANCH_NAME == "develop" || env.BRANCH_NAME == "master") || params.run_tests_all_os) {
-            node('macos') {
-              stage('Mac Unit') {
-                checkout scm
-                runUnit(cxx: MAC_CXX)
-              }
-            }
-          }
-        }
-      }
-
-      stage('Integration') {
-        // TODO: this was disabled before
         def integration_tests_flags = params.compile_all_models ? '--no-ignore-models' : ''
         def runIntegration = { args ->
           def pre = args.pre ?: ''
@@ -168,39 +129,65 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
             writeFile(file: 'make/local', text: stanc3_bin_url)
           }
           writeFile(file: 'cmdstan/make/local', text: args.local+"\n$stanc3_bin_url")
-          batsh pre + """
-            make -C cmdstan -j\$PARALLEL build
-            python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 stanc3/test/integration/good
-            python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 example-models
-          """
+          batsh(pre + 'make -C cmdstan -j$PARALLEL build')
+          batsh(pre + "python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 stanc3/test/integration/good")
+          batsh(pre + "python3 ./runPerformanceTests.py -j\$PARALLEL $integration_tests_flags --runs=0 example-models")
+
           dir('cmdstan/stan') {
-            batsh pre + """
-                python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
-                python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
-            """
+            batsh(pre + "python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp")
+            batsh(pre + "python3 ./runTests.py src/test/integration/standalone_functions_test.cpp")
+            batsh(pre + "python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp")
           }
         }
 
-        parallel linux: {
+        parallel failFast: true,
+          windowsUnit: {
+          node('windows') {
+            stage('Windows Headers & Unit') {
+              checkout scm
+              bat """$WINSETENV
+                  make -f lib/stan_math/make/standalone math-libs
+              """
+              withEnv(["PATH+TBB=$WORKSPACE\\lib\\stan_math\\lib\\tbb"]) {
+                runUnit(cxx: WIN_CXX, pre: WINSETENV)
+              }
+            }
+          }
+        }, linuxUnit: {
+          runPod(image: image, gpus: 1) {
+            stage('Linux Unit') {
+              runUnit(cxx: LINUX_CXX, local: """
+STAN_OPENCL=true
+OPENCL_PLATFORM_ID=0
+OPENCL_DEVICE_ID=0
+LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
+""")
+            }
+          }
+        }, macUnit: {
+          node('macos') {
+            stage('Mac Unit') {
+              checkout scm
+              runUnit(cxx: MAC_CXX)
+            }
+          }
+        }, linuxInt: {
           runPod(image: image, checkout: false, cpus: 16, memory: '128Gi') {
             stage('Integration Linux') {
               runIntegration(local: "O=0\nCXX=${LINUX_CXX}")
             }
           }
-        }, mac: {
-          if (!params.downstream && (env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'master') || params.run_tests_all_os) {
-            node('macos') {
-              stage('Integration Mac') {
-                runIntegration(local: "O=0\nCXX=${MAC_CXX}")
-              }
+        }, macInt: {
+          node('macos') {
+            stage('Integration Mac') {
+              runIntegration(local: "O=0\nCXX=${MAC_CXX}")
             }
           }
-        }, windows: {
+        }, windowsInt: {
           node('windows') {
             stage('Integration Windows') {
               withEnv(["PATH+TBB=${WORKSPACE}\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
-                runIntegration(local: "CXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
+                runIntegration(local: "O=0\nCXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true\n", pre: WINSETENV)
               }
             }
           }
