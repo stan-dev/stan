@@ -123,7 +123,7 @@ int newton(Model& model, const stan::io::var_context& init,
 
   bool finite_result
       = std::isfinite(lp)
-        && Eigen::Map<const vector_d>(cont_vector.data(), cont_vector.size())
+        && Eigen::Map<const Eigen::VectorXd>(cont_vector.data(), cont_vector.size())
                .array()
                .isFinite()
                .all();
