@@ -24,7 +24,7 @@ def image = 'stanorg/ci:v1'
 def commit
 def runRemainingStages = false
 def LINUX_CXX = 'clang++-7 -Werror -Wno-inconsistent-missing-override -Wno-error=return-type -Wno-error=division-by-zero'
-def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds -Wno-error=dangling-reference -Wno-error=return-type -Wno-error=div-by-zero -w -m64 -Wa,-mbig-obj'
+def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=deprecated-declarations -Wno-error=unused-value -Wno-error=array-bounds -Wno-error=return-type -Wno-error=div-by-zero -w -m64 -Wa,-mbig-obj'
 def MAC_CXX = 'clang++' // -Werror -Wno-inconsistent-missing-override -Wno-unused-but-set-variable
 def WINSETENV = '''
   SET "PATH=W:\\jenkins\\rtools40\\mingw64\\bin;W:\\jenkins\\rtools40;W:\\jenkins\\rtools40\\usr\\bin;%CONDA%;%PATH%"
