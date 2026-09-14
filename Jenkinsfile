@@ -27,7 +27,7 @@ def LINUX_CXX = 'clang++-7 -Werror -Wno-inconsistent-missing-override -Wno-error
 def WIN_CXX = 'g++ -Werror -Wno-error=overloaded-virtual -Wno-error=template-id-cdtor -Wno-error=deprecated-declarations -Wno-error=cast-user-defined -Wno-error=unused-value -Wno-error=array-bounds -Wno-error=dangling-reference -Wno-error=return-type -Wno-error=div-by-zero -w -m64 -Wa,-mbig-obj'
 def MAC_CXX = 'clang++' // -Werror -Wno-inconsistent-missing-override -Wno-unused-but-set-variable
 def WINSETENV = '''
-  SET "PATH=%RTOOLS%\\x86_64-w64-mingw32.static.posix\\bin;%RTOOLS%;%RTOOLS%\\usr\\bin;%CONDA%;%PATH%"
+  SET "PATH=W:\\jenkins\\rtools40\\mingw64\\bin;W:\\jenkins\\rtools40;W:\\jenkins\\rtools40\\usr\\bin;%CONDA%;%PATH%"
 '''
 def stanc3_bin_url = params.stanc3_bin_url != "nightly" ? "STANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n" : ''
 
