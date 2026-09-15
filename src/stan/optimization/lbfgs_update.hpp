@@ -28,7 +28,7 @@ class LBFGSUpdate {
    *
    * @param L New size of buffer.
    **/
-  void set_history_size(size_t L) { _buf.rset_capacity(L); }
+  void set_history_size(size_t L) { _buf.reset_capacity(L); }
 
   /**
    * Add a new set of update vectors to the history.
