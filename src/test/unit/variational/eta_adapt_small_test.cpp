@@ -8,7 +8,6 @@
 #include <string>
 #include <iostream>
 #include <stan/services/util/create_rng.hpp>
-#include <boost/version.hpp>
 
 class eta_adapt_small_test : public ::testing::Test {
  public:

@@ -17,9 +17,12 @@ namespace analyze {
  * @param chains matrix of draws, one column per chain
  * @return bool true if OK, false otherwise
  */
-inline bool is_finite_and_varies(const Eigen::MatrixXd chains) {
+inline bool is_finite_and_varies(const Eigen::MatrixXd& chains) {
   size_t num_chains = chains.cols();
   size_t num_samples = chains.rows();
+  if (num_samples < 2) {
+    return false;
+  }
   Eigen::VectorXd first_draws = Eigen::VectorXd::Zero(num_chains);
   for (std::size_t i = 0; i < num_chains; ++i) {
     first_draws(i) = chains.col(i)(0);

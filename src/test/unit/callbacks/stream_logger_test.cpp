@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <boost/lexical_cast.hpp>
 #include <sstream>
 #include <stan/callbacks/stream_logger.hpp>
 

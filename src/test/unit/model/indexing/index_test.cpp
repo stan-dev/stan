@@ -1,6 +1,5 @@
 #include <stan/model/indexing.hpp>
 #include <gtest/gtest.h>
-#include <boost/type_traits/is_same.hpp>
 #include <vector>
 
 using stan::model::index_max;
