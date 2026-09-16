@@ -105,9 +105,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
         model.transform_inits(context, disc_vector, unconstrained, &msg);
       }
     } catch (std::domain_error& e) {
-      if (msg.str().length() > 0) {
-        logger.info(msg);
-      }
+      log_if_nonempty(logger, msg);
       logger.warn("Rejecting initial value:");
       logger.warn(
           "  Error evaluating the log probability"
@@ -115,9 +113,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       logger.warn(e.what());
       continue;
     } catch (std::exception& e) {
-      if (msg.str().length() > 0) {
-        logger.info(msg);
-      }
+      log_if_nonempty(logger, msg);
       logger.error(
           "Unrecoverable error evaluating the log probability"
           " at the initial value.");
@@ -132,12 +128,9 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       // the parameters.
       log_prob = model.template log_prob<false, Jacobian>(unconstrained,
                                                           disc_vector, &msg);
-      if (msg.str().length() > 0) {
-        logger.info(msg);
-      }
+      log_if_nonempty(logger, msg);
     } catch (std::domain_error& e) {
-      if (msg.str().length() > 0)
-        logger.info(msg);
+      log_if_nonempty(logger, msg);
       logger.warn("Rejecting initial value:");
       logger.warn(
           "  Error evaluating the log probability"
@@ -145,9 +138,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       logger.warn(e.what());
       continue;
     } catch (std::exception& e) {
-      if (msg.str().length() > 0) {
-        logger.info(msg);
-      }
+      log_if_nonempty(logger, msg);
       logger.error(
           "Unrecoverable error evaluating the log probability"
           " at the initial value.");
@@ -172,9 +163,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       log_prob = stan::model::log_prob_grad<true, Jacobian>(
           model, unconstrained, disc_vector, gradient, &log_prob_msg);
     } catch (const std::exception& e) {
-      if (log_prob_msg.str().length() > 0) {
-        logger.info(log_prob_msg);
-      }
+      log_if_nonempty(logger, log_prob_msg);
       logger.error(e.what());
       throw;
     }
@@ -183,8 +172,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
         = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
               .count()
           / 1000000.0;
-    if (log_prob_msg.str().length() > 0)
-      logger.info(log_prob_msg);
+    log_if_nonempty(logger, log_prob_msg);
 
     bool gradient_ok = std::isfinite(stan::math::sum(gradient));
 
