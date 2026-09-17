@@ -58,3 +58,24 @@ TEST_F(ServicesOptimize, rosenbrock) {
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_EQ(19, interrupt.call_count());
 }
+
+TEST_F(ServicesOptimize, bfgs_timing_info) {
+  unsigned int seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+
+  bool save_iterations = true;
+  int refresh = 0;
+  stan::test::unit::instrumented_interrupt interrupt;
+
+  int return_code = stan::services::optimize::bfgs(
+      model, context, seed, chain, init_radius, 0.001, 1e-12, 10000, 1e-8,
+      10000000, 1e-8, 2000, save_iterations, refresh, interrupt, logger, init,
+      parameter);
+
+  EXPECT_EQ(return_code, 0);
+  EXPECT_TRUE(parameter_ss.str().find("Elapsed Time:") != std::string::npos)
+      << "Should find 'Elapsed Time:' in parameter_writer output";
+  EXPECT_TRUE(logger.find_info("Elapsed Time:") > 0)
+      << "Should find 'Elapsed Time:' in logger info output";
+}
