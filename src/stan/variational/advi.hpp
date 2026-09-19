@@ -9,7 +9,7 @@
 #include <stan/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
-#include <boost/circular_buffer.hpp>
+#include <stan/util/ring_buffer.hpp>
 #include <algorithm>
 #include <chrono>
 #include <limits>
@@ -335,7 +335,7 @@ class advi {
     // Heuristic to estimate how far to look back in rolling window
     int cb_size
         = static_cast<int>(std::max(0.1 * max_iterations / eval_elbo_, 2.0));
-    boost::circular_buffer<double> elbo_diff(cb_size);
+    stan::util::ring_buffer<double> elbo_diff(cb_size);
 
     logger.info("Begin stochastic gradient ascent.");
     logger.info(
@@ -528,10 +528,10 @@ class advi {
    * @param[in] cb circular buffer with some number of values in it.
    * @return median of values in circular buffer.
    */
-  double circ_buff_median(const boost::circular_buffer<double>& cb) const {
+  double circ_buff_median(const stan::util::ring_buffer<double>& cb) const {
     // FIXME: naive implementation; creates a copy as a vector
     std::vector<double> v;
-    for (boost::circular_buffer<double>::const_iterator i = cb.begin();
+    for (stan::util::ring_buffer<double>::const_iterator i = cb.begin();
          i != cb.end(); ++i) {
       v.push_back(*i);
     }

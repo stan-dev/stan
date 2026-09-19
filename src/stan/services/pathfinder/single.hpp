@@ -12,7 +12,7 @@
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/duration_diff.hpp>
-#include <boost/circular_buffer.hpp>
+#include <stan/util/ring_buffer.hpp>
 #include <tbb/parallel_for.h>
 #include <tbb/concurrent_queue.h>
 #include <tbb/task_group.h>
@@ -659,8 +659,8 @@ inline auto pathfinder_lbfgs_single(
                 + std::to_string(lbfgs.logp()));
   }
   int ret = 0;
-  boost::circular_buffer<Eigen::VectorXd> param_buff(max_history_size);
-  boost::circular_buffer<Eigen::VectorXd> grad_buff(max_history_size);
+  stan::util::ring_buffer<Eigen::VectorXd> param_buff(max_history_size);
+  stan::util::ring_buffer<Eigen::VectorXd> grad_buff(max_history_size);
   Eigen::VectorXd prev_params
       = Eigen::Map<Eigen::VectorXd>(cont_vector.data(), cont_vector.size());
   std::size_t history_size = 0;
