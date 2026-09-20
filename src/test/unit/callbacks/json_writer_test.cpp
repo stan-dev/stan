@@ -49,10 +49,11 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_unsigned_through_base) {
   base.write("size", std::size_t{5});
   base.write("uint64", std::numeric_limits<std::uint64_t>::max());
   base.end_record();
-  EXPECT_EQ("{\"uint\":42,\"ulong\":4294967295,"
-            "\"ullong\":18446744073709551615,\"size\":5,"
-            "\"uint64\":18446744073709551615}",
-            output_sans_whitespace(ss));
+  EXPECT_EQ(
+      "{\"uint\":42,\"ulong\":4294967295,"
+      "\"ullong\":18446744073709551615,\"size\":5,"
+      "\"uint64\":18446744073709551615}",
+      output_sans_whitespace(ss));
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_named_record) {
