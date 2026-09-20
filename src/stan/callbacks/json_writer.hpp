@@ -296,12 +296,15 @@ class json_writer final : public structured_writer {
    */
   void write(const std::string& key, int value) { write_int_like(key, value); }
 
-  /**
-   * Write a key-value pair where the value is an `std::size_t`.
-   * @param key Name of the value pair
-   * @param value `std::size_t` to write.
-   */
-  void write(const std::string& key, std::size_t value) {
+  /// Write a key-value pair with an unsigned long value.
+  void write(const std::string& key,
+             unsigned long value) override {  // NOLINT(runtime/int)
+    write_int_like(key, value);
+  }
+
+  /// Write a key-value pair with an unsigned long long value.
+  void write(const std::string& key,
+             unsigned long long value) override {  // NOLINT(runtime/int)
     write_int_like(key, value);
   }
 
@@ -321,7 +324,7 @@ class json_writer final : public structured_writer {
    * @param key Name of the value pair
    * @param value `unsigned int` to write.
    */
-  void write(const std::string& key, unsigned int value) {
+  void write(const std::string& key, unsigned int value) override {
     write_int_like(key, value);
   }
 
