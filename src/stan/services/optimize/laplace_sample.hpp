@@ -8,6 +8,9 @@
 #include <stan/math/rev.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <stan/services/util/duration_diff.hpp>
+#include <stan/services/util/write_timing.hpp>
+#include <chrono>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -176,6 +179,7 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
                    int refresh, callbacks::interrupt& interrupt,
                    callbacks::logger& logger, callbacks::writer& sample_writer,
                    callbacks::structured_writer& hessian_writer) {
+  auto start_time = std::chrono::steady_clock::now();
   try {
     internal::laplace_sample<jacobian>(model, theta_hat, draws, calculate_lp,
                                        random_seed, refresh, interrupt, logger,
@@ -184,6 +188,11 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     logger.error(e.what());
     return error_codes::CONFIG;
   }
+
+  auto end_time = std::chrono::steady_clock::now();
+  util::write_timing(util::duration_diff(start_time, end_time),
+                     "Laplace Approximation", sample_writer, logger);
+
   return error_codes::OK;
 }
 
