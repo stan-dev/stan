@@ -28,6 +28,10 @@ namespace analyze {
 double ess(const Eigen::MatrixXd& chains) {
   const Eigen::Index num_chains = chains.cols();
   const Eigen::Index draws_per_chain = chains.rows();
+  if (draws_per_chain < 4) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
   Eigen::MatrixXd acov(draws_per_chain, num_chains);
   Eigen::VectorXd chain_mean(num_chains);
   Eigen::VectorXd chain_var(num_chains);

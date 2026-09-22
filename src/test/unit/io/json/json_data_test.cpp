@@ -7,7 +7,6 @@
 #include <test/unit/util.hpp>
 #include <test/unit/io/json/util.hpp>
 
-#include <boost/limits.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>

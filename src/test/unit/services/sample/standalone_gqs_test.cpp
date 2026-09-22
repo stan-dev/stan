@@ -1,4 +1,3 @@
-#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <stan/callbacks/stream_logger.hpp>
@@ -55,7 +54,7 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   EXPECT_EQ(return_code, stan::services::error_codes::OK);
   EXPECT_EQ(count_matches("mu", sample_ss.str()), 1);
   EXPECT_EQ(count_matches("y_rep", sample_ss.str()), 10);
-  EXPECT_EQ(count_matches("\n", sample_ss.str()), 1001);
+  EXPECT_EQ(count_matches("\n", sample_ss.str()), 1004);
   match_csv_columns(bern_csv.samples, sample_ss.str(), 1000, 1, 8);
 }
 

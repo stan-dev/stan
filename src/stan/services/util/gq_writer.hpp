@@ -16,6 +16,28 @@ namespace stan {
 namespace services {
 namespace util {
 
+namespace internal {
+
+/**
+ * Internal method
+ *
+ * Logs timing information
+ *
+ * @param[in] deltaT time in seconds
+ */
+template <typename F>
+void write_timing(double deltaT, F writer) {
+  std::string title(" Elapsed Time: ");
+  writer("");
+
+  std::stringstream ss1;
+  ss1 << title << deltaT << " seconds (Generated Quantities)";
+  writer(ss1.str());
+
+  writer("");
+}
+}  // namespace internal
+
 /**
  * gq_writer writes out
  *
@@ -126,7 +148,22 @@ class gq_writer {
       logger_.info(e.what());
       throw;
     }
-    sample_writer_(values);
+    // drop the constrained parameters, as the std::vector overload does
+    plain_type_t<EigVec> gq_values
+        = values.tail(values.size() - num_constrained_params_);
+    sample_writer_(gq_values);
+  }
+
+  /**
+   * Print timing information to all streams
+   *
+   * @param[in] deltaT time in seconds
+   */
+  void write_timing(double deltaT) {
+    internal::write_timing(
+        deltaT, [this](const std::string& msg) { this->sample_writer_(msg); });
+    internal::write_timing(
+        deltaT, [this](const std::string& msg) { this->logger_.info(msg); });
   }
 };
 

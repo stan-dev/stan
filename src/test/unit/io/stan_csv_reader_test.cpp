@@ -1,6 +1,5 @@
 #include <stan/io/stan_csv_reader.hpp>
 #include <test/unit/util.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
 #include <sstream>

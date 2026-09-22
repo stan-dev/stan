@@ -1,9 +1,9 @@
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
+#include <stan/io/string_utils.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 
 class ServicesSampleHmcNutsDiagEAdapt : public testing::Test {
@@ -274,8 +274,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, term_buffer_1) {
   std::vector<std::string> messages = parameter.string_values();
   for (auto msg : messages) {
     if (msg.find("Step size") != std::string::npos) {
-      std::vector<std::string> toks;
-      boost::split(toks, msg, boost::is_any_of(" "));
+      std::vector<std::string> toks = stan::io::split(msg, " ");
       auto adapted = std::stod(toks[toks.size() - 1]);
       EXPECT_NEAR(draw[2], adapted, 1e-5);
     }
@@ -360,8 +359,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, schedule_a) {
   std::vector<std::string> messages = parameter.string_values();
   for (auto msg : messages) {
     if (msg.find("Step size") != std::string::npos) {
-      std::vector<std::string> toks;
-      boost::split(toks, msg, boost::is_any_of(" "));
+      std::vector<std::string> toks = stan::io::split(msg, " ");
       auto adapted = std::stod(toks[toks.size() - 1]);
       EXPECT_NEAR(draw[2], adapted, 1e-5);
     }
@@ -406,8 +404,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, schedule_b) {
   std::vector<std::string> messages = parameter.string_values();
   for (auto msg : messages) {
     if (msg.find("Step size") != std::string::npos) {
-      std::vector<std::string> toks;
-      boost::split(toks, msg, boost::is_any_of(" "));
+      std::vector<std::string> toks = stan::io::split(msg, " ");
       auto adapted = std::stod(toks[toks.size() - 1]);
       EXPECT_NEAR(draw[2], adapted, 1e-5);
     }
@@ -452,8 +449,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, schedule_c) {
   std::vector<std::string> messages = parameter.string_values();
   for (auto msg : messages) {
     if (msg.find("Step size") != std::string::npos) {
-      std::vector<std::string> toks;
-      boost::split(toks, msg, boost::is_any_of(" "));
+      std::vector<std::string> toks = stan::io::split(msg, " ");
       auto adapted = std::stod(toks[toks.size() - 1]);
       EXPECT_NEAR(draw[2], adapted, 1e-5);
     }

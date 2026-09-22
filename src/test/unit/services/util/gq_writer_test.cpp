@@ -46,6 +46,18 @@ TEST_F(ServicesUtilGQWriter, t2) {
   EXPECT_EQ(count_matches("nan", sample_ss.str()), 0);
 }
 
+TEST_F(ServicesUtilGQWriter, timing) {
+  stan::callbacks::stream_writer sample_writer(sample_ss, "#");
+  stan::callbacks::stream_logger logger(logger_ss, logger_ss, logger_ss,
+                                        logger_ss, logger_ss);
+  stan::services::util::gq_writer writer(sample_writer, logger, 2);
+  writer.write_timing(4.31);
+  // model test_gq.stan generates 4 values, 3 commas
+  EXPECT_EQ(count_matches("4.31 seconds", logger_ss.str()), 1);
+  EXPECT_EQ(count_matches("4.31 seconds", sample_ss.str()), 1)
+      << sample_ss.str();
+}
+
 TEST_F(ServicesUtilGQWriter, TestExceptions) {
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   stan::callbacks::stream_logger logger(logger_ss, logger_ss, logger_ss,

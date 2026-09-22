@@ -24,7 +24,7 @@ namespace callbacks {
  * The writer doesn't try to validate the object's internal structure
  * or object completeness, only syntactic correctness.
  *
- * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Stream A type with a valid `operator<<(std::string)` and `flush()`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
  * output stream
  */
@@ -227,6 +227,7 @@ class json_writer final : public structured_writer {
       record_element_needs_comma_ = true;
     } else {
       *output_ << "\n";
+      output_->flush();
     }
   }
 
@@ -371,8 +372,9 @@ class json_writer final : public structured_writer {
       for (auto it = values.begin(); it != last; ++it) {
         *output_ << process_string(*it) << ", ";
       }
+      *output_ << process_string(values.back());
     }
-    *output_ << values.back() << " ]";
+    *output_ << " ]";
   }
 
   /**
@@ -419,8 +421,9 @@ class json_writer final : public structured_writer {
       for (auto it = values.begin(); it != last; ++it) {
         *output_ << *it << ", ";
       }
+      *output_ << values.back();
     }
-    *output_ << values.back() << " ]";
+    *output_ << " ]";
   }
 
   /**
@@ -438,12 +441,13 @@ class json_writer final : public structured_writer {
 
     *output_ << "[ ";
     if (values.size() > 0) {
-      size_t last = values.size() - 1;
-      for (size_t i = 0; i < last; ++i) {
-        write_complex_value(values[i]);
+      auto last = values.end();
+      --last;
+      for (auto it = values.begin(); it != last; ++it) {
+        write_complex_value(*it);
         *output_ << ", ";
       }
-      write_complex_value(values[last]);
+      write_complex_value(values.back());
     }
     *output_ << " ]";
   }

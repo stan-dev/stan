@@ -32,10 +32,11 @@ TEST_F(ServicesOptimize, withJacobian) {
 
   EXPECT_FLOAT_EQ(return_code, 0);
 
-  ASSERT_EQ(2, parameter.names_.size());
+  ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("sigma", parameter.names_[1]);
-  EXPECT_NEAR((3 + std::sqrt(13)) / 2, parameter.states_.back()[1], 0.001);
+  EXPECT_EQ("converged__", parameter.names_[1]);
+  EXPECT_EQ("sigma", parameter.names_[2]);
+  EXPECT_NEAR((3 + std::sqrt(13)) / 2, parameter.states_.back()[2], 0.001);
   EXPECT_GT(interrupt.call_count(), 0);
 }
 
@@ -54,9 +55,10 @@ TEST_F(ServicesOptimize, withoutJacobian) {
 
   EXPECT_FLOAT_EQ(return_code, 0);
 
-  ASSERT_EQ(2, parameter.names_.size());
+  ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("sigma", parameter.names_[1]);
-  EXPECT_NEAR(3, parameter.states_.back()[1], 0.001);
+  EXPECT_EQ("converged__", parameter.names_[1]);
+  EXPECT_EQ("sigma", parameter.names_[2]);
+  EXPECT_NEAR(3, parameter.states_.back()[2], 0.001);
   EXPECT_GT(interrupt.call_count(), 0);
 }

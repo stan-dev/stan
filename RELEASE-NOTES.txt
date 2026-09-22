@@ -5,6 +5,29 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.40.0 (16 September 2026)
+======================================================================
+
+ - Fixed standalone generated quantities not respecting the chain ID for rng seeding. (#3402)
+ - Added `max_tries` as an argument to `stan::services::util::initialize`. (#3395)
+ - Fixed the output format of standalone generated quantities differing between the single- and multi-chain overloads. (#3404)
+ - Switched to using explicitly sized integer types in the structured_writer interface. (#3406)
+ - Fixed several edge case issues in the summary and analysis functions. (#3423)
+ - Reduce dependencies on the Boost library headers. (#3409, #3410, #3411, #3415, #3419)
+ - JSON writers are now flushed whenever the json object is finished, rather than at the end of the program. (#3418)
+ - Fixed some edge cases in JSON file writing. (#3427)
+ - Fixed an infinite loop when reading certain invalid CSV files. (#3428)
+
+v2.39.0 (19 May 2026)
+======================================================================
+
+ - Added timing information to the output of standalone generated quantities. (#3373, #3377)
+ - Added a `converged__` column to the output of the optimization algorithms,
+   which documents why the optimization algorithm halted. A string explanation
+   is also added as a comment. (#3379)
+ - Changes for compatibility with Eigen 5.0.1. (#3371)
+ - Fixed an issue where memory was being re-allocated unnecessarily. (#3392)
+
 v2.38.0 (13 January 2026)
 ======================================================================
 
@@ -18,7 +41,7 @@ v2.37.0 (2 September 2025)
 
  - Fixed a memory leak in `laplace_sample`. (#3324)
  - Dramatically reduce the memory footprint of Pathfinder when PSIS resampling is disabled. Note that this change involves changes to thread scheduling that may result in the same seed returning draws in a different order when multiple threads are used, but the unordered set of draws should be unchanged. (#3325)
- - Fixed a missing size check by directing all std::vector assigns through size-aware version. (#3352) 
+ - Fixed a missing size check by directing all std::vector assigns through size-aware version. (#3352)
  - Implemented serialization and deserializtion for `sum_to_zero` matrix. (#3342)
  - Fixed stepsize adaption being completely reset when passing `0` for the size of `term_buffer`. (#3346)
 
@@ -270,11 +293,11 @@ v.2.19.0 (20 March 2019)
 ======================================================================
 Stan now comes with GPU support for certain functions; see the Math library
 release notes for more details: https://github.com/stan-dev/math/releases/tag/v2.19.0
-The manual is now online in HTML format! 
+The manual is now online in HTML format!
 
 New Features
 --------------------------------------------------
-* #2618 - Add a new Variational Inference diagnostic 
+* #2618 - Add a new Variational Inference diagnostic
 * #2627 - 1d integrator
 * #2725 - standalone generated quantities
 * #2717, #2669 - offset/multiplier transformations for easier non-centering, etc

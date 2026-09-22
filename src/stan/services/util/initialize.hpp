@@ -36,8 +36,8 @@ namespace util {
  *
  * When at least some of the initialization is random, it will
  * randomly initialize until it finds a set of unconstrained
- * parameters that are valid or it hits <code>MAX_INIT_TRIES =
- * 100</code> (hard-coded).
+ * parameters that are valid or it hits <code>max_tries</code>,
+ * which defaults to 100.
  *
  * Valid initialization is defined as a finite, non-NaN value for the
  * evaluation of the log probability density function and all its
@@ -58,6 +58,8 @@ namespace util {
  *   be printed to the logger
  * @param[in,out] logger logger for messages
  * @param[in,out] init_writer init writer (on the unconstrained scale)
+ * @param[in] max_tries The maximum number of times a random initialization
+ *   will be re-tried to achieve a finite log density and gradient. Default 100.
  * @throws exception passed through from the model if the model has a
  *   fatal error (not a std::domain_error)
  * @throws std::domain_error if the model can not be initialized and
@@ -70,7 +72,8 @@ template <bool Jacobian = true, typename Model, typename InitContext,
 std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
                                double init_radius, bool print_timing,
                                stan::callbacks::logger& logger,
-                               stan::callbacks::writer& init_writer) {
+                               stan::callbacks::writer& init_writer,
+                               int max_tries = 100) {
   std::vector<double> unconstrained;
   std::vector<int> disc_vector;
 
@@ -86,7 +89,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
   bool is_initialized_with_zero = init_radius == 0.0;
 
   int MAX_INIT_TRIES
-      = is_fully_initialized || is_initialized_with_zero ? 1 : 100;
+      = is_fully_initialized || is_initialized_with_zero ? 1 : max_tries;
   int num_init_tries = 0;
   for (; num_init_tries < MAX_INIT_TRIES; num_init_tries++) {
     std::stringstream msg;
