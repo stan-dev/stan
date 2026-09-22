@@ -154,6 +154,23 @@ TEST(model, openclLogProbMatchesCpu) {
   auto lp_opencl = model.log_prob(params_opencl, nullptr);
   EXPECT_NEAR(expected, lp_opencl.val(), 1e-12);
 
+  // The model's deserializer and child handles have already gone out of scope.
+  lp_opencl.grad();
+  Eigen::VectorXd adjoints
+      = stan::math::from_matrix_cl<Eigen::VectorXd>(params_opencl.adj());
+  const auto layout = stan::io::compute_serializer_layout(sizes, align_elems);
+  Eigen::VectorXd expected_adjoints = Eigen::VectorXd::Zero(layout.total_size);
+  size_t param_index = 0;
+  for (size_t block = 0; block < sizes.size(); ++block) {
+    for (size_t i = 0; i < sizes[block]; ++i) {
+      expected_adjoints[layout.offsets[block] + i] = 2.0 * params[param_index++];
+    }
+  }
+  ASSERT_EQ(expected_adjoints.size(), adjoints.size());
+  for (Eigen::Index i = 0; i < adjoints.size(); ++i) {
+    EXPECT_DOUBLE_EQ(expected_adjoints[i], adjoints[i]) << "index " << i;
+  }
+
   stan::math::matrix_cl<double> params_vals = params_opencl.val();
   auto lp_opencl_prim = model.log_prob(params_vals, nullptr);
   EXPECT_NEAR(expected, lp_opencl_prim.val(), 1e-12);

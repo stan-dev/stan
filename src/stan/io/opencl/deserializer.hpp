@@ -92,8 +92,7 @@ class deserializer<stan::math::matrix_cl<double>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  inline mat_t read_matrix_cl_(size_t size, int rows,
-                                                       int cols) {
+  inline mat_t read_matrix_cl_(size_t size, int rows, int cols) {
     align_pos();
     if (size == 0) {
       return mat_t(rows, cols);
@@ -364,6 +363,7 @@ template <>
 class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
  using mat_t = stan::math::matrix_cl<double>;
  private:
+  stan::math::var_value<mat_t> parent_;
   std::reference_wrapper<mat_t> val_;
   std::reference_wrapper<mat_t> adj_;
   Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;
@@ -442,7 +442,14 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
     mat_t adj_mat(std::move(sub_adj), rows, cols);
     auto* vi = new stan::math::vari_value<mat_t>(
         std::move(val_mat), std::move(adj_mat));
-    return stan::math::var_value<mat_t>(vi);
+    stan::math::var_value<mat_t> child(vi);
+    stan::math::reverse_pass_callback([parent = parent_, child]() mutable {
+      // Subbuffers share storage, but their event lists are independent.
+      for (const auto& event : child.adj().write_events()) {
+        parent.adj().add_write_event(event);
+      }
+    });
+    return child;
   }
 
  public:
@@ -455,9 +462,10 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @param align_elems Alignment in elements.
    */
   template <typename IntVec, require_vector_like_t<IntVec>* = nullptr>
-  deserializer(const stan::math::var_value<mat_t>& data_r,
+  deserializer(stan::math::var_value<mat_t>& data_r,
                const IntVec& data_i, size_t align_elems)
-      : val_(data_r.val()),
+      : parent_(data_r),
+        val_(data_r.val_op()),
         adj_(data_r.adj()),
         map_i_(data_i.data(), data_i.size()),
         r_size_(data_r.val().size()),
