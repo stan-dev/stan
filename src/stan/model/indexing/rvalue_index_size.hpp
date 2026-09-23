@@ -50,7 +50,7 @@ inline int rvalue_index_size(const index_omni& idx, int size) noexcept {
  * @return Size of result.
  */
 inline int rvalue_index_size(const index_min& idx, int size) noexcept {
-  return size - idx.min_ + 1;
+  return (idx.min_ > size) ? 0 : (size - idx.min_ + 1);
 }
 
 /**

@@ -256,7 +256,7 @@ void test_min_vec() {
   check_adjs(check_i, x, "lhs");
   check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min(0));
-  test_throw_out_of_range(x, y, index_min(6));
+  test_throw_invalid_arg(x, y, index_min(6));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(4),
                          index_min(3));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(2),
@@ -1104,7 +1104,7 @@ void min_matrix_test() {
   check_adjs(check_i_x, check_all, x, "lhs", 0);
   check_adjs(check_all, y, "rhs", 1.0);
   test_throw_out_of_range(x, y, index_min(0));
-  test_throw_out_of_range(x, y, index_min(4));
+  test_throw_invalid_arg(x, y, index_min(4));
   test_throw_invalid_arg(x, y, index_min(1));
   var_value<MatrixXd> z(MatrixXd::Ones(1, 2));
   test_throw_invalid_arg(x, z, index_min(2));
@@ -1137,7 +1137,7 @@ void minmax_min_matrix_test() {
   test_throw_out_of_range(x, y, index_min_max(0, 3), index_min(2));
   test_throw_out_of_range(x, y, index_min_max(2, 4), index_min(2));
   test_throw_out_of_range(x, y, index_min_max(2, 3), index_min(0));
-  test_throw_out_of_range(x, y, index_min_max(2, 3), index_min(5));
+  test_throw_invalid_arg(x, y, index_min_max(2, 3), index_min(5));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(1, 3, 10),
                          index_min_max(2, 3), index_min(2));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(2, 5, 10),
@@ -1202,7 +1202,7 @@ void min_max_matrix_test() {
   auto check_all = [](int /* i*/) { return true; };
   check_adjs(check_all, check_all, y, "rhs");
   test_throw_out_of_range(x, y, index_min(0), index_max(2));
-  test_throw_out_of_range(x, y, index_min(5), index_max(2));
+  test_throw_invalid_arg(x, y, index_min(5), index_max(2));
   test_throw_invalid_arg(x, y, index_min(2), index_max(0));
   test_throw_out_of_range(x, y, index_min(2), index_max(5));
   test_throw_invalid_arg(x, y, index_min(2), index_max(1));
