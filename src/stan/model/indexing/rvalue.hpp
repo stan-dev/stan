@@ -308,7 +308,6 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& idx) {
 template <typename Mat, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, index_min idx) {
   if (idx.min_ <= x.rows()) {
-    math::check_range("matrix[min] row indexing", name, x.rows(), idx.min_);
     return x.bottomRows(x.rows() - idx.min_ + 1);
   } else {
     return x.bottomRows(0);
@@ -647,8 +646,6 @@ template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, Idx&& row_idx,
                    index_min col_idx) {
   if (col_idx.min_ <= x.cols()) {
-    math::check_range("matrix[..., min] column indexing", name, x.cols(),
-                      col_idx.min_);
     const Eigen::Index col_size = x.cols() - col_idx.min_ + 1;
     return rvalue(x.rightCols(col_size), name, std::forward<Idx>(row_idx));
   } else {

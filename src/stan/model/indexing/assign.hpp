@@ -172,7 +172,6 @@ template <typename Vec1, typename Vec2,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name, index_min idx) {
   if (likely(idx.min_ <= x.size())) {
-    stan::math::check_range("vector[min] assign", name, x.size(), idx.min_);
     stan::math::check_size_match("vector[min] assign", name,
                                  x.size() - idx.min_ + 1, "right hand side",
                                  y.size());
@@ -337,7 +336,6 @@ template <typename Mat1, typename Mat2,
           require_matrix_t<Mat2>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name, index_min idx) {
   if (likely(idx.min_ <= x.rows())) {
-    stan::math::check_range("matrix[min] assign row", name, x.rows(), idx.min_);
     const auto row_size = x.rows() - idx.min_ + 1;
     stan::math::check_size_match("matrix[min] assign rows", name, row_size,
                                  "right hand side rows", y.rows());
@@ -700,8 +698,6 @@ template <typename Mat1, typename Mat2, typename Idx,
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const Idx& row_idx, index_min col_idx) {
   if (likely(col_idx.min_ <= x.cols())) {
-    stan::math::check_range("matrix[..., min] assign column", name, x.cols(),
-                            col_idx.min_);
     const auto col_size = x.cols() - col_idx.min_ + 1;
     stan::math::check_size_match("matrix[..., min] assign columns", name,
                                  col_size, "right hand side columns", y.cols());
