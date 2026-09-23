@@ -18,13 +18,10 @@ namespace {
 class opencl_mock_model
     : public stan::model::model_base_crtp<opencl_mock_model> {
  public:
-  using var_matrix_cl_t
-      = stan::math::var_value<stan::math::matrix_cl<double>>;
+  using var_matrix_cl_t = stan::math::var_value<stan::math::matrix_cl<double>>;
 
   opencl_mock_model(size_t a_size, size_t b_size)
-      : model_base_crtp(a_size + b_size),
-        a_size_(a_size),
-        b_size_(b_size) {}
+      : model_base_crtp(a_size + b_size), a_size_(a_size), b_size_(b_size) {}
 
   std::string model_name() const override { return "opencl_mock_model"; }
 
@@ -82,8 +79,8 @@ class opencl_mock_model
     }
     std::vector<int> params_i;
     size_t align_elems = stan::io::internal::align_elems_from_device();
-    stan::io::deserializer<stan::math::matrix_cl<double>> in(
-        params_r, params_i, align_elems);
+    stan::io::deserializer<stan::math::matrix_cl<double>> in(params_r, params_i,
+                                                             align_elems);
     auto a = in.template read<stan::math::matrix_cl<double>>(
         static_cast<Eigen::Index>(a_size_));
     auto b = in.template read<stan::math::matrix_cl<double>>(
@@ -102,10 +99,10 @@ class opencl_mock_model
     std::vector<int> params_i;
     size_t align_elems = stan::io::internal::align_elems_from_device();
     stan::io::deserializer<var_matrix_cl_t> in(params_r, params_i, align_elems);
-    auto a = in.template read<var_matrix_cl_t>(
-        static_cast<Eigen::Index>(a_size_));
-    auto b = in.template read<var_matrix_cl_t>(
-        static_cast<Eigen::Index>(b_size_));
+    auto a
+        = in.template read<var_matrix_cl_t>(static_cast<Eigen::Index>(a_size_));
+    auto b
+        = in.template read<var_matrix_cl_t>(static_cast<Eigen::Index>(b_size_));
     return (propto ? 2 : 1)
                * (stan::math::dot_product(a, a) + stan::math::dot_product(b, b))
            + (jacobian ? 3 : 0);

@@ -109,7 +109,7 @@ class model_base : public prob_grad {
    * @param[in] include_gqs true if generated quantities should be
    * included
    */
-  virtual void get_dims(std::vector<std::vector<size_t> >& dimss,
+  virtual void get_dims(std::vector<std::vector<size_t>>& dimss,
                         bool include_tparams = true,
                         bool include_gqs = true) const = 0;
   /**
@@ -218,8 +218,7 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob(math::matrix_cl<double>& params_r,
                              std::ostream* msgs) const {
-    throw std::runtime_error(
-        "OpenCL log_prob not implemented for this model.");
+    throw std::runtime_error("OpenCL log_prob not implemented for this model.");
   }
 
   /**
@@ -230,11 +229,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob(
-      math::var_value<math::matrix_cl<double>>& params_r,
-      std::ostream* msgs) const {
-    throw std::runtime_error(
-        "OpenCL log_prob not implemented for this model.");
+  virtual math::var log_prob(math::var_value<math::matrix_cl<double>>& params_r,
+                             std::ostream* msgs) const {
+    throw std::runtime_error("OpenCL log_prob not implemented for this model.");
   }
 
   /**

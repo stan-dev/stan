@@ -27,10 +27,10 @@ TEST(deserializer_opencl_stdvector, read_varied_containers) {
   std::vector<int> theta_i;
 
   std::vector<size_t> sizes;
-  append_sizes(sizes, 4, 1);   // std::vector<double>(4)
-  append_sizes(sizes, 4, 1);   // std::vector<std::complex<double>>(2)
-  append_sizes(sizes, 2, 4);   // std::vector<matrix_cl>(2, 2x2)
-  append_sizes(sizes, 6, 2);   // std::vector<std::vector<matrix_cl>>(2,3,1x2)
+  append_sizes(sizes, 4, 1);  // std::vector<double>(4)
+  append_sizes(sizes, 4, 1);  // std::vector<std::complex<double>>(2)
+  append_sizes(sizes, 2, 4);  // std::vector<matrix_cl>(2, 2x2)
+  append_sizes(sizes, 6, 2);  // std::vector<std::vector<matrix_cl>>(2,3,1x2)
 
   Eigen::VectorXd params = make_params(sizes);
   auto align_elems = stan::io::internal::align_elems_from_device();
@@ -39,8 +39,7 @@ TEST(deserializer_opencl_stdvector, read_varied_containers) {
                                                      CL_MEM_READ_ONLY);
   stan::io::copy_to_serialize_buffer(params, values, layout);
 
-  std::vector<double> params_vec(params.data(),
-                                 params.data() + params.size());
+  std::vector<double> params_vec(params.data(), params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
       values, theta_i, layout);
@@ -60,8 +59,8 @@ TEST(deserializer_opencl_stdvector, read_varied_containers) {
     EXPECT_FLOAT_EQ(complex_ref[i].imag(), complex_vals[i].imag());
   }
 
-  auto mats = deserializer.read<std::vector<stan::math::matrix_cl<double>>>(
-      2, 2, 2);
+  auto mats
+      = deserializer.read<std::vector<stan::math::matrix_cl<double>>>(2, 2, 2);
   auto mats_ref = cpu.read<std::vector<Eigen::MatrixXd>>(2, 2, 2);
   ASSERT_EQ(mats.size(), mats_ref.size());
   for (size_t i = 0; i < mats.size(); ++i) {
@@ -69,8 +68,10 @@ TEST(deserializer_opencl_stdvector, read_varied_containers) {
     stan::test::expect_near_rel("deserializer_opencl", mat, mats_ref[i]);
   }
 
-  auto nested = deserializer.read<
-      std::vector<std::vector<stan::math::matrix_cl<double>>>>(2, 3, 1, 2);
+  auto nested
+      = deserializer
+            .read<std::vector<std::vector<stan::math::matrix_cl<double>>>>(
+                2, 3, 1, 2);
   auto nested_ref
       = cpu.read<std::vector<std::vector<Eigen::MatrixXd>>>(2, 3, 1, 2);
   ASSERT_EQ(nested.size(), nested_ref.size());
@@ -78,8 +79,7 @@ TEST(deserializer_opencl_stdvector, read_varied_containers) {
     ASSERT_EQ(nested[i].size(), nested_ref[i].size());
     for (size_t j = 0; j < nested[i].size(); ++j) {
       Eigen::MatrixXd mat = stan::math::from_matrix_cl(nested[i][j]);
-      stan::test::expect_near_rel("deserializer_opencl", mat,
-                                  nested_ref[i][j]);
+      stan::test::expect_near_rel("deserializer_opencl", mat, nested_ref[i][j]);
     }
   }
 }

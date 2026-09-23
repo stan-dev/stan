@@ -44,8 +44,8 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 
 #ifdef STAN_OPENCL
   inline stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
-                                  std::ostream* pstream__ = nullptr) const
-      override {
+                                  std::ostream* pstream__
+                                  = nullptr) const override {
     return 0.0;
   }
 

@@ -70,9 +70,8 @@ inline size_t round_up(size_t value, size_t multiple) {
  * @throws cl::Error if OpenCL device queries fail.
  */
 inline size_t align_elems_from_device() {
-  size_t align_bits
-      = stan::math::opencl_context.device()[0]
-            .getInfo<CL_DEVICE_MEM_BASE_ADDR_ALIGN>();
+  size_t align_bits = stan::math::opencl_context.device()[0]
+                          .getInfo<CL_DEVICE_MEM_BASE_ADDR_ALIGN>();
   size_t align_bytes = (align_bits + 7) / 8;
   if (align_bytes == 0) {
     return 1;
@@ -85,7 +84,7 @@ inline size_t align_elems_from_device() {
 }  // namespace internal
 
 inline serializer_layout::serializer_layout(const std::vector<size_t>& sizes,
-                                             size_t align_elems)
+                                            size_t align_elems)
     : align_elems_(std::max<size_t>(1, align_elems)) {
   sizes_offsets_.reserve(sizes.size());
   size_t pos = 0;
@@ -190,8 +189,7 @@ inline void copy_to_serialize_buffer(const Eigen::VectorXd& src,
  * @throws std::invalid_argument if params size does not match sum of sizes.
  */
 inline stan::math::var_value<stan::math::matrix_cl<double>> serialize_to_opencl(
-    const Eigen::VectorXd& params,
-    const std::vector<size_t>& sizes) {
+    const Eigen::VectorXd& params, const std::vector<size_t>& sizes) {
   const size_t align_elems = internal::align_elems_from_device();
   const serializer_layout layout(sizes, align_elems);
 

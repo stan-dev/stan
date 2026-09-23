@@ -25,12 +25,10 @@ TEST(opencl_subbuffer_ops, add_subbuffers) {
   cl_buffer_region region_b{layout.sizes_offsets_[1].second * sizeof(double),
                             sizes[1] * sizeof(double)};
 
-  cl::Buffer sub_a = parent.createSubBuffer(CL_MEM_READ_ONLY,
-                                            CL_BUFFER_CREATE_TYPE_REGION,
-                                            &region_a);
-  cl::Buffer sub_b = parent.createSubBuffer(CL_MEM_READ_ONLY,
-                                            CL_BUFFER_CREATE_TYPE_REGION,
-                                            &region_b);
+  cl::Buffer sub_a = parent.createSubBuffer(
+      CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region_a);
+  cl::Buffer sub_b = parent.createSubBuffer(
+      CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region_b);
 
   stan::math::matrix_cl<double> a(sub_a, 2, 2);
   stan::math::matrix_cl<double> b(sub_b, 2, 2);
@@ -39,10 +37,10 @@ TEST(opencl_subbuffer_ops, add_subbuffers) {
   Eigen::MatrixXd sum_host = stan::math::from_matrix_cl<Eigen::MatrixXd>(sum);
 
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                  Eigen::ColMajor>>
+                                 Eigen::ColMajor>>
       a_ref(params.data(), 2, 2);
   Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                  Eigen::ColMajor>>
+                                 Eigen::ColMajor>>
       b_ref(params.data() + 4, 2, 2);
 
   Eigen::MatrixXd expected = a_ref + b_ref;

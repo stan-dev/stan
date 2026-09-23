@@ -38,7 +38,8 @@ namespace io {
  */
 template <>
 class deserializer<stan::math::matrix_cl<double>> {
- using mat_t = stan::math::matrix_cl<double>;
+  using mat_t = stan::math::matrix_cl<double>;
+
  private:
   const mat_t& data_r_;
   Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;
@@ -155,8 +156,7 @@ class deserializer<stan::math::matrix_cl<double>> {
    * @param align_elems Alignment in elements.
    */
   template <typename IntVec, require_vector_like_t<IntVec>* = nullptr>
-  deserializer(const mat_t& data_r, const IntVec& data_i,
-               size_t align_elems)
+  deserializer(const mat_t& data_r, const IntVec& data_i, size_t align_elems)
       : data_r_(data_r),
         map_i_(data_i.data(), data_i.size()),
         r_size_(data_r.size()),
@@ -202,8 +202,7 @@ class deserializer<stan::math::matrix_cl<double>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  template <typename Ret,
-            require_t<std::is_floating_point<Ret>>* = nullptr>
+  template <typename Ret, require_t<std::is_floating_point<Ret>>* = nullptr>
   inline Ret read() {
     auto cl_val = read_matrix_cl_(1, 1, 1);
     return stan::math::from_matrix_cl<Ret>(cl_val);
@@ -308,7 +307,8 @@ class deserializer<stan::math::matrix_cl<double>> {
   template <typename Ret, bool Jacobian, typename LB, typename LP,
             typename... Sizes>
   inline auto read_constrain_lb(const LB& lb, LP& lp, Sizes... sizes) {
-    return stan::math::lb_constrain<Jacobian>(this->read<Ret>(sizes...), lb, lp);
+    return stan::math::lb_constrain<Jacobian>(this->read<Ret>(sizes...), lb,
+                                              lp);
   }
 
   /**
@@ -328,7 +328,8 @@ class deserializer<stan::math::matrix_cl<double>> {
   template <typename Ret, bool Jacobian, typename UB, typename LP,
             typename... Sizes>
   inline auto read_constrain_ub(const UB& ub, LP& lp, Sizes... sizes) {
-    return stan::math::ub_constrain<Jacobian>(this->read<Ret>(sizes...), ub, lp);
+    return stan::math::ub_constrain<Jacobian>(this->read<Ret>(sizes...), ub,
+                                              lp);
   }
 
   /**
@@ -351,8 +352,8 @@ class deserializer<stan::math::matrix_cl<double>> {
             typename... Sizes>
   inline auto read_constrain_lub(const LB& lb, const UB& ub, LP& lp,
                                  Sizes... sizes) {
-    return stan::math::lub_constrain<Jacobian>(this->read<Ret>(sizes...), lb, ub,
-                                               lp);
+    return stan::math::lub_constrain<Jacobian>(this->read<Ret>(sizes...), lb,
+                                               ub, lp);
   }
 
   /**
@@ -393,8 +394,8 @@ class deserializer<stan::math::matrix_cl<double>> {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes>
   inline auto read_constrain_unit_vector(LP& lp, Sizes... sizes) {
-    return stan::math::unit_vector_constrain<Jacobian>(this->read<Ret>(sizes...),
-                                                       lp);
+    return stan::math::unit_vector_constrain<Jacobian>(
+        this->read<Ret>(sizes...), lp);
   }
 };
 
@@ -403,7 +404,8 @@ class deserializer<stan::math::matrix_cl<double>> {
  */
 template <>
 class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
- using mat_t = stan::math::matrix_cl<double>;
+  using mat_t = stan::math::matrix_cl<double>;
+
  private:
   stan::math::var_value<mat_t> parent_;
   std::reference_wrapper<mat_t> val_;
@@ -479,15 +481,15 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  inline stan::math::var_value<mat_t>
-  read_var_matrix_cl_(size_t size, int rows, int cols) {
+  inline stan::math::var_value<mat_t> read_var_matrix_cl_(size_t size, int rows,
+                                                          int cols) {
     prepare_read(size);
     if (size == 0) {
       ++block_pos_;
       mat_t empty_val(rows, cols);
       mat_t empty_adj(rows, cols);
-      auto* vi = new stan::math::vari_value<mat_t>(
-          std::move(empty_val), std::move(empty_adj));
+      auto* vi = new stan::math::vari_value<mat_t>(std::move(empty_val),
+                                                   std::move(empty_adj));
       return stan::math::var_value<mat_t>(vi);
     }
     const size_t origin_bytes = pos_r_ * sizeof(double);
@@ -501,8 +503,8 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
     ++block_pos_;
     mat_t val_mat(std::move(sub_val), rows, cols);
     mat_t adj_mat(std::move(sub_adj), rows, cols);
-    auto* vi = new stan::math::vari_value<mat_t>(
-        std::move(val_mat), std::move(adj_mat));
+    auto* vi = new stan::math::vari_value<mat_t>(std::move(val_mat),
+                                                 std::move(adj_mat));
     stan::math::var_value<mat_t> child(vi);
     stan::math::reverse_pass_callback([parent = parent_, child]() mutable {
       // Subbuffers share storage, but their event lists are independent.
@@ -523,8 +525,8 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @param align_elems Alignment in elements.
    */
   template <typename IntVec, require_vector_like_t<IntVec>* = nullptr>
-  deserializer(stan::math::var_value<mat_t>& data_r,
-               const IntVec& data_i, size_t align_elems)
+  deserializer(stan::math::var_value<mat_t>& data_r, const IntVec& data_i,
+               size_t align_elems)
       : parent_(data_r),
         val_(data_r.val_op()),
         adj_(data_r.adj()),
@@ -572,8 +574,7 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  template <typename Ret,
-            require_t<std::is_floating_point<Ret>>* = nullptr>
+  template <typename Ret, require_t<std::is_floating_point<Ret>>* = nullptr>
   inline Ret read() {
     auto cl_val = read_var_matrix_cl_(1, 1, 1).val();
     return stan::math::from_matrix_cl<Ret>(cl_val);
@@ -617,14 +618,12 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  template <typename Ret,
-            require_t<std::is_same<
-                Ret,
-                stan::math::var_value<mat_t>>>* = nullptr>
+  template <
+      typename Ret,
+      require_t<std::is_same<Ret, stan::math::var_value<mat_t>>>* = nullptr>
   inline Ret read(Eigen::Index rows, Eigen::Index cols) {
     return read_var_matrix_cl_(static_cast<size_t>(rows * cols),
-                               static_cast<int>(rows),
-                               static_cast<int>(cols));
+                               static_cast<int>(rows), static_cast<int>(cols));
   }
 
   /**
@@ -636,10 +635,9 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    * @throws std::runtime_error if there are insufficient elements.
    * @throws cl::Error if subbuffer creation fails.
    */
-  template <typename Ret,
-            require_t<std::is_same<
-                Ret,
-                stan::math::var_value<mat_t>>>* = nullptr>
+  template <
+      typename Ret,
+      require_t<std::is_same<Ret, stan::math::var_value<mat_t>>>* = nullptr>
   inline Ret read(Eigen::Index m) {
     return read_var_matrix_cl_(static_cast<size_t>(m), static_cast<int>(m), 1);
   }
@@ -685,7 +683,8 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
   template <typename Ret, bool Jacobian, typename LB, typename LP,
             typename... Sizes>
   inline auto read_constrain_lb(const LB& lb, LP& lp, Sizes... sizes) {
-    return stan::math::lb_constrain<Jacobian>(this->read<Ret>(sizes...), lb, lp);
+    return stan::math::lb_constrain<Jacobian>(this->read<Ret>(sizes...), lb,
+                                              lp);
   }
 
   /**
@@ -705,7 +704,8 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
   template <typename Ret, bool Jacobian, typename UB, typename LP,
             typename... Sizes>
   inline auto read_constrain_ub(const UB& ub, LP& lp, Sizes... sizes) {
-    return stan::math::ub_constrain<Jacobian>(this->read<Ret>(sizes...), ub, lp);
+    return stan::math::ub_constrain<Jacobian>(this->read<Ret>(sizes...), ub,
+                                              lp);
   }
 
   /**
@@ -728,8 +728,8 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
             typename... Sizes>
   inline auto read_constrain_lub(const LB& lb, const UB& ub, LP& lp,
                                  Sizes... sizes) {
-    return stan::math::lub_constrain<Jacobian>(this->read<Ret>(sizes...), lb, ub,
-                                               lp);
+    return stan::math::lub_constrain<Jacobian>(this->read<Ret>(sizes...), lb,
+                                               ub, lp);
   }
 
   /**
@@ -770,8 +770,8 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes>
   inline auto read_constrain_unit_vector(LP& lp, Sizes... sizes) {
-    return stan::math::unit_vector_constrain<Jacobian>(this->read<Ret>(sizes...),
-                                                       lp);
+    return stan::math::unit_vector_constrain<Jacobian>(
+        this->read<Ret>(sizes...), lp);
   }
 };
 

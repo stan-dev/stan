@@ -45,8 +45,7 @@ TEST(deserializer_opencl_mixed, read_scalar_complex_vector_matrix) {
   Eigen::VectorXd params = make_params(sizes);
   auto pack = pack_opencl_values(params, sizes);
 
-  std::vector<double> params_vec(params.data(),
-                                 params.data() + params.size());
+  std::vector<double> params_vec(params.data(), params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
       pack.values, theta_i, pack.layout);
@@ -119,8 +118,7 @@ TEST(deserializer_opencl_constraints, read_lb) {
   Eigen::VectorXd params = make_params(sizes);
   auto pack = pack_opencl_values(params, sizes);
 
-  std::vector<double> params_vec(params.data(),
-                                 params.data() + params.size());
+  std::vector<double> params_vec(params.data(), params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
       pack.values, theta_i, pack.layout);
@@ -132,8 +130,7 @@ TEST(deserializer_opencl_constraints, read_lb) {
   double lp_ref = 0.0;
   auto lb_ref = stan::math::lb_constrain<true>(cpu.read<Eigen::VectorXd>(3),
                                                -1.0, lp_ref);
-  Eigen::VectorXd lb_host
-      = stan::math::from_matrix_cl<Eigen::VectorXd>(lb_cl);
+  Eigen::VectorXd lb_host = stan::math::from_matrix_cl<Eigen::VectorXd>(lb_cl);
   stan::test::expect_near_rel("deserializer_opencl", lb_host, lb_ref);
   EXPECT_NEAR(lp_ref, lp, 1e-8);
 }
@@ -144,8 +141,7 @@ TEST(deserializer_opencl_constraints, read_ub) {
   Eigen::VectorXd params = make_params(sizes);
   auto pack = pack_opencl_values(params, sizes);
 
-  std::vector<double> params_vec(params.data(),
-                                 params.data() + params.size());
+  std::vector<double> params_vec(params.data(), params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
       pack.values, theta_i, pack.layout);
@@ -157,8 +153,7 @@ TEST(deserializer_opencl_constraints, read_ub) {
   double lp_ref = 0.0;
   auto ub_ref = stan::math::ub_constrain<true>(cpu.read<Eigen::VectorXd>(2),
                                                2.0, lp_ref);
-  Eigen::VectorXd ub_host
-      = stan::math::from_matrix_cl<Eigen::VectorXd>(ub_cl);
+  Eigen::VectorXd ub_host = stan::math::from_matrix_cl<Eigen::VectorXd>(ub_cl);
   stan::test::expect_near_rel("deserializer_opencl", ub_host, ub_ref);
   EXPECT_NEAR(lp_ref, lp, 1e-8);
 }
@@ -169,8 +164,7 @@ TEST(deserializer_opencl_constraints, read_lub) {
   Eigen::VectorXd params = make_params(sizes);
   auto pack = pack_opencl_values(params, sizes);
 
-  std::vector<double> params_vec(params.data(),
-                                 params.data() + params.size());
+  std::vector<double> params_vec(params.data(), params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
       pack.values, theta_i, pack.layout);
@@ -194,16 +188,14 @@ TEST(deserializer_opencl_constraints, read_offset_multiplier) {
   Eigen::VectorXd params = make_params(sizes);
   auto pack = pack_opencl_values(params, sizes);
 
-  std::vector<double> params_vec(params.data(),
-                                 params.data() + params.size());
+  std::vector<double> params_vec(params.data(), params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
       pack.values, theta_i, pack.layout);
 
   double lp = 0.0;
-  auto off_cl = deserializer
-                    .read_constrain_offset_multiplier<
-                        stan::math::matrix_cl<double>, true>(1.5, 2.0, lp, 3);
+  auto off_cl = deserializer.read_constrain_offset_multiplier<
+      stan::math::matrix_cl<double>, true>(1.5, 2.0, lp, 3);
   double lp_ref = 0.0;
   auto off_ref = stan::math::offset_multiplier_constrain<true>(
       cpu.read<Eigen::VectorXd>(3), 1.5, 2.0, lp_ref);
@@ -219,8 +211,7 @@ TEST(deserializer_opencl_constraints, subbuffer_addition) {
   Eigen::VectorXd params = make_params(sizes);
   auto pack = pack_opencl_values(params, sizes);
 
-  std::vector<double> params_vec(params.data(),
-                                 params.data() + params.size());
+  std::vector<double> params_vec(params.data(), params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
       pack.values, theta_i, pack.layout);

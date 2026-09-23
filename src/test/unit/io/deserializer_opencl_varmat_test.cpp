@@ -18,7 +18,9 @@ TEST(deserializer_opencl_varmat, read_and_adj) {
 
   stan::io::deserializer<stan::math::var_value<stan::math::matrix_cl<double>>>
       deserializer(var_buf, theta_i, layout);
-  auto mat_var = deserializer.read<stan::math::var_value<stan::math::matrix_cl<double>>>(3, 2);
+  auto mat_var
+      = deserializer.read<stan::math::var_value<stan::math::matrix_cl<double>>>(
+          3, 2);
 
   Eigen::MatrixXd vals = stan::math::from_matrix_cl(mat_var.val());
   EXPECT_EQ(vals.rows(), 3);
@@ -56,10 +58,12 @@ TEST(deserializer_opencl_varmat, multiple_blocks_and_padding) {
   stan::io::deserializer<stan::math::var_value<stan::math::matrix_cl<double>>>
       deserializer(var_buf, theta_i, layout);
 
-  auto vec_var = deserializer.read<stan::math::var_value<
-      stan::math::matrix_cl<double>>>(3);
-  auto row_var = deserializer.read<stan::math::var_value<
-      stan::math::matrix_cl<double>>>(1, 5);
+  auto vec_var
+      = deserializer.read<stan::math::var_value<stan::math::matrix_cl<double>>>(
+          3);
+  auto row_var
+      = deserializer.read<stan::math::var_value<stan::math::matrix_cl<double>>>(
+          1, 5);
 
   vec_var.adj() = stan::math::constant(1.0, 3, 1);
   row_var.adj() = stan::math::constant(2.0, 1, 5);
