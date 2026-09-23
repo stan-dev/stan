@@ -9,6 +9,7 @@
 #include <stan/model/model_base_crtp.hpp>
 #include <Eigen/Dense>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -62,7 +63,9 @@ class opencl_mock_model
     using vec_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
     vec_t a = in.template read<vec_t>(static_cast<Eigen::Index>(a_size_));
     vec_t b = in.template read<vec_t>(static_cast<Eigen::Index>(b_size_));
-    return stan::math::dot_product(a, a) + stan::math::dot_product(b, b);
+    return (propto ? 2 : 1)
+               * (stan::math::dot_product(a, a) + stan::math::dot_product(b, b))
+           + (jacobian ? 3 : 0);
   }
 
   template <bool propto, bool jacobian, typename T>
@@ -71,8 +74,12 @@ class opencl_mock_model
     return 0;
   }
 
+  template <bool propto, bool jacobian>
   stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
-                           std::ostream* msgs) const override {
+                           std::ostream* msgs) const {
+    if (msgs) {
+      *msgs << propto << jacobian;
+    }
     std::vector<int> params_i;
     size_t align_elems = stan::io::internal::align_elems_from_device();
     stan::io::deserializer<stan::math::matrix_cl<double>> in(
@@ -82,12 +89,16 @@ class opencl_mock_model
     auto b = in.template read<stan::math::matrix_cl<double>>(
         static_cast<Eigen::Index>(b_size_));
     double lp = stan::math::dot_product(a, a) + stan::math::dot_product(b, b);
-    return stan::math::var(lp);
+    return stan::math::var((propto ? 2 : 1) * lp + (jacobian ? 3 : 0));
   }
 
+  template <bool propto, bool jacobian>
   stan::math::var log_prob(
       stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
-      std::ostream* msgs) const override {
+      std::ostream* msgs) const {
+    if (msgs) {
+      *msgs << propto << jacobian;
+    }
     std::vector<int> params_i;
     size_t align_elems = stan::io::internal::align_elems_from_device();
     stan::io::deserializer<var_matrix_cl_t> in(params_r, params_i, align_elems);
@@ -95,7 +106,9 @@ class opencl_mock_model
         static_cast<Eigen::Index>(a_size_));
     auto b = in.template read<var_matrix_cl_t>(
         static_cast<Eigen::Index>(b_size_));
-    return stan::math::dot_product(a, a) + stan::math::dot_product(b, b);
+    return (propto ? 2 : 1)
+               * (stan::math::dot_product(a, a) + stan::math::dot_product(b, b))
+           + (jacobian ? 3 : 0);
   }
 
   void transform_inits(const stan::io::var_context& context,
@@ -132,6 +145,57 @@ class opencl_mock_model
   size_t b_size_;
 };
 
+template <bool propto, bool jacobian>
+void check_opencl_dispatch() {
+  stan::math::nested_rev_autodiff nested;
+  opencl_mock_model model(2, 3);
+  stan::model::model_base& base = model;
+  stan::model::model_base_crtp<opencl_mock_model>& crtp = model;
+  Eigen::VectorXd params(5);
+  params << 1, 2, 3, 4, 5;
+  const double scale = propto ? 2 : 1;
+  const double expected = scale * params.squaredNorm() + (jacobian ? 3 : 0);
+  const std::vector<size_t> sizes{2, 3};
+  const stan::io::serializer_layout layout(
+      sizes, stan::io::internal::align_elems_from_device());
+  auto vars = stan::io::serialize_to_opencl(params, sizes);
+  stan::math::matrix_cl<double> values = vars.val();
+  std::stringstream msgs;
+  const std::string flags = std::to_string(propto) + std::to_string(jacobian);
+  auto lp = base.log_prob<propto, jacobian>(vars, &msgs);
+  EXPECT_DOUBLE_EQ(expected, lp.val());
+  EXPECT_EQ(flags, msgs.str());
+  msgs.str("");
+  EXPECT_DOUBLE_EQ(expected,
+                   (base.log_prob<propto, jacobian>(values, &msgs).val()));
+  EXPECT_EQ(flags, msgs.str());
+  EXPECT_DOUBLE_EQ(expected,
+                   (base.log_prob<propto, jacobian>(params, nullptr)));
+  if constexpr (propto && jacobian) {
+    EXPECT_DOUBLE_EQ(expected,
+                     crtp.log_prob_propto_jacobian(values, nullptr).val());
+    EXPECT_DOUBLE_EQ(expected,
+                     crtp.log_prob_propto_jacobian(vars, nullptr).val());
+  } else if constexpr (propto) {
+    EXPECT_DOUBLE_EQ(expected, crtp.log_prob_propto(values, nullptr).val());
+    EXPECT_DOUBLE_EQ(expected, crtp.log_prob_propto(vars, nullptr).val());
+  } else if constexpr (jacobian) {
+    EXPECT_DOUBLE_EQ(expected, crtp.log_prob_jacobian(values, nullptr).val());
+    EXPECT_DOUBLE_EQ(expected, crtp.log_prob_jacobian(vars, nullptr).val());
+  } else {
+    EXPECT_DOUBLE_EQ(expected, crtp.log_prob(values, nullptr).val());
+    EXPECT_DOUBLE_EQ(expected, crtp.log_prob(vars, nullptr).val());
+  }
+  lp.grad();
+  Eigen::VectorXd adjoints = stan::math::from_matrix_cl(vars.adj());
+  size_t param_index = 0;
+  for (const auto& [size, offset] : layout.sizes_offsets_) {
+    for (size_t i = 0; i < size; ++i) {
+      EXPECT_DOUBLE_EQ(2 * scale * params[param_index++], adjoints[offset + i]);
+    }
+  }
+}
+
 }  // namespace
 
 TEST(model, openclLogProbMatchesCpu) {
@@ -147,23 +211,24 @@ TEST(model, openclLogProbMatchesCpu) {
 
   double expected = params.squaredNorm();
 
-  std::vector<std::vector<size_t>> dimss;
   std::vector<size_t> sizes{a_size, b_size};
-  auto params_opencl = stan::io::serialize_to_opencl(params, dimss, sizes);
+  auto params_opencl = stan::io::serialize_to_opencl(params, sizes);
 
-  auto lp_opencl = model.log_prob(params_opencl, nullptr);
+  stan::model::model_base& base = model;
+  auto lp_opencl = base.log_prob(params_opencl, nullptr);
   EXPECT_NEAR(expected, lp_opencl.val(), 1e-12);
 
   // The model's deserializer and child handles have already gone out of scope.
   lp_opencl.grad();
   Eigen::VectorXd adjoints
       = stan::math::from_matrix_cl<Eigen::VectorXd>(params_opencl.adj());
-  const auto layout = stan::io::compute_serializer_layout(sizes, align_elems);
-  Eigen::VectorXd expected_adjoints = Eigen::VectorXd::Zero(layout.total_size);
+  const stan::io::serializer_layout layout(sizes, align_elems);
+  Eigen::VectorXd expected_adjoints = Eigen::VectorXd::Zero(layout.total_size_);
   size_t param_index = 0;
   for (size_t block = 0; block < sizes.size(); ++block) {
     for (size_t i = 0; i < sizes[block]; ++i) {
-      expected_adjoints[layout.offsets[block] + i] = 2.0 * params[param_index++];
+      expected_adjoints[layout.sizes_offsets_[block].second + i]
+          = 2.0 * params[param_index++];
     }
   }
   ASSERT_EQ(expected_adjoints.size(), adjoints.size());
@@ -172,10 +237,17 @@ TEST(model, openclLogProbMatchesCpu) {
   }
 
   stan::math::matrix_cl<double> params_vals = params_opencl.val();
-  auto lp_opencl_prim = model.log_prob(params_vals, nullptr);
+  auto lp_opencl_prim = base.log_prob(params_vals, nullptr);
   EXPECT_NEAR(expected, lp_opencl_prim.val(), 1e-12);
 
   stan::math::recover_memory();
+}
+
+TEST(model, openclLogProbAllVariants) {
+  check_opencl_dispatch<false, false>();
+  check_opencl_dispatch<false, true>();
+  check_opencl_dispatch<true, false>();
+  check_opencl_dispatch<true, true>();
 }
 
 #else

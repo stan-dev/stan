@@ -22,8 +22,8 @@ opencl_pack pack_opencl_values(const Eigen::VectorXd& params,
                                const std::vector<size_t>& sizes) {
   opencl_pack pack;
   pack.align_elems = stan::io::internal::align_elems_from_device();
-  pack.layout = stan::io::compute_serializer_layout(sizes, pack.align_elems);
-  pack.values = stan::io::allocate_serializer_buffer(pack.layout,
+  pack.layout = stan::io::serializer_layout(sizes, pack.align_elems);
+  pack.values = stan::io::allocate_serializer_buffer(pack.layout.total_size_,
                                                      CL_MEM_READ_ONLY);
   stan::io::copy_to_serialize_buffer(params, pack.values, pack.layout);
   return pack;
@@ -49,7 +49,7 @@ TEST(deserializer_opencl_mixed, read_scalar_complex_vector_matrix) {
                                  params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
-      pack.values, theta_i, pack.align_elems);
+      pack.values, theta_i, pack.layout);
 
   double x = deserializer.read<double>();
   EXPECT_FLOAT_EQ(cpu.read<double>(), x);
@@ -79,6 +79,40 @@ TEST(deserializer_opencl_mixed, read_scalar_complex_vector_matrix) {
   EXPECT_EQ(cpu.read<int>(), i);
 }
 
+TEST(deserializer_opencl_mixed, explicit_layout) {
+  using mat_t = stan::math::matrix_cl<double>;
+  const size_t align = stan::io::internal::align_elems_from_device();
+  stan::io::serializer_layout layout({1, 0, 2}, align);
+  layout.sizes_offsets_[2].second = 3 * align;
+  layout.total_size_ = 3 * align + 2;
+  Eigen::VectorXd params(3);
+  params << 1, 2, 3;
+  auto values = stan::io::allocate_serializer_buffer(layout.total_size_,
+                                                     CL_MEM_READ_ONLY);
+  stan::io::copy_to_serialize_buffer(params, values, layout);
+  std::vector<int> theta_i;
+  stan::io::deserializer<mat_t> deserializer(values, theta_i, layout);
+
+  EXPECT_THROW(deserializer.read<mat_t>(2), std::invalid_argument);
+  EXPECT_DOUBLE_EQ(deserializer.read<double>(), 1);
+  EXPECT_EQ(deserializer.read<mat_t>(0).size(), 0);
+  Eigen::VectorXd actual
+      = stan::math::from_matrix_cl(deserializer.read<mat_t>(2));
+  EXPECT_DOUBLE_EQ(actual[0], 2);
+  EXPECT_DOUBLE_EQ(actual[1], 3);
+  EXPECT_EQ(deserializer.available(), 0U);
+  EXPECT_THROW(deserializer.read<double>(), std::runtime_error);
+
+  auto invalid_layout = layout;
+  ++invalid_layout.total_size_;
+  EXPECT_THROW((stan::io::deserializer<mat_t>(values, theta_i, invalid_layout)),
+               std::invalid_argument);
+  invalid_layout = layout;
+  invalid_layout.sizes_offsets_[0].second = layout.total_size_;
+  stan::io::deserializer<mat_t> invalid(values, theta_i, invalid_layout);
+  EXPECT_THROW(invalid.read<double>(), std::runtime_error);
+}
+
 TEST(deserializer_opencl_constraints, read_lb) {
   std::vector<int> theta_i;
   std::vector<size_t> sizes{3};
@@ -89,7 +123,7 @@ TEST(deserializer_opencl_constraints, read_lb) {
                                  params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
-      pack.values, theta_i, pack.align_elems);
+      pack.values, theta_i, pack.layout);
 
   double lp = 0.0;
   auto lb_cl
@@ -114,7 +148,7 @@ TEST(deserializer_opencl_constraints, read_ub) {
                                  params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
-      pack.values, theta_i, pack.align_elems);
+      pack.values, theta_i, pack.layout);
 
   double lp = 0.0;
   auto ub_cl
@@ -139,7 +173,7 @@ TEST(deserializer_opencl_constraints, read_lub) {
                                  params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
-      pack.values, theta_i, pack.align_elems);
+      pack.values, theta_i, pack.layout);
 
   double lp = 0.0;
   auto lub_cl
@@ -164,7 +198,7 @@ TEST(deserializer_opencl_constraints, read_offset_multiplier) {
                                  params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
-      pack.values, theta_i, pack.align_elems);
+      pack.values, theta_i, pack.layout);
 
   double lp = 0.0;
   auto off_cl = deserializer
@@ -189,7 +223,7 @@ TEST(deserializer_opencl_constraints, subbuffer_addition) {
                                  params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
   stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
-      pack.values, theta_i, pack.align_elems);
+      pack.values, theta_i, pack.layout);
 
   auto a_cl = deserializer.read<stan::math::matrix_cl<double>>(2, 2);
   auto b_cl = deserializer.read<stan::math::matrix_cl<double>>(2, 2);

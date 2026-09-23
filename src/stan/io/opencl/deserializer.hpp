@@ -26,6 +26,7 @@
 #include <CL/opencl.hpp>
 
 #include <complex>
+#include <optional>
 #include <vector>
 #include <type_traits>
 
@@ -46,6 +47,8 @@ class deserializer<stan::math::matrix_cl<double>> {
   size_t pos_r_{0};
   size_t pos_i_{0};
   size_t align_elems_{1};
+  std::optional<serializer_layout> layout_;
+  size_t block_pos_{0};
 
   /**
    * Check there are at least m reals left to read.
@@ -55,7 +58,7 @@ class deserializer<stan::math::matrix_cl<double>> {
    */
   void check_r_capacity(size_t m) const {
     STAN_NO_RANGE_CHECKS_RETURN;
-    if (pos_r_ + m > r_size_) {
+    if (pos_r_ > r_size_ || m > r_size_ - pos_r_) {
       []() STAN_COLD_PATH {
         throw std::runtime_error("no more scalars to read");
       }();
@@ -78,9 +81,26 @@ class deserializer<stan::math::matrix_cl<double>> {
   }
 
   /**
-   * Align the real position to the next aligned element offset.
+   * Locate the next block and check its size against the supplied layout.
+   * Without a layout, compute the offset from the requested alignment.
    */
-  inline void align_pos() { pos_r_ = internal::round_up(pos_r_, align_elems_); }
+  inline void prepare_read(size_t size) {
+    if (layout_) {
+      if (block_pos_ >= layout_->sizes_offsets_.size()) {
+        throw std::runtime_error("no more blocks to read");
+      }
+      const auto& [block_size, offset] = layout_->sizes_offsets_[block_pos_];
+      stan::math::check_size_match("deserializer", "requested block size", size,
+                                   "layout block size", block_size);
+      if (offset > r_size_ || size > r_size_ - offset) {
+        throw std::runtime_error("layout block exceeds real buffer");
+      }
+      pos_r_ = offset;
+    } else {
+      pos_r_ = internal::round_up(pos_r_, align_elems_);
+    }
+    check_r_capacity(size);
+  }
 
   /**
    * Read a block as a matrix_cl subbuffer.
@@ -93,11 +113,11 @@ class deserializer<stan::math::matrix_cl<double>> {
    * @throws cl::Error if subbuffer creation fails.
    */
   inline mat_t read_matrix_cl_(size_t size, int rows, int cols) {
-    align_pos();
+    prepare_read(size);
     if (size == 0) {
+      ++block_pos_;
       return mat_t(rows, cols);
     }
-    check_r_capacity(size);
     const size_t origin_bytes = pos_r_ * sizeof(double);
     const size_t size_bytes = size * sizeof(double);
     cl_buffer_region region{origin_bytes, size_bytes};
@@ -105,7 +125,7 @@ class deserializer<stan::math::matrix_cl<double>> {
     cl::Buffer sub = parent.createSubBuffer(
         CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region);
     pos_r_ += size;
-    align_pos();
+    ++block_pos_;
     return mat_t(sub, rows, cols);
   }
 
@@ -144,9 +164,31 @@ class deserializer<stan::math::matrix_cl<double>> {
         align_elems_(std::max<size_t>(1, align_elems)) {}
 
   /**
+   * Construct a deserializer using explicit block sizes and offsets.
+   *
+   * @tparam IntVec Integer data vector type.
+   * @param data_r Device buffer of reals.
+   * @param data_i Integer data.
+   * @param layout Layout in read order, copied into the deserializer.
+   * @throws std::invalid_argument if the buffer is smaller than the layout.
+   */
+  template <typename IntVec, require_vector_like_t<IntVec>* = nullptr>
+  deserializer(const mat_t& data_r, const IntVec& data_i,
+               const serializer_layout& layout)
+      : deserializer(data_r, data_i, layout.align_elems_) {
+    if (layout.total_size_ > r_size_) {
+      throw std::invalid_argument("serializer layout exceeds real buffer");
+    }
+    layout_ = layout;
+    r_size_ = layout.total_size_;
+  }
+
+  /**
    * @return Number of remaining real elements.
    */
-  inline size_t available() const noexcept { return r_size_ - pos_r_; }
+  inline size_t available() const noexcept {
+    return pos_r_ < r_size_ ? r_size_ - pos_r_ : 0;
+  }
   /**
    * @return Number of remaining integer elements.
    */
@@ -372,6 +414,8 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
   size_t pos_r_{0};
   size_t pos_i_{0};
   size_t align_elems_{1};
+  std::optional<serializer_layout> layout_;
+  size_t block_pos_{0};
 
   /**
    * Check there are at least m reals left to read.
@@ -381,7 +425,7 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    */
   void check_r_capacity(size_t m) const {
     STAN_NO_RANGE_CHECKS_RETURN;
-    if (pos_r_ + m > r_size_) {
+    if (pos_r_ > r_size_ || m > r_size_ - pos_r_) {
       []() STAN_COLD_PATH {
         throw std::runtime_error("no more scalars to read");
       }();
@@ -404,9 +448,26 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
   }
 
   /**
-   * Align the real position to the next aligned element offset.
+   * Locate the next block and check its size against the supplied layout.
+   * Without a layout, compute the offset from the requested alignment.
    */
-  inline void align_pos() { pos_r_ = internal::round_up(pos_r_, align_elems_); }
+  inline void prepare_read(size_t size) {
+    if (layout_) {
+      if (block_pos_ >= layout_->sizes_offsets_.size()) {
+        throw std::runtime_error("no more blocks to read");
+      }
+      const auto& [block_size, offset] = layout_->sizes_offsets_[block_pos_];
+      stan::math::check_size_match("deserializer", "requested block size", size,
+                                   "layout block size", block_size);
+      if (offset > r_size_ || size > r_size_ - offset) {
+        throw std::runtime_error("layout block exceeds real buffer");
+      }
+      pos_r_ = offset;
+    } else {
+      pos_r_ = internal::round_up(pos_r_, align_elems_);
+    }
+    check_r_capacity(size);
+  }
 
   /**
    * Read a block as a var_value<matrix_cl> subbuffer.
@@ -420,15 +481,15 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
    */
   inline stan::math::var_value<mat_t>
   read_var_matrix_cl_(size_t size, int rows, int cols) {
-    align_pos();
+    prepare_read(size);
     if (size == 0) {
+      ++block_pos_;
       mat_t empty_val(rows, cols);
       mat_t empty_adj(rows, cols);
       auto* vi = new stan::math::vari_value<mat_t>(
           std::move(empty_val), std::move(empty_adj));
       return stan::math::var_value<mat_t>(vi);
     }
-    check_r_capacity(size);
     const size_t origin_bytes = pos_r_ * sizeof(double);
     const size_t size_bytes = size * sizeof(double);
     cl_buffer_region region{origin_bytes, size_bytes};
@@ -437,7 +498,7 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
     cl::Buffer sub_adj = adj_.get().buffer().createSubBuffer(
         CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &region);
     pos_r_ += size;
-    align_pos();
+    ++block_pos_;
     mat_t val_mat(std::move(sub_val), rows, cols);
     mat_t adj_mat(std::move(sub_adj), rows, cols);
     auto* vi = new stan::math::vari_value<mat_t>(
@@ -473,9 +534,31 @@ class deserializer<stan::math::var_value<stan::math::matrix_cl<double>>> {
         align_elems_(std::max<size_t>(1, align_elems)) {}
 
   /**
+   * Construct a deserializer using explicit block sizes and offsets.
+   *
+   * @tparam IntVec Integer data vector type.
+   * @param data_r Device buffer with values and adjoints.
+   * @param data_i Integer data.
+   * @param layout Layout in read order, copied into the deserializer.
+   * @throws std::invalid_argument if the buffer is smaller than the layout.
+   */
+  template <typename IntVec, require_vector_like_t<IntVec>* = nullptr>
+  deserializer(stan::math::var_value<mat_t>& data_r, const IntVec& data_i,
+               const serializer_layout& layout)
+      : deserializer(data_r, data_i, layout.align_elems_) {
+    if (layout.total_size_ > r_size_) {
+      throw std::invalid_argument("serializer layout exceeds real buffer");
+    }
+    layout_ = layout;
+    r_size_ = layout.total_size_;
+  }
+
+  /**
    * @return Number of remaining real elements.
    */
-  inline size_t available() const noexcept { return r_size_ - pos_r_; }
+  inline size_t available() const noexcept {
+    return pos_r_ < r_size_ ? r_size_ - pos_r_ : 0;
+  }
   /**
    * @return Number of remaining integer elements.
    */

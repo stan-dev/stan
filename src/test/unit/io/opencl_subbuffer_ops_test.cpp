@@ -8,20 +8,21 @@
 TEST(opencl_subbuffer_ops, add_subbuffers) {
   std::vector<size_t> sizes{4, 4};
   const size_t align_elems = stan::io::internal::align_elems_from_device();
-  const auto layout = stan::io::compute_serializer_layout(sizes, align_elems);
+  const stan::io::serializer_layout layout(sizes, align_elems);
 
   Eigen::VectorXd params(8);
   for (Eigen::Index i = 0; i < params.size(); ++i) {
     params.coeffRef(i) = static_cast<double>(i + 1);
   }
 
-  auto values = stan::io::allocate_serializer_buffer(layout, CL_MEM_READ_ONLY);
+  auto values = stan::io::allocate_serializer_buffer(layout.total_size_,
+                                                     CL_MEM_READ_ONLY);
   stan::io::copy_to_serialize_buffer(params, values, layout);
 
   cl::Buffer parent = values.buffer();
-  cl_buffer_region region_a{layout.offsets[0] * sizeof(double),
+  cl_buffer_region region_a{layout.sizes_offsets_[0].second * sizeof(double),
                             sizes[0] * sizeof(double)};
-  cl_buffer_region region_b{layout.offsets[1] * sizeof(double),
+  cl_buffer_region region_b{layout.sizes_offsets_[1].second * sizeof(double),
                             sizes[1] * sizeof(double)};
 
   cl::Buffer sub_a = parent.createSubBuffer(CL_MEM_READ_ONLY,

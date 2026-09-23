@@ -60,19 +60,6 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
     }
   }
 
-#ifdef STAN_OPENCL
-  stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
-                           std::ostream* msgs) const override {
-    return 9;
-  }
-
-  stan::math::var log_prob(
-      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
-      std::ostream* msgs) const override {
-    return 10;
-  }
-#endif
-
   void transform_inits(const stan::io::var_context& context,
                        Eigen::VectorXd& params_r,
                        std::ostream* msgs) const override {}
@@ -171,3 +158,37 @@ TEST(model, modelTemplateLogProb) {
   double v8 = bm.template log_prob<true, true>(params_r_v, msgs).val();
   EXPECT_FLOAT_EQ(8, v8);
 }
+
+#ifdef STAN_OPENCL
+TEST(model, modelOpenclWithoutTemplates) {
+  stan::math::nested_rev_autodiff nested;
+  mock_model model(0);
+  stan::model::model_base& base = model;
+  stan::math::matrix_cl<double> values;
+  stan::math::var_value<stan::math::matrix_cl<double>> vars{
+      stan::math::matrix_cl<double>()};
+  EXPECT_THROW(base.log_prob(values, nullptr), std::runtime_error);
+  EXPECT_THROW(base.log_prob(vars, nullptr), std::runtime_error);
+  EXPECT_THROW((base.log_prob<false, false>(values, nullptr)),
+               std::runtime_error);
+  EXPECT_THROW((base.log_prob<false, false>(vars, nullptr)),
+               std::runtime_error);
+  EXPECT_THROW(base.log_prob_jacobian(values, nullptr), std::runtime_error);
+  EXPECT_THROW((base.log_prob<false, true>(values, nullptr)),
+               std::runtime_error);
+  EXPECT_THROW(base.log_prob_jacobian(vars, nullptr), std::runtime_error);
+  EXPECT_THROW((base.log_prob<false, true>(vars, nullptr)), std::runtime_error);
+  EXPECT_THROW(base.log_prob_propto(values, nullptr), std::runtime_error);
+  EXPECT_THROW((base.log_prob<true, false>(values, nullptr)),
+               std::runtime_error);
+  EXPECT_THROW(base.log_prob_propto(vars, nullptr), std::runtime_error);
+  EXPECT_THROW((base.log_prob<true, false>(vars, nullptr)), std::runtime_error);
+  EXPECT_THROW(base.log_prob_propto_jacobian(values, nullptr),
+               std::runtime_error);
+  EXPECT_THROW((base.log_prob<true, true>(values, nullptr)),
+               std::runtime_error);
+  EXPECT_THROW(base.log_prob_propto_jacobian(vars, nullptr),
+               std::runtime_error);
+  EXPECT_THROW((base.log_prob<true, true>(vars, nullptr)), std::runtime_error);
+}
+#endif

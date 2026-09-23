@@ -34,16 +34,16 @@ TEST(deserializer_opencl_stdvector, read_varied_containers) {
 
   Eigen::VectorXd params = make_params(sizes);
   auto align_elems = stan::io::internal::align_elems_from_device();
-  auto layout = stan::io::compute_serializer_layout(sizes, align_elems);
-  auto values = stan::io::allocate_serializer_buffer(layout, CL_MEM_READ_ONLY);
+  stan::io::serializer_layout layout(sizes, align_elems);
+  auto values = stan::io::allocate_serializer_buffer(layout.total_size_,
+                                                     CL_MEM_READ_ONLY);
   stan::io::copy_to_serialize_buffer(params, values, layout);
 
   std::vector<double> params_vec(params.data(),
                                  params.data() + params.size());
   stan::io::deserializer<double> cpu(params_vec, theta_i);
-  stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(values,
-                                                                     theta_i,
-                                                                     align_elems);
+  stan::io::deserializer<stan::math::matrix_cl<double>> deserializer(
+      values, theta_i, layout);
 
   auto scalars = deserializer.read<std::vector<double>>(4);
   auto scalars_ref = cpu.read<std::vector<double>>(4);

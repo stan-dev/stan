@@ -17,6 +17,7 @@
 
 #include <numeric>
 #include <vector>
+#include <utility>
 #include <algorithm>
 
 namespace stan {
@@ -28,14 +29,22 @@ namespace io {
  * Offsets and sizes are in elements (not bytes).
  */
 struct serializer_layout {
-  /** Aligned offsets in elements for each block. */
-  std::vector<size_t> offsets;
-  /** Block sizes in elements. */
-  std::vector<size_t> sizes;
+  /** Size and aligned offset in elements for each block, in read order. */
+  std::vector<std::pair<size_t, size_t>> sizes_offsets_;
   /** Total size (including padding) in elements. */
-  size_t total_size{0};
+  size_t total_size_{0};
   /** Alignment in elements. */
-  size_t align_elems{1};
+  size_t align_elems_{1};
+
+  serializer_layout() = default;
+
+  /**
+   * Construct aligned offsets and total size for parameter blocks.
+   *
+   * @param sizes Block sizes in read order (elements).
+   * @param align_elems Alignment in elements.
+   */
+  serializer_layout(const std::vector<size_t>& sizes, size_t align_elems);
 };
 
 namespace internal {
@@ -75,40 +84,30 @@ inline size_t align_elems_from_device() {
 }
 }  // namespace internal
 
-/**
- * Compute aligned offsets and total size for parameter blocks.
- *
- * @param sizes Block sizes in read order (elements).
- * @param align_elems Alignment in elements.
- * @return Layout with aligned offsets and total size.
- */
-inline serializer_layout compute_serializer_layout(
-    const std::vector<size_t>& sizes, size_t align_elems) {
-  serializer_layout layout;
-  layout.sizes = sizes;
-  layout.align_elems = std::max<size_t>(1, align_elems);
-  layout.offsets.reserve(sizes.size());
+inline serializer_layout::serializer_layout(const std::vector<size_t>& sizes,
+                                             size_t align_elems)
+    : align_elems_(std::max<size_t>(1, align_elems)) {
+  sizes_offsets_.reserve(sizes.size());
   size_t pos = 0;
   for (size_t size : sizes) {
-    pos = internal::round_up(pos, layout.align_elems);
-    layout.offsets.push_back(pos);
+    pos = internal::round_up(pos, align_elems_);
+    sizes_offsets_.emplace_back(size, pos);
     pos += size;
   }
-  layout.total_size = pos;
-  return layout;
+  total_size_ = pos;
 }
 
 /**
  * Allocate a matrix_cl buffer sized to the serialized layout.
  *
- * @param layout Serializer layout.
+ * @param total_size Total buffer size in elements, including padding.
  * @param flags OpenCL memory flags.
- * @return Device buffer with shape (layout.total_size, 1).
+ * @return Device buffer with shape (total_size, 1).
  * @throws std::system_error if an OpenCL error occurs.
  */
 inline stan::math::matrix_cl<double> allocate_serializer_buffer(
-    const serializer_layout& layout, cl_mem_flags flags) {
-  if (layout.total_size == 0) {
+    const size_t& total_size, cl_mem_flags flags) {
+  if (total_size == 0) {
     return stan::math::matrix_cl<double>();
   }
   cl::Context& ctx = stan::math::opencl_context.context();
@@ -118,8 +117,8 @@ inline stan::math::matrix_cl<double> allocate_serializer_buffer(
             .getInfo<CL_DEVICE_HOST_UNIFIED_MEMORY>()) {
       alloc_flags |= CL_MEM_ALLOC_HOST_PTR;
     }
-    cl::Buffer buffer(ctx, alloc_flags, sizeof(double) * layout.total_size);
-    return stan::math::matrix_cl<double>(buffer, layout.total_size, 1);
+    cl::Buffer buffer(ctx, alloc_flags, sizeof(double) * total_size);
+    return stan::math::matrix_cl<double>(buffer, total_size, 1);
   } catch (const cl::Error& e) {
     stan::math::check_opencl_error("allocate_serializer_buffer", e);
   }
@@ -139,26 +138,28 @@ inline void copy_to_serialize_buffer(const Eigen::VectorXd& src,
                                      stan::math::matrix_cl<double>& dst,
                                      const serializer_layout& layout) {
   const size_t total_src = static_cast<size_t>(src.size());
-  const size_t total_sizes
-      = std::accumulate(layout.sizes.begin(), layout.sizes.end(), size_t{0});
+  const size_t total_sizes = std::accumulate(
+      layout.sizes_offsets_.begin(), layout.sizes_offsets_.end(), size_t{0},
+      [](size_t total, const auto& size_offset) {
+        return total + size_offset.first;
+      });
   stan::math::check_size_match("copy_to_serialize_buffer", "src.size()",
                                total_src, "sum(sizes)", total_sizes);
-  if (layout.total_size == 0) {
+  if (layout.total_size_ == 0) {
     return;
   }
 
   auto& queue = stan::math::opencl_context.queue();
   std::vector<cl::Event> events;
-  events.reserve(layout.sizes.size());
+  events.reserve(layout.sizes_offsets_.size());
   size_t src_offset = 0;
 
   try {
-    for (size_t i = 0; i < layout.sizes.size(); ++i) {
-      const size_t block_size = layout.sizes[i];
+    for (const auto& [block_size, offset] : layout.sizes_offsets_) {
       if (block_size == 0) {
         continue;
       }
-      const size_t origin_bytes = layout.offsets[i] * sizeof(double);
+      const size_t origin_bytes = offset * sizeof(double);
       const size_t size_bytes = block_size * sizeof(double);
       cl_buffer_region region{origin_bytes, size_bytes};
       cl::Buffer sub_dst = dst.buffer().createSubBuffer(
@@ -183,7 +184,6 @@ inline void copy_to_serialize_buffer(const Eigen::VectorXd& src,
  * Serialize host parameters into a padded OpenCL buffer.
  *
  * @param params Flat unconstrained parameters.
- * @param dimss Parameter dimensions (unused, passed for API parity).
  * @param sizes Unconstrained block sizes.
  * @return var_value holding values and adjoints buffers.
  * @throws std::system_error if an OpenCL error occurs.
@@ -191,25 +191,23 @@ inline void copy_to_serialize_buffer(const Eigen::VectorXd& src,
  */
 inline stan::math::var_value<stan::math::matrix_cl<double>> serialize_to_opencl(
     const Eigen::VectorXd& params,
-    const std::vector<std::vector<size_t>>& dimss,
     const std::vector<size_t>& sizes) {
-  (void)dimss;
   const size_t align_elems = internal::align_elems_from_device();
-  const serializer_layout layout = compute_serializer_layout(sizes, align_elems);
+  const serializer_layout layout(sizes, align_elems);
 
   stan::math::matrix_cl<double> values
-      = allocate_serializer_buffer(layout, CL_MEM_READ_ONLY);
+      = allocate_serializer_buffer(layout.total_size_, CL_MEM_READ_ONLY);
   stan::math::matrix_cl<double> adjoints
-      = allocate_serializer_buffer(layout, CL_MEM_READ_WRITE);
+      = allocate_serializer_buffer(layout.total_size_, CL_MEM_READ_WRITE);
 
-  if (layout.total_size > 0) {
+  if (layout.total_size_ > 0) {
     auto& queue = stan::math::opencl_context.queue();
     try {
       double zero = 0.0;
       queue.enqueueFillBuffer(values.buffer(), zero, 0,
-                              sizeof(double) * layout.total_size);
+                              sizeof(double) * layout.total_size_);
       queue.enqueueFillBuffer(adjoints.buffer(), zero, 0,
-                              sizeof(double) * layout.total_size);
+                              sizeof(double) * layout.total_size_);
       queue.finish();
     } catch (const cl::Error& e) {
       stan::math::check_opencl_error("serialize_to_opencl", e);

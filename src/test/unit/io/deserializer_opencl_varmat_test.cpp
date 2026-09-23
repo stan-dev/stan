@@ -13,11 +13,11 @@ TEST(deserializer_opencl_varmat, read_and_adj) {
 
   std::vector<size_t> sizes{6};
   auto align_elems = stan::io::internal::align_elems_from_device();
-  auto layout = stan::io::compute_serializer_layout(sizes, align_elems);
-  auto var_buf = stan::io::serialize_to_opencl(params, {}, sizes);
+  stan::io::serializer_layout layout(sizes, align_elems);
+  auto var_buf = stan::io::serialize_to_opencl(params, sizes);
 
   stan::io::deserializer<stan::math::var_value<stan::math::matrix_cl<double>>>
-      deserializer(var_buf, theta_i, align_elems);
+      deserializer(var_buf, theta_i, layout);
   auto mat_var = deserializer.read<stan::math::var_value<stan::math::matrix_cl<double>>>(3, 2);
 
   Eigen::MatrixXd vals = stan::math::from_matrix_cl(mat_var.val());
@@ -35,7 +35,7 @@ TEST(deserializer_opencl_varmat, read_and_adj) {
 
   Eigen::VectorXd full_adj
       = stan::math::from_matrix_cl<Eigen::VectorXd>(var_buf.adj());
-  ASSERT_EQ(full_adj.size(), static_cast<int>(layout.total_size));
+  ASSERT_EQ(full_adj.size(), static_cast<int>(layout.total_size_));
   for (int i = 0; i < 6; ++i) {
     EXPECT_FLOAT_EQ(full_adj[i], 1.0);
   }
@@ -45,16 +45,16 @@ TEST(deserializer_opencl_varmat, multiple_blocks_and_padding) {
   std::vector<int> theta_i;
   std::vector<size_t> sizes{3, 5};
   auto align_elems = stan::io::internal::align_elems_from_device();
-  auto layout = stan::io::compute_serializer_layout(sizes, align_elems);
+  stan::io::serializer_layout layout(sizes, align_elems);
 
   Eigen::VectorXd params(static_cast<Eigen::Index>(sizes[0] + sizes[1]));
   for (Eigen::Index i = 0; i < params.size(); ++i) {
     params.coeffRef(i) = static_cast<double>(i + 1);
   }
 
-  auto var_buf = stan::io::serialize_to_opencl(params, {}, sizes);
+  auto var_buf = stan::io::serialize_to_opencl(params, sizes);
   stan::io::deserializer<stan::math::var_value<stan::math::matrix_cl<double>>>
-      deserializer(var_buf, theta_i, align_elems);
+      deserializer(var_buf, theta_i, layout);
 
   auto vec_var = deserializer.read<stan::math::var_value<
       stan::math::matrix_cl<double>>>(3);
@@ -68,12 +68,12 @@ TEST(deserializer_opencl_varmat, multiple_blocks_and_padding) {
 
   Eigen::VectorXd full_adj
       = stan::math::from_matrix_cl<Eigen::VectorXd>(var_buf.adj());
-  ASSERT_EQ(full_adj.size(), static_cast<int>(layout.total_size));
+  ASSERT_EQ(full_adj.size(), static_cast<int>(layout.total_size_));
 
-  std::vector<double> expected(layout.total_size, 0.0);
+  std::vector<double> expected(layout.total_size_, 0.0);
   for (size_t i = 0; i < sizes.size(); ++i) {
     const size_t block_size = sizes[i];
-    const size_t offset = layout.offsets[i];
+    const size_t offset = layout.sizes_offsets_[i].second;
     const double value = (i == 0) ? 1.0 : 2.0;
     for (size_t j = 0; j < block_size; ++j) {
       expected[offset + j] = value;
@@ -91,12 +91,12 @@ TEST(deserializer_opencl_varmat, gradient_events_outlive_deserializer) {
   // Use a valid multiple of device alignment that guarantees padding.
   const size_t align_elems = 4 * stan::io::internal::align_elems_from_device();
   const std::vector<size_t> sizes{3, 5};
-  const auto layout = stan::io::compute_serializer_layout(sizes, align_elems);
-  Eigen::VectorXd values = Eigen::VectorXd::Zero(layout.total_size);
-  Eigen::VectorXd expected = Eigen::VectorXd::Zero(layout.total_size);
+  const stan::io::serializer_layout layout(sizes, align_elems);
+  Eigen::VectorXd values = Eigen::VectorXd::Zero(layout.total_size_);
+  Eigen::VectorXd expected = Eigen::VectorXd::Zero(layout.total_size_);
   for (size_t block = 0; block < sizes.size(); ++block) {
     for (size_t i = 0; i < sizes[block]; ++i) {
-      const size_t offset = layout.offsets[block] + i;
+      const size_t offset = layout.sizes_offsets_[block].second + i;
       values[offset] = i + 1;
       expected[offset] = 2.0 * (block + 1) * values[offset];
     }
@@ -108,7 +108,7 @@ TEST(deserializer_opencl_varmat, gradient_events_outlive_deserializer) {
   stan::math::var objective;
   {
     std::vector<int> theta_i;
-    stan::io::deserializer<var_mat> deserializer(parent, theta_i, align_elems);
+    stan::io::deserializer<var_mat> deserializer(parent, theta_i, layout);
     auto a = deserializer.read<var_mat>(3);
     auto b = deserializer.read<var_mat>(1, 5);
     objective = stan::math::dot_self(a) + 2.0 * stan::math::dot_self(b);
@@ -122,6 +122,49 @@ TEST(deserializer_opencl_varmat, gradient_events_outlive_deserializer) {
   for (Eigen::Index i = 0; i < expected.size(); ++i) {
     EXPECT_DOUBLE_EQ(expected[i], actual[i]) << "index " << i;
   }
+}
+
+TEST(deserializer_opencl_varmat, explicit_layout) {
+  stan::math::nested_rev_autodiff nested;
+  using mat_t = stan::math::matrix_cl<double>;
+  using var_mat = stan::math::var_value<mat_t>;
+  const size_t align = stan::io::internal::align_elems_from_device();
+  stan::io::serializer_layout layout({1, 0, 2}, align);
+  layout.sizes_offsets_[2].second = 3 * align;
+  layout.total_size_ = 3 * align + 2;
+  Eigen::VectorXd values = Eigen::VectorXd::Zero(layout.total_size_);
+  values[0] = 1;
+  values[3 * align] = 2;
+  values[3 * align + 1] = 3;
+  var_mat parent{mat_t(values)};
+  parent.val().wait_for_write_events();
+  parent.adj().wait_for_write_events();
+  std::vector<int> theta_i;
+  stan::io::deserializer<var_mat> deserializer(parent, theta_i, layout);
+
+  EXPECT_THROW(deserializer.read<var_mat>(2), std::invalid_argument);
+  auto first = deserializer.read<var_mat>(1);
+  EXPECT_EQ(deserializer.read<var_mat>(0).val().size(), 0);
+  auto last = deserializer.read<var_mat>(2);
+  EXPECT_EQ(deserializer.available(), 0U);
+  EXPECT_THROW(deserializer.read<var_mat>(1), std::runtime_error);
+  stan::math::var objective
+      = stan::math::dot_self(first) + stan::math::dot_self(last);
+  objective.grad();
+  Eigen::VectorXd actual = stan::math::from_matrix_cl(parent.adj());
+  for (Eigen::Index i = 0; i < values.size(); ++i) {
+    EXPECT_DOUBLE_EQ(actual[i], 2 * values[i]) << "index " << i;
+  }
+
+  auto invalid_layout = layout;
+  ++invalid_layout.total_size_;
+  EXPECT_THROW(
+      (stan::io::deserializer<var_mat>(parent, theta_i, invalid_layout)),
+      std::invalid_argument);
+  invalid_layout = layout;
+  invalid_layout.sizes_offsets_[0].second = layout.total_size_;
+  stan::io::deserializer<var_mat> invalid(parent, theta_i, invalid_layout);
+  EXPECT_THROW(invalid.read<var_mat>(1), std::runtime_error);
 }
 
 TEST(deserializer_opencl_varmat, appends_all_child_events) {
