@@ -615,7 +615,7 @@ TEST(ModelIndexing, lvalueMatrixMultiMulti) {
   EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
 
   test_throw(x, y, index_min_max(2, 3), index_min(0));
-  test_throw(x, y, index_min_max(2, 3), index_min(10));
+  test_throw_ia(x, y, index_min_max(2, 3), index_min(10));
   test_throw_ia(x, y, index_min_max(1, 3), index_min(2));
 
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
@@ -1113,7 +1113,7 @@ TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
   EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
 
   test_throw(x, y, index_min_max(2, 3), index_min(0));
-  test_throw(x, y, index_min_max(2, 3), index_min(10));
+  test_throw_ia(x, y, index_min_max(2, 3), index_min(10));
   test_throw_ia(x, y, index_min_max(1, 3), index_min(2));
 }
 

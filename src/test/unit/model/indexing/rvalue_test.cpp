@@ -100,9 +100,9 @@ TEST(ModelIndexing, rvalue_vector_min_nil) {
       EXPECT_FLOAT_EQ(x[n + k], rx[n]);
   }
 
-  EXPECT_THROW(rvalue(x, "", index_min(7)), std::domain_error);
+  EXPECT_EQ(0, rvalue(x, "", index_min(7)).size());
 
-  // test_out_of_range(x, index_min(0));
+  test_out_of_range(x, index_min(0));
 }
 
 TEST(ModelIndexing, rvalue_eigen_vector_min_nil) {
@@ -115,7 +115,7 @@ TEST(ModelIndexing, rvalue_eigen_vector_min_nil) {
       EXPECT_FLOAT_EQ(x[n + k - 1], rx[n]);
   }
 
-  test_out_of_range(x, index_min(7));
+  EXPECT_EQ(0, rvalue(x, "", index_min(7)).size());
   test_out_of_range(x, index_min(0));
 }
 

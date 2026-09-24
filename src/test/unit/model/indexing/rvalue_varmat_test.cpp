@@ -524,7 +524,7 @@ TEST_F(RvalueRev, min_uni_mat) {
   EXPECT_MATRIX_EQ(y.adj(), y_exp_adj);
 
   test_throw_out_of_range(x, index_min(0), index_uni(3));
-  test_throw_out_of_range(x, index_min(20), index_uni(3));
+  EXPECT_EQ(0, rvalue(x, "", index_min(20), index_uni(3)).size());
   test_throw_out_of_range(x, index_min(2), index_uni(0));
   test_throw_out_of_range(x, index_min(2), index_uni(30));
 }
@@ -784,7 +784,7 @@ TEST_F(RvalueRev, min_mat) {
   EXPECT_MATRIX_EQ(x.adj(), x_exp_adj);
   EXPECT_MATRIX_EQ(y.adj(), y_exp_adj);
   test_throw_out_of_range(x, index_min(0));
-  test_throw_out_of_range(x, index_min(12));
+  EXPECT_EQ(0, rvalue(x, "", index_min(12)).size());
 }
 
 TEST_F(RvalueRev, uni_min_mat) {
@@ -807,7 +807,7 @@ TEST_F(RvalueRev, uni_min_mat) {
   test_throw_out_of_range(x, index_uni(0), index_min(2));
   test_throw_out_of_range(x, index_uni(12), index_min(2));
   test_throw_out_of_range(x, index_uni(1), index_min(0));
-  test_throw_out_of_range(x, index_uni(1), index_min(12));
+  EXPECT_EQ(0, rvalue(x, "", index_uni(1), index_min(12)).size());
 }
 
 TEST_F(RvalueRev, min_min_mat) {
@@ -830,9 +830,9 @@ TEST_F(RvalueRev, min_min_mat) {
   EXPECT_MATRIX_EQ(x.adj(), x_exp_adj);
   EXPECT_MATRIX_EQ(y.adj(), y_exp_adj);
   test_throw_out_of_range(x, index_min(0), index_min(3));
-  test_throw_out_of_range(x, index_min(12), index_min(3));
+  EXPECT_EQ(0, rvalue(x, "", index_min(12), index_min(3)).size());
   test_throw_out_of_range(x, index_min(2), index_min(0));
-  test_throw_out_of_range(x, index_min(2), index_min(12));
+  EXPECT_EQ(0, rvalue(x, "", index_min(2), index_min(12)).size());
 }
 
 TEST_F(RvalueRev, minmax_min_matrix) {
@@ -853,7 +853,7 @@ TEST_F(RvalueRev, minmax_min_matrix) {
   test_throw_out_of_range(x, index_min_max(0, 3), index_min(2));
   test_throw_out_of_range(x, index_min_max(2, 7), index_min(2));
   test_throw_out_of_range(x, index_min_max(2, 3), index_min(0));
-  test_throw_out_of_range(x, index_min_max(2, 3), index_min(7));
+  EXPECT_EQ(0, rvalue(x, "", index_min_max(2, 3), index_min(7)).size());
 }
 
 // max
@@ -895,7 +895,7 @@ TEST_F(RvalueRev, min_max_matrix) {
   EXPECT_MATRIX_EQ(x.adj(), x_exp_adj);
   EXPECT_MATRIX_EQ(y.adj(), y_exp_adj);
   test_throw_out_of_range(x, index_min(0), index_max(2));
-  test_throw_out_of_range(x, index_min(12), index_max(3));
+  EXPECT_EQ(0, rvalue(x, "", index_min(12), index_max(3)).size());
   test_throw_out_of_range(x, index_min(2), index_max(12));
   EXPECT_NO_THROW(rvalue(x, "", index_min(2), index_max(0)));
 }

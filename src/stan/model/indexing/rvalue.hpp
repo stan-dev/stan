@@ -25,6 +25,8 @@ namespace model {
  * index_max - index from 1:max
  * index_min_max - index from min:max
  * nil_index_list - no-op
+ * Ranges are empty when the lower bound exceeds the upper bound, including
+ * min > N for index_min and max < 1 for index_max.
  * The order of the overloads are
  * vector / row_vector:
  *  - all index overloads
@@ -211,8 +213,12 @@ inline auto rvalue(Vec&& v, const char* name, index_min_max idx) {
 template <typename Vec, require_vector_t<Vec>* = nullptr,
           require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x, const char* name, index_min idx) {
-  stan::math::check_range("vector[min] indexing", name, x.size(), idx.min_);
-  return x.tail(x.size() - idx.min_ + 1);
+  if (idx.min_ <= x.size()) {
+    stan::math::check_range("vector[min] indexing", name, x.size(), idx.min_);
+    return x.tail(x.size() - idx.min_ + 1);
+  } else {
+    return x.tail(0);
+  }
 }
 
 /**
@@ -301,9 +307,12 @@ inline auto rvalue(EigMat&& x, const char* name, MultiIndex&& idx) {
  */
 template <typename Mat, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, index_min idx) {
-  const auto row_size = x.rows() - (idx.min_ - 1);
-  math::check_range("matrix[min] row indexing", name, x.rows(), idx.min_);
-  return x.bottomRows(row_size);
+  if (idx.min_ <= x.rows()) {
+    math::check_range("matrix[min] row indexing", name, x.rows(), idx.min_);
+    return x.bottomRows(x.rows() - idx.min_ + 1);
+  } else {
+    return x.bottomRows(0);
+  }
 }
 
 /**
@@ -637,10 +646,14 @@ inline auto rvalue(Mat&& x, const char* name, Idx&& row_idx,
 template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, Idx&& row_idx,
                    index_min col_idx) {
-  const Eigen::Index col_size = x.cols() - (col_idx.min_ - 1);
-  math::check_range("matrix[..., min] column indexing", name, x.cols(),
-                    col_idx.min_);
-  return rvalue(x.rightCols(col_size), name, std::forward<Idx>(row_idx));
+  if (col_idx.min_ <= x.cols()) {
+    math::check_range("matrix[..., min] column indexing", name, x.cols(),
+                      col_idx.min_);
+    const Eigen::Index col_size = x.cols() - col_idx.min_ + 1;
+    return rvalue(x.rightCols(col_size), name, std::forward<Idx>(row_idx));
+  } else {
+    return rvalue(x.rightCols(0), name, std::forward<Idx>(row_idx));
+  }
 }
 
 /**
