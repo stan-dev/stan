@@ -5,6 +5,12 @@
 #include <stan/model/model_base_crtp.hpp>
 #include <stan/math.hpp>
 
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/rev.hpp>
+#include <stan/io/opencl/deserializer.hpp>
+#include <stan/io/opencl/utils.hpp>
+#endif
+
 #include <stan/io/deserializer.hpp>
 #include <stan/io/serializer.hpp>
 

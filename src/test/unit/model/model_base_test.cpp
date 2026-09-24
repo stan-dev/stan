@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/model/model_base.hpp>
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/matrix_cl.hpp>
+#endif
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -21,7 +24,7 @@ struct mock_model : public stan::model::model_base {
 
   void get_param_names(std::vector<std::string>& names, bool include_tparams,
                        bool include_gqs) const override {}
-  void get_dims(std::vector<std::vector<size_t> >& dimss, bool include_tparams,
+  void get_dims(std::vector<std::vector<size_t>>& dimss, bool include_tparams,
                 bool include_gqs) const override {}
 
   void constrained_param_names(std::vector<std::string>& param_names,
@@ -41,6 +44,53 @@ struct mock_model : public stan::model::model_base {
                            std::ostream* msgs) const override {
     return 2;
   }
+
+#ifdef STAN_OPENCL
+  stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
+                           std::ostream* msgs) const override {
+    return 9;
+  }
+
+  stan::math::var log_prob(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const override {
+    return 10;
+  }
+
+  stan::math::var log_prob_jacobian(stan::math::matrix_cl<double>& params_r,
+                                    std::ostream* msgs) const override {
+    return 11;
+  }
+
+  stan::math::var log_prob_jacobian(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const override {
+    return 12;
+  }
+
+  stan::math::var log_prob_propto(stan::math::matrix_cl<double>& params_r,
+                                  std::ostream* msgs) const override {
+    return 13;
+  }
+
+  stan::math::var log_prob_propto(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const override {
+    return 14;
+  }
+
+  stan::math::var log_prob_propto_jacobian(
+      stan::math::matrix_cl<double>& params_r,
+      std::ostream* msgs) const override {
+    return 15;
+  }
+
+  stan::math::var log_prob_propto_jacobian(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const override {
+    return 16;
+  }
+#endif
 
   double log_prob_jacobian(Eigen::VectorXd& params_r,
                            std::ostream* msgs) const override {
@@ -244,3 +294,44 @@ TEST(model, modelTemplateLogProb) {
   EXPECT_FLOAT_EQ(21, v12);
 #endif
 }
+
+#ifdef STAN_OPENCL
+TEST(model, modelOpenclLogProbDispatch) {
+  stan::math::nested_rev_autodiff nested;
+  mock_model model(0);
+  stan::model::model_base& base = model;
+  stan::math::matrix_cl<double> values;
+  stan::math::var_value<stan::math::matrix_cl<double>> vars{
+      stan::math::matrix_cl<double>()};
+  EXPECT_DOUBLE_EQ(9, base.log_prob(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(9, (base.log_prob<false, false>(values, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob(values, nullptr), std::runtime_error);
+  EXPECT_DOUBLE_EQ(10, base.log_prob(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(10, (base.log_prob<false, false>(vars, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob(vars, nullptr), std::runtime_error);
+  EXPECT_DOUBLE_EQ(11, base.log_prob_jacobian(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(11, (base.log_prob<false, true>(values, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob_jacobian(values, nullptr),
+               std::runtime_error);
+  EXPECT_DOUBLE_EQ(12, base.log_prob_jacobian(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(12, (base.log_prob<false, true>(vars, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob_jacobian(vars, nullptr),
+               std::runtime_error);
+  EXPECT_DOUBLE_EQ(13, base.log_prob_propto(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(13, (base.log_prob<true, false>(values, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob_propto(values, nullptr),
+               std::runtime_error);
+  EXPECT_DOUBLE_EQ(14, base.log_prob_propto(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(14, (base.log_prob<true, false>(vars, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob_propto(vars, nullptr),
+               std::runtime_error);
+  EXPECT_DOUBLE_EQ(15, base.log_prob_propto_jacobian(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(15, (base.log_prob<true, true>(values, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob_propto_jacobian(values, nullptr),
+               std::runtime_error);
+  EXPECT_DOUBLE_EQ(16, base.log_prob_propto_jacobian(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(16, (base.log_prob<true, true>(vars, nullptr).val()));
+  EXPECT_THROW(base.model_base::log_prob_propto_jacobian(vars, nullptr),
+               std::runtime_error);
+}
+#endif
