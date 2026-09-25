@@ -48,7 +48,7 @@ int test_gradients(const Model& model, std::vector<double>& params_r,
   double lp = log_prob_grad<propto, jacobian_adjust_transform>(
       model, params_r, params_i, grad, &msg);
   if (msg.str().length() > 0) {
-    logger.info(msg);
+    log_if_nonempty(logger, msg);
     parameter_writer(msg.str());
   }
 
@@ -56,7 +56,7 @@ int test_gradients(const Model& model, std::vector<double>& params_r,
   finite_diff_grad<false, true, Model>(model, interrupt, params_r, params_i,
                                        grad_fd, epsilon, &msg);
   if (msg.str().length() > 0) {
-    logger.info(msg);
+    log_if_nonempty(logger, msg);
     parameter_writer(msg.str());
   }
 
