@@ -6,6 +6,7 @@
 #include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/string_utils.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <algorithm>
 #include <iostream>
 #include <locale>
@@ -452,6 +453,26 @@ class json_data_handler : public stan::json::json_handler {
    *  update dimensions for array of tuple variables.
    */
   void end_text() { update_array_dims(); }
+
+  /**
+   * Return the number of scalar values in each tuple-free array block.
+   * Unlike the dimensions in vars_r and vars_i after end_text(), these
+   * sizes exclude enclosing arrays of tuples.
+   *
+   * @return Map from leaf names to the size of one array block.
+   */
+  boost::unordered_flat_map<std::string, size_t> array_block_sizes() const {
+    boost::unordered_flat_map<std::string, size_t> sizes;
+    for (const auto& slot : slot_dims_map) {
+      if (slot_types_map.at(slot.first) != meta_type::ARRAY)
+        continue;
+      size_t size = 1;
+      for (size_t dim : slot.second.dims)
+        size *= dim;
+      sizes.emplace(slot.first, size);
+    }
+    return sizes;
+  }
 
   /** A key is either a top-level Stan variable name or a tuple slot id.
    *  Logic handles edge case where key is the first slot of a tuple;

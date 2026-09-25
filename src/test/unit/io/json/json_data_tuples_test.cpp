@@ -8,6 +8,105 @@
 #include <test/unit/io/json/util.hpp>
 
 #include <gtest/gtest.h>
+#include <complex>
+#include <sstream>
+
+TEST(ioJsonTuples, jsonData_array_tuple_complex_scalar) {
+  std::stringstream in(R"({
+    "d": [{"1": 1.0, "2": [2.0, 3.0]},
+          {"1": 4.0, "2": [5.0, 6.0]}],
+    "e": [{"1": [7.0, 8.0], "2": 9.0},
+          {"1": [10.0, 11.0], "2": 12.0}],
+    "f": {"1": 13.0, "2": [14.0, 15.0]}
+  })");
+  stan::json::json_data jdata(in);
+
+  test_real_var(jdata, "d.1", {1.0, 4.0}, {2});
+  test_real_var(jdata, "e.2", {9.0, 12.0}, {2});
+  test_real_var(jdata, "f.1", {13.0}, {});
+
+  EXPECT_EQ((std::vector<size_t>{2, 2}), jdata.dims_r("d.2"));
+  EXPECT_EQ((std::vector<size_t>{2, 2}), jdata.dims_r("e.1"));
+  EXPECT_EQ((std::vector<size_t>{2}), jdata.dims_r("f.2"));
+
+  // Real and imaginary components must belong to the same tuple instance.
+  EXPECT_EQ((std::vector<std::complex<double>>{{2.0, 3.0}, {5.0, 6.0}}),
+            jdata.vals_c("d.2"));
+  EXPECT_EQ((std::vector<std::complex<double>>{{7.0, 8.0}, {10.0, 11.0}}),
+            jdata.vals_c("e.1"));
+  EXPECT_EQ((std::vector<std::complex<double>>{{14.0, 15.0}}),
+            jdata.vals_c("f.2"));
+}
+
+TEST(ioJsonTuples, jsonData_nested_array_tuple_complex_integer) {
+  std::stringstream in(R"({"x": [
+    {"1": [{"1": [[1, 101], [2, 102], [3, 103]]},
+           {"1": [[4, 104], [5, 105], [6, 106]]}]},
+    {"1": [{"1": [[7, 107], [8, 108], [9, 109]]},
+           {"1": [[10, 110], [11, 111], [12, 112]]}]}
+  ]})");
+  stan::json::json_data jdata(in);
+
+  EXPECT_TRUE(jdata.contains_i("x.1.1"));
+  EXPECT_EQ((std::vector<size_t>{2, 2, 3, 2}), jdata.dims_r("x.1.1"));
+  EXPECT_EQ((std::vector<std::complex<double>>{{1, 101},
+                                               {2, 102},
+                                               {3, 103},
+                                               {4, 104},
+                                               {5, 105},
+                                               {6, 106},
+                                               {7, 107},
+                                               {8, 108},
+                                               {9, 109},
+                                               {10, 110},
+                                               {11, 111},
+                                               {12, 112}}),
+            jdata.vals_c("x.1.1"));
+  EXPECT_EQ(
+      (std::vector<int>{1, 2, 3, 101, 102, 103, 4,  5,  6,  104, 105, 106,
+                        7, 8, 9, 107, 108, 109, 10, 11, 12, 110, 111, 112}),
+      jdata.vals_i("x.1.1"));
+}
+
+TEST(ioJsonTuples, jsonData_array_tuple_complex_matrix) {
+  std::stringstream in(R"({"x": [
+    {"1": [[[1, 101], [2, 102], [3, 103]],
+           [[4, 104], [5, 105], [6, 106]]]},
+    {"1": [[[7.5, 107.5], [8, 108], [9, 109]],
+           [[10, 110], [11, 111], [12, 112]]]}
+  ]})");
+  stan::json::json_data jdata(in);
+
+  EXPECT_FALSE(jdata.contains_i("x.1"));
+  EXPECT_EQ((std::vector<size_t>{2, 2, 3, 2}), jdata.dims_r("x.1"));
+  EXPECT_EQ((std::vector<std::complex<double>>{{1, 101},
+                                               {4, 104},
+                                               {2, 102},
+                                               {5, 105},
+                                               {3, 103},
+                                               {6, 106},
+                                               {7.5, 107.5},
+                                               {10, 110},
+                                               {8, 108},
+                                               {11, 111},
+                                               {9, 109},
+                                               {12, 112}}),
+            jdata.vals_c("x.1"));
+  EXPECT_EQ((std::vector<double>{1,   4,   2,     5,   3,   6,   101, 104,
+                                 102, 105, 103,   106, 7.5, 10,  8,   11,
+                                 9,   12,  107.5, 110, 108, 111, 109, 112}),
+            jdata.vals_r("x.1"));
+}
+
+TEST(ioJsonTuples, jsonData_array_tuple_complex_empty) {
+  std::stringstream in(R"({"x": [{"1": []}, {"1": []}],
+                           "y": [{"1": [[], []]}, {"1": [[], []]}]})");
+  stan::json::json_data jdata(in);
+
+  EXPECT_TRUE(jdata.vals_c("x.1").empty());
+  EXPECT_TRUE(jdata.vals_c("y.1").empty());
+  EXPECT_TRUE(jdata.vals_c("missing").empty());
+}
 
 // tuple(int, real) x - also real y;
 TEST(ioJsonTuples, jsonData_tuple_int_real) {
