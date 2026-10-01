@@ -6,9 +6,13 @@
 #endif
 #include <stan/io/var_context.hpp>
 #include <stan/math/rev/core.hpp>
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/matrix_cl.hpp>
+#endif
 #include <stan/model/prob_grad.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -105,7 +109,7 @@ class model_base : public prob_grad {
    * @param[in] include_gqs true if generated quantities should be
    * included
    */
-  virtual void get_dims(std::vector<std::vector<size_t> >& dimss,
+  virtual void get_dims(std::vector<std::vector<size_t>>& dimss,
                         bool include_tparams = true,
                         bool include_gqs = true) const = 0;
   /**
@@ -202,6 +206,121 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob(Eigen::Matrix<math::var, -1, 1>& params_r,
                              std::ostream* msgs) const = 0;
+
+#ifdef STAN_OPENCL
+  /**
+   * Return the log density for the specified OpenCL unconstrained parameters,
+   * without Jacobian and with normalizing constants for probability functions.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::var log_prob(math::matrix_cl<double>& params_r,
+                             std::ostream* msgs) const {
+    throw std::runtime_error("OpenCL log_prob not implemented for this model.");
+  }
+
+  /**
+   * Return the log density for the specified OpenCL unconstrained parameters,
+   * without Jacobian and with normalizing constants for probability functions.
+   *
+   * @param[in] params_r unconstrained parameters on the device with adjoints
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::var log_prob(math::var_value<math::matrix_cl<double>>& params_r,
+                             std::ostream* msgs) const {
+    throw std::runtime_error("OpenCL log_prob not implemented for this model.");
+  }
+
+  /**
+   * Return the OpenCL log density with Jacobian, including constants.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   * @throws std::runtime_error if the model does not implement this overload
+   */
+  virtual math::var log_prob_jacobian(math::matrix_cl<double>& params_r,
+                                      std::ostream* msgs) const {
+    throw std::runtime_error(
+        "OpenCL log_prob_jacobian not implemented for this model.");
+  }
+
+  /**
+   * Return the OpenCL log density with Jacobian, including constants.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   * @throws std::runtime_error if the model does not implement this overload
+   */
+  virtual math::var log_prob_jacobian(
+      math::var_value<math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const {
+    throw std::runtime_error(
+        "OpenCL log_prob_jacobian not implemented for this model.");
+  }
+
+  /**
+   * Return the OpenCL log density without Jacobian, dropping constants.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   * @throws std::runtime_error if the model does not implement this overload
+   */
+  virtual math::var log_prob_propto(math::matrix_cl<double>& params_r,
+                                    std::ostream* msgs) const {
+    throw std::runtime_error(
+        "OpenCL log_prob_propto not implemented for this model.");
+  }
+
+  /**
+   * Return the OpenCL log density without Jacobian, dropping constants.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   * @throws std::runtime_error if the model does not implement this overload
+   */
+  virtual math::var log_prob_propto(
+      math::var_value<math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const {
+    throw std::runtime_error(
+        "OpenCL log_prob_propto not implemented for this model.");
+  }
+
+  /**
+   * Return the OpenCL log density with Jacobian, dropping constants.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   * @throws std::runtime_error if the model does not implement this overload
+   */
+  virtual math::var log_prob_propto_jacobian(math::matrix_cl<double>& params_r,
+                                             std::ostream* msgs) const {
+    throw std::runtime_error(
+        "OpenCL log_prob_propto_jacobian not implemented for this model.");
+  }
+
+  /**
+   * Return the OpenCL log density with Jacobian, dropping constants.
+   *
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   * @throws std::runtime_error if the model does not implement this overload
+   */
+  virtual math::var log_prob_propto_jacobian(
+      math::var_value<math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const {
+    throw std::runtime_error(
+        "OpenCL log_prob_propto_jacobian not implemented for this model.");
+  }
+#endif
 
   /**
    * Return the log density for the specified unconstrained
@@ -336,6 +455,55 @@ class model_base : public prob_grad {
       return log_prob(params_r, msgs);
     }
   }
+
+#ifdef STAN_OPENCL
+  /**
+   * Dispatch to the OpenCL log density with the requested adjustments.
+   *
+   * @tparam propto true to drop normalizing constants
+   * @tparam jacobian true to include the log Jacobian adjustment
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density with the requested adjustments
+   */
+  template <bool propto, bool jacobian>
+  inline math::var log_prob(math::matrix_cl<double>& params_r,
+                            std::ostream* msgs) const {
+    if constexpr (propto && jacobian) {
+      return log_prob_propto_jacobian(params_r, msgs);
+    } else if constexpr (propto) {
+      return log_prob_propto(params_r, msgs);
+    } else if constexpr (jacobian) {
+      return log_prob_jacobian(params_r, msgs);
+    } else {
+      return log_prob(params_r, msgs);
+    }
+  }
+
+  /**
+   * Dispatch to the OpenCL log density with the requested adjustments.
+   *
+   * @tparam propto true to drop normalizing constants
+   * @tparam jacobian true to include the log Jacobian adjustment
+   * @param[in] params_r unconstrained parameters on the device
+   * @param[in,out] msgs message stream
+   * @return log density with the requested adjustments
+   */
+  template <bool propto, bool jacobian>
+  inline math::var log_prob(math::var_value<math::matrix_cl<double>>& params_r,
+                            std::ostream* msgs) const {
+    if constexpr (propto && jacobian) {
+      return log_prob_propto_jacobian(params_r, msgs);
+    } else if constexpr (propto) {
+      return log_prob_propto(params_r, msgs);
+    } else if constexpr (jacobian) {
+      return log_prob_jacobian(params_r, msgs);
+    } else {
+      return log_prob(params_r, msgs);
+    }
+  }
+
+#endif
 
   /**
    * Read constrained parameter values from the specified context,
