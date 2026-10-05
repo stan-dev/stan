@@ -14,6 +14,12 @@ class covar_adaptation : public windowed_adaptation {
   explicit covar_adaptation(int n)
       : windowed_adaptation("covariance"), estimator_(n) {}
 
+  /**
+   * Return true if covariance was updated and adaptation is not finished
+   *
+   * @param covar Covariance
+   * @param q Last draw
+   */
   bool learn_covariance(Eigen::MatrixXd& covar, const Eigen::VectorXd& q) {
     if (adaptation_window())
       estimator_.add_sample(q);
@@ -38,11 +44,11 @@ class covar_adaptation : public windowed_adaptation {
 
       estimator_.restart();
 
-      ++adapt_window_counter_;
-      return true;
+      increment_window_counter();
+      return true && !finished();
     }
 
-    ++adapt_window_counter_;
+    increment_window_counter();
     return false;
   }
 
