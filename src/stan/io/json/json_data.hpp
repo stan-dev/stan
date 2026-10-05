@@ -36,16 +36,13 @@ namespace json {
  * stored as a vector of ints, else the array will be stored
  * as a vector of type double.
  *
- * <p>A variable nested inside one or more arrays of tuples is named by the
- * dotted path to its innermost tuple slot.  Its dimensions are the dimensions
- * of the enclosing arrays followed by the dimensions of the variable itself,
- * and its values hold one contiguous block per enclosing tuple element, laid
- * out back to back.  The enclosing array dimensions are in element (row-major)
- * order, while the values within each block are column-major as above; this
- * mixed layout is the convention assumed by
- * <code>stan::io::read_from_context</code>.  The dimension vector alone does
- * not say where the enclosing dimensions end and the variable's own begin,
- * so <code>var_entry::num_outer_dims</code> records that split.
+ * <p>A variable inside an array of tuples is named by the dotted path to its
+ * tuple slot.  Given <code>"x": [ [[1, 2, 3], 4], [[5, 6, 7], 8] ]</code>,
+ * slot <code>x.1</code> has dims <code>{2, 3}</code> and values
+ * <code>{1, 2, 3, 5, 6, 7}</code>.  The leading 2 is the enclosing array,
+ * which is in element order; the 3 values of each block are column-major as
+ * above.  <code>var_entry::num_outer_arrays</code> records how many leading
+ * dimensions are enclosing arrays, which <code>dims</code> alone cannot say.
  *
  * <p><code>json_data</code> objects are created by using the
  * <code>json_parser</code> and a <code>json_data_handler</code>
@@ -76,29 +73,30 @@ class json_data : public stan::io::var_context {
   /**
    * Decode complex components within each innermost array block.
    *
-   * Values are stored as one block per enclosing tuple element, laid out
-   * back to back.  Within a block the real components precede the imaginary
-   * ones, so the component of a value is a half block away from its real part.
+   * A block holds all the real components first, then all the imaginary
+   * ones, so a block of 6 values <code>{r0, r1, r2, i0, i1, i2}</code>
+   * decodes to <code>{(r0,i0), (r1,i1), (r2,i2)}</code>.  An array of tuples
+   * contributes one such block per tuple element, laid out back to back.
    *
    * @tparam T Stored scalar type, either int or double.
    * @param name Variable name.
-   * @param var Stored values and dimensions for the variable.
+   * @param entry Stored values and dimensions for the variable.
    * @return Complex values in the order of the input blocks.
    * @throw json_error if nonempty data has no trailing component dimension 2.
    */
   template <typename T>
-  std::vector<std::complex<double>> vals_c_impl(const std::string &name,
-                                                const var_entry<T> &var) const {
-    const auto &values = var.values;
+  std::vector<std::complex<double>> vals_c_impl(
+      const std::string &name, const var_entry<T> &entry) const {
+    const auto &values = entry.values;
     if (values.empty())
       return {};
     // The trailing 2 must be the variable's own, not an enclosing array dim.
-    if (!var.has_own_dims() || var.dims.back() != 2) {
+    if (!entry.is_array() || entry.dims.back() != 2) {
       throw json_error("Variable: " + name
                        + ", expected a trailing dimension of 2 for complex "
                          "values.");
     }
-    const size_t block_size = var.block_size();
+    const size_t block_size = entry.block_size();
     const size_t half_block = block_size / 2;
     std::vector<std::complex<double>> result;
     result.reserve(values.size() / 2);
