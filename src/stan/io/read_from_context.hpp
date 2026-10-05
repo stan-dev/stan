@@ -274,6 +274,25 @@ void check_consumed(const InVec& values, std::size_t position,
 }
 
 /**
+ * @brief Read a destination that holds no tuples, so its buffer is one
+ * payload consumed in full. Equivalent to walking an empty tuple-field path,
+ * without instantiating the path machinery.
+ * @tparam T Tuple-free destination type with its dimensions already set.
+ * @tparam InVec Input buffer type holding int values for integer
+ * destinations or double values for real and complex destinations.
+ * @param[in,out] x Destination with every container dimension allocated.
+ * @param[in] values Buffer loaded for this variable.
+ * @param[in] path Variable name, used in the error message.
+ * @throw std::runtime_error if the buffer does not match the destination.
+ */
+template <typename T, typename InVec>
+inline void read_whole_payload(T& x, const InVec& values, const std::string& path) {
+  std::size_t position = 0;
+  internal::read_from_buffer_block(x, values, position);
+  internal::check_consumed(values, position, path);
+}
+
+/**
  * @brief Load and write one named leaf at a time, releasing each buffer before
  * loading the next. Discover tuple paths from types, including for empty
  * arrays.
@@ -381,6 +400,16 @@ inline void read_from_context(T& x, const Context& context,
                                + path);
     }
     x = values[0];
+  } else if constexpr (std::is_same_v<T, std::vector<int>>) {
+    internal::read_whole_payload(x, context.vals_i(path), path);
+  } else if constexpr (std::is_same_v<T, std::vector<double>>) {
+    internal::read_whole_payload(x, context.vals_r(path), path);
+  } else if constexpr (is_eigen<T>::value
+                       && std::is_same_v<scalar_type_t<T>, int>) {
+    internal::read_whole_payload(x, context.vals_i(path), path);
+  } else if constexpr (is_eigen<T>::value
+                       && std::is_same_v<scalar_type_t<T>, double>) {
+    internal::read_whole_payload(x, context.vals_r(path), path);
   } else {
     internal::load_from_context<T>(x, context, path, std::index_sequence<>{});
   }
