@@ -13,7 +13,6 @@
 #include <locale>
 #include <ostream>
 #include <limits>
-#include <map>
 #include <numeric>
 #include <sstream>
 #include <string>
@@ -73,16 +72,19 @@ struct string_hash {
   }
 };
 
-/** Name-keyed map used for the handler's parse-time bookkeeping. */
+/** Name-keyed map used for the handler's bookkeeping and for its results.
+ *  Nothing depends on the iteration order: names_r and names_i are its only
+ *  consumers and var_context does not promise one.
+ */
 template <typename T>
 using string_map
     = boost::unordered_flat_map<std::string, T, string_hash, std::equal_to<>>;
 
-typedef var_entry<double> var_r;
-typedef var_entry<int> var_i;
+using var_r = var_entry<double>;
+using var_i = var_entry<int>;
 
-typedef std::map<std::string, var_r> vars_map_r;
-typedef std::map<std::string, var_i> vars_map_i;
+using vars_map_r = string_map<var_r>;
+using vars_map_i = string_map<var_i>;
 
 /** Enum of the kinds of structures the handler needs to manage.
  *  Determined by the initial sequence of start elements following
