@@ -70,74 +70,97 @@ inline void read_from_buffer(std::complex<double>& x,
 }
 
 /**
- * @brief Read an Eigen object in logical column-major order without advancing
- * a consumption cursor.
- * @tparam EigMat Writable Eigen destination type with int, double, or
- * std::complex<double> coefficients.
+ * @brief Map a strided column-major source block onto a destination.
+ * @tparam Source Dense source matrix type matching the buffer's scalar type.
+ * @tparam InVec Contiguous input buffer type, possibly const.
+ */
+template <typename Source, typename InVec>
+inline auto source_block(const InVec& values, std::size_t offset,
+                         Eigen::Index rows, Eigen::Index cols,
+                         std::size_t stride) {
+  using Stride = Eigen::InnerStride<Eigen::Dynamic>;
+  return Eigen::Map<const Source, Eigen::Unaligned, Stride>(
+      values.data() + offset, rows, cols, Stride(stride));
+}
+
+/**
+ * @brief Read an int or real Eigen object in logical column-major order
+ * without advancing a consumption cursor.
+ * @tparam EigMat Writable Eigen destination type with int or double
+ * coefficients.
  * @tparam InVec Contiguous input buffer type with int or double coefficients,
- * possibly const. Integer destinations use integer buffers; real and complex
- * destinations use real buffers.
+ * possibly const. Integer destinations use integer buffers.
  * @param[in,out] x Destination with its rows and columns already allocated.
  * @param[in] values Buffer containing the tuple-free payload to read.
- * @param[in] offset Zero-based source index of the first coefficient's value
- * or real component.
+ * @param[in] offset Zero-based source index of the first coefficient's value.
  * @param[in] stride Positive distance in buffer elements between successive
  * logical column-major coefficients.
- * @param[in] imaginary_offset Distance in buffer elements from each real
- * component to its imaginary component; ignored for non-complex destinations.
  * @pre The caller has validated that all source indices are within values.
  */
 template <typename EigMat, typename InVec, require_eigen_t<EigMat>* = nullptr>
-void read_from_buffer(EigMat& x, InVec& values, std::size_t offset,
-                      std::size_t stride, std::size_t imaginary_offset) {
-  using Scalar = scalar_type_t<EigMat>;
-  const std::size_t size = x.size();
-  if (size == 0) {
+void read_real(EigMat& x, const InVec& values, std::size_t offset,
+               std::size_t stride) {
+  if (x.size() == 0) {
     return;
   }
   using Source
       = Eigen::Matrix<scalar_type_t<InVec>, Eigen::Dynamic, Eigen::Dynamic>;
-  using Stride = Eigen::InnerStride<Eigen::Dynamic>;
-  using SourceMap = Eigen::Map<const Source, Eigen::Unaligned, Stride>;
-  if constexpr (stan::is_complex<Scalar>::value) {
-    x.real()
-        = SourceMap(values.data() + offset, x.rows(), x.cols(), Stride(stride));
-    x.imag() = SourceMap(values.data() + offset + imaginary_offset, x.rows(),
-                         x.cols(), Stride(stride));
-  } else {
-    x = SourceMap(values.data() + offset, x.rows(), x.cols(), Stride(stride));
-  }
+  x = internal::source_block<Source>(values, offset, x.rows(), x.cols(),
+                                     stride);
 }
 
 /**
- * @brief Read a tuple-free array using column-major source strides.
- * Each child uses stride * x.size(); imaginary_offset stays constant within
- * the payload. This function does not advance a consumption cursor.
- * @tparam StdVec Destination std::vector type containing int, double,
- * std::complex<double>, Eigen objects, or nested tuple-free std::vectors.
+ * @brief Read a complex Eigen object in logical column-major order without
+ * advancing a consumption cursor. The real components of the payload precede
+ * the imaginary ones, so each component block is read separately.
+ * @tparam EigMat Writable Eigen destination type with std::complex<double>
+ * coefficients.
+ * @tparam InVec Contiguous input buffer type with double coefficients,
+ * possibly const.
+ * @param[in,out] x Destination with its rows and columns already allocated.
+ * @param[in] values Buffer containing the tuple-free payload to read.
+ * @param[in] offset Zero-based source index of the first real component.
+ * @param[in] stride Positive distance in buffer elements between successive
+ * logical column-major coefficients.
+ * @param[in] imaginary_offset Distance in buffer elements from each real
+ * component to its imaginary component.
+ * @pre The caller has validated that all source indices are within values.
+ */
+template <typename EigMat, typename InVec, require_eigen_t<EigMat>* = nullptr>
+void read_complex(EigMat& x, const InVec& values, std::size_t offset,
+                  std::size_t stride, std::size_t imaginary_offset) {
+  if (x.size() == 0) {
+    return;
+  }
+  using Source
+      = Eigen::Matrix<scalar_type_t<InVec>, Eigen::Dynamic, Eigen::Dynamic>;
+  x.real() = internal::source_block<Source>(values, offset, x.rows(), x.cols(),
+                                            stride);
+  x.imag() = internal::source_block<Source>(values, offset + imaginary_offset,
+                                            x.rows(), x.cols(), stride);
+}
+
+/**
+ * @brief Read an int or real tuple-free array using column-major source
+ * strides. Each child uses stride * x.size(). This function does not advance
+ * a consumption cursor.
+ * @tparam StdVec Destination std::vector type containing int, double, Eigen
+ * objects, or nested tuple-free std::vectors of these.
  * @tparam InVec Input std::vector type holding int values for integer
- * destinations or double values for real and complex destinations.
+ * destinations or double values for real ones.
  * @param[in,out] x Rectangular destination with every dimension allocated.
  * @param[in] values Buffer containing the tuple-free payload to read.
- * @param[in] offset Zero-based source index of the first value or real
- * component in this array.
+ * @param[in] offset Zero-based source index of the first value in this array.
  * @param[in] stride Positive distance in buffer elements between the starting
  * indices of consecutive elements of x.
- * @param[in] imaginary_offset Distance in buffer elements from each real
- * component to its imaginary component; ignored for non-complex destinations.
  * @pre The caller has validated that all source indices are within values.
  */
 template <typename StdVec, typename InVec,
           require_std_vector_t<StdVec>* = nullptr>
-void read_from_buffer(StdVec& x, const InVec& values, std::size_t offset,
-                      std::size_t stride, std::size_t imaginary_offset) {
+void read_real(StdVec& x, const InVec& values, std::size_t offset,
+               std::size_t stride) {
   using T = value_type_t<StdVec>;
-  if constexpr (stan::is_complex<T>::value) {
-    for (std::size_t i = 0; i < x.size(); ++i) {
-      const std::size_t idx = offset + i * stride;
-      internal::read_from_buffer(x[i], values, idx, idx + imaginary_offset);
-    }
-  } else if constexpr (std::is_same_v<T, double> || std::is_same_v<T, int>) {
+  if constexpr (std::is_same_v<T, double> || std::is_same_v<T, int>) {
     using Vec = Eigen::Matrix<T, Eigen::Dynamic, 1>;
     using Stride = Eigen::InnerStride<Eigen::Dynamic>;
     Eigen::Map<Vec>(x.data(), x.size())
@@ -145,9 +168,43 @@ void read_from_buffer(StdVec& x, const InVec& values, std::size_t offset,
             values.data() + offset, x.size(), Stride(stride));
   } else {
     for (std::size_t i = 0; i < x.size(); ++i) {
+      internal::read_real(x[i], values, offset + i * stride, stride * x.size());
+    }
+  }
+}
+
+/**
+ * @brief Read a complex tuple-free array using column-major source strides.
+ * Each child uses stride * x.size(); imaginary_offset stays constant within
+ * the payload. This function does not advance a consumption cursor.
+ * @tparam StdVec Destination std::vector type containing
+ * std::complex<double>, Eigen objects, or nested tuple-free std::vectors of
+ * these.
+ * @tparam InVec Input std::vector type holding double values.
+ * @param[in,out] x Rectangular destination with every dimension allocated.
+ * @param[in] values Buffer containing the tuple-free payload to read.
+ * @param[in] offset Zero-based source index of the first real component in
+ * this array.
+ * @param[in] stride Positive distance in buffer elements between the starting
+ * indices of consecutive elements of x.
+ * @param[in] imaginary_offset Distance in buffer elements from each real
+ * component to its imaginary component.
+ * @pre The caller has validated that all source indices are within values.
+ */
+template <typename StdVec, typename InVec,
+          require_std_vector_t<StdVec>* = nullptr>
+void read_complex(StdVec& x, const InVec& values, std::size_t offset,
+                  std::size_t stride, std::size_t imaginary_offset) {
+  using T = value_type_t<StdVec>;
+  if constexpr (stan::is_complex<T>::value) {
+    for (std::size_t i = 0; i < x.size(); ++i) {
       const std::size_t idx = offset + i * stride;
-      internal::read_from_buffer(x[i], values, idx, stride * x.size(),
-                                 imaginary_offset);
+      internal::read_from_buffer(x[i], values, idx, idx + imaginary_offset);
+    }
+  } else {
+    for (std::size_t i = 0; i < x.size(); ++i) {
+      internal::read_complex(x[i], values, offset + i * stride,
+                             stride * x.size(), imaginary_offset);
     }
   }
 }
@@ -189,7 +246,7 @@ void read_from_buffer_block(T& x, InputVec&& values, std::size_t& position) {
     if constexpr (stan::is_complex<T>::value) {
       internal::read_from_buffer(x, values, position, position + 1);
     } else {
-      internal::read_from_buffer(x, values, position, 1, size);
+      internal::read_complex(x, values, position, 1, size);
     }
     position += 2 * size;
   } else {
@@ -200,7 +257,7 @@ void read_from_buffer_block(T& x, InputVec&& values, std::size_t& position) {
     if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
       internal::read_from_buffer(x, values, position);
     } else {
-      internal::read_from_buffer(x, values, position, 1, 0);
+      internal::read_real(x, values, position, 1);
     }
     position += size;
   }
@@ -286,7 +343,8 @@ void check_consumed(const InVec& values, std::size_t position,
  * @throw std::runtime_error if the buffer does not match the destination.
  */
 template <typename T, typename InVec>
-inline void read_whole_payload(T& x, const InVec& values, const std::string& path) {
+inline void read_whole_payload(T& x, const InVec& values,
+                               const std::string& path) {
   std::size_t position = 0;
   internal::read_from_buffer_block(x, values, position);
   internal::check_consumed(values, position, path);
