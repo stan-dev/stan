@@ -6,8 +6,8 @@
 #include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/string_utils.hpp>
-#include <boost/unordered/unordered_flat_map.hpp>
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <locale>
 #include <ostream>
@@ -23,8 +23,48 @@ namespace stan {
 
 namespace json {
 
-typedef std::pair<std::vector<double>, std::vector<size_t>> var_r;
-typedef std::pair<std::vector<int>, std::vector<size_t>> var_i;
+/** Number of scalar values in an array with the given dimensions. */
+inline size_t size_from_dims(std::vector<size_t>::const_iterator first,
+                             std::vector<size_t>::const_iterator last) {
+  return std::accumulate(first, last, static_cast<size_t>(1),
+                         std::multiplies<size_t>());
+}
+
+inline size_t size_from_dims(const std::vector<size_t>& dims) {
+  return size_from_dims(dims.cbegin(), dims.cend());
+}
+
+/** The values and dimensions of a single Stan variable.
+ *
+ *  For a variable nested in one or more arrays of tuples, `dims` is the
+ *  dimensions of those enclosing arrays followed by the dimensions of the
+ *  variable itself, and `values` holds one contiguous block per enclosing
+ *  tuple element, laid out back to back.  `num_outer_dims` is how many
+ *  leading entries of `dims` belong to the enclosing arrays, which `dims`
+ *  alone does not determine.
+ */
+template <typename T>
+struct var_entry {
+  std::vector<T> values;
+  std::vector<size_t> dims;
+  size_t num_outer_dims = 0;
+
+  /** Dimensions of the variable itself, without the enclosing array dims. */
+  std::vector<size_t>::const_iterator own_dims_begin() const {
+    return dims.cbegin() + num_outer_dims;
+  }
+
+  /** True if the variable itself is an array rather than a scalar. */
+  bool has_own_dims() const { return num_outer_dims < dims.size(); }
+
+  /** Number of values in one enclosing tuple element's block. */
+  size_t block_size() const {
+    return size_from_dims(own_dims_begin(), dims.cend());
+  }
+};
+
+typedef var_entry<double> var_r;
+typedef var_entry<int> var_i;
 
 typedef std::map<std::string, var_r> vars_map_r;
 typedef std::map<std::string, var_i> vars_map_i;
@@ -237,6 +277,17 @@ class json_data_handler : public stan::json::json_handler {
     }
   }
 
+  /* Append one tuple element's block of values to an existing variable.
+   * `dims` is the variable's own shape; update_array_dims() prepends the
+   * dimensions of the enclosing arrays once all elements have been seen.
+   */
+  template <typename T>
+  static void append_block(var_entry<T>& var, const std::vector<T>& values,
+                           const std::vector<size_t>& dims) {
+    var.values.insert(var.values.end(), values.begin(), values.end());
+    var.dims = dims;
+  }
+
   /* Save non-tuple vars and innermost tuple slots to vars_i and vars_r.
    * Converts multi-dim arrays from row-major to column major.
    * For arrays of tuples we need to check that new elements are consistent
@@ -265,23 +316,19 @@ class json_data_handler : public stan::json::json_handler {
         if (is_int) {
           std::vector<int> cm_values_i(values_i.size());
           to_column_major(key, cm_values_i, values_i, dims);
-          values_i.assign(cm_values_i.begin(), cm_values_i.end());
+          values_i = std::move(cm_values_i);
         } else {
           std::vector<double> cm_values_r(values_r.size());
           to_column_major(key, cm_values_r, values_r, dims);
-          values_r.assign(cm_values_r.begin(), cm_values_r.end());
+          values_r = std::move(cm_values_r);
         }
       }
       if (is_new) {
         var_types_map[key] = slot_types_map[key];
         if (is_int) {
-          std::pair<std::vector<int>, std::vector<size_t>> pair;
-          pair = make_pair(values_i, dims);
-          vars_i[key] = pair;
+          vars_i[key] = var_i{values_i, dims, 0};
         } else {
-          std::pair<std::vector<double>, std::vector<size_t>> pair;
-          pair = make_pair(values_r, dims);
-          vars_r[key] = pair;
+          vars_r[key] = var_r{values_r, dims, 0};
         }
       } else {
         bool is_aot = false;
@@ -296,28 +343,11 @@ class json_data_handler : public stan::json::json_handler {
         }
         if (!is_aot)
           unexpected_error(key, "not array of tuples");
-        bool consistent = true;
-        if (is_int || was_int) {
-          auto expect_dims = vars_i[key].second;
-          size_t expect_vals_len = 1;
-          for (auto& x : expect_dims)
-            expect_vals_len *= x;
-          if (is_int) {
-            if (expect_vals_len != values_i.size())
-              consistent = false;
-          } else {
-            if (expect_vals_len != values_r.size())
-              consistent = false;
-          }
-        } else {
-          auto expect_dims = vars_r[key].second;
-          size_t expect_vals_len = 1;
-          for (auto& x : expect_dims)
-            expect_vals_len *= x;
-          if (expect_vals_len != values_r.size())
-            consistent = false;
-        }
-        if (!consistent) {
+        size_t expect_vals_len = (is_int || was_int)
+                                     ? size_from_dims(vars_i[key].dims)
+                                     : size_from_dims(vars_r[key].dims);
+        size_t found_vals_len = is_int ? values_i.size() : values_r.size();
+        if (expect_vals_len != found_vals_len) {
           std::stringstream errorMsg;
           errorMsg << "Variable " << key
                    << ": size mismatch between tuple elements.";
@@ -325,32 +355,27 @@ class json_data_handler : public stan::json::json_handler {
         }
         var_types_map[key] = meta_type::ARRAY;
         if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
+          const std::vector<int>& prev_values = vars_i[key].values;
           std::vector<double> values_tmp;
-          for (auto& x : vars_i[key].first) {
-            values_tmp.push_back(x);
-          }
-          for (auto& x : values_r)
-            values_tmp.push_back(x);
-          std::pair<std::vector<double>, std::vector<size_t>> pair;
-          pair = make_pair(values_tmp, dims);
-          vars_r[key] = pair;
+          values_tmp.reserve(prev_values.size() + values_r.size());
+          values_tmp.insert(values_tmp.end(), prev_values.begin(),
+                            prev_values.end());
+          values_tmp.insert(values_tmp.end(), values_r.begin(), values_r.end());
+          vars_r[key] = var_r{std::move(values_tmp), dims, 0};
           vars_i.erase(key);
         } else if (is_int) {
-          for (auto& x : values_i)
-            vars_i[key].first.push_back(x);
-          vars_i[key].second = dims;
+          append_block(vars_i[key], values_i, dims);
         } else {
-          for (auto& x : values_r)
-            vars_r[key].first.push_back(x);
-          vars_r[key].second = dims;
+          append_block(vars_r[key], values_r, dims);
         }
       }
     }
     key_stack.pop_back();
   }
 
-  /* For array of tuples, concatenate dimensions
-   * Update vars_i and vars_r dimensions accordingly.
+  /* For array of tuples, prepend the dimensions of the enclosing arrays
+   * onto the variable's own dimensions and record where the two meet.
+   * This is the point at which the split is otherwise lost.
    */
   void update_array_dims() {
     for (auto const& var : var_types_map) {
@@ -362,23 +387,24 @@ class json_data_handler : public stan::json::json_handler {
       std::string slot;
       for (size_t i = 0; i < slots.size(); ++i) {
         slot.append(slots[i]);
-        if (slot_dims_map.count(slot) == 1
-            && !slot_dims_map[slot].dims.empty()) {
-          for (auto& x : slot_dims_map[slot].dims)
-            all_dims.push_back(x);
-        }
+        auto it = slot_dims_map.find(slot);
+        if (it != slot_dims_map.end())
+          all_dims.insert(all_dims.end(), it->second.dims.begin(),
+                          it->second.dims.end());
         slot.append(".");
       }
-      if (vars_i.count(var.first) == 1) {
-        if (all_dims.size() == vars_i[var.first].second.size())
-          continue;
-        else
-          vars_i[var.first].second.assign(all_dims.begin(), all_dims.end());
-      } else if (vars_r.count(var.first) == 1) {
-        if (all_dims.size() == vars_r[var.first].second.size())
-          continue;
-        else
-          vars_r[var.first].second.assign(all_dims.begin(), all_dims.end());
+      auto set_dims = [&all_dims](auto& entry) {
+        if (all_dims.size() > entry.dims.size()) {
+          entry.num_outer_dims = all_dims.size() - entry.dims.size();
+          entry.dims = all_dims;
+        }
+      };
+      auto it_i = vars_i.find(var.first);
+      auto it_r = vars_r.find(var.first);
+      if (it_i != vars_i.end()) {
+        set_dims(it_i->second);
+      } else if (it_r != vars_r.end()) {
+        set_dims(it_r->second);
       } else {
         std::stringstream errorMsg;
         errorMsg << "Variable: " << var.first << ", ill-formed JSON.";
@@ -388,13 +414,10 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   template <typename T>
-  void to_column_major(std::string vname, std::vector<T>& cm_vals,
+  void to_column_major(const std::string& vname, std::vector<T>& cm_vals,
                        const std::vector<T>& rm_vals,
                        const std::vector<size_t>& dims) {
-    size_t expected_size = 1;
-    for (auto& x : dims)
-      expected_size *= x;
-    if (expected_size != rm_vals.size()) {
+    if (size_from_dims(dims) != rm_vals.size()) {
       std::stringstream errorMsg;
       errorMsg << "Variable: " << vname << ", error: ill-formed array.";
       throw json_error(errorMsg.str());
@@ -453,26 +476,6 @@ class json_data_handler : public stan::json::json_handler {
    *  update dimensions for array of tuple variables.
    */
   void end_text() { update_array_dims(); }
-
-  /**
-   * Return the number of scalar values in each tuple-free array block.
-   * Unlike the dimensions in vars_r and vars_i after end_text(), these
-   * sizes exclude enclosing arrays of tuples.
-   *
-   * @return Map from leaf names to the size of one array block.
-   */
-  boost::unordered_flat_map<std::string, size_t> array_block_sizes() const {
-    boost::unordered_flat_map<std::string, size_t> sizes;
-    for (const auto& slot : slot_dims_map) {
-      if (slot_types_map.at(slot.first) != meta_type::ARRAY)
-        continue;
-      size_t size = 1;
-      for (size_t dim : slot.second.dims)
-        size *= dim;
-      sizes.emplace(slot.first, size);
-    }
-    return sizes;
-  }
 
   /** A key is either a top-level Stan variable name or a tuple slot id.
    *  Logic handles edge case where key is the first slot of a tuple;
@@ -744,7 +747,7 @@ class json_data_handler : public stan::json::json_handler {
   /** This function provides the column-major offset of an array element
    *  given its row-major offset and the array dimensions.
    */
-  size_t convert_offset_rtl_2_ltr(std::string vname, size_t rtl_offset,
+  size_t convert_offset_rtl_2_ltr(const std::string& vname, size_t rtl_offset,
                                   const std::vector<size_t>& dims) {
     size_t rtl_dsize = 1;
     for (size_t i = 1; i < dims.size(); i++)

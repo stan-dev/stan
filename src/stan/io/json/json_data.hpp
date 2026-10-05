@@ -5,7 +5,7 @@
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/var_context.hpp>
-#include <boost/unordered/unordered_flat_map.hpp>
+#include <stan/io/validate_dims.hpp>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -36,6 +36,17 @@ namespace json {
  * stored as a vector of ints, else the array will be stored
  * as a vector of type double.
  *
+ * <p>A variable nested inside one or more arrays of tuples is named by the
+ * dotted path to its innermost tuple slot.  Its dimensions are the dimensions
+ * of the enclosing arrays followed by the dimensions of the variable itself,
+ * and its values hold one contiguous block per enclosing tuple element, laid
+ * out back to back.  The enclosing array dimensions are in element (row-major)
+ * order, while the values within each block are column-major as above; this
+ * mixed layout is the convention assumed by
+ * <code>stan::io::read_from_context</code>.  The dimension vector alone does
+ * not say where the enclosing dimensions end and the variable's own begin,
+ * so <code>var_entry::num_outer_dims</code> records that split.
+ *
  * <p><code>json_data</code> objects are created by using the
  * <code>json_parser</code> and a <code>json_data_handler</code>
  * to read a single JSON text from an input stream.
@@ -44,7 +55,6 @@ class json_data : public stan::io::var_context {
  private:
   vars_map_r vars_r_;
   vars_map_i vars_i_;
-  boost::unordered_flat_map<std::string, size_t> array_block_sizes_;
 
   std::vector<double> const empty_vec_r_;
   std::vector<int> const empty_vec_i_;
@@ -64,36 +74,37 @@ class json_data : public stan::io::var_context {
   }
 
   /**
-   * Decode complex components within each tuple-free array block.
+   * Decode complex components within each innermost array block.
+   *
+   * Values are stored as one block per enclosing tuple element, laid out
+   * back to back.  Within a block the real components precede the imaginary
+   * ones, so the component of a value is a half block away from its real part.
    *
    * @tparam T Stored scalar type, either int or double.
    * @param name Variable name.
-   * @param data Flat values and combined dimensions for the variable.
+   * @param var Stored values and dimensions for the variable.
    * @return Complex values in the order of the input blocks.
    * @throw json_error if nonempty data has no trailing component dimension 2.
    */
   template <typename T>
-  std::vector<std::complex<double>> vals_c_impl(
-      const std::string &name,
-      const std::pair<std::vector<T>, std::vector<size_t>> &data) const {
-    const auto &values = data.first;
+  std::vector<std::complex<double>> vals_c_impl(const std::string &name,
+                                                const var_entry<T> &var) const {
+    const auto &values = var.values;
     if (values.empty())
       return {};
-    const auto block = array_block_sizes_.find(name);
-    if (block == array_block_sizes_.end() || data.second.empty()
-        || data.second.back() != 2) {
+    // The trailing 2 must be the variable's own, not an enclosing array dim.
+    if (!var.has_own_dims() || var.dims.back() != 2) {
       throw json_error("Variable: " + name
                        + ", expected a trailing dimension of 2 for complex "
                          "values.");
     }
-    const size_t block_size = block->second;
-    const size_t offset = block_size / 2;
-    std::vector<std::complex<double>> result(values.size() / 2);
+    const size_t block_size = var.block_size();
+    const size_t half_block = block_size / 2;
+    std::vector<std::complex<double>> result;
+    result.reserve(values.size() / 2);
     for (size_t start = 0; start < values.size(); start += block_size) {
-      for (size_t i = 0; i < offset; ++i) {
-        result[start / 2 + i]
-            = {static_cast<double>(values[start + i]),
-               static_cast<double>(values[start + offset + i])};
+      for (size_t i = 0; i < half_block; ++i) {
+        result.emplace_back(values[start + i], values[start + half_block + i]);
       }
     }
     return result;
@@ -111,7 +122,6 @@ class json_data : public stan::io::var_context {
   explicit json_data(std::istream &in) : vars_r_(), vars_i_() {
     json_data_handler handler(vars_r_, vars_i_);
     rapidjson_parse(in, handler);
-    array_block_sizes_ = handler.array_block_sizes();
   }
 
   /**
@@ -147,14 +157,10 @@ class json_data : public stan::io::var_context {
    */
   std::vector<double> vals_r(const std::string &name) const {
     if (contains_r_only(name)) {
-      return (vars_r_.find(name)->second).first;
+      return vars_r_.find(name)->second.values;
     } else if (contains_i(name)) {
-      std::vector<int> vec_int = (vars_i_.find(name)->second).first;
-      std::vector<double> vec_r(vec_int.size());
-      for (size_t ii = 0; ii < vec_int.size(); ii++) {
-        vec_r[ii] = vec_int[ii];
-      }
-      return vec_r;
+      const std::vector<int> &vec_int = vars_i_.find(name)->second.values;
+      return std::vector<double>(vec_int.begin(), vec_int.end());
     }
     return empty_vec_r_;
   }
@@ -185,9 +191,9 @@ class json_data : public stan::io::var_context {
    */
   std::vector<size_t> dims_r(const std::string &name) const {
     if (contains_r_only(name)) {
-      return (vars_r_.find(name)->second).second;
+      return vars_r_.find(name)->second.dims;
     } else if (contains_i(name)) {
-      return (vars_i_.find(name)->second).second;
+      return vars_i_.find(name)->second.dims;
     }
     return empty_vec_ui_;
   }
@@ -201,7 +207,7 @@ class json_data : public stan::io::var_context {
    */
   std::vector<int> vals_i(const std::string &name) const {
     if (contains_i(name)) {
-      return (vars_i_.find(name)->second).first;
+      return vars_i_.find(name)->second.values;
     }
     return empty_vec_i_;
   }
@@ -215,7 +221,7 @@ class json_data : public stan::io::var_context {
    */
   std::vector<size_t> dims_i(const std::string &name) const {
     if (contains_i(name)) {
-      return (vars_i_.find(name)->second).second;
+      return vars_i_.find(name)->second.dims;
     }
     return empty_vec_ui_;
   }
@@ -254,7 +260,6 @@ class json_data : public stan::io::var_context {
    *   returns <code>false</code>.
    */
   bool remove(const std::string &name) {
-    array_block_sizes_.erase(name);
     return (vars_i_.erase(name) > 0) || (vars_r_.erase(name) > 0);
   }
 
@@ -264,66 +269,12 @@ class json_data : public stan::io::var_context {
     std::vector<size_t> dims = dims_r(name);
 
     // JSON '[ ]' is ambiguous - any multi-dim variable with len 0 dim
-    size_t num_elements = 1;
-    if (dims.size() == 0) {
-      // treat non-existent variables as size-0 objects
-      num_elements = 0;
-    } else {
-      for (size_t i = 0; i < dims.size(); ++i) {
-        num_elements *= dims[i];
-      }
-    }
-
-    size_t num_elements_expected = 1;
-    for (size_t i = 0; i < dims_declared.size(); ++i) {
-      num_elements_expected *= dims_declared[i];
-    }
-
-    if (num_elements == 0 && num_elements_expected == 0)
+    // treat non-existent variables as size-0 objects
+    size_t num_values = dims.empty() ? 0 : size_from_dims(dims);
+    if (num_values == 0 && size_from_dims(dims_declared) == 0)
       return;
 
-    if (dims.size() != dims_declared.size()) {
-      std::stringstream msg;
-      msg << "mismatch in number dimensions declared and found in context"
-          << "; processing stage=" << stage << "; variable name=" << name
-          << "; dims declared=";
-      dims_msg(msg, dims_declared);
-      msg << "; dims found=";
-      dims_msg(msg, dims);
-      throw std::runtime_error(msg.str());
-    }
-    for (size_t i = 0; i < dims.size(); ++i) {
-      if (dims_declared[i] != dims[i]) {
-        std::stringstream msg;
-        msg << "mismatch in dimension declared and found in context"
-            << "; processing stage=" << stage << "; variable name=" << name
-            << "; position=" << i << "; dims declared=";
-        dims_msg(msg, dims_declared);
-        msg << "; dims found=";
-        dims_msg(msg, dims);
-        throw std::runtime_error(msg.str());
-      }
-    }
-
-    bool is_int_type = base_type == "int";
-    if (is_int_type) {
-      if (!contains_i(name)) {
-        std::stringstream msg;
-        msg << (contains_r(name) ? "int variable contained non-int values"
-                                 : "variable does not exist")
-            << "; processing stage=" << stage << "; variable name=" << name
-            << "; base type=" << base_type;
-        throw std::runtime_error(msg.str());
-      }
-    } else {
-      if (!contains_r(name)) {
-        std::stringstream msg;
-        msg << "variable does not exist"
-            << "; processing stage=" << stage << "; variable name=" << name
-            << "; base type=" << base_type;
-        throw std::runtime_error(msg.str());
-      }
-    }
+    stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
 };
 

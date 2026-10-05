@@ -329,3 +329,137 @@ TEST(ioJsonTuples, jsonData_plus_comments_2) {
   std::vector<size_t> expected_dims_y;
   test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
 }
+
+/* ---------------------------------------------------------------------------
+ * N-dimensional arrays of tuples.
+ *
+ * Layout convention: the arrays enclosing a tuple are traversed in element
+ * order, while each leaf payload is converted to column-major.  A tuple slot
+ * therefore does NOT match a plain array of the same declared shape, whose
+ * every dimension is column-major.  One-dimensional outer arrays cannot tell
+ * the two apart, so these cases start at two dimensions.
+ * ---------------------------------------------------------------------------
+ */
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_dims) {
+  std::stringstream in(R"({
+    "x": [[{"1": 1.0, "2": 11}, {"1": 2.0, "2": 12}, {"1": 3.0, "2": 13}],
+          [{"1": 4.0, "2": 14}, {"1": 5.0, "2": 15}, {"1": 6.0, "2": 16}]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_EQ((std::vector<size_t>{2, 3}), jdata.dims_r("x.1"));
+  EXPECT_EQ((std::vector<size_t>{2, 3}), jdata.dims_i("x.2"));
+  EXPECT_TRUE(jdata.contains_i("x.2"));
+  EXPECT_FALSE(jdata.contains_i("x.1"));
+  EXPECT_EQ(6u, jdata.vals_r("x.1").size());
+  EXPECT_EQ(6u, jdata.vals_i("x.2").size());
+}
+
+TEST(ioJsonTuples, jsonData_array_3d_tuple_dims) {
+  std::stringstream in(R"({
+    "x": [[[{"1": 1.0}, {"1": 2.0}], [{"1": 3.0}, {"1": 4.0}]],
+          [[{"1": 5.0}, {"1": 6.0}], [{"1": 7.0}, {"1": 8.0}]]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_EQ((std::vector<size_t>{2, 2, 2}), jdata.dims_r("x.1"));
+  EXPECT_EQ(8u, jdata.vals_r("x.1").size());
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_array_slot_dims) {
+  std::stringstream in(R"({
+    "x": [[{"1": [1.0, 2.0]}, {"1": [3.0, 4.0]}],
+          [{"1": [5.0, 6.0]}, {"1": [7.0, 8.0]}]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_EQ((std::vector<size_t>{2, 2, 2}), jdata.dims_r("x.1"));
+  EXPECT_EQ(8u, jdata.vals_r("x.1").size());
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_nested_tuple_dims) {
+  std::stringstream in(R"({
+    "x": [[{"1": {"1": 1.0}}, {"1": {"1": 2.0}}],
+          [{"1": {"1": 3.0}}, {"1": {"1": 4.0}}]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_EQ((std::vector<size_t>{2, 2}), jdata.dims_r("x.1.1"));
+  EXPECT_EQ(4u, jdata.vals_r("x.1.1").size());
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_int_and_promotion) {
+  std::stringstream in(R"({
+    "a": [[{"1": 1}, {"1": 2}], [{"1": 3}, {"1": 4}]],
+    "b": [[{"1": 1}, {"1": 2}], [{"1": 3}, {"1": 4.5}]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_TRUE(jdata.contains_i("a.1"));
+  EXPECT_FALSE(jdata.contains_i("b.1"));
+  EXPECT_EQ((std::vector<size_t>{2, 2}), jdata.dims_i("a.1"));
+  EXPECT_EQ((std::vector<size_t>{2, 2}), jdata.dims_r("b.1"));
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_ragged_outer) {
+  test_exception(R"({"x": [[{"1": 1.0}, {"1": 2.0}], [{"1": 3.0}]]})",
+                 "Variable: x, error: non-rectangular array.");
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_slot_count_mismatch) {
+  test_exception(R"({"x": [[{"1": 1.0, "2": 9.0}, {"1": 2.0, "2": 9.0}],
+                           [{"1": 3.0}, {"1": 4.0, "2": 9.0}]]})",
+                 "Variable x: size mismatch between tuple elements.");
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_slot_size_mismatch) {
+  test_exception(R"({"x": [[{"1": [1.0, 2.0]}, {"1": [3.0, 4.0]}],
+                           [{"1": [5.0]}, {"1": [7.0, 8.0]}]]})",
+                 "Variable: x.1, error: non-rectangular array.");
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_uses_element_order) {
+  std::stringstream in(R"({
+    "x": [[{"1": 1.0}, {"1": 2.0}, {"1": 3.0}],
+          [{"1": 4.0}, {"1": 5.0}, {"1": 6.0}]],
+    "plain": [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_EQ(jdata.dims_r("plain"), jdata.dims_r("x.1"));
+  EXPECT_EQ((std::vector<double>{1, 2, 3, 4, 5, 6}), jdata.vals_r("x.1"));
+  EXPECT_EQ((std::vector<double>{1, 4, 2, 5, 3, 6}), jdata.vals_r("plain"));
+}
+
+TEST(ioJsonTuples, jsonData_array_3d_tuple_uses_element_order) {
+  std::stringstream in(R"({
+    "x": [[[{"1": 1.0}, {"1": 2.0}], [{"1": 3.0}, {"1": 4.0}]],
+          [[{"1": 5.0}, {"1": 6.0}], [{"1": 7.0}, {"1": 8.0}]]],
+    "plain": [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_EQ(jdata.dims_r("plain"), jdata.dims_r("x.1"));
+  EXPECT_EQ((std::vector<double>{1, 2, 3, 4, 5, 6, 7, 8}), jdata.vals_r("x.1"));
+  EXPECT_EQ((std::vector<double>{1, 5, 3, 7, 2, 6, 4, 8}),
+            jdata.vals_r("plain"));
+}
+
+TEST(ioJsonTuples, jsonData_array_2d_tuple_complex_uses_element_order) {
+  std::stringstream in(R"({
+    "x": [[{"1": [1.0, 101.0]}, {"1": [2.0, 102.0]}, {"1": [3.0, 103.0]}],
+          [{"1": [4.0, 104.0]}, {"1": [5.0, 105.0]}, {"1": [6.0, 106.0]}]],
+    "plain": [[[1.0, 101.0], [2.0, 102.0], [3.0, 103.0]],
+              [[4.0, 104.0], [5.0, 105.0], [6.0, 106.0]]]
+  })");
+  stan::json::json_data jdata(in);
+
+  EXPECT_EQ(jdata.dims_r("plain"), jdata.dims_r("x.1"));
+  EXPECT_EQ((std::vector<std::complex<double>>{
+                {1, 101}, {2, 102}, {3, 103}, {4, 104}, {5, 105}, {6, 106}}),
+            jdata.vals_c("x.1"));
+  EXPECT_EQ((std::vector<std::complex<double>>{
+                {1, 101}, {4, 104}, {2, 102}, {5, 105}, {3, 103}, {6, 106}}),
+            jdata.vals_c("plain"));
+}
