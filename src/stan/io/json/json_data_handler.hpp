@@ -16,6 +16,7 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -166,8 +167,9 @@ class json_data_handler : public stan::json::json_handler {
   vars_map_r& vars_r;
   vars_map_i& vars_i;
   std::vector<std::string> key_stack;
-  std::map<std::string, int> var_types_map;   // vars_r and vars_i entries
-  std::map<std::string, int> slot_types_map;  // all slots all vars parsed
+  std::map<std::string, int> var_types_map;  // vars_r and vars_i entries
+  // std::less<> so that key() can look up a string_view without copying it.
+  std::map<std::string, int, std::less<>> slot_types_map;
   std::map<std::string, array_dims> slot_dims_map;
   std::map<std::string, tuple_slots> tuple_slots_map;
   std::map<std::string, bool> int_slots_map;
@@ -210,7 +212,7 @@ class json_data_handler : public stan::json::json_handler {
   /** Stan variable names must start with a letter
    *  and contain only letters, numbers, or an underscore.
    */
-  bool valid_varname(const std::string& name) {
+  bool valid_varname(std::string_view name) {
     static const std::locale& locale = std::locale::classic();
     if (name.empty() || !std::isalpha(name[0], locale)) {
       return false;
@@ -414,7 +416,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   template <typename T>
-  void to_column_major(const std::string& vname, std::vector<T>& cm_vals,
+  void to_column_major(std::string_view vname, std::vector<T>& cm_vals,
                        const std::vector<T>& rm_vals,
                        const std::vector<size_t>& dims) {
     if (size_from_dims(dims) != rm_vals.size()) {
@@ -428,7 +430,7 @@ class json_data_handler : public stan::json::json_handler {
     }
   }
 
-  void unexpected_error(const std::string& where, const std::string& what) {
+  void unexpected_error(std::string_view where, std::string_view what) {
     std::stringstream errorMsg;
     errorMsg << "Variable " << where << ", " << what << ".";
     throw json_error(errorMsg.str());
@@ -482,14 +484,14 @@ class json_data_handler : public stan::json::json_handler {
    *  the name of the enclosing object is not used in the generated C++,
    *  but we still need to track the number of tuple slots.
    */
-  void key(const std::string& key) {
+  void key(std::string_view key) override {
     if (event != meta_event::OBJ_OPEN) {
       save_key_value_pair();
     }
     event = meta_event::KEY;
     reset_values();
     std::string outer = key_str();
-    key_stack.push_back(key);
+    key_stack.emplace_back(key);
     if (key_stack.size() == 1) {
       not_stan_var = !valid_varname(key);
     }
@@ -675,7 +677,7 @@ class json_data_handler : public stan::json::json_handler {
     throw json_error(errorMsg.str());
   }
 
-  void string(const std::string& s) {
+  void string(std::string_view s) override {
     if (not_stan_var)
       return;
     double tmp;
@@ -747,7 +749,7 @@ class json_data_handler : public stan::json::json_handler {
   /** This function provides the column-major offset of an array element
    *  given its row-major offset and the array dimensions.
    */
-  size_t convert_offset_rtl_2_ltr(const std::string& vname, size_t rtl_offset,
+  size_t convert_offset_rtl_2_ltr(std::string_view vname, size_t rtl_offset,
                                   const std::vector<size_t>& dims) {
     size_t rtl_dsize = 1;
     for (size_t i = 1; i < dims.size(); i++)
