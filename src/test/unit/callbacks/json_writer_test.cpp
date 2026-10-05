@@ -1,6 +1,8 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
+#include <cstdint>
+#include <limits>
 #include <string>
 
 struct deleter_noop {
@@ -36,6 +38,22 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record) {
   writer.end_record();
   auto out = output_sans_whitespace(ss);
   EXPECT_EQ("{}", out);
+}
+
+TEST_F(StanInterfaceCallbacksJsonWriter, write_unsigned_through_base) {
+  stan::callbacks::structured_writer& base = writer;
+  base.begin_record();
+  base.write("uint", 42U);
+  base.write("ulong", 4294967295UL);
+  base.write("ullong", 18446744073709551615ULL);
+  base.write("size", std::size_t{5});
+  base.write("uint64", std::numeric_limits<std::uint64_t>::max());
+  base.end_record();
+  EXPECT_EQ(
+      "{\"uint\":42,\"ulong\":4294967295,"
+      "\"ullong\":18446744073709551615,\"size\":5,"
+      "\"uint64\":18446744073709551615}",
+      output_sans_whitespace(ss));
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_named_record) {
