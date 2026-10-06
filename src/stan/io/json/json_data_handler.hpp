@@ -37,14 +37,22 @@ inline size_t size_from_dims(const std::vector<size_t>& dims) {
 
 /** The values and dimensions of a single Stan variable.
  *
- *  For `x` given as `[ [[1, 2, 3], 4], [[5, 6, 7], 8] ]`, an array of 2
- *  tuples whose first slot is an array of 3 reals, slot `x.1` holds
+ *  An array of 2 tuples whose first slot is an array of 3 reals,
  *
- *      values = {1, 2, 3, 5, 6, 7}   dims = {2, 3}   num_outer_arrays = 1
+ *  ```
+ *  "x": [{"1": [1.0, 2.0, 3.0], "2": 4}, {"1": [5.0, 6.0, 7.0], "2": 8}]
+ *  ```
  *
- *  The leading 2 is the enclosing array; the trailing 3 is the slot's own
- *  shape, one block per tuple element.  `dims` alone cannot say where the
- *  first ends and the second begins, so `num_outer_arrays` records it.
+ *  stores slot `x.1` as
+ *
+ *  ```
+ *  values = {1, 2, 3, 5, 6, 7}   dims = {2, 3}   num_outer_arrays = 1
+ *  ```
+ *
+ *  The leading 2 is the enclosing array, with one block per tuple element in
+ *  element order. The trailing 3 is the slot's own shape, column-major within
+ *  each block. `dims` alone cannot say where the first ends and the second
+ *  begins, so `num_outer_arrays` records it.
  */
 template <typename T>
 struct var_entry {
@@ -73,8 +81,8 @@ struct string_hash {
 };
 
 /** Name-keyed map used for the handler's bookkeeping and for its results.
- *  Nothing depends on the iteration order: names_r and names_i are its only
- *  consumers and var_context does not promise one.
+ *  Nothing depends on the iteration order: `names_r` and `names_i` are its
+ *  only consumers and `var_context` does not promise one.
  */
 template <typename T>
 using string_map
@@ -295,7 +303,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   /* Append one tuple element's block of values to an existing variable.
-   * `dims` is the variable's own shape; update_array_dims() prepends the
+   * `dims` is the variable's own shape; `update_array_dims()` prepends the
    * dimensions of the enclosing arrays once all elements have been seen.
    */
   template <typename T>
@@ -391,8 +399,8 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   /* For array of tuples, prepend the dimensions of the enclosing arrays
-   * onto the variable's own dimensions and record where the two meet.
-   * This is the point at which the split is otherwise lost.
+   * onto the variable's own dimensions and record how many were prepended in
+   * `num_outer_arrays`, since the merged `dims` no longer shows the split.
    */
   void update_array_dims() {
     for (auto const& [name, type] : var_types_map) {

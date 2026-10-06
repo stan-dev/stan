@@ -36,12 +36,17 @@ namespace json {
  * as a vector of type double.
  *
  * <p>A variable inside an array of tuples is named by the dotted path to its
- * tuple slot.  Given <code>"x": [ [[1, 2, 3], 4], [[5, 6, 7], 8] ]</code>,
- * slot <code>x.1</code> has dims <code>{2, 3}</code> and values
- * <code>{1, 2, 3, 5, 6, 7}</code>.  The leading 2 is the enclosing array,
- * which is in element order; the 3 values of each block are column-major as
- * above.  <code>var_entry::num_outer_arrays</code> records how many leading
- * dimensions are enclosing arrays, which <code>dims</code> alone cannot say.
+ * tuple slot.  Given
+ *
+ * ```
+ * "x": [{"1": [1.0, 2.0, 3.0], "2": 4}, {"1": [5.0, 6.0, 7.0], "2": 8}]
+ * ```
+ *
+ * slot `x.1` has dims `{2, 3}` and values `{1, 2, 3, 5, 6, 7}`.  The leading 2
+ * is the enclosing array, with one block per tuple element in element order;
+ * the 3 values of each block are column-major as above.
+ * `var_entry::num_outer_arrays` records how many leading dimensions are
+ * enclosing arrays, which `dims` alone cannot say.
  *
  * <p><code>json_data</code> objects are created by using the
  * <code>json_parser</code> and a <code>json_data_handler</code>
@@ -70,14 +75,14 @@ class json_data : public stan::io::var_context {
   }
 
   /**
-   * Decode complex components within each innermost array block.
+   * Pair the real and imaginary components of a complex variable.
    *
-   * A block holds all the real components first, then all the imaginary
-   * ones, so a block of 6 values <code>{r0, r1, r2, i0, i1, i2}</code>
-   * decodes to <code>{(r0,i0), (r1,i1), (r2,i2)}</code>.  An array of tuples
-   * contributes one such block per tuple element, laid out back to back.
+   * The values are one block per enclosing tuple element, or a single block
+   * when no array of tuples encloses the variable.  A block holds all the real
+   * components first, then all the imaginary ones, so a block of 6 values
+   * `{r0, r1, r2, i0, i1, i2}` decodes to `{(r0, i0), (r1, i1), (r2, i2)}`.
    *
-   * @tparam T Stored scalar type, either int or double.
+   * @tparam T Stored scalar type, either `int` or `double`.
    * @param name Variable name.
    * @param entry Stored values and dimensions for the variable.
    * @return Complex values in the order of the input blocks.

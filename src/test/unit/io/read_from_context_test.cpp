@@ -352,7 +352,7 @@ TEST(ioReadFromContext, nested_array_tuple) {
   std::vector<std::vector<element>> x(2, std::vector<element>(3, {-999, -999}));
   ASSERT_NO_THROW(read_fixture(x, "nested_array_tuple"));
   // Multiple array dimensions outside a tuple use tuple-instance order,
-  // unlike the identically sized ordinary array_array_real fixture.
+  // unlike the identically sized ordinary `array_array_real` fixture.
   for (int a = 0; a < 2; ++a) {
     for (int b = 0; b < 3; ++b) {
       EXPECT_EQ(10 * a + b, std::get<0>(x[a][b]));
