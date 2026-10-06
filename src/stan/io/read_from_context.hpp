@@ -3,15 +3,19 @@
 
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/math/prim/fun/num_elements.hpp>
-#include <stan/math/prim/meta/is_complex.hpp>
-#include <stan/math/prim/meta/is_tuple.hpp>
+#include <stan/math/prim/meta/contains_tuple.hpp>
 #include <stan/math/prim/meta/index_apply.hpp>
+#include <stan/math/prim/meta/is_complex.hpp>
+#include <stan/math/prim/meta/is_eigen.hpp>
+#include <stan/math/prim/meta/is_tuple.hpp>
+#include <stan/math/prim/meta/is_vector.hpp>
 #include <stan/math/prim/meta/scalar_type.hpp>
+#include <stan/math/prim/meta/value_type.hpp>
+#include <algorithm>
 #include <complex>
 #include <cstddef>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -19,459 +23,360 @@
 
 namespace stan {
 
+namespace io {
+
+/* A var_context stores one value array per NAME, never per array element. For
+ *
+ *   array[2] tuple(real, real) x;
+ *
+ * it holds exactly two entries, "x.1" -> {a, b} and "x.2" -> {c, d}. There is
+ * no "x[0].1". Reading is therefore name-major: fetch a name once, then visit
+ * every element that has that slot. Element-major would refetch each buffer
+ * once per element, and vals_r returns its vector by value.
+ *
+ * Worked example:
+ *
+ *   using Leaf = std::tuple<Eigen::MatrixXcd, double>;
+ *   using Mid = std::tuple<std::vector<Leaf>>;
+ *   std::vector<Mid> x;
+ *
+ * scalar_type_t erases every std::vector and Eigen layer and keeps the tuples,
+ * so SlotType starts as the name tree alone:
+ *
+ *   SlotType = std::tuple<std::tuple<std::complex<double>, double>>
+ *
+ * read_from_context walks that tree at compile time and never touches x. The
+ * std::tuple_element_t below indexes a TYPE; the only runtime work in that
+ * branch is building name strings.
+ *
+ *   SlotType                        path     name
+ *   tuple<tuple<complex, double>>   <>       "x"
+ *     \__ tuple<complex, double>    <0>      "x.1"
+ *          |__ complex<double>      <0,0>    "x.1.1"   leaf
+ *          \__ double               <0,1>    "x.1.2"   leaf
+ *
+ * Each leaf fetches its own buffer, then fill_slots walks the VALUE to every
+ * destination that name feeds, off one shared cursor. For "x.1.1", path <0,0>:
+ *
+ *   x             std::vector<Mid>    array  -> loop, path stays <0,0>
+ *    \__ x[i]     std::tuple          slot 0 -> get<0>, path <0>
+ *         \__ v   std::vector<Leaf>   array  -> loop, path stays <0>
+ *              \__ v[j]  std::tuple   slot 0, path empty -> the payload
+ *
+ * One buffer fills the matrix of every x[i] -> v[j], laid back to back.
+ *
+ * The two array orderings are opposite, and both are deliberate:
+ *   an array ENCLOSING a tuple is element order        (fill_slots)
+ *   a tuple-free payload is column-major               (read_payload)
+ * array_array_real and nested_array_tuple are both 2x3 and disagree.
+ */
+
 namespace internal {
 
-/**
- * @brief Read one integer without advancing a consumption cursor.
- * @param[out] x Destination integer.
- * @param[in] values Buffer of integer values for a named leaf.
- * @param[in] idx Zero-based index of the value to read.
- * @throw std::runtime_error if idx is outside values.
- */
-inline void read_from_buffer(int& x, const std::vector<int>& values,
-                             std::size_t idx) {
-  if (idx >= values.size()) {
-    throw std::runtime_error("read_from_context: not enough integer values");
-  }
-  x = values[idx];
-}
-
-/**
- * @brief Read one real value without advancing a consumption cursor.
- * @param[out] x Destination real value.
- * @param[in] values Buffer of real values for a named leaf.
- * @param[in] idx Zero-based index of the value to read.
- * @throw std::runtime_error if idx is outside values.
- */
-inline void read_from_buffer(double& x, const std::vector<double>& values,
-                             std::size_t idx) {
-  if (idx >= values.size()) {
-    throw std::runtime_error("read_from_context: not enough real values");
-  }
-  x = values[idx];
-}
-
-/**
- * @brief Read one complex value from separate component indices.
- * @param[out] x Destination complex value.
- * @param[in] values Buffer of real and imaginary components for a named leaf.
- * @param[in] real_idx Zero-based index of the real component.
- * @param[in] imag_idx Zero-based index of the imaginary component.
- * @throw std::runtime_error if either index is outside values.
- */
-inline void read_from_buffer(std::complex<double>& x,
-                             const std::vector<double>& values,
-                             std::size_t real_idx, std::size_t imag_idx) {
-  if (real_idx >= values.size() || imag_idx >= values.size()) {
-    throw std::runtime_error(
-        "read_from_context: not enough complex components");
-  }
-  x = {values[real_idx], values[imag_idx]};
-}
-
-/**
- * @brief Map a strided column-major source block onto a destination.
- * @tparam Source Dense source matrix type matching the buffer's scalar type.
- * @tparam InVec Contiguous input buffer type, possibly const.
- */
-template <typename Source, typename InVec>
-inline auto source_block(const InVec& values, std::size_t offset,
-                         Eigen::Index rows, Eigen::Index cols,
-                         std::size_t stride) {
-  using Stride = Eigen::InnerStride<Eigen::Dynamic>;
-  return Eigen::Map<const Source, Eigen::Unaligned, Stride>(
-      values.data() + offset, rows, cols, Stride(stride));
-}
-
-/**
- * @brief Read an int or real Eigen object in logical column-major order
- * without advancing a consumption cursor.
- * @tparam EigMat Writable Eigen destination type with int or double
- * coefficients.
- * @tparam InVec Contiguous input buffer type with int or double coefficients,
- * possibly const. Integer destinations use integer buffers.
- * @param[in,out] x Destination with its rows and columns already allocated.
- * @param[in] values Buffer containing the tuple-free payload to read.
- * @param[in] offset Zero-based source index of the first coefficient's value.
- * @param[in] stride Positive distance in buffer elements between successive
- * logical column-major coefficients.
- * @pre The caller has validated that all source indices are within values.
- */
-template <typename EigMat, typename InVec, require_eigen_t<EigMat>* = nullptr>
-void read_real(EigMat& x, const InVec& values, std::size_t offset,
-               std::size_t stride) {
-  if (x.size() == 0) {
-    return;
-  }
-  using Source
-      = Eigen::Matrix<scalar_type_t<InVec>, Eigen::Dynamic, Eigen::Dynamic>;
-  x = internal::source_block<Source>(values, offset, x.rows(), x.cols(),
-                                     stride);
-}
-
-/**
- * @brief Read a complex Eigen object in logical column-major order without
- * advancing a consumption cursor. The real components of the payload precede
- * the imaginary ones, so each component block is read separately.
- * @tparam EigMat Writable Eigen destination type with std::complex<double>
- * coefficients.
- * @tparam InVec Contiguous input buffer type with double coefficients,
- * possibly const.
- * @param[in,out] x Destination with its rows and columns already allocated.
- * @param[in] values Buffer containing the tuple-free payload to read.
- * @param[in] offset Zero-based source index of the first real component.
- * @param[in] stride Positive distance in buffer elements between successive
- * logical column-major coefficients.
- * @param[in] imaginary_offset Distance in buffer elements from each real
- * component to its imaginary component.
- * @pre The caller has validated that all source indices are within values.
- */
-template <typename EigMat, typename InVec, require_eigen_t<EigMat>* = nullptr>
-void read_complex(EigMat& x, const InVec& values, std::size_t offset,
-                  std::size_t stride, std::size_t imaginary_offset) {
-  if (x.size() == 0) {
-    return;
-  }
-  using Source
-      = Eigen::Matrix<scalar_type_t<InVec>, Eigen::Dynamic, Eigen::Dynamic>;
-  x.real() = internal::source_block<Source>(values, offset, x.rows(), x.cols(),
-                                            stride);
-  x.imag() = internal::source_block<Source>(values, offset + imaginary_offset,
-                                            x.rows(), x.cols(), stride);
-}
-
-/**
- * @brief Read an int or real tuple-free array using column-major source
- * strides. Each child uses stride * x.size(). This function does not advance
- * a consumption cursor.
- * @tparam StdVec Destination std::vector type containing int, double, Eigen
- * objects, or nested tuple-free std::vectors of these.
- * @tparam InVec Input std::vector type holding int values for integer
- * destinations or double values for real ones.
- * @param[in,out] x Rectangular destination with every dimension allocated.
- * @param[in] values Buffer containing the tuple-free payload to read.
- * @param[in] offset Zero-based source index of the first value in this array.
- * @param[in] stride Positive distance in buffer elements between the starting
- * indices of consecutive elements of x.
- * @pre The caller has validated that all source indices are within values.
- */
-template <typename StdVec, typename InVec,
-          require_std_vector_t<StdVec>* = nullptr>
-void read_real(StdVec& x, const InVec& values, std::size_t offset,
-               std::size_t stride) {
-  using T = value_type_t<StdVec>;
-  if constexpr (std::is_same_v<T, double> || std::is_same_v<T, int>) {
-    using Vec = Eigen::Matrix<T, Eigen::Dynamic, 1>;
-    using Stride = Eigen::InnerStride<Eigen::Dynamic>;
-    Eigen::Map<Vec>(x.data(), x.size())
-        = Eigen::Map<const Vec, Eigen::Unaligned, Stride>(
-            values.data() + offset, x.size(), Stride(stride));
+template <typename ScalarType, typename ContextT, typename Name>
+inline auto get_values(const ContextT& context, const Name& name) {
+  if constexpr (std::is_same_v<ScalarType, int>) {
+    return context.vals_i(name);
   } else {
-    for (std::size_t i = 0; i < x.size(); ++i) {
-      internal::read_real(x[i], values, offset + i * stride, stride * x.size());
-    }
+    return context.vals_r(name);
   }
 }
 
-/**
- * @brief Read a complex tuple-free array using column-major source strides.
- * Each child uses stride * x.size(); imaginary_offset stays constant within
- * the payload. This function does not advance a consumption cursor.
- * @tparam StdVec Destination std::vector type containing
- * std::complex<double>, Eigen objects, or nested tuple-free std::vectors of
- * these.
- * @tparam InVec Input std::vector type holding double values.
- * @param[in,out] x Rectangular destination with every dimension allocated.
- * @param[in] values Buffer containing the tuple-free payload to read.
- * @param[in] offset Zero-based source index of the first real component in
- * this array.
- * @param[in] stride Positive distance in buffer elements between the starting
- * indices of consecutive elements of x.
- * @param[in] imaginary_offset Distance in buffer elements from each real
- * component to its imaginary component.
- * @pre The caller has validated that all source indices are within values.
- */
-template <typename StdVec, typename InVec,
-          require_std_vector_t<StdVec>* = nullptr>
-void read_complex(StdVec& x, const InVec& values, std::size_t offset,
-                  std::size_t stride, std::size_t imaginary_offset) {
-  using T = value_type_t<StdVec>;
-  if constexpr (stan::is_complex<T>::value) {
-    for (std::size_t i = 0; i < x.size(); ++i) {
-      const std::size_t idx = offset + i * stride;
-      internal::read_from_buffer(x[i], values, idx, idx + imaginary_offset);
-    }
-  } else {
-    for (std::size_t i = 0; i < x.size(); ++i) {
-      internal::read_complex(x[i], values, offset + i * stride,
-                             stride * x.size(), imaginary_offset);
-    }
-  }
-}
-
-/**
- * @brief Read one tuple-free payload and advance its consumption cursor.
- * Validate the full payload before reading. Complex payloads use separate
- * real and imaginary component blocks and consume two stored values per
- * destination value. Non-complex payloads consume one stored value per
- * destination value.
- * @tparam T Tuple-free destination type: int, double, std::complex<double>,
- * an Eigen object, or a rectangular std::vector nesting of these types.
- * @tparam InputVec Input std::vector type, or a reference to it, holding int
- * values for integer destinations or double values for real and complex ones.
- * @param[in,out] x Destination with every container dimension allocated.
- * @param[in] values Buffer for the named leaf containing this payload;
- * neither modified nor moved from.
- * @param[in,out] position Zero-based start of the payload in values. Advances
- * by the number of stored int or double values on success, counting two per
- * complex value. An empty payload leaves position unchanged.
- * @throw std::runtime_error if position exceeds the buffer size or there are
- * insufficient values for the payload.
- */
-template <typename T, typename InputVec>
-void read_from_buffer_block(T& x, InputVec&& values, std::size_t& position) {
-  const std::size_t size = math::num_elements(x);
-  if (position > values.size()) {
-    throw std::runtime_error(
-        "read_from_context: not enough values for payload");
-  }
-  if (size == 0) {
-    return;
-  }
-  if constexpr (stan::is_complex<scalar_type_t<T>>::value) {
-    if (size > (values.size() - position) / 2) {
-      throw std::runtime_error(
-          "read_from_context: not enough values for complex payload");
-    }
-    if constexpr (stan::is_complex<T>::value) {
-      internal::read_from_buffer(x, values, position, position + 1);
-    } else {
-      internal::read_complex(x, values, position, 1, size);
-    }
-    position += 2 * size;
-  } else {
-    if (size > values.size() - position) {
-      throw std::runtime_error(
-          "read_from_context: not enough values for payload");
-    }
-    if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
-      internal::read_from_buffer(x, values, position);
-    } else {
-      internal::read_real(x, values, position, 1);
-    }
-    position += size;
-  }
-}
-
-/**
- * @brief Read a complete tuple-free payload once the field path is exhausted.
- * @tparam T Tuple-free scalar, Eigen, or rectangular std::vector destination
- * type with int, double, or std::complex<double> scalar values.
- * @tparam InVec Input std::vector type holding int values for integer
- * destinations or double values for real and complex destinations.
- * @param[in,out] x Destination payload with its dimensions already allocated.
- * @param[in] values Buffer for the named leaf containing this payload.
- * @param[in,out] position Zero-based payload start in values; advances past
- * this payload on success, counting both components of complex values.
- * @param[in] fields Empty tuple-field path selecting x itself as the payload.
- * @throw std::runtime_error if the buffer cannot supply the complete payload.
- */
-template <typename T, typename InVec>
-void read_from_buffer(T& x, const InVec& values, std::size_t& position,
-                      std::index_sequence<> fields) {
-  internal::read_from_buffer_block(x, values, position);
-}
-
-/**
- * @brief Follow a tuple-field path through the destination for one named leaf.
- * Tuples consume one path index. Arrays visit elements in order without
- * consuming an index, sharing the input buffer and consumption cursor.
- * @tparam T Destination tuple or std::vector nesting containing tuples.
- * @tparam InVec Input std::vector type holding int values for integer
- * destinations or double values for real and complex destinations.
- * @tparam First Zero-based field index in the next tuple encountered.
- * @tparam Rest Remaining zero-based field indices in successive nested tuples.
- * @param[in,out] x Destination subtree with every dimension already allocated.
- * @param[in] values Buffer for the named leaf selected by fields.
- * @param[in,out] position Zero-based index of the next unread buffer element;
- * advances through each selected payload in traversal order.
- * @param[in] fields Compile-time tuple-field path, excluding array indices.
- * @throw std::runtime_error if the buffer cannot supply a selected payload.
- */
-template <typename T, typename InVec, std::size_t First, std::size_t... Rest>
-void read_from_buffer(T& x, const InVec& values, std::size_t& position,
-                      std::index_sequence<First, Rest...> fields) {
-  if constexpr (is_tuple_v<T>) {
-    internal::read_from_buffer(std::get<First>(x), values, position,
-                               std::index_sequence<Rest...>{});
-  } else {
-    for (auto& element : x) {
-      internal::read_from_buffer(element, values, position, fields);
-    }
-  }
-}
-
-/**
- * @brief Check that a named leaf buffer has been consumed exactly.
- * @tparam InVec Input buffer type providing size().
- * @param[in] values Loaded buffer for one named leaf.
- * @param[in] position Number of consumed buffer elements, counting both
- * components of complex values.
- * @param[in] path Variable name, including one-based dotted tuple-field
- * suffixes, used in the error message.
- * @throw std::runtime_error if position differs from values.size().
- */
 template <typename InVec>
-void check_consumed(const InVec& values, std::size_t position,
-                    const std::string& path) {
-  if (position != values.size()) {
-    throw std::runtime_error("read_from_context: unexpected value count for "
-                             + path);
+using source_map_t = Eigen::Map<
+    const Eigen::Matrix<value_type_t<InVec>, Eigen::Dynamic, Eigen::Dynamic>,
+    Eigen::Unaligned, Eigen::InnerStride<Eigen::Dynamic>>;
+
+template <typename T, typename InVec>
+inline void read_payload(T& x, const InVec& values, std::size_t offset,
+                         std::size_t stride) {
+  using map_t = source_map_t<InVec>;
+  if constexpr (std::is_arithmetic_v<T>) {
+    x = values[offset];
+  } else if constexpr (is_eigen_v<T>) {
+    x = map_t(values.data() + offset, x.rows(), x.cols(), stride);
+  } else if constexpr (std::is_same_v<value_type_t<T>, scalar_type_t<T>>) {
+    const std::size_t size = x.size();
+    Eigen::Map<Eigen::Matrix<scalar_type_t<T>, Eigen::Dynamic, 1>> dst(x.data(),
+                                                                       size);
+    dst = map_t(values.data() + offset, size, 1, stride);
+  } else {
+    const std::size_t size = x.size();
+    const std::size_t child_stride = stride * size;
+    for (std::size_t i = 0; i < size; ++i) {
+      read_payload(x[i], values, offset + i * stride, child_stride);
+    }
   }
 }
 
-/**
- * @brief Read a destination that holds no tuples, so its buffer is one
- * payload consumed in full. Equivalent to walking an empty tuple-field path,
- * without instantiating the path machinery.
- * @tparam T Tuple-free destination type with its dimensions already set.
- * @tparam InVec Input buffer type holding int values for integer
- * destinations or double values for real and complex destinations.
- * @param[in,out] x Destination with every container dimension allocated.
- * @param[in] values Buffer loaded for this variable.
- * @param[in] path Variable name, used in the error message.
- * @throw std::runtime_error if the buffer does not match the destination.
- */
 template <typename T, typename InVec>
-inline void read_whole_payload(T& x, const InVec& values,
-                               const std::string& path) {
-  std::size_t position = 0;
-  internal::read_from_buffer_block(x, values, position);
-  internal::check_consumed(values, position, path);
+inline void read_payload(T& x, const InVec& values, std::size_t offset) {
+  using map_t = source_map_t<InVec>;
+  if constexpr (std::is_arithmetic_v<T>) {
+    x = values[offset];
+  } else if constexpr (is_eigen_v<T>) {
+    x = map_t(values.data() + offset, x.rows(), x.cols(), 1);
+  } else if constexpr (std::is_same_v<value_type_t<T>, scalar_type_t<T>>) {
+    const std::size_t size = x.size();
+    Eigen::Map<Eigen::Matrix<scalar_type_t<T>, Eigen::Dynamic, 1>> dst(x.data(),
+                                                                       size);
+    dst = map_t(values.data() + offset, size, 1, 1);
+  } else {
+    const std::size_t size = x.size();
+    const std::size_t child_stride = size;
+    for (std::size_t i = 0; i < size; ++i) {
+      read_payload(x[i], values, offset + i, child_stride);
+    }
+  }
 }
 
-/**
- * @brief Load and write one named leaf at a time, releasing each buffer before
- * loading the next. Discover tuple paths from types, including for empty
- * arrays.
- * @tparam Field Type at the current tuple-field path, possibly wrapped in
- * arrays. Its scalar_type_t determines the next tuple or the leaf scalar type.
- * @tparam Root Complete destination type with int, double, or
- * std::complex<double> scalar values, Eigen objects, std::vectors, and tuples.
- * @tparam Context Source type providing const vals_i(name) and vals_r(name)
- * methods returning std::vector<int> and std::vector<double>, respectively.
- * @tparam Fields Zero-based tuple-field indices from the root, excluding array
- * indices.
- * @param[in,out] x Complete rectangular destination with all dimensions
- * allocated. Earlier writes remain if a subsequent leaf fails.
- * @param[in] context Source of the named integer and real buffers.
- * @param[in] path Variable name including the one-based dotted tuple-field
- * suffixes corresponding to Fields.
- * @param[in] fields Compile-time tuple-field path into x corresponding to
- * Field and path; empty at the root.
- * @throw std::runtime_error if a leaf has too few or too many values for its
- * destinations. Exceptions from the context propagate to the caller.
- */
-template <typename Field, typename Root, typename Context,
-          std::size_t... Fields>
-void load_from_context(Root& x, const Context& context, const std::string& path,
-                       std::index_sequence<Fields...> fields) {
-  using S = scalar_type_t<Field>;
-  if constexpr (is_tuple_v<S>) {
-    math::index_apply<std::tuple_size_v<S>>([&x, &context, &path](auto... i) {
-      (internal::load_from_context<std::tuple_element_t<decltype(i)::value, S>>(
-           x, context, path + "." + std::to_string(decltype(i)::value + 1),
-           std::index_sequence<Fields..., decltype(i)::value>{}),
-       ...);
-    });
+template <typename T, typename InVec>
+inline void read_payload(T& x, const InVec& values) {
+  using map_t = source_map_t<InVec>;
+  if constexpr (std::is_arithmetic_v<T>) {
+    x = values[0];
+  } else if constexpr (is_eigen_v<T>) {
+    x = map_t(values.data(), x.rows(), x.cols(), 1);
+  } else if constexpr (std::is_same_v<value_type_t<T>, scalar_type_t<T>>) {
+    const std::size_t size = x.size();
+    Eigen::Map<Eigen::Matrix<scalar_type_t<T>, Eigen::Dynamic, 1>> dst(x.data(),
+                                                                       size);
+    dst = map_t(values.data(), size, 1, 1);
   } else {
-    std::size_t position = 0;
-    if constexpr (std::is_same_v<S, int>) {
-      const auto values = context.vals_i(path);
-      internal::read_from_buffer(x, values, position, fields);
-      internal::check_consumed(values, position, path);
-    } else {
-      static_assert(
-          std::is_same_v<S, double> || std::is_same_v<S, std::complex<double>>,
-          "read_from_context requires int, double or complex<double> "
-          "scalar types");
-      const auto values = context.vals_r(path);
-      internal::read_from_buffer(x, values, position, fields);
-      internal::check_consumed(values, position, path);
+    const std::size_t size = x.size();
+    const std::size_t child_stride = size;
+    for (std::size_t i = 0; i < size; ++i) {
+      read_payload(x[i], values, i, child_stride);
     }
+  }
+}
+
+template <typename T, typename InVec>
+inline void read_payload_complex(T& x, const InVec& values, std::size_t offset,
+                                 std::size_t stride,
+                                 std::size_t imaginary_offset) {
+  using map_t = source_map_t<InVec>;
+  if constexpr (is_complex<T>::value) {
+    x = {values[offset], values[offset + imaginary_offset]};
+  } else if constexpr (is_eigen_v<T>) {
+    x.real() = map_t(values.data() + offset, x.rows(), x.cols(), stride);
+    x.imag() = map_t(values.data() + offset + imaginary_offset, x.rows(),
+                     x.cols(), stride);
+  } else if constexpr (std::is_same_v<value_type_t<T>, scalar_type_t<T>>) {
+    const std::size_t size = x.size();
+    Eigen::Map<Eigen::Matrix<scalar_type_t<T>, Eigen::Dynamic, 1>> dst(x.data(),
+                                                                       size);
+    dst.real() = map_t(values.data() + offset, size, 1, stride);
+    dst.imag()
+        = map_t(values.data() + offset + imaginary_offset, size, 1, stride);
+  } else {
+    const std::size_t size = x.size();
+    const std::size_t child_stride = stride * size;
+    for (std::size_t i = 0; i < size; ++i) {
+      read_payload_complex(x[i], values, offset + i * stride, child_stride,
+                           imaginary_offset);
+    }
+  }
+}
+
+template <typename T, typename InVec>
+inline void read_payload_complex(T& x, const InVec& values,
+                                 std::size_t imaginary_offset) {
+  using map_t = source_map_t<InVec>;
+  if constexpr (is_complex<T>::value) {
+    x = {values[0], values[imaginary_offset]};
+  } else if constexpr (is_eigen_v<T>) {
+    x.real() = map_t(values.data(), x.rows(), x.cols(), 1);
+    x.imag() = map_t(values.data() + imaginary_offset, x.rows(), x.cols(), 1);
+  } else if constexpr (std::is_same_v<value_type_t<T>, scalar_type_t<T>>) {
+    const std::size_t size = x.size();
+    Eigen::Map<Eigen::Matrix<scalar_type_t<T>, Eigen::Dynamic, 1>> dst(x.data(),
+                                                                       size);
+    dst.real() = map_t(values.data() + 0, size, 1, 1);
+    dst.imag() = map_t(values.data() + 0 + imaginary_offset, size, 1, 1);
+  } else {
+    const std::size_t size = x.size();
+    const std::size_t child_stride = size;
+    for (std::size_t i = 0; i < size; ++i) {
+      read_payload_complex(x[i], values, i, child_stride, imaginary_offset);
+    }
+  }
+}
+
+template <typename T, typename InVec, std::size_t Slot, std::size_t... Rest>
+inline void fill_slots(T& x, const InVec& values, std::size_t& cursor,
+                       std::index_sequence<Slot, Rest...> path) {
+  if constexpr (!is_tuple_v<T>) {
+    for (auto& element : x) {
+      fill_slots(element, values, cursor, path);
+    }
+  } else if constexpr (sizeof...(Rest) > 0) {
+    fill_slots(std::get<Slot>(x), values, cursor,
+               std::index_sequence<Rest...>{});
+  } else {
+    using scalar_t = scalar_type_t<std::tuple_element_t<Slot, T>>;
+    auto& payload = std::get<Slot>(x);
+    const std::size_t size = math::num_elements(payload);
+    const std::size_t needed = is_complex<scalar_t>::value ? 2 * size : size;
+    if (needed > values.size() - cursor) {
+      throw std::runtime_error(
+          "read_from_context: ran out of values filling "
+          "slot "
+          + std::to_string(Slot + 1));
+    } else if (size > 0) {
+      if constexpr (is_complex<scalar_t>::value) {
+        read_payload_complex(payload, values, cursor, 1, size);
+      } else {
+        read_payload(payload, values, cursor);
+      }
+    }
+    cursor += needed;
   }
 }
 
 }  // namespace internal
 
 /**
- * Read a named variable into an already-sized destination.
+ * Read a tuple-free variable out of a var_context into an already-sized
+ * destination.
  *
- * Supported destinations are int, double, std::complex<double>, Eigen
- * vectors, row vectors and matrices, and nested std::vectors and std::tuples
- * of these types. Arrays must be rectangular. Declared dimensions must be
- * validated before this call; empty containers cannot describe the sizes of
- * their missing elements.
+ * The whole destination is one name and one whole buffer, so the buffer is
+ * fetched once and must supply exactly the number of values the destination
+ * holds. A complex destination takes two values per coefficient, every real
+ * component before every imaginary one.
  *
- * Each dotted tuple-field name is fetched once, written, and its buffer
- * released before the next name is fetched. Arrays containing tuples are
- * traversed in element order, while each tuple-free payload is decoded in
- * column-major order. Complex components are paired within that payload.
- * If a later leaf fails, previously written leaves remain modified.
- *
- * @tparam T Destination type: int, double, std::complex<double>, an Eigen
- * object, or a nesting of std::vectors and std::tuples of supported types.
- * @tparam Context Source type providing const vals_i(name) and vals_r(name)
- * methods returning std::vector<int> and std::vector<double>, respectively.
- * @param[in,out] x Rectangular destination with its declared dimensions already
- * allocated. Scalar values are overwritten; container dimensions are preserved.
+ * @tparam T Destination type with no std::tuple anywhere inside: int, double,
+ * std::complex<double>, an Eigen vector, row vector or matrix, or a
+ * rectangular std::vector nesting of these. Its scalar type must be int,
+ * double or std::complex<double>.
+ * @tparam Context Source providing vals_i(name) and vals_r(name) as const
+ * members returning std::vector<int> and std::vector<double> by value.
+ * Integer destinations read vals_i, real and complex ones read vals_r.
+ * @param[in,out] x Destination with every dimension already allocated.
+ * Declared dimensions must be validated before this call, because an empty
+ * container cannot describe the sizes of the elements it does not have.
  * @param[in] context Source of the named integer and real buffers.
- * @param[in] name Root variable name, without array indices or tuple suffixes;
- * converted to an owned string for this call.
- * @throw std::runtime_error if the input contains an unexpected number of
- * values.
+ * @param[in] name Variable name, with no array indices or tuple suffixes.
+ * @throw std::runtime_error if the context supplies a number of values other
+ * than the number the destination holds. Exceptions from the context
+ * propagate unchanged.
  */
-template <typename T, typename Context>
+template <typename T, typename Context,
+          stan::require_not_t<stan::contains_tuple<T>>* = nullptr>
 inline void read_from_context(T& x, const Context& context,
-                              std::string_view name) {
-  const std::string path(name);
-  if constexpr (stan::is_complex<T>::value) {
-    static_assert(std::is_same_v<typename T::value_type, double>,
-                  "read_from_context requires complex<double> scalar types");
-    const auto values = context.vals_r(path);
-    if (values.size() != 2) {
-      throw std::runtime_error("read_from_context: expected two components for "
-                               + path);
-    }
+                              const std::string& name) {
+  using scalar_t = scalar_type_t<T>;
+  static_assert(std::is_same_v<scalar_t, int>
+                    || std::is_same_v<scalar_t, double>
+                    || std::is_same_v<scalar_t, std::complex<double>>,
+                "read_from_context requires int, double or complex<double> "
+                "scalars");
+  const auto values = internal::get_values<scalar_t>(context, name);
+  const std::size_t size = math::num_elements(x);
+  const std::size_t expected = is_complex<scalar_t>::value ? 2 * size : size;
+  if (values.size() != expected) {
+    throw std::runtime_error("read_from_context: " + name + " expected "
+                             + std::to_string(expected) + " values, got "
+                             + std::to_string(values.size()));
+  } else if (size == 0) {
+    return;
+  }
+  if constexpr (std::is_arithmetic_v<T>) {
+    x = values[0];
+  } else if constexpr (is_complex<T>::value) {
     x = {values[0], values[1]};
-  } else if constexpr (std::is_same_v<T, int>) {
-    const auto values = context.vals_i(path);
-    if (values.size() != 1) {
-      throw std::runtime_error("read_from_context: expected one value for "
-                               + path);
+  } else if constexpr (is_eigen_v<T>) {
+    using map_t
+        = Eigen::Map<const Eigen::Matrix<value_type_t<decltype(values)>,
+                                         Eigen::Dynamic, Eigen::Dynamic>>;
+    if constexpr (is_complex<scalar_t>::value) {
+      x.real() = map_t(values.data(), x.rows(), x.cols());
+      x.imag() = map_t(values.data() + size, x.rows(), x.cols());
+    } else {
+      x = map_t(values.data(), x.rows(), x.cols());
     }
-    x = values[0];
-  } else if constexpr (std::is_same_v<T, double>) {
-    const auto values = context.vals_r(path);
-    if (values.size() != 1) {
-      throw std::runtime_error("read_from_context: expected one value for "
-                               + path);
+  } else if constexpr (std::is_same_v<value_type_t<T>, scalar_t>) {
+    if constexpr (is_complex<scalar_t>::value) {
+      for (std::size_t i = 0; i < size; ++i) {
+        x[i] = {values[i], values[i + size]};
+      }
+    } else {
+      std::copy(values.begin(), values.end(), x.begin());
     }
-    x = values[0];
-  } else if constexpr (std::is_same_v<T, std::vector<int>>) {
-    internal::read_whole_payload(x, context.vals_i(path), path);
-  } else if constexpr (std::is_same_v<T, std::vector<double>>) {
-    internal::read_whole_payload(x, context.vals_r(path), path);
-  } else if constexpr (is_eigen<T>::value
-                       && std::is_same_v<scalar_type_t<T>, int>) {
-    internal::read_whole_payload(x, context.vals_i(path), path);
-  } else if constexpr (is_eigen<T>::value
-                       && std::is_same_v<scalar_type_t<T>, double>) {
-    internal::read_whole_payload(x, context.vals_r(path), path);
+  } else if constexpr (is_complex<scalar_t>::value) {
+    internal::read_payload_complex(x, values, size);
   } else {
-    internal::load_from_context<T>(x, context, path, std::index_sequence<>{});
+    internal::read_payload(x, values);
   }
 }
+
+/**
+ * Read a variable containing std::tuple out of a var_context into an
+ * already-sized destination.
+ *
+ * Every tuple slot is a separate name, so this reads one name per leaf of the
+ * tuple skeleton, fetching and releasing each buffer before the next. If a
+ * later name fails, the names already read remain written. See the file
+ * comment above for a worked example of the two traversals.
+ *
+ * Call it with three arguments; SlotType and path carry the recursion and
+ * default to the root of the tuple skeleton and the empty path.
+ *
+ * @tparam T Destination type with a std::tuple somewhere inside: a
+ * std::tuple, or a rectangular std::vector nesting around one. Every leaf
+ * scalar must be int, double or std::complex<double>.
+ * @tparam SlotType Position in the tuple skeleton, scalar_type_t<T> at the
+ * root. A std::tuple here means the name has more slots below it; anything
+ * else means the name is a leaf and is read. Never a type of x itself, since
+ * scalar_type_t has erased the std::vector and Eigen layers.
+ * @tparam Context Source providing vals_i(name) and vals_r(name) as const
+ * members returning std::vector<int> and std::vector<double> by value.
+ * @tparam Slots Tuple slot indices from the root to SlotType, excluding array
+ * indices. The path that fill_slots follows through the destination.
+ * @param[in,out] x Destination with every dimension already allocated. It is
+ * always the root: the recursion descends SlotType and path, never x.
+ * @param[in] context Source of the named integer and real buffers.
+ * @param[in] name Variable name, with the dotted one-based suffix for Slots
+ * already appended.
+ * @param[in] path Slots as a value, so the pack is deduced rather than given.
+ * @throw std::runtime_error if a name supplies a number of values other than
+ * the number its destinations hold. Exceptions from the context propagate
+ * unchanged.
+ */
+template <typename T, typename SlotType = scalar_type_t<T>, typename Context,
+          std::size_t... Slots,
+          stan::require_t<stan::contains_tuple<T>>* = nullptr>
+inline void read_from_context(T& x, const Context& context,
+                              std::string_view name,
+                              std::index_sequence<Slots...> path = {}) {
+  if constexpr (is_tuple_v<SlotType>) {
+    math::index_apply<std::tuple_size_v<SlotType>>([&x, &context,
+                                                    &name](auto... Slot) {
+      (read_from_context<T, std::tuple_element_t<Slot.value, SlotType>>(
+           x, context, std::string(name) + "." + std::to_string(Slot.value + 1),
+           std::index_sequence<Slots..., Slot.value>{}),
+       ...);
+    });
+  } else {
+    static_assert(std::is_same_v<SlotType, int>
+                      || std::is_same_v<SlotType, double>
+                      || std::is_same_v<SlotType, std::complex<double>>,
+                  "read_from_context requires int, double or complex<double> "
+                  "scalars");
+    const std::string leaf_name(name);
+    const auto values = internal::get_values<SlotType>(context, leaf_name);
+    std::size_t cursor = 0;
+    internal::fill_slots(x, values, cursor, path);
+    if (cursor != values.size()) {
+      throw std::runtime_error("read_from_context: " + leaf_name + " supplied "
+                               + std::to_string(values.size())
+                               + " values but the destination holds "
+                               + std::to_string(cursor));
+    }
+  }
+}
+
+}  // namespace io
 
 }  // namespace stan
 

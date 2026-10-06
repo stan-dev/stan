@@ -27,7 +27,7 @@ void read_fixture(T& x, const std::string& fixture,
                   const std::string& name = "x") {
   auto in = fixture_stream(fixture);
   const stan::json::json_data context(in);
-  stan::read_from_context(x, context, name);
+  stan::io::read_from_context(x, context, name);
 }
 
 void expect_complex(const std::complex<double>& actual, double real) {
@@ -411,8 +411,8 @@ TEST(ioReadFromContext, repeated_read_has_independent_positions) {
   std::tuple<std::vector<double>, int> first{std::vector<double>(3, -999),
                                              -999};
   auto second = first;
-  ASSERT_NO_THROW(stan::read_from_context(first, context, "basic"));
-  ASSERT_NO_THROW(stan::read_from_context(second, context, "basic"));
+  ASSERT_NO_THROW(stan::io::read_from_context(first, context, "basic"));
+  ASSERT_NO_THROW(stan::io::read_from_context(second, context, "basic"));
   EXPECT_EQ((std::vector<double>{1.25, -2.5, 3.75}), std::get<0>(first));
   EXPECT_EQ(-17, std::get<1>(first));
   EXPECT_EQ(first, second);
