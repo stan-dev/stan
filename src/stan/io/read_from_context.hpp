@@ -26,11 +26,11 @@ namespace stan {
 
 namespace io {
 
-/** 
+/**
  * `read_from_context` is used by the stan compiler to read in user data
  *  from a `var_context`. This code looks a bit messy due to the indexing
- *  issues that arise from serializing arrays of tuples and complex number 
- *  types.  
+ *  issues that arise from serializing arrays of tuples and complex number
+ *  types.
  * `read_from_context` fills one already-sized model variable from a
  * `var_context`. The context maps a name to a flat `std::vector<int>` or
  * `std::vector<double>`, while the destination can be any nesting of
@@ -101,15 +101,15 @@ namespace io {
  *
  * Inside the x[1].2 block, first index fastest (rule 1):
  *
- *   1 -> x[1].2[1][1]    
+ *   1 -> x[1].2[1][1]
  *   2 -> x[1].2[1][2]
- *   3 -> x[1].2[2][1]    
+ *   3 -> x[1].2[2][1]
  *   4 -> x[1].2[2][2]
  *
  * so x[1].2[1] = [1, 2]' and x[1].2[2] = [3, 4]'. x[2].2 is read the
  * same way from {5, 7, 6, 8}.
  * ```
- *  
+ *
  * `scalar_type_t<decltype(x)>` is `std::tuple<int, double>`, so the second
  * overload reads `"x.1"` through `vals_i` and `"x.2"` through `vals_r`. For
  * `"x.2"`, `fill_slots` visits `x[0]` and then `x[1]`, takes slot 2 of each,
