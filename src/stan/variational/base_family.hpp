@@ -23,6 +23,7 @@ class base_family {
   virtual const Eigen::VectorXd& mean() const = 0;
   virtual double entropy() const = 0;
   virtual Eigen::VectorXd transform(const Eigen::VectorXd& eta) const = 0;
+  virtual void write_parameterization(callbacks::structured_writer& out) const;
   /**
    * Assign a draw from this mean field approximation to the
    * specified vector using the specified random number generator.

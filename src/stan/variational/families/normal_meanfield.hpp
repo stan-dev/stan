@@ -392,6 +392,14 @@ class normal_meanfield : public base_family {
     elbo_grad.set_mu(mu_grad);
     elbo_grad.set_omega(omega_grad);
   }
+
+  void write_parameterization(callbacks::structured_writer& out) const {
+   out.begin_record();
+   out.write("family", "normal_meanfield");
+   out.write("mean", mu_);
+   out.write("log_std", omega_);
+   out.end_record();
+  }
 };
 
 /**

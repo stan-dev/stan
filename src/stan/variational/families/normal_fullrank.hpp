@@ -461,6 +461,14 @@ class normal_fullrank : public base_family {
     elbo_grad.set_mu(mu_grad);
     elbo_grad.set_L_chol(L_grad);
   }
+
+  void write_parameterization(callbacks::structured_writer& out) const {
+   out.begin_record();
+   out.write("family", "normal_fullrank");
+   out.write("mean", mu_);
+   out.write("L_cholesky", L_chol_);
+   out.end_record();
+  }
 };
 
 /**

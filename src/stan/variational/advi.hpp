@@ -5,6 +5,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
@@ -456,7 +457,8 @@ class advi {
   int run(double eta, bool adapt_engaged, int adapt_iterations,
           double tol_rel_obj, int max_iterations, callbacks::logger& logger,
           callbacks::writer& parameter_writer,
-          callbacks::writer& diagnostic_writer) const {
+          callbacks::writer& diagnostic_writer
+          callbacks::structured_writer& cov_writer) const {
     diagnostic_writer("iter,time_in_seconds,ELBO");
 
     // Initialize variational approximation
@@ -474,6 +476,7 @@ class advi {
                                logger, diagnostic_writer);
 
     // Write posterior mean of variational approximations.
+    variational.write_parameterization(cov_writer);
     cont_params_ = variational.mean();
     std::vector<double> cont_vector(cont_params_.size());
     for (int i = 0; i < cont_params_.size(); ++i)
