@@ -266,11 +266,12 @@ template <typename T, typename Context,
 inline void read_from_context(T& x, const Context& context,
                               const std::string& name) {
   using scalar_t = scalar_type_t<T>;
-  static_assert(std::is_same_v<scalar_t, int>
-                    || std::is_same_v<scalar_t, double>
-                    || std::is_same_v<scalar_t, std::complex<double>>,
-                "read_from_context requires int, double or complex<double> "
-                "scalars");
+  static_assert(
+      std::is_same_v<
+          scalar_t,
+          int> || std::is_same_v<scalar_t, double> || std::is_same_v<scalar_t, std::complex<double>>,
+      "read_from_context requires int, double or complex<double> "
+      "scalars");
   const auto values = internal::get_values<scalar_t>(context, name);
   const std::size_t size = math::num_elements(x);
   const std::size_t expected = is_complex<scalar_t>::value ? 2 * size : size;
@@ -358,11 +359,12 @@ inline void read_from_context(T& x, const Context& context,
        ...);
     });
   } else {
-    static_assert(std::is_same_v<SlotType, int>
-                      || std::is_same_v<SlotType, double>
-                      || std::is_same_v<SlotType, std::complex<double>>,
-                  "read_from_context requires int, double or complex<double> "
-                  "scalars");
+    static_assert(
+        std::is_same_v<
+            SlotType,
+            int> || std::is_same_v<SlotType, double> || std::is_same_v<SlotType, std::complex<double>>,
+        "read_from_context requires int, double or complex<double> "
+        "scalars");
     const std::string leaf_name(name);
     const auto values = internal::get_values<SlotType>(context, leaf_name);
     std::size_t cursor = 0;
