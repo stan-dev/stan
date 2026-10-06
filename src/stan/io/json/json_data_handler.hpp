@@ -477,7 +477,7 @@ class json_data_handler : public stan::json::json_handler {
    *  This means that we don't accumulate variable definitions
    *  across calls to the parser.
    */
-  void start_text() {
+  void start_text() override {
     vars_i.clear();
     vars_r.clear();
     var_types_map.clear();
@@ -492,7 +492,7 @@ class json_data_handler : public stan::json::json_handler {
   /** Once all variable definitions have been processed,
    *  update dimensions for array of tuple variables.
    */
-  void end_text() { update_array_dims(); }
+  void end_text() override { update_array_dims(); }
 
   /** A key is either a top-level Stan variable name or a tuple slot id.
    *  Logic handles edge case where key is the first slot of a tuple;
@@ -535,7 +535,7 @@ class json_data_handler : public stan::json::json_handler {
    * A start object ("{") event changes the meta-type of the current key.
    * Initialize or update tuple slots.
    */
-  void start_object() {
+  void start_object() override {
     event = meta_event::OBJ_OPEN;
     if (is_init() || not_stan_var)
       return;
@@ -560,7 +560,7 @@ class json_data_handler : public stan::json::json_handler {
    *  If this is an array of tuples, track or check the number tuple slots
    *  and the array size.
    */
-  void end_object() {
+  void end_object() override {
     event = meta_event::OBJ_CLOSE;
     if (not_stan_var) {
       if (!key_stack.empty())
@@ -598,7 +598,7 @@ class json_data_handler : public stan::json::json_handler {
    *  doesn't distinguish lists of heterogeneous elements and arrays.
    *  Then we add or update the dimensions of the array variable.
    */
-  void start_array() {
+  void start_array() override {
     if (key_stack.empty()) {
       throw json_error("Expecting JSON object, found array.");
     }
@@ -636,7 +636,7 @@ class json_data_handler : public stan::json::json_handler {
    *  If processing the first row of an array, record the size of this row,
    *  else check that the size of this row matches recorded row size.
    */
-  void end_array() {
+  void end_array() override {
     if (not_stan_var)
       return;
     if (slot_dims_map.count(key_str()) == 0)
@@ -674,7 +674,7 @@ class json_data_handler : public stan::json::json_handler {
     slot_dims_map[key] = dims;
   }
 
-  void null() {
+  void null() override {
     if (not_stan_var)
       return;
     std::stringstream errorMsg;
@@ -683,7 +683,7 @@ class json_data_handler : public stan::json::json_handler {
     throw json_error(errorMsg.str());
   }
 
-  void boolean(bool p) {
+  void boolean(bool p) override {
     if (not_stan_var)
       return;
     std::stringstream errorMsg;
@@ -716,14 +716,14 @@ class json_data_handler : public stan::json::json_handler {
     values_r.push_back(tmp);
   }
 
-  void number_double(double x) {
+  void number_double(double x) override {
     if (not_stan_var)
       return;
     promote_to_double();
     values_r.push_back(x);
   }
 
-  void number_int(int n) {
+  void number_int(int n) override {
     if (not_stan_var)
       return;
     if (int_slots_map[key_str()]) {
@@ -733,7 +733,7 @@ class json_data_handler : public stan::json::json_handler {
     }
   }
 
-  void number_unsigned_int(unsigned n) {
+  void number_unsigned_int(unsigned n) override {
     if (not_stan_var)
       return;
     // if integer overflow, promote numeric data to double
@@ -746,14 +746,14 @@ class json_data_handler : public stan::json::json_handler {
     }
   }
 
-  void number_int64(int64_t n) {
+  void number_int64(int64_t n) override {
     if (not_stan_var)
       return;
     // the number doesn't fit in int (otherwise number_int() would be called)
     number_double(n);
   }
 
-  void number_unsigned_int64(uint64_t n) {
+  void number_unsigned_int64(uint64_t n) override {
     if (not_stan_var)
       return;
     // the number doesn't fit in int (otherwise number_unsigned_int() would be

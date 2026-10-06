@@ -267,7 +267,7 @@ inline void read_from_context(T& x, const Context& context,
                               const std::string& name) {
   using scalar_t = scalar_type_t<T>;
   static_assert(
-      std::is_arithmetic_v<scalar_t> || stan::is_complex_v<scalar_t>,
+      std::is_arithmetic_v<scalar_t> || stan::is_complex<scalar_t>::value,
       "read_from_context requires int, double or complex<double> "
       "scalars");
   const auto values = internal::get_values<scalar_t>(context, name);
@@ -350,16 +350,18 @@ inline void read_from_context(T& x, const Context& context,
                               std::index_sequence<Slots...> path = {}) {
   if constexpr (is_tuple_v<SlotT>) {
     math::index_apply<std::tuple_size_v<SlotT>>([&x, &context,
-                                                    &name](auto... Slot) {
+                                                 &name](auto... Slot) {
       (read_from_context<T, std::tuple_element_t<Slot.value, SlotT>>(
            x, context, std::string(name) + "." + std::to_string(Slot.value + 1),
            std::index_sequence<Slots..., Slot.value>{}),
        ...);
     });
   } else {
-    static_assert(std::is_arithmetic_v<SlotT> || stan::is_complex_v<SlotT>,
-        "read_from_context requires int, double or complex<double> "
-        "scalars");
+    constexpr bool is_valid_slot_type
+        = std::is_arithmetic_v<SlotT> || stan::is_complex<SlotT>::value;
+    static_assert(is_valid_slot_type,
+                  "read_from_context requires int, double or complex<double> "
+                  "scalars");
     const std::string leaf_name(name);
     const auto values = internal::get_values<SlotT>(context, leaf_name);
     std::size_t cursor = 0;
