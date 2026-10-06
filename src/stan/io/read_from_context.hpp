@@ -41,15 +41,15 @@ namespace io {
  *   std::vector<Mid> x;
  *
  * scalar_type_t erases every std::vector and Eigen layer and keeps the tuples,
- * so SlotType starts as the name tree alone:
+ * so SlotT starts as the name tree alone:
  *
- *   SlotType = std::tuple<std::tuple<std::complex<double>, double>>
+ *   SlotT = std::tuple<std::tuple<std::complex<double>, double>>
  *
  * read_from_context walks that tree at compile time and never touches x. The
  * std::tuple_element_t below indexes a TYPE; the only runtime work in that
  * branch is building name strings.
  *
- *   SlotType                        path     name
+ *   SlotT                        path     name
  *   tuple<tuple<complex, double>>   <>       "x"
  *     \__ tuple<complex, double>    <0>      "x.1"
  *          |__ complex<double>      <0,0>    "x.1.1"   leaf
@@ -267,9 +267,7 @@ inline void read_from_context(T& x, const Context& context,
                               const std::string& name) {
   using scalar_t = scalar_type_t<T>;
   static_assert(
-      std::is_same_v<
-          scalar_t,
-          int> || std::is_same_v<scalar_t, double> || std::is_same_v<scalar_t, std::complex<double>>,
+      std::is_arithmetic_v<scalar_t> || stan::is_complex_v<scalar_t>,
       "read_from_context requires int, double or complex<double> "
       "scalars");
   const auto values = internal::get_values<scalar_t>(context, name);
@@ -320,22 +318,22 @@ inline void read_from_context(T& x, const Context& context,
  * later name fails, the names already read remain written. See the file
  * comment above for a worked example of the two traversals.
  *
- * Call it with three arguments; SlotType and path carry the recursion and
+ * Call it with three arguments; SlotT and path carry the recursion and
  * default to the root of the tuple skeleton and the empty path.
  *
  * @tparam T Destination type with a std::tuple somewhere inside: a
  * std::tuple, or a rectangular std::vector nesting around one. Every leaf
  * scalar must be int, double or std::complex<double>.
- * @tparam SlotType Position in the tuple skeleton, scalar_type_t<T> at the
+ * @tparam SlotT Position in the tuple skeleton, scalar_type_t<T> at the
  * root. A std::tuple here means the name has more slots below it; anything
  * else means the name is a leaf and is read. Never a type of x itself, since
  * scalar_type_t has erased the std::vector and Eigen layers.
  * @tparam Context Source providing vals_i(name) and vals_r(name) as const
  * members returning std::vector<int> and std::vector<double> by value.
- * @tparam Slots Tuple slot indices from the root to SlotType, excluding array
+ * @tparam Slots Tuple slot indices from the root to SlotT, excluding array
  * indices. The path that fill_slots follows through the destination.
  * @param[in,out] x Destination with every dimension already allocated. It is
- * always the root: the recursion descends SlotType and path, never x.
+ * always the root: the recursion descends SlotT and path, never x.
  * @param[in] context Source of the named integer and real buffers.
  * @param[in] name Variable name, with the dotted one-based suffix for Slots
  * already appended.
@@ -344,29 +342,26 @@ inline void read_from_context(T& x, const Context& context,
  * the number its destinations hold. Exceptions from the context propagate
  * unchanged.
  */
-template <typename T, typename SlotType = scalar_type_t<T>, typename Context,
+template <typename T, typename SlotT = scalar_type_t<T>, typename Context,
           std::size_t... Slots,
           stan::require_t<stan::contains_tuple<T>>* = nullptr>
 inline void read_from_context(T& x, const Context& context,
                               std::string_view name,
                               std::index_sequence<Slots...> path = {}) {
-  if constexpr (is_tuple_v<SlotType>) {
-    math::index_apply<std::tuple_size_v<SlotType>>([&x, &context,
+  if constexpr (is_tuple_v<SlotT>) {
+    math::index_apply<std::tuple_size_v<SlotT>>([&x, &context,
                                                     &name](auto... Slot) {
-      (read_from_context<T, std::tuple_element_t<Slot.value, SlotType>>(
+      (read_from_context<T, std::tuple_element_t<Slot.value, SlotT>>(
            x, context, std::string(name) + "." + std::to_string(Slot.value + 1),
            std::index_sequence<Slots..., Slot.value>{}),
        ...);
     });
   } else {
-    static_assert(
-        std::is_same_v<
-            SlotType,
-            int> || std::is_same_v<SlotType, double> || std::is_same_v<SlotType, std::complex<double>>,
+    static_assert(std::is_arithmetic_v<SlotT> || stan::is_complex_v<SlotT>,
         "read_from_context requires int, double or complex<double> "
         "scalars");
     const std::string leaf_name(name);
-    const auto values = internal::get_values<SlotType>(context, leaf_name);
+    const auto values = internal::get_values<SlotT>(context, leaf_name);
     std::size_t cursor = 0;
     internal::fill_slots(x, values, cursor, path);
     if (cursor != values.size()) {
