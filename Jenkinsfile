@@ -100,19 +100,6 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
 
     if (runRemainingStages) {
       stage('Unit & integration tests') {
-        // The unit stages reuse their workspace so math-libs is not rebuilt
-        // every run, so an aborted build can leave a stale index.lock behind
-        // and every later checkout into that workspace fails while cleaning.
-        def checkoutResilient = {
-          try {
-            checkout scm
-          } catch (e) {
-            echo "checkout failed (${e.message}); wiping workspace and retrying"
-            deleteDir()
-            checkout scm
-          }
-        }
-
         def runUnit = { args ->
           def local = "CXX=$args.cxx\n$stanc3_bin_url"
           if (args.local)
@@ -157,7 +144,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           windowsUnit: {
           node('windows') {
             stage('Windows Headers & Unit') {
-              checkoutResilient()
+              checkout scm
               bat """$WINSETENV
                   make -f lib/stan_math/make/standalone math-libs
               """
@@ -180,7 +167,7 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
         }, macUnit: {
           node('macos') {
             stage('Mac Unit') {
-              checkoutResilient()
+              checkout scm
               runUnit(cxx: MAC_CXX)
             }
           }
