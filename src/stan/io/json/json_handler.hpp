@@ -2,7 +2,7 @@
 #define STAN_IO_JSON_JSON_HANDLER_HPP
 
 #include <cstdint>
-#include <string>
+#include <string_view>
 
 namespace stan {
 
@@ -100,16 +100,22 @@ class json_handler {
   /**
    * Handle the specified string value.
    *
+   * The view is only valid for the duration of the call; a handler which
+   * needs to retain the text must copy it.
+   *
    * @param s String value to handle.
    */
-  virtual void string(const std::string &s) {}
+  virtual void string(std::string_view s) {}
 
   /**
    * Handle the specified object key.
    *
+   * The view is only valid for the duration of the call; a handler which
+   * needs to retain the text must copy it.
+   *
    * @param s String object key to handle.
    */
-  virtual void key(const std::string &s) {}
+  virtual void key(std::string_view s) {}
 };
 
 }  // namespace json

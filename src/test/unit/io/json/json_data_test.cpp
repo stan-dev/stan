@@ -43,6 +43,27 @@ TEST(ioJson, jsonData_scalar_complex) {
   test_complex_var(jdata, "foo", expected_vals, expected_dims);
 }
 
+TEST(ioJson, jsonData_complex_invalid_dimensions) {
+  std::stringstream in(R"({"scalar": 1, "odd": [1, 2, 3],
+                           "even": [1.0, 2.0, 3.0, 4.0],
+                           "tuples": [{"1": 1.0}, {"1": 2.0}]})");
+  stan::json::json_data jdata(in);
+
+  EXPECT_THROW(jdata.vals_c("scalar"), stan::json::json_error);
+  EXPECT_THROW(jdata.vals_c("odd"), stan::json::json_error);
+  EXPECT_THROW(jdata.vals_c("even"), stan::json::json_error);
+  EXPECT_THROW(jdata.vals_c("tuples.1"), stan::json::json_error);
+}
+
+TEST(ioJson, jsonData_complex_removed_variable) {
+  std::stringstream in(R"({"x": [[1, 2], [3, 4]]})");
+  stan::json::json_data jdata(in);
+
+  EXPECT_TRUE(jdata.remove("x"));
+  EXPECT_FALSE(jdata.remove("x"));
+  EXPECT_TRUE(jdata.vals_c("x").empty());
+}
+
 TEST(ioJson, jsonData_mult_vars) {
   std::string txt = "{ \"foo\" : 1, \"bar\" : 0.1 }";
   std::stringstream in(txt);
