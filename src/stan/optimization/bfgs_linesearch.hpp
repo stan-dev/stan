@@ -122,7 +122,13 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
   while (1) {
     itNum++;
 
-    if (std::fabs(alo - ahi) < min_range)
+    // Also stop when no double lies strictly between alo and ahi. Then
+    // every trial step equals alo or ahi: a trial at alo collapses the
+    // bracket (and returns 1 in the next iteration), and a trial at ahi
+    // leaves it unchanged forever, because the absolute min_range is
+    // smaller than the spacing of doubles when |alpha| >= 0.5 (#3229).
+    // No trial can satisfy the Wolfe conditions in either case.
+    if (std::fabs(alo - ahi) < min_range || std::nextafter(alo, ahi) == ahi)
       return 1;
 
     if (itNum % 5 == 0) {
@@ -143,8 +149,12 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
 
     newX = x + alpha * p;
     while (func(newX, newF, newDF)) {
+      const Scalar alpha_prev = alpha;
       alpha = 0.5 * (alpha + std::min(alo, ahi));
-      if (std::fabs(std::min(alo, ahi) - alpha) < min_range)
+      // if the halving does not change alpha, the same failing point would
+      // be evaluated forever
+      if (std::fabs(std::min(alo, ahi) - alpha) < min_range
+          || alpha == alpha_prev)
         return 1;
       newX = x + alpha * p;
     }
