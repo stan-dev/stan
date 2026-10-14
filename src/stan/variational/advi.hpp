@@ -484,8 +484,7 @@ class advi {
     std::stringstream msg;
     model_.write_array(rng_, cont_vector, disc_vector, values, true, true,
                        &msg);
-    if (msg.str().length() > 0)
-      logger.info(msg);
+    log_if_nonempty(logger, msg);
 
     // The first row of lp_, log_p, and log_g.
     values.insert(values.begin(), {0, 0, 0});
