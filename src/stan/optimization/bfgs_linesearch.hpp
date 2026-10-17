@@ -38,9 +38,13 @@ Scalar CubicInterp(const Scalar &df0, const Scalar &x1, const Scalar &f1,
   const Scalar c2(-(4 * df0 + 2 * df1) / x1 + 6 * f1 / (x1 * x1));
   const Scalar &c1(df0);
 
+  // Roots of g'(x) = c3 x^2 / 2 + c2 x + c1 in the cancellation-free form:
+  // for (near-)quadratic data c3 is rounding noise, and the form that
+  // subtracts, -(c2 - sign(c2) t_s) / c3, would lose the root -c1 / c2.
   const Scalar t_s = std::sqrt(c2 * c2 - 2.0 * c1 * c3);
-  const Scalar s1 = -(c2 + t_s) / c3;
-  const Scalar s2 = -(c2 - t_s) / c3;
+  const Scalar q = c2 + std::copysign(t_s, c2);
+  const Scalar s1 = -q / c3;
+  const Scalar s2 = -2.0 * c1 / q;
 
   Scalar tmpF;
   Scalar minF, minX;

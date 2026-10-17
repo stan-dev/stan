@@ -76,6 +76,17 @@ TEST(OptimizationBfgsLinesearch, CubicInterp_6arg) {
   }
 }
 
+TEST(OptimizationBfgsLinesearch, CubicInterp_quadratic_data) {
+  // Data at 0 and x1 = 0.4 from phi(x) = -x + x^2 / (2 m), minimised at
+  // m = 0.1. The cubic coefficient is rounding noise (about -1e-14), and the
+  // root -(c2 - sqrt(c2^2 - 2 c1 c3)) / c3 cancelled: it came out as 0.128.
+  using stan::optimization::CubicInterp;
+  const double m = 0.1, x1 = 0.4;
+  const double f1 = -x1 + x1 * x1 / (2 * m);
+  const double df1 = -1 + x1 / m;
+  EXPECT_NEAR(m, CubicInterp(-1.0, x1, f1, df1, 1e-12, 1.0), 1e-13);
+}
+
 class linesearch_testfunc {
  public:
   double operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x) {
