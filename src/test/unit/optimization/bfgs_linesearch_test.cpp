@@ -277,3 +277,18 @@ TEST(OptimizationBfgsLinesearch, WolfLSZoom_failing_evaluations) {
   EXPECT_EQ(1, ret);
   EXPECT_LT(func.n_evals_, 1000);
 }
+
+TEST(OptimizationBfgsLinesearch, WolfLSZoom_max_evals_counts_failures) {
+  // every evaluation fails: the zoom gives up after max_evals of them
+  using stan::optimization::WolfLSZoom;
+  linesearch_jumpfunc func(10.0, 0.0, 20.0);
+  Eigen::Matrix<double, -1, 1> x0(1), x1, p(1), gradx1;
+  x0 << 0.0;
+  p << 1.0;
+  const double f0 = 0.0, dfp = -1.0;
+  double alpha = 1.0, f1 = 0.0;
+  int ret = WolfLSZoom(alpha, x1, f1, gradx1, func, x0, f0, dfp, 1e-4 * dfp,
+                       0.9 * dfp, p, 0.0, f0, dfp, 1.0, 1.0, 1.0, 1e-16, 5.0);
+  EXPECT_EQ(1, ret);
+  EXPECT_EQ(5, func.n_evals_);
+}
