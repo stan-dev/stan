@@ -195,6 +195,42 @@ TEST(OptimizationBfgsLinesearch, wolfeLineSearch) {
   EXPECT_LE(std::fabs(p.dot(gradx1)), c2 * std::fabs(p.dot(gradx0)));
 }
 
+TEST(OptimizationBfgsLinesearch, wolfeLineSearch_armijo_after_expansion) {
+  // A cubic Hermite interpolant of phi(0) = 0, phi(1) = -2e-4,
+  // phi(10) = -3e-4 with slopes -1, -0.95, -0.5. The step 1 meets sufficient
+  // decrease but not the curvature condition, so it is expanded to 10, which
+  // meets the curvature condition but not sufficient decrease for alpha = 10
+  // (-3e-4 > 1e-4 * 10 * -1). It used to be accepted because sufficient
+  // decrease was tested for the first trial step.
+  using stan::optimization::WolfeLineSearch;
+  const double c1 = 1e-4, c2 = 0.9;
+  const double xs[] = {0, 1, 10}, fs[] = {0, -2e-4, -3e-4},
+               gs[] = {-1, -0.95, -0.5};
+  auto func = [&](const Eigen::VectorXd &x, double &f, Eigen::VectorXd &g) {
+    const int k = x[0] > xs[1];
+    const double h = xs[k + 1] - xs[k], t = (x[0] - xs[k]) / h;
+    f = (2 * t * t * t - 3 * t * t + 1) * fs[k]
+        + (t * t * t - 2 * t * t + t) * h * gs[k]
+        + (-2 * t * t * t + 3 * t * t) * fs[k + 1]
+        + (t * t * t - t * t) * h * gs[k + 1];
+    g.resize(1);
+    g[0] = (6 * t * t - 6 * t) * (fs[k] - fs[k + 1]) / h
+           + (3 * t * t - 4 * t + 1) * gs[k] + (3 * t * t - 2 * t) * gs[k + 1];
+    return 0;
+  };
+  Eigen::VectorXd x0(1), x1, p(1), gradx0, gradx1;
+  double f0, f1;
+  x0 << 0.0;
+  func(x0, f0, gradx0);
+  p << 1.0;
+  double alpha = 1.0;
+  int ret = WolfeLineSearch(func, alpha, x1, f1, gradx1, p, x0, f0, gradx0, c1,
+                            c2, 1e-16, 20.0, 10.0);
+  EXPECT_EQ(0, ret);
+  EXPECT_LE(f1, f0 + c1 * alpha * p.dot(gradx0));
+  EXPECT_LE(std::fabs(p.dot(gradx1)), c2 * std::fabs(p.dot(gradx0)));
+}
+
 // A 1-D test function for #3229: slope -1 below jump_at, value and slope
 // 1e300 from jump_at on, and failed evaluations for fail_lo <= x < fail_hi.
 // A line search towards jump_at can bracket the jump, but no point meets
