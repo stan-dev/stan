@@ -349,3 +349,97 @@ TEST_F(OptimizationBfgsMinimizer, minimize) {
 
   EXPECT_FLOAT_EQ(bfgs.minimize(cont_vector), 31);
 }
+
+namespace {
+// f(x) = sum cosh(x_i), minimised at 0; the evaluation fails where cosh
+// overflows
+struct minimizer_cosh {
+  int operator()(const Eigen::VectorXd &x, double &f, Eigen::VectorXd &g) {
+    f = x.array().cosh().sum();
+    g = x.array().sinh().matrix();
+    return std::isfinite(f) && g.allFinite() ? 0 : 1;
+  }
+};
+}  // namespace
+
+TEST(OptimizationBfgsMinimizerCosh, large_initial_gradient) {
+  // At x0 = (30, 30) the gradient is sinh(30) = 5.3e12 per coordinate. With
+  // the default maxStep0 = +inf the first trial step is init_alpha * |g| =
+  // 5.3e9, where cosh overflows, and after halving that step 10 times the
+  // first line search fails. With maxStep0 = 1 (as the optimize services set
+  // it) the first trial moves no coordinate by more than 1.
+  stan::optimization::BFGSMinimizer<minimizer_cosh,
+                                    stan::optimization::LBFGSUpdate<> >
+      lbfgs(minimizer_cosh{});
+  lbfgs._ls_opts.maxStep0 = 1;
+  Eigen::VectorXd x0(2);
+  x0 << 30, 30;
+  lbfgs.initialize(x0);
+  int ret = lbfgs.step();
+  EXPECT_EQ(stan::optimization::TERM_SUCCESS, ret);
+  while (ret == stan::optimization::TERM_SUCCESS) {
+    ret = lbfgs.step();
+  }
+  EXPECT_GT(ret, 0);
+  EXPECT_NEAR(2, lbfgs.curr_f(), 1e-8);
+}
+
+namespace {
+// f(x) = exp(30 x) - 30 x, minimised at 0
+struct minimizer_exp {
+  int operator()(const Eigen::VectorXd &x, double &f, Eigen::VectorXd &g) {
+    f = std::exp(30 * x[0]) - 30 * x[0];
+    g.resize(1);
+    g[0] = 30 * (std::exp(30 * x[0]) - 1);
+    return std::isfinite(f) && g.allFinite() ? 0 : 1;
+  }
+};
+}  // namespace
+
+TEST(OptimizationBfgsMinimizerExp, no_relative_convergence_after_reset) {
+  // From x0 = 2 (gradient 3e27) the first line search fails with the default
+  // maxStep0 = +inf. With the first trial step capped at 1 it accepts x = 1,
+  // where the gradient is 3e14 and the inverse Hessian estimate from that one
+  // step is 3e-28. The relative gradient test (with CmdStan's default
+  // tolerance) must not stop the run there.
+  stan::optimization::BFGSMinimizer<minimizer_exp,
+                                    stan::optimization::LBFGSUpdate<> >
+      lbfgs(minimizer_exp{});
+  lbfgs._ls_opts.maxStep0 = 1;
+  lbfgs._conv_opts.tolRelGrad = 1e7;
+  Eigen::VectorXd x0(1);
+  x0 << 2;
+  lbfgs.initialize(x0);
+  int ret = stan::optimization::TERM_SUCCESS;
+  while (ret == stan::optimization::TERM_SUCCESS) {
+    ret = lbfgs.step();
+  }
+  EXPECT_GT(ret, 0);
+  EXPECT_NEAR(1, lbfgs.curr_f(), 1e-8);
+}
+
+namespace {
+// f(x) = 1e13 x^2 / 2, minimised at 0
+struct minimizer_stiff_quadratic {
+  int operator()(const Eigen::VectorXd &x, double &f, Eigen::VectorXd &g) {
+    f = 0.5e13 * x.squaredNorm();
+    g = 1e13 * x;
+    return 0;
+  }
+};
+}  // namespace
+
+TEST(OptimizationBfgsMinimizerStiffQuadratic, capped_step_without_floor) {
+  // From x0 = 0.08 (gradient 8e11) the capped first trial step 1.25e-12
+  // moves x by 1, past the minimiser at step 1e-13. That step lies below
+  // minAlpha = 1e-12, the smallest step the line search may return, so the
+  // first search used to fail.
+  stan::optimization::BFGSMinimizer<minimizer_stiff_quadratic,
+                                    stan::optimization::LBFGSUpdate<> >
+      lbfgs(minimizer_stiff_quadratic{});
+  lbfgs._ls_opts.maxStep0 = 1;
+  Eigen::VectorXd x0(1);
+  x0 << 0.08;
+  lbfgs.initialize(x0);
+  EXPECT_GE(lbfgs.step(), 0);
+}
