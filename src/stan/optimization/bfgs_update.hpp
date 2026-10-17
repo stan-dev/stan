@@ -25,21 +25,25 @@ class BFGSUpdate_HInv {
   inline Scalar update(const VectorT &yk, const VectorT &sk,
                        bool reset = false) {
     Scalar rhok, skyk, B0fact;
-    HessianT Hupd;
 
     skyk = yk.dot(sk);
     rhok = 1.0 / skyk;
 
-    Hupd.noalias()
-        = HessianT::Identity(yk.size(), yk.size()) - rhok * sk * yk.transpose();
     if (reset) {
       B0fact = yk.squaredNorm() / skyk;
-      _Hk.noalias() = ((1.0 / B0fact) * Hupd) * Hupd.transpose();
+      _Hk.setIdentity(yk.size(), yk.size());
+      _Hk /= B0fact;
     } else {
       B0fact = 1.0;
-      _Hk = Hupd * _Hk * Hupd.transpose();
     }
-    _Hk.noalias() += rhok * sk * sk.transpose();
+    // H <- (I - rho s y') H (I - rho y s') + rho s s'
+    //    = H + (c s - rho u) s' - rho s u',  u = H y,  c = rho^2 y'u + rho
+    _u.noalias() = _Hk * yk;
+    const Scalar c = rhok * rhok * yk.dot(_u) + rhok;
+    _w = c * sk - rhok * _u;
+    _Hk.noalias() += _w * sk.transpose();
+    _u *= rhok;
+    _Hk.noalias() -= sk * _u.transpose();
     return B0fact;
   }
 
@@ -57,6 +61,7 @@ class BFGSUpdate_HInv {
 
  private:
   HessianT _Hk;
+  VectorT _u, _w;
 };
 }  // namespace optimization
 }  // namespace stan
