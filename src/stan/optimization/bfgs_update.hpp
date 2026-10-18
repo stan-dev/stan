@@ -37,13 +37,16 @@ class BFGSUpdate_HInv {
       B0fact = 1.0;
     }
     // H <- (I - rho s y') H (I - rho y s') + rho s s'
-    //    = H + (c s - rho u) s' - rho s u',  u = H y,  c = rho^2 y'u + rho
-    _u.noalias() = _Hk * yk;
+    //    = H + s w' + w s',  u = H y,  w = (c / 2) s - rho u,
+    //    c = rho^2 y'u + rho
+    // Only the lower triangle of _Hk is kept up to date.
+    _u.noalias() = _Hk.template selfadjointView<Eigen::Lower>() * yk;
     const Scalar c = rhok * rhok * yk.dot(_u) + rhok;
-    _w = c * sk - rhok * _u;
-    _Hk.noalias() += _w * sk.transpose();
-    _u *= rhok;
-    _Hk.noalias() -= sk * _u.transpose();
+    _w = (0.5 * c) * sk - rhok * _u;
+    // rankUpdate copies plain vector arguments; Maps avoid the allocations
+    _Hk.template selfadjointView<Eigen::Lower>().rankUpdate(
+        Eigen::Map<const VectorT>(sk.data(), sk.size()),
+        Eigen::Map<const VectorT>(_w.data(), _w.size()));
     return B0fact;
   }
 
@@ -56,7 +59,7 @@ class BFGSUpdate_HInv {
    * @param[in] gk Gradient direction.
    **/
   inline void search_direction(VectorT &pk, const VectorT &gk) const {
-    pk.noalias() = -(_Hk * gk);
+    pk.noalias() = _Hk.template selfadjointView<Eigen::Lower>() * (-gk);
   }
 
  private:
