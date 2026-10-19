@@ -70,7 +70,7 @@ class LBFGSUpdate {
    * direction gk.
    * @param[in] gk Gradient direction.
    **/
-  inline void search_direction(VectorT &pk, const VectorT &gk) const {
+  inline void search_direction(VectorT &pk, const VectorT &gk) {
     std::vector<Scalar> &alphas = _alphas;
     alphas.resize(_buf.size());
     typename stan::util::ring_buffer<UpdateT>::const_reverse_iterator buf_rit;
@@ -107,7 +107,7 @@ class LBFGSUpdate {
   stan::util::ring_buffer<UpdateT> _buf;
   Scalar _gammak;
   // workspace of search_direction, kept to avoid an allocation per call
-  mutable std::vector<Scalar> _alphas;
+  std::vector<Scalar> _alphas;
 };
 }  // namespace optimization
 }  // namespace stan
