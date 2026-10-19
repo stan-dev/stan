@@ -109,8 +109,8 @@ Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
 /**
  * An internal utility function for implementing WolfeLineSearch()
  *
- * Gives up (returns 1) when the bracket collapses or after max_evals
- * function evaluations, failed ones included.
+ * Gives up (returns 1) when the bracket collapses or after max_failed
+ * failed function evaluations.
  **/
 template <typename FunctorType, typename Scalar, typename XType>
 int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
@@ -118,19 +118,29 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
                const Scalar &dfp, const Scalar &c1dfp, const Scalar &c2dfp,
                const XType &p, Scalar alo, Scalar aloF, Scalar aloDFp,
                Scalar ahi, Scalar ahiF, Scalar ahiDFp, const Scalar &min_range,
-               Scalar max_evals = std::numeric_limits<Scalar>::infinity()) {
+               Scalar max_failed = std::numeric_limits<Scalar>::infinity()) {
   Scalar d1, d2, newDFp;
   int itNum(0);
-  int nEvals(0);
+  int nFailed(0);
+  Scalar width_1(std::numeric_limits<Scalar>::infinity());
+  Scalar width_2(width_1);
 
   while (1) {
     itNum++;
 
     if (std::fabs(alo - ahi) < min_range || std::nextafter(alo, ahi) == ahi
-        || nEvals >= max_evals)
+        || nFailed >= max_failed)
       return 1;
 
-    if (itNum % 5 == 0) {
+    // Bisect when the last two trials did not shrink the bracket to 0.66 of
+    // its width (More and Thuente, 1994): a trial kept 1% from one end can
+    // remove only 1% of the bracket when the minimizer is near the other end.
+    const Scalar width = std::fabs(ahi - alo);
+    const bool slow = width > 0.66 * width_2;
+    width_2 = width_1;
+    width_1 = width;
+
+    if (itNum % 5 == 0 || slow) {
       alpha = 0.5 * (alo + ahi);
     } else {
       // Perform cubic interpolation to determine next point to try
@@ -157,11 +167,12 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
     }
 
     newX = x + alpha * p;
-    while (++nEvals, func(newX, newF, newDF)) {
+    while (func(newX, newF, newDF)) {
+      ++nFailed;
       const Scalar alpha_prev = alpha;
       alpha = 0.5 * (alpha + std::min(alo, ahi));
       if (std::fabs(std::min(alo, ahi) - alpha) < min_range
-          || alpha == alpha_prev || nEvals >= max_evals)
+          || alpha == alpha_prev || nFailed >= max_failed)
         return 1;
       newX = x + alpha * p;
     }
@@ -235,8 +246,8 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  *
  * @param minAlpha Smallest allowable step-size.
  *
- * @param maxLSIts Maximum number of line search iterations, both for
- * expanding the step and for function evaluations while zooming in.
+ * @param maxLSIts Maximum number of line search iterations for expanding
+ * the step, and of failed function evaluations while zooming in.
  *
  * @param maxLSRestarts Maximum number of times line search will
  * restart with \f$ f() \f$ failing.
