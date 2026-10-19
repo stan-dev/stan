@@ -14,16 +14,16 @@ namespace psis {
 namespace internal {
 
 /**
- * Compute log joint likelihood parameter estimates from generalized pareto
+ * Compute log joint likelihood parameter estimates from generalized Pareto
  * distribution and the samples the parameters were estimated from.
  * @tparam EigArray1 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @tparam EigArray2 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
- * @param[in] theta Estimates from generalized pareto distribution estimation
+ * @param[in] theta Estimates from generalized Pareto distribution estimation
  * @param[in] x The sample that the parameters were estimated from.
  * @return Array of the joint log likelihood of parameter estimates from
- * generalized pareto distribution and the samples the parameters were estimated
+ * generalized Pareto distribution and the samples the parameters were estimated
  * from.
  */
 template <typename EigArray1, typename EigArray2>
@@ -41,10 +41,10 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> profile_loglikelihood(
 }
 
 /**
- * Estimate parameters of the Generalized Pareto distribution
+ * Estimate parameters of the generalized Pareto distribution
  *
  * Given a sample `x`, Estimate the parameters `k` and $sigma$ of
- * the Generalized Pareto Distribution (GPD), assuming the location parameter is
+ * the generalized Pareto distribution (GPD), assuming the location parameter is
  * 0. By default the fit uses a prior for `k`, which will stabilize
  * estimates for very small sample sizes (and low effective sample sizes in the
  * case of MCMC samples). The weakly informative prior is a Gaussian prior
@@ -105,7 +105,7 @@ inline std::pair<double, double> gpdfit(const EigArray& x,
 }
 
 /**
- * Inverse CDF of generalized pareto distribution
+ * Inverse CDF of generalized Pareto distribution
  * (assuming location parameter is 0)
  *
  * @tparam EigArray An Eigen type inheriting from `ArrayBase` with dynamic
@@ -129,7 +129,7 @@ inline auto qgpd(const EigArray& p, const double k, const double sigma) {
  * @param[in] cutoff
  * @return A pair containing:
  * `first`: Eigen Array same size as `x` containing the logs of the
- *   order statistics of the generalized pareto distribution, or `x` itself
+ *   order statistics of the generalized Pareto distribution, or `x` itself
  *   if the shape parameter estimate is not finite.
  * `second`: scalar shape parameter estimate.
  */
@@ -262,8 +262,8 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
        std::string("In PSIS Weight Calculation: Difference "
        "between the tails is ") +
         std::to_string(eps_diff) +
-        " which is too small for estimating the generalized pareto values."
-        " Returning non-pareto smoothed weights.");
+        " which is too small for estimating the generalized Pareto values."
+        " Returning non-Pareto smoothed weights.");
     } else {
       auto smoothed = internal::psis_smooth_tail(lw_tail, cutoff);
       auto idx = max_n.second.tail(tail_len);
@@ -275,8 +275,8 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
         logger.warn(
             "In PSIS Weight Calculation: At least a quarter of the importance "
             "ratios in the tail are equal to the smallest one, which is too "
-            "many for estimating the generalized pareto values. Returning "
-            "non-pareto smoothed weights.");
+            "many for estimating the generalized Pareto values. Returning "
+            "non-Pareto smoothed weights.");
       } else if (smoothed.second > 0.7) {
         std::stringstream s;
         s << "Pareto k value (" << std::setprecision(2) << smoothed.second
