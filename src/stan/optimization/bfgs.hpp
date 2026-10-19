@@ -66,6 +66,7 @@ class BFGSMinimizer {
   Scalar _fk, _fk_1, _alphak_1;
   Scalar _alpha, _alpha0;
   size_t _itNum;
+  bool _capped{false};
   std::string _note;
   QNUpdateType _qn;
 
@@ -163,6 +164,7 @@ class BFGSMinimizer {
     _pk = -_gk;
 
     _itNum = 0;
+    _capped = false;
     _note = "";
   }
 
@@ -174,7 +176,12 @@ class BFGSMinimizer {
 
     _itNum++;
 
-    if (_itNum == 1) {
+    // If maxStep0 cut the first step short, start once more from -g: the
+    // pair (s, y) of that step measures only the parameters with the largest
+    // gradient, and an approximation built from it makes the next steps in
+    // all other parameters tiny as well. Restarting after every capped step
+    // instead turns runs with large gradients into steepest descent.
+    if (_itNum == 1 || _capped) {
       resetB = 1;
       _note = "";
     } else {
@@ -189,7 +196,7 @@ class BFGSMinimizer {
       }
 
       // Get an initial guess for the step size (alpha)
-      if (_itNum > 1 && resetB != 2) {
+      if (!resetB) {
         // use cubic interpolation based on the previous step
         _alpha0 = _alpha = std::min(
             1.0, 1.01
@@ -257,19 +264,24 @@ class BFGSMinimizer {
     // Compute search direction for next step
     _qn.search_direction(_pk, _gk);
 
+    // The first trial step was cut short by maxStep0. The tests on the change
+    // of f and x, and the relative gradient test, would judge convergence
+    // from that short step alone: a large gradient in one parameter makes
+    // the step in all others tiny.
+    const bool capped = resetB && _alpha0 < _ls_opts.alpha0;
+    _capped = capped && _itNum == 1;
+
     // Check for convergence
-    if (std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
+    if (!capped && std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
       // Objective function improvement wasn't sufficient
       retCode = TERM_ABSF;
     } else if (gradNorm < _conv_opts.tolAbsGrad) {
       retCode = TERM_ABSGRAD;  // Gradient norm was below threshold
-    } else if (stepNorm < _conv_opts.tolAbsX) {
+    } else if (!capped && stepNorm < _conv_opts.tolAbsX) {
       retCode = TERM_ABSX;  // Change in x was too small
     } else if (_itNum >= _conv_opts.maxIts) {
       retCode = TERM_MAXIT;  // Max number of iterations hit
-    } else if (resetB && _alpha0 < _ls_opts.alpha0) {
-      // The first trial step was cut short by maxStep0: the relative tests
-      // would judge convergence from that short step alone
+    } else if (capped) {
       retCode = TERM_SUCCESS;
     } else if (rel_obj_decrease()
                < _conv_opts.tolRelF * std::numeric_limits<Scalar>::epsilon()) {
