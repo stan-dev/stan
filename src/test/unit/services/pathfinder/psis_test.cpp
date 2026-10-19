@@ -228,7 +228,7 @@ TEST(ServicesPSIS, psis_weights_tied_cutoff) {
   for (Eigen::Index i = 0; i < lr.size(); ++i) {
     EXPECT_FLOAT_EQ(w(i), std::exp(lr(i))) << "for weight " << i;
   }
-  EXPECT_NE(logger.log_->str().find("Returning non-pareto smoothed weights"),
+  EXPECT_NE(logger.log_->str().find("Returning non-Pareto smoothed weights"),
             std::string::npos);
 }
 
@@ -248,6 +248,6 @@ TEST(ServicesPSIS, psis_weights_underflow_in_tail) {
   for (Eigen::Index i = 0; i < lr.size(); ++i) {
     EXPECT_FLOAT_EQ(w(i), std::exp(lr(i))) << "for weight " << i;
   }
-  EXPECT_NE(logger.log_->str().find("Returning non-pareto smoothed weights"),
+  EXPECT_NE(logger.log_->str().find("Returning non-Pareto smoothed weights"),
             std::string::npos);
 }
