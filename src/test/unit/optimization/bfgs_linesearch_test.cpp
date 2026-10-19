@@ -85,6 +85,10 @@ TEST(OptimizationBfgsLinesearch, CubicInterp_quadratic_data) {
   const double f1 = -x1 + x1 * x1 / (2 * m);
   const double df1 = -1 + x1 / m;
   EXPECT_NEAR(m, CubicInterp(-1.0, x1, f1, df1, 1e-12, 1.0), 1e-13);
+
+  // m = 0.5, x1 = 1: f1 = 0 and df1 = 1, every coefficient is exact and
+  // c3 = 0 on any platform. The root was 0 / 0 and the lower bound came out.
+  EXPECT_DOUBLE_EQ(0.5, CubicInterp(-1.0, 1.0, 0.0, 1.0, 1e-12, 1.0));
 }
 
 class linesearch_testfunc {
