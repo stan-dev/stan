@@ -57,7 +57,8 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> profile_loglikelihood(
  * @param[in] min_grid_pts The minimum number of grid points used in the fitting
  *   algorithm.
  * @return A pair of doubles with the first element `sigma` and the second
- * element `k`.
+ * element `k`. Both are NaN if the first quartile of `x` is not larger than
+ * the smallest value of `x`.
  *
  * @details Here the parameter `k is the negative of `k` in Zhang & Stephens
  * (2009).
@@ -80,6 +81,13 @@ inline std::pair<double, double> gpdfit(const EigArray& x,
   const double x_1st_qt = x_ref.coeff(
       static_cast<Eigen::Index>(std::floor(static_cast<double>(N) / 4.0 + 0.5))
       - 1l);
+  // At least a quarter of x equals the minimum. The sample is then far from a
+  // generalized Pareto distribution, and with a minimum of 0 the grid for
+  // theta below divides by 0.
+  if (!(x_1st_qt > x_ref.coeff(0))) {
+    constexpr double nan = std::numeric_limits<double>::quiet_NaN();
+    return {nan, nan};
+  }
   array_vec_t theta
       = 1.0 / x_ref.coeff(N - 1)
         + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt);
@@ -121,7 +129,8 @@ inline auto qgpd(const EigArray& p, const double k, const double sigma) {
  * @param[in] cutoff
  * @return A pair containing:
  * `first`: Eigen Array same size as `x` containing the logs of the
- *   order statistics of the generalized pareto distribution.
+ *   order statistics of the generalized pareto distribution, or `x` itself
+ *   if the shape parameter estimate is not finite.
  * `second`: scalar shape parameter estimate.
  */
 template <typename EigArray>
@@ -129,7 +138,7 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
   const double exp_cutoff = std::exp(cutoff);
   const auto fit = gpdfit(x.array().exp() - exp_cutoff);
   const double k = fit.second;
-  if (!std::isinf(k)) {
+  if (std::isfinite(k)) {
     const Eigen::Index x_size = x.size();
     const double sigma = fit.first;
     auto p
@@ -262,7 +271,13 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
       for (Eigen::Index i = 0; i < idx_size; ++i) {
         llr_weights.coeffRef(idx.coeff(i)) = smoothed.first.coeff(i);
       }
-      if (smoothed.second > 0.7) {
+      if (!std::isfinite(smoothed.second)) {
+        logger.warn(
+            "In PSIS Weight Calculation: At least a quarter of the importance "
+            "ratios in the tail are equal to the smallest one, which is too "
+            "many for estimating the generalized pareto values. Returning "
+            "non-pareto smoothed weights.");
+      } else if (smoothed.second > 0.7) {
         std::stringstream s;
         s << "Pareto k value (" << std::setprecision(2) << smoothed.second
           << ") is greater than 0.7. Importance resampling was not able to "
