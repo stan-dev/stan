@@ -488,7 +488,7 @@ Bug Fixes
 --------------------------------------------------
 * NUTS sampler broken (#2179)
 * serialization issues with RStan v2.13.1 (#2179)
-* printing result of a void function parses, but doesnt' compile (#2168)
+* printing result of a void function parses, but doesn't compile (#2168)
 * compound declare/define not working for all types (#2163)
 
 Other
