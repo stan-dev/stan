@@ -23,6 +23,7 @@ void check_adaptation(const size_t& num_params,
   size_t offset = 0;
   for (size_t i = 0; i < param_strings.size(); i++) {
     offset++;
+    // codespell:ignore-next-line
     if (param_strings[i].find("lements of inverse mass matrix:")
         != std::string::npos) {
       break;
@@ -44,6 +45,7 @@ void check_adaptation(const size_t& num_rows, const size_t& num_cols,
   size_t offset = 0;
   for (size_t i = 0; i < param_strings.size(); i++) {
     offset++;
+    // codespell:ignore-next-line
     if (param_strings[i].find("lements of inverse mass matrix:")
         != std::string::npos) {
       break;
@@ -67,6 +69,7 @@ void check_different(const size_t& num_params,
   size_t offset = 0;
   for (size_t i = 0; i < param_strings.size(); i++) {
     offset++;
+    // codespell:ignore-next-line
     if (param_strings[i].find("lements of inverse mass matrix:")
         != std::string::npos) {
       break;
@@ -88,6 +91,7 @@ void check_different(const size_t& num_rows, const size_t& num_cols,
   size_t offset = 0;
   for (size_t i = 0; i < param_strings.size(); i++) {
     offset++;
+    // codespell:ignore-next-line
     if (param_strings[i].find("lements of inverse mass matrix:")
         != std::string::npos) {
       break;

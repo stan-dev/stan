@@ -305,7 +305,7 @@ New Features
 * #2620 - expose beta_proportion distribution, cdf, rng functions
 * #2635 - allow paths to be passed to stanc
 * #2441 - Add specialized functions for GLMs
-* #2358 - enchanced include syntax
+* #2358 - enhanced include syntax
 * #2575 - Analysis API for computing effective sample size
 * #2467 - expose bernoulli logit rng
 
@@ -1015,7 +1015,7 @@ New Features
 * added get_lp() function to remove any need for bar lp__  (#470)
 * new functions append_col() and append_row() like cbind and rbind
   in R (#787)
-* added modulus function in a way tht is consistent with integer
+* added modulus function in a way that is consistent with integer
   division across platforms (#577)
 * exposed pareto_type_2_rng (#580)
 * added Frechet distribution and multi_gp_cholesky distribution
