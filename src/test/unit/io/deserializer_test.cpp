@@ -90,12 +90,12 @@ TEST(deserializer_vector, complex_read) {
   EXPECT_EQ(4, y.rows());
   EXPECT_EQ(1, y.cols());
   EXPECT_EQ(4, y.size());
-  double sentinal = 7;
+  double sentinel = 7;
   for (int i = 0; i < y.size(); ++i) {
-    EXPECT_FLOAT_EQ(sentinal, y[i].real());
-    ++sentinal;
-    EXPECT_FLOAT_EQ(sentinal, y[i].imag());
-    ++sentinal;
+    EXPECT_FLOAT_EQ(sentinel, y[i].real());
+    ++sentinel;
+    EXPECT_FLOAT_EQ(sentinel, y[i].imag());
+    ++sentinel;
   }
 
   double z = deserializer.read<double>();
@@ -144,12 +144,12 @@ TEST(deserializer_row_vector, complex_read) {
   EXPECT_EQ(1, y.rows());
   EXPECT_EQ(4, y.cols());
   EXPECT_EQ(4, y.size());
-  double sentinal = 7;
+  double sentinel = 7;
   for (int i = 0; i < y.size(); ++i) {
-    EXPECT_FLOAT_EQ(sentinal, y[i].real());
-    ++sentinal;
-    EXPECT_FLOAT_EQ(sentinal, y[i].imag());
-    ++sentinal;
+    EXPECT_FLOAT_EQ(sentinel, y[i].real());
+    ++sentinel;
+    EXPECT_FLOAT_EQ(sentinel, y[i].imag());
+    ++sentinel;
   }
 
   double z = deserializer.read<double>();
@@ -198,12 +198,12 @@ TEST(deserializer_matrix, complex_read) {
   eig_mat y = deserializer.read<eig_mat>(3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
-  double sentinal = 7;
+  double sentinel = 7;
   for (int i = 0; i < y.size(); ++i) {
-    EXPECT_FLOAT_EQ(sentinal, y(i).real());
-    sentinal++;
-    EXPECT_FLOAT_EQ(sentinal, y(i).imag());
-    sentinal++;
+    EXPECT_FLOAT_EQ(sentinel, y(i).real());
+    sentinel++;
+    EXPECT_FLOAT_EQ(sentinel, y(i).imag());
+    sentinel++;
   }
 }
 
@@ -243,12 +243,12 @@ TEST(deserializer_array, complex_read) {
   using complex_array = std::vector<std::complex<double>>;
   complex_array y = deserializer.read<complex_array>(4);
   EXPECT_EQ(4, y.size());
-  double sentinal = 7;
+  double sentinel = 7;
   for (int i = 0; i < y.size(); ++i) {
-    EXPECT_FLOAT_EQ(sentinal, y[i].real());
-    ++sentinal;
-    EXPECT_FLOAT_EQ(sentinal, y[i].imag());
-    ++sentinal;
+    EXPECT_FLOAT_EQ(sentinel, y[i].real());
+    ++sentinel;
+    EXPECT_FLOAT_EQ(sentinel, y[i].imag());
+    ++sentinel;
   }
 
   double z = deserializer.read<double>();
