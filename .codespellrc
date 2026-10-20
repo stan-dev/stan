@@ -1,6 +1,12 @@
 [codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = .git,.gitignore,.gitattributes,.codespellrc
+# lib/ - vendored rapidjson and stan_math submodule
+# licenses/stan-doc-license.txt - verbatim CC license text, not ours to edit
+skip = .git,.git-meta,.gitignore,.gitattributes,.codespellrc,.*cache,*.pdf,*.svg,*.css,*.min.*,.npm,./lib,./licenses/stan-doc-license.txt
 check-hidden = true
-# ignore-regex = 
-# ignore-words-list =
+# ignore-regex =
+ignore-words-list =
+  # "a low" bracket endpoint variable in BFGS line search (alo/ahi)
+  alo,
+  # clang-tidy check group name (*optin*) in make/clang-tidy
+  optin
