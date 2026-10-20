@@ -183,7 +183,7 @@ class BFGSMinimizer {
     // instead turns runs with large gradients into steepest descent.
     if (_itNum == 1 || _capped) {
       resetB = 1;
-      _note = "";
+      _note = _capped ? "capped first step, Hessian reset" : "";
     } else {
       resetB = 0;
       _note = "";
