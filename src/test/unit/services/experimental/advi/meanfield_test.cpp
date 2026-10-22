@@ -95,3 +95,37 @@ TEST_F(ServicesExperimentalAdvi, meanfield) {
 
   EXPECT_EQ(0, interrupt.call_count());
 }
+
+TEST_F(ServicesExperimentalAdvi, meanfield_timing_info) {
+  unsigned int seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int grad_samples = 1;
+  int elbo_samples = 100;
+  int max_iterations = 100;
+  double tol_rel_obj = 0.01;
+  double eta = 1.0;
+  bool adapt_engaged = true;
+  int adapt_iterations = 50;
+  int eval_elbo = 100;
+  int output_samples = 10;
+
+  stan::services::experimental::advi::meanfield(
+      model, context, seed, chain, init_radius, grad_samples, elbo_samples,
+      max_iterations, tol_rel_obj, eta, adapt_engaged, adapt_iterations,
+      eval_elbo, output_samples, interrupt, logger, init, parameter,
+      diagnostic);
+
+  EXPECT_TRUE(logger.find_info("Elapsed Time:") > 0)
+      << "Should find 'Elapsed Time:' in logger info output";
+
+  bool found_in_parameter = false;
+  for (const auto& msg : parameter.string_values()) {
+    if (msg.find("Elapsed Time:") != std::string::npos) {
+      found_in_parameter = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(found_in_parameter)
+      << "Should find 'Elapsed Time:' in parameter_writer output";
+}
