@@ -27,3 +27,32 @@ TEST(McmcCovarAdaptation, learn_covariance) {
   }
   EXPECT_EQ(0, logger.call_count());
 }
+
+TEST(McmcCovarAdaptation, learn_covariance_one_sample) {
+  stan::test::unit::instrumented_logger logger;
+
+  const int n = 10;
+  Eigen::VectorXd q = Eigen::VectorXd::Zero(n);
+  Eigen::MatrixXd covar(Eigen::MatrixXd::Identity(n, n));
+
+  const int n_learn = 1;
+
+  Eigen::MatrixXd target_covar(Eigen::MatrixXd::Identity(n, n));
+
+  stan::mcmc::covar_adaptation adapter(n);
+  adapter.set_window_params(50, 0, 0, n_learn, logger);
+
+  bool update = false;
+
+  for (int i = 0; i < n_learn; ++i)
+    update = adapter.learn_covariance(covar, q);
+
+  EXPECT_TRUE(update);
+
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      EXPECT_EQ(target_covar(i, j), covar(i, j));
+    }
+  }
+  EXPECT_EQ(0, logger.call_count());
+}
