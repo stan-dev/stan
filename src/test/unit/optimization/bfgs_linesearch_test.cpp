@@ -277,3 +277,102 @@ TEST(OptimizationBfgsLinesearch, WolfLSZoom_failing_evaluations) {
   EXPECT_EQ(1, ret);
   EXPECT_LT(func.n_evals_, 1000);
 }
+
+TEST(OptimizationBfgsLinesearch, WolfLSZoom_max_failed_evaluations) {
+  // every evaluation fails: the zoom gives up after max_failed of them
+  using stan::optimization::WolfLSZoom;
+  linesearch_jumpfunc func(10.0, 0.0, 20.0);
+  Eigen::Matrix<double, -1, 1> x0(1), x1, p(1), gradx1;
+  x0 << 0.0;
+  p << 1.0;
+  const double f0 = 0.0, dfp = -1.0;
+  double alpha = 1.0, f1 = 0.0;
+  int ret = WolfLSZoom(alpha, x1, f1, gradx1, func, x0, f0, dfp, 1e-4 * dfp,
+                       0.9 * dfp, p, 0.0, f0, dfp, 1.0, 1.0, 1.0, 1e-16, 5.0);
+  EXPECT_EQ(1, ret);
+  EXPECT_EQ(5, func.n_evals_);
+}
+
+TEST(OptimizationBfgsLinesearch, wolfeLineSearch_narrow_kink) {
+  // The slope changes from -1 to 10 over a width of 1e-13 at 1e-5, far
+  // below the first trial step 1. Only steps inside the kink meet the
+  // curvature condition. The zoom needs more than maxLSIts = 20 successful
+  // evaluations to narrow the bracket to the kink, so a limit of maxLSIts on
+  // all its evaluations makes the search fail.
+  using stan::optimization::WolfeLineSearch;
+  const double c1 = 1e-4, c2 = 0.9, m = 1e-5, w = 1e-13, s = 10;
+  auto func = [&](const Eigen::Matrix<double, -1, 1> &x, double &f,
+                  Eigen::Matrix<double, -1, 1> &g) {
+    const double z = (x[0] - m) / w;
+    f = -x[0] + (1 + s) * w * (z > 30 ? z : std::log1p(std::exp(z)));
+    g.resize(1);
+    g[0] = -1 + (1 + s) / (1 + std::exp(-z));
+    return 0;
+  };
+  Eigen::Matrix<double, -1, 1> x0(1), x1, p(1), gradx0, gradx1;
+  double f0, f1;
+  x0 << 0.0;
+  func(x0, f0, gradx0);
+  p << 1.0;
+  double alpha = 1.0;
+  int ret = WolfeLineSearch(func, alpha, x1, f1, gradx1, p, x0, f0, gradx0, c1,
+                            c2, 1e-12, 20.0, 10.0);
+  EXPECT_EQ(0, ret);
+  EXPECT_LE(f1, f0 + c1 * alpha * p.dot(gradx0));
+  EXPECT_LE(std::fabs(p.dot(gradx1)), c2 * std::fabs(p.dot(gradx0)));
+}
+
+TEST(OptimizationBfgsLinesearch, wolfeLineSearch_stiff_first_step) {
+  // phi(x) = -x + 1e11 x^2 / 2: the first trial step 1e-3 is 1e8 times the
+  // minimizer 1e-11. A cubic trial kept 1% from the bracket end shrinks the
+  // bracket 100-fold per evaluation; bisection needs 22 evaluations.
+  using stan::optimization::WolfeLineSearch;
+  const double c1 = 1e-4, c2 = 0.9;
+  int n_evals = 0;
+  auto func = [&](const Eigen::Matrix<double, -1, 1> &x, double &f,
+                  Eigen::Matrix<double, -1, 1> &g) {
+    ++n_evals;
+    f = -x[0] + 0.5e11 * x[0] * x[0];
+    g.resize(1);
+    g[0] = -1 + 1e11 * x[0];
+    return 0;
+  };
+  Eigen::Matrix<double, -1, 1> x0(1), x1, p(1), gradx0, gradx1;
+  double f0, f1;
+  x0 << 0.0;
+  func(x0, f0, gradx0);
+  n_evals = 0;
+  p << 1.0;
+  double alpha = 1e-3;
+  int ret = WolfeLineSearch(func, alpha, x1, f1, gradx1, p, x0, f0, gradx0, c1,
+                            c2, 1e-12, 20.0, 10.0);
+  EXPECT_EQ(0, ret);
+  EXPECT_LE(f1, f0 + c1 * alpha * p.dot(gradx0));
+  EXPECT_LE(std::fabs(p.dot(gradx1)), c2 * std::fabs(p.dot(gradx0)));
+  EXPECT_LE(n_evals, 10);
+}
+
+TEST(OptimizationBfgsLinesearch, wolfeLineSearch_ascent_direction) {
+  // p is not a descent direction: the search fails without evaluating f
+  using stan::optimization::WolfeLineSearch;
+  int n_evals = 0;
+  auto func = [&](const Eigen::Matrix<double, -1, 1> &x, double &f,
+                  Eigen::Matrix<double, -1, 1> &g) {
+    ++n_evals;
+    f = -x[0];
+    g.resize(1);
+    g[0] = -1;
+    return 0;
+  };
+  Eigen::Matrix<double, -1, 1> x0(1), x1, p(1), gradx0, gradx1;
+  double f0, f1;
+  x0 << 0.0;
+  func(x0, f0, gradx0);
+  n_evals = 0;
+  p << -1.0;
+  double alpha = 1.0;
+  int ret = WolfeLineSearch(func, alpha, x1, f1, gradx1, p, x0, f0, gradx0,
+                            1e-4, 0.9, 1e-16, 20.0, 10.0);
+  EXPECT_EQ(1, ret);
+  EXPECT_EQ(0, n_evals);
+}
