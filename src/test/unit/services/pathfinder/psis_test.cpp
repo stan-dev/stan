@@ -183,3 +183,71 @@ TEST(ServicesPSIS, max_n_elements) {
     EXPECT_EQ(sorted_idx(i), sorted_result_pos(i));
   }
 }
+
+TEST(ServicesPSIS, gpdfit_tied_first_quartile) {
+  Eigen::Array<double, -1, 1> x(20);
+  x << 0.00231135747917145, 0.00433831801177895, 0.0108541508266367,
+      0.0146361066006147, 0.016979809437058, 0.0175260143161184,
+      0.0185788657942587, 0.0221000771645818, 0.0246924617215394,
+      0.0274311810928377, 0.0492474466172383, 0.0623614301581945,
+      0.0659810585631264, 0.0796802961280512, 0.146305816395337,
+      0.184840740340265, 0.20479110080993, 0.257155687804798, 0.414031661251632,
+      0.95242504763768;
+  // 4 of 20 values at the minimum: the first quartile (the 5th value) is
+  // larger, so the fit is finite
+  x.head(4).setZero();
+  auto fit = stan::services::psis::internal::gpdfit(x);
+  EXPECT_TRUE(std::isfinite(std::get<0>(fit)));
+  EXPECT_TRUE(std::isfinite(std::get<1>(fit)));
+  // 5 of 20 values at the minimum, which is 0
+  x.head(5).setZero();
+  fit = stan::services::psis::internal::gpdfit(x);
+  EXPECT_TRUE(std::isnan(std::get<0>(fit)));
+  EXPECT_TRUE(std::isnan(std::get<1>(fit)));
+  // 5 of 20 values at a positive minimum
+  x.head(5).setConstant(0.001);
+  fit = stan::services::psis::internal::gpdfit(x);
+  EXPECT_TRUE(std::isnan(std::get<0>(fit)));
+  EXPECT_TRUE(std::isnan(std::get<1>(fit)));
+}
+
+TEST(ServicesPSIS, psis_weights_tied_cutoff) {
+  // The tail has 20 values: 15 spread from -3.5 to 0 and 5 of the 15 values
+  // at -5. The cutoff is also -5, so 5 tail values have a zero excess.
+  Eigen::Array<double, -1, 1> lr(100);
+  for (Eigen::Index i = 0; i < 70; ++i) {
+    lr(i) = -20.0 - 0.1 * i;
+  }
+  lr.segment(70, 15).setConstant(-5.0);
+  for (Eigen::Index i = 85; i < 100; ++i) {
+    lr(i) = -0.25 * (i - 85);
+  }
+  std::unique_ptr<std::stringstream> log(new std::stringstream{});
+  stan::test::test_logger<std::stringstream> logger(std::move(log));
+  auto w = stan::services::psis::psis_weights(lr, 20, logger);
+  for (Eigen::Index i = 0; i < lr.size(); ++i) {
+    EXPECT_FLOAT_EQ(w(i), std::exp(lr(i))) << "for weight " << i;
+  }
+  EXPECT_NE(logger.log_->str().find("Returning non-Pareto smoothed weights"),
+            std::string::npos);
+}
+
+TEST(ServicesPSIS, psis_weights_underflow_in_tail) {
+  // Ratios more than about 745 below the largest one underflow to 0 in the
+  // generalized Pareto fit. Here 5 of the 20 tail values and the cutoff do.
+  Eigen::Array<double, -1, 1> lr(100);
+  for (Eigen::Index i = 0; i < 85; ++i) {
+    lr(i) = -1000.0 - i;
+  }
+  for (Eigen::Index i = 85; i < 100; ++i) {
+    lr(i) = -0.25 * (i - 85);
+  }
+  std::unique_ptr<std::stringstream> log(new std::stringstream{});
+  stan::test::test_logger<std::stringstream> logger(std::move(log));
+  auto w = stan::services::psis::psis_weights(lr, 20, logger);
+  for (Eigen::Index i = 0; i < lr.size(); ++i) {
+    EXPECT_FLOAT_EQ(w(i), std::exp(lr(i))) << "for weight " << i;
+  }
+  EXPECT_NE(logger.log_->str().find("Returning non-Pareto smoothed weights"),
+            std::string::npos);
+}
