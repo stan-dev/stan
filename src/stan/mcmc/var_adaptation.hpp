@@ -14,6 +14,12 @@ class var_adaptation : public windowed_adaptation {
   explicit var_adaptation(int n)
       : windowed_adaptation("variance"), estimator_(n) {}
 
+  /**
+   * Return true if variance was updated and adaptation is not finished
+   *
+   * @param var Diagonal covariance
+   * @param q Last draw
+   */
   bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
     if (adaptation_window())
       estimator_.add_sample(q);
@@ -37,11 +43,11 @@ class var_adaptation : public windowed_adaptation {
 
       estimator_.restart();
 
-      ++adapt_window_counter_;
-      return true;
+      increment_window_counter();
+      return true && !finished();
     }
 
-    ++adapt_window_counter_;
+    increment_window_counter();
     return false;
   }
 
