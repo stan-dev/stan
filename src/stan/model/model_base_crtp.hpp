@@ -53,6 +53,18 @@ namespace model {
  *                  std::ostream* msgs = 0) const
  * ```
  *
+ * When STAN_OPENCL is defined, the derived class must also implement
+ * the OpenCL overloads to enable OpenCL deserialization:
+ *
+ * ```
+ * template <bool propto, bool jacobian>
+ * math::var log_prob(math::matrix_cl<double>& params_r,
+ *                    std::ostream* msgs = 0) const;
+ * template <bool propto, bool jacobian>
+ * math::var log_prob(math::var_value<math::matrix_cl<double>>& params_r,
+ *                    std::ostream* msgs = 0) const;
+ * ```
+ *
  * <p>The derived class `M` must be declared following the curiously
  * recursive template pattern, for example, if `M` is `foo_model`,
  * then `foo_model` should be declared as
@@ -132,6 +144,60 @@ class model_base_crtp : public stan::model::model_base {
     return static_cast<const M*>(this)->template log_prob<true, true>(theta,
                                                                       msgs);
   }
+
+#ifdef STAN_OPENCL
+  inline math::var log_prob(math::matrix_cl<double>& theta,
+                            std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, false>(theta,
+                                                                        msgs);
+  }
+
+  inline math::var log_prob(math::var_value<math::matrix_cl<double>>& theta,
+                            std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, false>(theta,
+                                                                        msgs);
+  }
+
+  inline math::var log_prob_jacobian(math::matrix_cl<double>& theta,
+                                     std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, true>(theta,
+                                                                       msgs);
+  }
+
+  inline math::var log_prob_jacobian(
+      math::var_value<math::matrix_cl<double>>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, true>(theta,
+                                                                       msgs);
+  }
+
+  inline math::var log_prob_propto(math::matrix_cl<double>& theta,
+                                   std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, false>(theta,
+                                                                       msgs);
+  }
+
+  inline math::var log_prob_propto(
+      math::var_value<math::matrix_cl<double>>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, false>(theta,
+                                                                       msgs);
+  }
+
+  inline math::var log_prob_propto_jacobian(math::matrix_cl<double>& theta,
+                                            std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, true>(theta,
+                                                                      msgs);
+  }
+
+  inline math::var log_prob_propto_jacobian(
+      math::var_value<math::matrix_cl<double>>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, true>(theta,
+                                                                      msgs);
+  }
+
+#endif
 
   void write_array(stan::rng_t& rng, Eigen::VectorXd& theta,
                    Eigen::VectorXd& vars, bool include_tparams = true,

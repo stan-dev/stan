@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include <stan/model/model_base.hpp>
 #include <stan/model/model_base_crtp.hpp>
+#ifdef STAN_OPENCL
+#include <stan/math/opencl/matrix_cl.hpp>
+#endif
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -23,7 +26,7 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
 
   void get_param_names(std::vector<std::string>& names, bool include_tparams,
                        bool include_gqs) const override {}
-  void get_dims(std::vector<std::vector<size_t> >& dimss, bool include_tparams,
+  void get_dims(std::vector<std::vector<size_t>>& dimss, bool include_tparams,
                 bool include_gqs) const override {}
 
   void constrained_param_names(std::vector<std::string>& param_names,
@@ -56,6 +59,21 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
         return 8;
     }
   }
+
+#ifdef STAN_OPENCL
+  template <bool propto, bool jacobian>
+  stan::math::var log_prob(stan::math::matrix_cl<double>& params_r,
+                           std::ostream* msgs) const {
+    return 9 + 4 * propto + 2 * jacobian;
+  }
+
+  template <bool propto, bool jacobian>
+  stan::math::var log_prob(
+      stan::math::var_value<stan::math::matrix_cl<double>>& params_r,
+      std::ostream* msgs) const {
+    return 10 + 4 * propto + 2 * jacobian;
+  }
+#endif
 
   void transform_inits(const stan::io::var_context& context,
                        Eigen::VectorXd& params_r,
@@ -155,3 +173,30 @@ TEST(model, modelTemplateLogProb) {
   double v8 = bm.template log_prob<true, true>(params_r_v, msgs).val();
   EXPECT_FLOAT_EQ(8, v8);
 }
+
+#ifdef STAN_OPENCL
+TEST(model, modelOpenclTemplateLogProb) {
+  stan::math::nested_rev_autodiff nested;
+  mock_model model(0);
+  stan::model::model_base& base = model;
+  stan::math::matrix_cl<double> values;
+  stan::math::var_value<stan::math::matrix_cl<double>> vars{
+      stan::math::matrix_cl<double>()};
+  EXPECT_DOUBLE_EQ(9, base.log_prob(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(9, (base.log_prob<false, false>(values, nullptr).val()));
+  EXPECT_DOUBLE_EQ(10, base.log_prob(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(10, (base.log_prob<false, false>(vars, nullptr).val()));
+  EXPECT_DOUBLE_EQ(11, base.log_prob_jacobian(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(11, (base.log_prob<false, true>(values, nullptr).val()));
+  EXPECT_DOUBLE_EQ(12, base.log_prob_jacobian(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(12, (base.log_prob<false, true>(vars, nullptr).val()));
+  EXPECT_DOUBLE_EQ(13, base.log_prob_propto(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(13, (base.log_prob<true, false>(values, nullptr).val()));
+  EXPECT_DOUBLE_EQ(14, base.log_prob_propto(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(14, (base.log_prob<true, false>(vars, nullptr).val()));
+  EXPECT_DOUBLE_EQ(15, base.log_prob_propto_jacobian(values, nullptr).val());
+  EXPECT_DOUBLE_EQ(15, (base.log_prob<true, true>(values, nullptr).val()));
+  EXPECT_DOUBLE_EQ(16, base.log_prob_propto_jacobian(vars, nullptr).val());
+  EXPECT_DOUBLE_EQ(16, (base.log_prob<true, true>(vars, nullptr).val()));
+}
+#endif
