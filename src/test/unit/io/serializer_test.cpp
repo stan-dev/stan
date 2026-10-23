@@ -59,11 +59,11 @@ TEST(serializer_vector, complex_write) {
 
   stan::io::serializer<double> serializer(theta);
   serializer.write(x);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 20U; i += 2) {
-    EXPECT_FLOAT_EQ(theta[i], x[sentinal].real());
-    EXPECT_FLOAT_EQ(theta[i + 1], x[sentinal].imag());
-    ++sentinal;
+    EXPECT_FLOAT_EQ(theta[i], x[sentinel].real());
+    EXPECT_FLOAT_EQ(theta[i + 1], x[sentinel].imag());
+    ++sentinel;
   }
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
@@ -94,11 +94,11 @@ TEST(serializer_rowvector, complex_write) {
 
   stan::io::serializer<double> serializer(theta);
   serializer.write(x);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 20U; i += 2) {
-    EXPECT_FLOAT_EQ(theta[i], x[sentinal].real());
-    EXPECT_FLOAT_EQ(theta[i + 1], x[sentinal].imag());
-    ++sentinal;
+    EXPECT_FLOAT_EQ(theta[i], x[sentinel].real());
+    EXPECT_FLOAT_EQ(theta[i + 1], x[sentinel].imag());
+    ++sentinel;
   }
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
@@ -129,11 +129,11 @@ TEST(serializer_matrix, complex_write) {
 
   stan::io::serializer<double> serializer(theta);
   serializer.write(x);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 32U; i += 2) {
-    EXPECT_FLOAT_EQ(theta[i], x(sentinal).real());
-    EXPECT_FLOAT_EQ(theta[i + 1], x(sentinal).imag());
-    ++sentinal;
+    EXPECT_FLOAT_EQ(theta[i], x(sentinel).real());
+    EXPECT_FLOAT_EQ(theta[i + 1], x(sentinel).imag());
+    ++sentinel;
   }
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
@@ -164,11 +164,11 @@ TEST(serializer_stdvector, complex_write) {
 
   stan::io::serializer<double> serializer(theta);
   serializer.write(x);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 20U; i += 2) {
-    EXPECT_FLOAT_EQ(theta[i], x[sentinal].real());
-    EXPECT_FLOAT_EQ(theta[i + 1], x[sentinal].imag());
-    ++sentinal;
+    EXPECT_FLOAT_EQ(theta[i], x[sentinel].real());
+    EXPECT_FLOAT_EQ(theta[i + 1], x[sentinel].imag());
+    ++sentinel;
   }
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }

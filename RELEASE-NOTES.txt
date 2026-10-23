@@ -99,7 +99,7 @@ v2.33.0 (5 September 2023)
 - Add callback writer to output JSON data for diagnostics. (#3191, #3202)
 - Replace use of `boost::lexical_cast` with `std::strol`, etc, and remove spurious header includes. (#3206)
 - Fixed several typos in documentation. (#3210)
-- Added multi chain service functions for hmc nuts for adapatation and nonadaption for the unit e, diag, and dense metrics. (#3212)
+- Added multi chain service functions for hmc nuts for adaptation and nonadaption for the unit e, diag, and dense metrics. (#3212)
 - Made the service functions consistently catch exceptions and favor return codes. (#3214)
 - Added a hard copy of the event vector for OpenCL before making a copy to go from a tbb concurrent vector to a standard vector. (#3217)
 - Added missing size checks to vectors of Eigen types. (#3218)
@@ -232,7 +232,7 @@ v.2.22.0 (24 January 2020)
 New Features
 ------------
 
-- validate_dims in stan::io::var_context vas made a virtual function which allows its implementation for JSON data which is needed to accepts arrays where any dimension is size 0
+- validate_dims in stan::io::var_context was made a virtual function which allows its implementation for JSON data which is needed to accepts arrays where any dimension is size 0
 - replaced Eigen vectors of strings with std::vector<std::string>
 - replaced stan::math::domain_error with throw_domain_error
 - added const noexcept accessors to the stepsize adaptation class which allows developers to query the adaptation parameters in contexts where it's natural to have a const sampler (logging, serialization, ...)
@@ -243,7 +243,7 @@ v.2.21.0 (18 October 2019)
 New Features
 ------------
 - Add Intel TBB (#2769)
-- Add automated maintanence and cleanup via clang-tools to makefile (#2805)
+- Add automated maintenance and cleanup via clang-tools to makefile (#2805)
 - Use Welford's algorithm for Variance Estimates in src/stan/analyze (#2819)
 - Adds additional no-u-turn checks across subtrees to avoid missing u-turns for approximately iid normal models (#2800)
 - Add gp kernels to language (#2739)
@@ -305,7 +305,7 @@ New Features
 * #2620 - expose beta_proportion distribution, cdf, rng functions
 * #2635 - allow paths to be passed to stanc
 * #2441 - Add specialized functions for GLMs
-* #2358 - enchanced include syntax
+* #2358 - enhanced include syntax
 * #2575 - Analysis API for computing effective sample size
 * #2467 - expose bernoulli logit rng
 
@@ -487,8 +487,8 @@ v2.14.0 (26 December 2016)
 Bug Fixes
 --------------------------------------------------
 * NUTS sampler broken (#2179)
-* seralization issues with RStan v2.13.1 (#2179)
-* printing result of a void function parses, but doesnt' compile (#2168)
+* serialization issues with RStan v2.13.1 (#2179)
+* printing result of a void function parses, but doesn't compile (#2168)
 * compound declare/define not working for all types (#2163)
 
 Other
@@ -537,7 +537,7 @@ New Internal Features
 
 Documentation
 --------------------------------------------------
-* manaul reorganization (#1599)
+* manual reorganization (#1599)
 * line too long (#2121)
 * added integer % operator documentation (#2065)
 * lots more (#2051)
@@ -644,7 +644,7 @@ New Internal Features
 * refactor semantic actions to header/implementation (#1795)
 * writer callback interface for algorithms (#1739)
 * error writer callbacks (#1836)
-* cleaner HMC diagnostic ouptut (#1790)
+* cleaner HMC diagnostic output (#1790)
 * pull-request template on GitHub (#1794)
 * remove unused filename argument in parser (#1752)
 * remove unused lp_no_jacobian function (now controlled with
@@ -734,7 +734,7 @@ New Features
 
 Bug Fixes
 --------------------------------------------------
-* Disallow user-defiend function overloading (#1547)
+* Disallow user-defined function overloading (#1547)
 * Better behaved beta cdf (#1561, stan-dev/math#124)
 
 Manual
@@ -812,7 +812,7 @@ Code Reorganization and Back End Upgrades
 * Split out derivative functionals (#1389)
 
 
-Manual and Dcoumentation
+Manual and Documentation
 --------------------------------------------------
 * New Logo in Manual; remove old logos (#1023)
 * Corrected all known bug reports and typos; details in
@@ -836,7 +836,7 @@ v2.6.3 (17 March 2015)
 
 Bug Fixes
 ----------------------------------------
-* removed extra semicolons in code; they are techinically a C++11
+* removed extra semicolons in code; they are technically a C++11
   extension [#1379]
 * removed use of variable length array; this is a C99 feature
   [#1381]
@@ -856,7 +856,7 @@ v2.6.2 (14 March 2015)
 
 Bug Fixes
 ----------------------------------------
-* fixed append_row and append_col to return the corect types [#1297]
+* fixed append_row and append_col to return the correct types [#1297]
 * documentation fix: fixed generation of stan-functions.txt [#1327]
 * changed constructor of stan::agrad::var so it can compile without
   C++11 [#1337, 1364]
@@ -886,7 +886,7 @@ API/Build/Test Enhancements
 * replace promote_args
 * allow reading from a local makefile outside of the code repository [#1277]
 * added gradient of hessian functional in C++ [#1272]
-* supressed printing of adjoints when printing stan::agrad::var [#330]
+* suppressed printing of adjoints when printing stan::agrad::var [#330]
 * removed some cpplint warnings [#1282]
 * removed doxygen warnings [#1290]
 * reimplemented fmix and fmax [#1311]
@@ -951,7 +951,7 @@ API/Build/Test Enhancements
 Bug Fixes
 ----------------------------------------
 * allow identifiers with prefixes matching keywords [#1177]
-* allow functions to be used in variable declaration constriants [#1151]
+* allow functions to be used in variable declaration constraints [#1151]
 * fix segfault resulting from multivariate normal in optimizer (root
   cause wasn't in optimizer, but in autodiff nesting cleanup) [#1200]
 * fixed return type in language and C++ for append_row of two
@@ -1015,7 +1015,7 @@ New Features
 * added get_lp() function to remove any need for bar lp__  (#470)
 * new functions append_col() and append_row() like cbind and rbind
   in R (#787)
-* added modulus function in a way tht is consistent with integer
+* added modulus function in a way that is consistent with integer
   division across platforms (#577)
 * exposed pareto_type_2_rng (#580)
 * added Frechet distribution and multi_gp_cholesky distribution
@@ -1362,7 +1362,7 @@ exponent
 * fixed rep_vector to work with integer value
 * fixed parser error message
 * fixed use of Boost NaN tests
-* initialze local variables to NaN to prevent segfaults if used
+* initialize local variables to NaN to prevent segfaults if used
   before defined
 * remove unused includes from model header
 * fix signed/unsigned warnings in tests and code
@@ -1494,7 +1494,7 @@ Bug Fixes
 * fixed matrix resize issue on Windows that caused models to fail
   at optimization levels above 0
 * fixed bug in print preventing hyphens or grave accents from
-  priting
+  printing
 * fixed issue preventing matrix rows from being assigned on the
   left side of an assignment statement
 * clearer error messages on matrix and other function arguments

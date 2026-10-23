@@ -287,7 +287,7 @@ TEST_F(ServicesPathfinderEightSchools, multi_and_single_psis_output) {
     EXPECT_EQ(stan_data.samples.rows(), num_multi_draws);
     EXPECT_EQ(stan_data.samples.cols(), 21);
   }
-  int sentinal = 1;
+  int sentinel = 1;
   for (auto&& single_param : single_path_parameter_writer) {
     auto&& streamer = single_param.get_stream();
     auto str = streamer.str();
@@ -298,11 +298,11 @@ TEST_F(ServicesPathfinderEightSchools, multi_and_single_psis_output) {
     EXPECT_FALSE(str.rfind("(Total)") == std::string::npos);
     EXPECT_EQ(stan_data.samples.rows(), num_draws);
     EXPECT_EQ(stan_data.samples.cols(), 21);
-    EXPECT_TRUE((stan_data.samples.col(2).array() == sentinal).all())
+    EXPECT_TRUE((stan_data.samples.col(2).array() == sentinel).all())
         << "path_id: " << stan_data.samples.col(2)(0)
-        << "sentinal: " << sentinal << std::endl;
+        << "sentinel: " << sentinel << std::endl;
     ;
-    sentinal++;
+    sentinel++;
   }
 }
 
@@ -387,7 +387,7 @@ TEST_F(ServicesPathfinderEightSchools, multi_and_single_nopsis_output) {
     EXPECT_EQ(stan_data.samples.rows(), num_draws * num_paths);
     EXPECT_EQ(stan_data.samples.cols(), 21);
   }
-  int sentinal = 1;
+  int sentinel = 1;
   for (auto&& single_param : single_path_parameter_writer) {
     auto&& streamer = single_param.get_stream();
     auto&& str = streamer.str();
@@ -399,8 +399,8 @@ TEST_F(ServicesPathfinderEightSchools, multi_and_single_nopsis_output) {
     EXPECT_TRUE(str.find("(PSIS)") == std::string::npos);
     EXPECT_EQ(stan_data.samples.rows(), num_draws);
     EXPECT_EQ(stan_data.samples.cols(), 21);
-    EXPECT_TRUE((stan_data.samples.col(2).array() == sentinal).all());
-    sentinal++;
+    EXPECT_TRUE((stan_data.samples.col(2).array() == sentinel).all());
+    sentinel++;
   }
 }
 
