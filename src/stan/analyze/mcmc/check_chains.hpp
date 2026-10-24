@@ -12,32 +12,23 @@ namespace stan {
 namespace analyze {
 
 /**
- * Checks that values across all matrix columns finite and non-identical.
+ * Checks that all values are finite and that at least one chain is not
+ * constant.  Some chains can be constant: a chain that does not move gives
+ * a large R-hat and a small ESS, which the diagnostics must report.
  *
  * @param chains matrix of draws, one column per chain
  * @return bool true if OK, false otherwise
  */
 inline bool is_finite_and_varies(const Eigen::MatrixXd& chains) {
-  size_t num_chains = chains.cols();
-  size_t num_samples = chains.rows();
-  if (num_samples < 2) {
+  if (chains.rows() < 2 || !chains.allFinite()) {
     return false;
   }
-  Eigen::VectorXd first_draws = Eigen::VectorXd::Zero(num_chains);
-  for (std::size_t i = 0; i < num_chains; ++i) {
-    first_draws(i) = chains.col(i)(0);
-    for (int j = 0; j < num_samples; ++j) {
-      if (!std::isfinite(chains.col(i)(j)))
-        return false;
-    }
-    if (chains.col(i).isApproxToConstant(first_draws(i))) {
-      return false;
+  for (Eigen::Index i = 0; i < chains.cols(); ++i) {
+    if (!chains.col(i).isApproxToConstant(chains(0, i))) {
+      return true;
     }
   }
-  if (num_chains > 1 && first_draws.isApproxToConstant(first_draws(0))) {
-    return false;
-  }
-  return true;
+  return false;
 }
 
 }  // namespace analyze

@@ -14,7 +14,9 @@ namespace analyze {
 /**
  * Computes the effective sample size (ESS) for the specified
  * parameter across all chains.  The number of draws per chain must be > 3,
- * and the values across all draws must be finite and not constant.
+ * and the values across all draws must be finite and not constant;
+ * otherwise the return value is NaN.  A constant chain is permitted: its
+ * autocovariances are zero.
  * See https://arxiv.org/abs/1903.08008, section 3.2 for discussion.
  *
  * Sample autocovariance is computed using the implementation in this namespace
@@ -53,6 +55,10 @@ double ess(const Eigen::MatrixXd& chains) {
       = w_chain_var * (draws_per_chain - 1) / draws_per_chain;  // \hat{var}^{+}
   if (num_chains > 1) {
     var_plus += math::variance(chain_mean);  // B (between chain var)
+  }
+  // all draws are equal, or a draw is not finite
+  if (!(var_plus > 0)) {
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   // Geyer's initial positive sequence, eqn (11)
