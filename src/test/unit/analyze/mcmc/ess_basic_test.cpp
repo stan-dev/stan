@@ -65,11 +65,15 @@ TEST_F(EssBasic, constant_chain) {
 
 TEST_F(EssBasic, every_chain_constant) {
   // computed via R pkg posterior
-  // posterior ends the Geyer sum at the lag limit differently; the
-  // difference is below 1%
   Eigen::MatrixXd chains(1000, 4);
   for (int i = 0; i < 4; ++i) {
     chains.col(i).setConstant(i + 1);
   }
-  EXPECT_NEAR(2.00803212851406, stan::analyze::ess(chains), 2e-2);
+  EXPECT_NEAR(2.00803212851406, stan::analyze::ess(chains), 1e-8);
+}
+
+TEST_F(EssBasic, autocorrelation_positive_up_to_max_lag) {
+  // computed via R pkg posterior
+  chains_theta.col(3).array() += 1.0;
+  EXPECT_NEAR(2.13486710959329, stan::analyze::ess(chains_theta), 1e-8);
 }

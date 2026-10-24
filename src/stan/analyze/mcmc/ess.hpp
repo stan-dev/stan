@@ -98,15 +98,20 @@ double ess(const Eigen::MatrixXd& chains) {
     t += 2;
   }
 
-  auto max_t = t;  // max lag, used for truncation
+  // truncation lag: the even lag of the last pair computed, which is the
+  // first negative pair or the pair at the lag limit
+  Eigen::Index max_t = t - 1;
   //  see discussion p. 8, par "In extreme antithetic cases, "
-  if (rho_hat_even > 0) {
-    rho_hat_t(max_t + 1) = rho_hat_even;
-  }
+  double rho_hat_last = (rho_hat_even > 0 || rho_hat_even + rho_hat_odd >= 0)
+                            ? rho_hat_even
+                            : 0;
 
   double draws_total = num_chains * draws_per_chain;
-  //  eqn (13): Geyer's truncation rule, w/ modification
-  double tau_hat = -1 + 2 * rho_hat_t.head(max_t).sum() + rho_hat_t(max_t + 1);
+  //  eqn (13): Geyer's truncation rule, w/ modification;
+  //  tau_hat is 2 if no pair was computed (max_t = 0)
+  double tau_hat = -1
+                   + 2 * rho_hat_t.head(std::max<Eigen::Index>(max_t, 1)).sum()
+                   + rho_hat_last;
   // safety check for negative values and with max ess equal to ess*log10(ess)
   tau_hat = std::max(tau_hat, 1 / std::log10(draws_total));
   return (draws_total / tau_hat);
