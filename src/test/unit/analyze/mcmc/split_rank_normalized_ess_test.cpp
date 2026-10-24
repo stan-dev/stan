@@ -101,6 +101,26 @@ TEST_F(RankNormalizedEss, every_chain_constant) {
   EXPECT_TRUE(std::isnan(ess.second));
 }
 
+TEST_F(RankNormalizedEss, discrete_tails) {
+  // computed via R pkg posterior
+  // 46% of the draws are 1, so the upper tail indicator is x == 1
+  Eigen::MatrixXd chains = (chains_theta.array() > 0.25).cast<double>();
+  auto ess = stan::analyze::split_rank_normalized_ess(chains);
+  EXPECT_NEAR(1951.94660323879, ess.first, 1e-6);
+  EXPECT_NEAR(1951.94660323879, ess.second, 1e-6);
+
+  // 96% of the draws are 1, so every draw is in the lower tail
+  chains = (chains_theta.array() > 0.07).cast<double>();
+  ess = stan::analyze::split_rank_normalized_ess(chains);
+  EXPECT_NEAR(1347.60516728569, ess.first, 1e-6);
+  EXPECT_TRUE(std::isnan(ess.second));
+
+  // the mirror image
+  ess = stan::analyze::split_rank_normalized_ess(-chains);
+  EXPECT_NEAR(1347.60516728569, ess.first, 1e-6);
+  EXPECT_TRUE(std::isnan(ess.second));
+}
+
 TEST_F(RankNormalizedEss, short_chains_fail) {
   chains_theta.resize(3, 4);
   auto ess = stan::analyze::split_rank_normalized_ess(chains_theta);
