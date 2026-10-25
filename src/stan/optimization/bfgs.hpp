@@ -48,6 +48,10 @@ class LSOptions {
   Scalar minAlpha{1e-12};
   Scalar maxLSIts{20};
   Scalar maxLSRestarts{10};
+  // largest change of any parameter in the first trial step of the first
+  // iteration and after a Hessian reset (the step is alpha0 times the
+  // gradient, or shorter)
+  Scalar maxStep0{std::numeric_limits<Scalar>::infinity()};
 };
 template <typename FunctorType, typename QNUpdateType, typename Scalar = double,
           int DimAtCompile = Eigen::Dynamic>
@@ -62,6 +66,7 @@ class BFGSMinimizer {
   Scalar _fk, _fk_1, _alphak_1;
   Scalar _alpha, _alpha0;
   size_t _itNum;
+  bool _capped{false};
   std::string _note;
   QNUpdateType _qn;
 
@@ -159,6 +164,7 @@ class BFGSMinimizer {
     _pk = -_gk;
 
     _itNum = 0;
+    _capped = false;
     _note = "";
   }
 
@@ -170,9 +176,14 @@ class BFGSMinimizer {
 
     _itNum++;
 
-    if (_itNum == 1) {
+    // If maxStep0 cut the first step short, start once more from -g: the
+    // pair (s, y) of that step measures only the parameters with the largest
+    // gradient, and an approximation built from it makes the next steps in
+    // all other parameters tiny as well. Restarting after every capped step
+    // instead turns runs with large gradients into steepest descent.
+    if (_itNum == 1 || _capped) {
       resetB = 1;
-      _note = "";
+      _note = _capped ? "capped first step, Hessian reset" : "";
     } else {
       resetB = 0;
       _note = "";
@@ -185,23 +196,30 @@ class BFGSMinimizer {
       }
 
       // Get an initial guess for the step size (alpha)
-      if (_itNum > 1 && resetB != 2) {
+      if (!resetB) {
         // use cubic interpolation based on the previous step
         _alpha0 = _alpha = std::min(
             1.0, 1.01
                      * CubicInterp(_gk_1.dot(_pk_1), _alphak_1, _fk - _fk_1,
                                    _gk.dot(_pk_1), _ls_opts.minAlpha, 1.0));
       } else {
-        // On the first step (or, after a reset) use the default step size
-        _alpha0 = _alpha = _ls_opts.alpha0;
+        // On the first step (or, after a reset) use the default step size,
+        // but move no parameter by more than maxStep0 along the gradient
+        _alpha0 = _alpha = std::min(
+            _ls_opts.alpha0,
+            _ls_opts.maxStep0 / _pk.template lpNorm<Eigen::Infinity>());
       }
 
       // Perform the line search.  If successful, the results are in the
-      // variables: _xk_1, _fk_1 and _gk_1.
-      retCode
-          = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1, _pk, _xk, _fk,
-                            _gk, _ls_opts.c1, _ls_opts.c2, _ls_opts.minAlpha,
-                            _ls_opts.maxLSIts, _ls_opts.maxLSRestarts);
+      // variables: _xk_1, _fk_1 and _gk_1. minAlpha is the smallest step the
+      // line search may return. A first trial step that maxStep0 shortened
+      // gets no such floor, so that its bracket starts at 0: the floor would
+      // forbid moving a parameter by less than minAlpha |g|_inf.
+      const Scalar min_alpha
+          = resetB && _alpha < _ls_opts.alpha0 ? Scalar(0) : _ls_opts.minAlpha;
+      retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1, _pk, _xk,
+                                _fk, _gk, _ls_opts.c1, _ls_opts.c2, min_alpha,
+                                _ls_opts.maxLSIts, _ls_opts.maxLSRestarts);
       if (retCode) {
         // Line search failed...
         if (resetB) {
@@ -246,16 +264,25 @@ class BFGSMinimizer {
     // Compute search direction for next step
     _qn.search_direction(_pk, _gk);
 
+    // The first trial step was cut short by maxStep0. The tests on the change
+    // of f and x, and the relative gradient test, would judge convergence
+    // from that short step alone: a large gradient in one parameter makes
+    // the step in all others tiny.
+    const bool capped = resetB && _alpha0 < _ls_opts.alpha0;
+    _capped = capped && _itNum == 1;
+
     // Check for convergence
-    if (std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
+    if (!capped && std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
       // Objective function improvement wasn't sufficient
       retCode = TERM_ABSF;
     } else if (gradNorm < _conv_opts.tolAbsGrad) {
       retCode = TERM_ABSGRAD;  // Gradient norm was below threshold
-    } else if (stepNorm < _conv_opts.tolAbsX) {
+    } else if (!capped && stepNorm < _conv_opts.tolAbsX) {
       retCode = TERM_ABSX;  // Change in x was too small
     } else if (_itNum >= _conv_opts.maxIts) {
       retCode = TERM_MAXIT;  // Max number of iterations hit
+    } else if (capped) {
+      retCode = TERM_SUCCESS;
     } else if (rel_obj_decrease()
                < _conv_opts.tolRelF * std::numeric_limits<Scalar>::epsilon()) {
       // Relative improvement in objective function wasn't sufficient

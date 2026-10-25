@@ -1,6 +1,7 @@
 #include <stan/services/optimize/bfgs.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <test/test-models/good/optimization/simple_jacobian.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
@@ -65,4 +66,16 @@ TEST_F(ServicesOptimize, withoutJacobian) {
   EXPECT_EQ("sigma", parameter.names_[2]);
   EXPECT_NEAR(3, parameter.states_.back()[2], 0.0001);
   EXPECT_GT(interrupt.call_count(), 1);
+}
+
+TEST_F(ServicesOptimize, bfgs_large_initial_gradient) {
+  // as lbfgs_large_initial_gradient in lbfgs_jacobian_test.cpp
+  std::stringstream init_json("{\"sigma\": 485165195.40979}");
+  stan::json::json_data init_context(init_json);
+  stan::test::unit::instrumented_interrupt interrupt;
+  int return_code = stan::services::optimize::bfgs<stan_model, false>(
+      model, init_context, 0, 1, 0, 0.001, 1e-12, 10000, 1e-8, 10000000, 1e-8,
+      2000, false, 0, interrupt, logger, init, parameter);
+  EXPECT_EQ(0, return_code);
+  EXPECT_NEAR(3, parameter.states_.back()[2], 0.0001);
 }

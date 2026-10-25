@@ -245,6 +245,11 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
   Scalar prevDFp(dfp);
   Scalar newDFp;
 
+  // the zoom gives up on a bracket narrower than 1e-16, or than 1e-13 of the
+  // first trial step when that is shorter than 1e-3 (a capped first step, or
+  // a short interpolated one)
+  const Scalar minRange(std::min(Scalar(1e-16), Scalar(1e-13) * alpha));
+
   int retCode = 0, nits = 0, lsRestarts = 0, ret;
 
   while (1) {
@@ -271,7 +276,7 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
     if ((func_val > f0 + alpha * c1dfp) || (func_val >= prevF && nits > 0)) {
       retCode = WolfLSZoom(alpha, x1, func_val, gradx1, func, x0, f0, dfp,
                            c1dfp, c2dfp, p, alpha0, prevF, prevDFp, alpha1,
-                           func_val, newDFp, 1e-16);
+                           func_val, newDFp, minRange);
       break;
     }
     if (std::fabs(newDFp) <= -c2dfp) {
@@ -281,7 +286,7 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
     if (newDFp >= 0) {
       retCode = WolfLSZoom(alpha, x1, func_val, gradx1, func, x0, f0, dfp,
                            c1dfp, c2dfp, p, alpha1, func_val, newDFp, alpha0,
-                           prevF, prevDFp, 1e-16);
+                           prevF, prevDFp, minRange);
       break;
     }
 
