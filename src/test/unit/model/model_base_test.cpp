@@ -23,7 +23,9 @@ struct mock_model : public stan::model::model_base {
                        bool include_gqs) const override {}
   void get_dims(std::vector<std::vector<size_t> >& dimss, bool include_tparams,
                 bool include_gqs) const override {}
-
+  void write_transformed_data_json(std::ostream* out) const override {
+    *out << "{}";
+  }
   void constrained_param_names(std::vector<std::string>& param_names,
                                bool include_tparams,
                                bool include_gqs) const override {}
