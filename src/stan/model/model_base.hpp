@@ -180,6 +180,15 @@ class model_base : public prob_grad {
                                          bool include_gqs = true) const = 0;
 
   /**
+   * Return a string containing the transformed data computed by the model at
+   * construction as JSON string.
+   * The format of the string is the same as the expected input format for the
+   * `stan::json` input methods, i.e. complex numbers are rendered as a 2-list,
+   * tuples as objects with integer keys counting from 1
+   */
+  virtual std::string get_transformed_data_json() const = 0;
+
+  /**
    * Return the log density for the specified unconstrained
    * parameters, without Jacobian and with normalizing constants for
    * probability functions.
