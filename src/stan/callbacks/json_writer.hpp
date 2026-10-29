@@ -192,12 +192,15 @@ class json_writer final : public structured_writer {
    */
   void write(const std::string& key, int value) { write_value(key, value); }
 
-  /**
-   * Write a key-value pair where the value is an `std::size_t`.
-   * @param key Name of the value pair
-   * @param value `std::size_t` to write.
-   */
-  void write(const std::string& key, std::size_t value) {
+  /// Write a key-value pair with an unsigned long value.
+  void write(const std::string& key,
+             unsigned long value) {  // NOLINT(runtime/int)
+    write_value(key, value);
+  }
+
+  /// Write a key-value pair with an unsigned long long value.
+  void write(const std::string& key,
+             unsigned long long value) {  // NOLINT(runtime/int)
     write_value(key, value);
   }
 
