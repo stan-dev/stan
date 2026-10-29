@@ -193,7 +193,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_string_vector) {
 
   writer.write("key", x);
   auto out = output_sans_whitespace(ss);
-  EXPECT_EQ("\"key\":[0,1,2,3,4]", out);
+  EXPECT_EQ("\"key\":[\"0\",\"1\",\"2\",\"3\",\"4\"]", out);
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_weird_string_vector) {
@@ -202,9 +202,13 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_weird_string_vector) {
   for (int n = 0; n < N; ++n)
     x.push_back(std::to_string(n) + "\"");
 
+  writer.begin_record();
   writer.write("key", x);
+  writer.end_record();
   auto out = output_sans_whitespace(ss);
-  EXPECT_EQ("\"key\":[0\\\",1\\\",2\\\",3\\\",4\\\"]", out);
+  EXPECT_EQ("{\"key\":[\"0\\\"\",\"1\\\"\",\"2\\\"\",\"3\\\"\",\"4\\\"\"]}",
+            out);
+  ASSERT_TRUE(stan::test::is_valid_JSON(out));
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_null) {
