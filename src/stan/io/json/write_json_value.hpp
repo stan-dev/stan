@@ -59,7 +59,7 @@ inline std::string process_string(const std::string& value) {
  * Writes key plus colon for key-value pair.
  */
 template <typename Stream>
-void write_key(Stream&& output, const std::string& key, int record_depth) {
+void write_key(Stream&& output, const std::string& key, int record_depth = 0) {
   *output << std::string(record_depth * 2, ' ') << "\""
           << internal::process_string(key) << "\" : ";
 }
