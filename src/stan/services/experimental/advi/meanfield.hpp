@@ -10,6 +10,9 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/variational/advi.hpp>
+#include <stan/services/util/duration_diff.hpp>
+#include <stan/services/util/write_timing.hpp>
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -57,6 +60,7 @@ int meanfield(Model& model, const stan::io::var_context& init,
               callbacks::writer& init_writer,
               callbacks::writer& parameter_writer,
               callbacks::writer& diagnostic_writer) {
+  auto start_time = std::chrono::steady_clock::now();
   util::experimental_message(logger);
 
   stan::rng_t rng = util::create_rng(random_seed, chain);
@@ -92,6 +96,10 @@ int meanfield(Model& model, const stan::io::var_context& init,
     logger.error(e.what());
     return error_codes::SOFTWARE;
   }
+
+  auto end_time = std::chrono::steady_clock::now();
+  util::write_timing(util::duration_diff(start_time, end_time), "ADVI",
+                     parameter_writer, logger);
 
   return stan::services::error_codes::OK;
 }
