@@ -25,21 +25,28 @@ class BFGSUpdate_HInv {
   inline Scalar update(const VectorT &yk, const VectorT &sk,
                        bool reset = false) {
     Scalar rhok, skyk, B0fact;
-    HessianT Hupd;
 
     skyk = yk.dot(sk);
     rhok = 1.0 / skyk;
 
-    Hupd.noalias()
-        = HessianT::Identity(yk.size(), yk.size()) - rhok * sk * yk.transpose();
     if (reset) {
       B0fact = yk.squaredNorm() / skyk;
-      _Hk.noalias() = ((1.0 / B0fact) * Hupd) * Hupd.transpose();
+      _Hk.setIdentity(yk.size(), yk.size());
+      _Hk /= B0fact;
     } else {
       B0fact = 1.0;
-      _Hk = Hupd * _Hk * Hupd.transpose();
     }
-    _Hk.noalias() += rhok * sk * sk.transpose();
+    // H <- (I - rho s y') H (I - rho y s') + rho s s'
+    //    = H + s w' + w s',  u = H y,  w = (c / 2) s - rho u,
+    //    c = rho^2 y'u + rho
+    // Only the lower triangle of _Hk is kept up to date.
+    _u.noalias() = _Hk.template selfadjointView<Eigen::Lower>() * yk;
+    const Scalar c = rhok * rhok * yk.dot(_u) + rhok;
+    _w = (0.5 * c) * sk - rhok * _u;
+    // rankUpdate copies plain vector arguments; Maps avoid the allocations
+    _Hk.template selfadjointView<Eigen::Lower>().rankUpdate(
+        Eigen::Map<const VectorT>(sk.data(), sk.size()),
+        Eigen::Map<const VectorT>(_w.data(), _w.size()));
     return B0fact;
   }
 
@@ -52,11 +59,12 @@ class BFGSUpdate_HInv {
    * @param[in] gk Gradient direction.
    **/
   inline void search_direction(VectorT &pk, const VectorT &gk) const {
-    pk.noalias() = -(_Hk * gk);
+    pk.noalias() = _Hk.template selfadjointView<Eigen::Lower>() * (-gk);
   }
 
  private:
   HessianT _Hk;
+  VectorT _u, _w;
 };
 }  // namespace optimization
 }  // namespace stan
