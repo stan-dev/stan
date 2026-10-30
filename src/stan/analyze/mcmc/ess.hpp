@@ -14,7 +14,9 @@ namespace analyze {
 /**
  * Computes the effective sample size (ESS) for the specified
  * parameter across all chains.  The number of draws per chain must be > 3,
- * and the values across all draws must be finite and not constant.
+ * and the values across all draws must be finite and not constant;
+ * otherwise the return value is NaN.  A constant chain is permitted: its
+ * autocovariances are zero.
  * See https://arxiv.org/abs/1903.08008, section 3.2 for discussion.
  *
  * Sample autocovariance is computed using the implementation in this namespace
@@ -54,6 +56,10 @@ double ess(const Eigen::MatrixXd& chains) {
   if (num_chains > 1) {
     var_plus += math::variance(chain_mean);  // B (between chain var)
   }
+  // all draws are equal, or a draw is not finite
+  if (!(var_plus > 0)) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 
   // Geyer's initial positive sequence, eqn (11)
   Eigen::VectorXd rho_hat_t = Eigen::VectorXd::Zero(draws_per_chain);
@@ -92,15 +98,20 @@ double ess(const Eigen::MatrixXd& chains) {
     t += 2;
   }
 
-  auto max_t = t;  // max lag, used for truncation
+  // truncation lag: the even lag of the last pair computed, which is the
+  // first negative pair or the pair at the lag limit
+  Eigen::Index max_t = t - 1;
   //  see discussion p. 8, par "In extreme antithetic cases, "
-  if (rho_hat_even > 0) {
-    rho_hat_t(max_t + 1) = rho_hat_even;
-  }
+  double rho_hat_last = (rho_hat_even > 0 || rho_hat_even + rho_hat_odd >= 0)
+                            ? rho_hat_even
+                            : 0;
 
   double draws_total = num_chains * draws_per_chain;
-  //  eqn (13): Geyer's truncation rule, w/ modification
-  double tau_hat = -1 + 2 * rho_hat_t.head(max_t).sum() + rho_hat_t(max_t + 1);
+  //  eqn (13): Geyer's truncation rule, w/ modification;
+  //  tau_hat is 2 if no pair was computed (max_t = 0)
+  double tau_hat = -1
+                   + 2 * rho_hat_t.head(std::max<Eigen::Index>(max_t, 1)).sum()
+                   + rho_hat_last;
   // safety check for negative values and with max ess equal to ess*log10(ess)
   tau_hat = std::max(tau_hat, 1 / std::log10(draws_total));
   return (draws_total / tau_hat);
