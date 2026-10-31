@@ -45,3 +45,20 @@ TEST(ModelUtil, grad_hess_log_prob) {
   EXPECT_EQ("", stan::test::cout_ss.str());
   EXPECT_EQ("", stan::test::cerr_ss.str());
 }
+
+TEST(ModelUtil, grad_hess_log_prob_values) {
+  // log density -x^2 / 2: gradient -x, Hessian -1 (the Hessian used to come
+  // out scaled by 1e-6)
+  stan::io::empty_var_context data_var_context;
+  stan_model model(data_var_context, 0, static_cast<std::stringstream*>(0));
+  std::vector<double> params_r{1.5};
+  std::vector<int> params_i;
+  std::vector<double> gradient, hessian;
+  double lp = stan::model::grad_hess_log_prob<true, true, stan_model>(
+      model, params_r, params_i, gradient, hessian, 0);
+  EXPECT_FLOAT_EQ(-1.125, lp);
+  ASSERT_EQ(1, gradient.size());
+  EXPECT_FLOAT_EQ(-1.5, gradient[0]);
+  ASSERT_EQ(1, hessian.size());
+  EXPECT_NEAR(-1, hessian[0], 1e-10);
+}
