@@ -241,7 +241,6 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
   Scalar alpha1(alpha);
 
   Scalar prevF(f0);
-  XType prevDF(gradx0);
   Scalar prevDFp(dfp);
   Scalar newDFp;
 
@@ -287,7 +286,6 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
 
     alpha0 = alpha1;
     prevF = func_val;
-    std::swap(prevDF, gradx1);
     prevDFp = newDFp;
 
     alpha1 *= 10.0;
