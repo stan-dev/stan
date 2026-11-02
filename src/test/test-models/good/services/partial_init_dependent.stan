@@ -14,6 +14,8 @@ parameters {
   real<lower=lb> y;
   array[2] tuple(real, real<multiplier=sigma>) at;
   real<offset=at[2].1> z;
+  tuple(real, vector<multiplier=sigma>[2]) tv;
+  tuple(real, tuple(real, real<multiplier=sigma>)) w;
 }
 model {
   mu ~ normal(0, 1);
@@ -34,4 +36,9 @@ model {
     at[i].2 ~ normal(0, sigma);
   }
   z ~ normal(at[2].1, 1);
+  tv.1 ~ normal(0, 1);
+  tv.2 ~ normal(0, sigma);
+  w.1 ~ normal(0, 1);
+  w.2.1 ~ normal(0, 1);
+  w.2.2 ~ normal(0, sigma);
 }

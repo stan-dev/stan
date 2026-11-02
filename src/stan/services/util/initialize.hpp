@@ -24,34 +24,32 @@ namespace internal {
  * Returns the unconstrained parameters for a partial initialization.
  *
  * The parameters that <code>init</code> provides keep their constrained
- * values.  The other parameters take the random unconstrained values of
- * <code>random_context</code>.
+ * values.  The other (missing) parameters take the random unconstrained
+ * values of <code>random_context</code>.  Each innermost tuple slot counts
+ * as a separate parameter, so <code>init</code> can provide some slots of
+ * a tuple and not others.
  *
- * The unconstrained values of the provided parameters are computed by a
- * fixed-point iteration on flat parameter vectors in the order of
- * <code>write_array</code>.  Each pass constrains the current
- * unconstrained values with <code>write_array</code>, replaces the
- * provided parameters with their values from <code>init</code>, frees the
+ * A fixed-point iteration finds the unconstrained values of the provided
+ * parameters.  It works on flat vectors in the order of
+ * <code>write_array</code>.  Each pass constrains the current values with
+ * <code>write_array</code>, puts back the provided values, frees the
  * result with <code>unconstrain_array</code>, and resets the missing
- * parameters to the random values.  A transform uses only parameters
- * declared before it, so the iteration stops after at most one pass per
+ * entries to the random values.  A transform uses only parameters
+ * declared before it, so the iteration needs at most one pass per
  * parameter.
  *
- * The values of the provided parameters in this order come from
- * <code>transform_inits</code> with <code>init</code> and
- * <code>random_context</code>, followed by <code>write_array</code>.  They
- * can differ from <code>init</code> by rounding, or by the projection onto
- * the constraint (for example a simplex).  If a value of
- * <code>random_context</code> violates a bound that depends on a provided
- * value (for example <code>lower=a</code> with a provided <code>a</code>),
- * <code>transform_inits</code> throws and the caller rejects the attempt.
+ * One call of <code>transform_inits</code> with <code>init</code> and
+ * <code>random_context</code>, followed by <code>write_array</code>, puts
+ * the provided values into this order.  They can differ from
+ * <code>init</code> by rounding, or by the projection onto a constraint
+ * such as a simplex.  If a random value violates a bound that uses a
+ * provided value (for example <code>lower=a</code> with a provided
+ * <code>a</code>), <code>transform_inits</code> throws, and the caller
+ * rejects the attempt.
  *
- * A parameter counts as provided if <code>init</code> has any of its
- * elements (a tuple parameter has one name per element).  If the
- * parameter names do not match the parameter vectors, the result is that
- * of <code>transform_inits</code> with <code>init</code> and
- * <code>random_context</code>.  This occurs only for hand-written models;
- * stanc generates the names and the vectors from the same declarations.
+ * If the number of names differs from the size of a parameter vector,
+ * the function returns the result of that <code>transform_inits</code>
+ * call.  Only a hand-written model can cause this.
  *
  * @tparam Model the type of the model class
  * @tparam InitContext the type of the user-provided var_context
@@ -74,17 +72,26 @@ std::vector<double> partial_init_unconstrained(
   std::vector<std::string> param_names;
   model.get_param_names(param_names, false, false);
 
-  // Tuple elements are "t.1" in the parameter names and "t:1" in the
-  // flat parameter names.
-  auto base_name = [](const std::string& name) {
-    return name.substr(0, name.find_first_of(".:"));
+  // The parameter names have one name per innermost tuple slot, for
+  // example "at.2" or "w.2.1".  A flat name puts ".i" before an index and
+  // ":k" before a tuple slot.  The slot name keeps each ":k" as ".k" and
+  // drops each ".i": "at.1:2.3" belongs to "at.2", "w:2:1" to "w.2.1".
+  auto slot_name = [](const std::string& flat) {
+    size_t pos = flat.find_first_of(".:");
+    std::string slot = flat.substr(0, pos);
+    while (pos != std::string::npos) {
+      const size_t next = flat.find_first_of(".:", pos + 1);
+      if (flat[pos] == ':') {
+        slot += "." + flat.substr(pos + 1, next - pos - 1);
+      }
+      pos = next;
+    }
+    return slot;
   };
-  std::set<std::string> all_bases;
   std::set<std::string> provided;
   for (const auto& name : param_names) {
-    all_bases.insert(base_name(name));
     if (init.contains_r(name)) {
-      provided.insert(base_name(name));
+      provided.insert(name);
     }
   }
 
@@ -106,9 +113,8 @@ std::vector<double> partial_init_unconstrained(
       || constrained_names.size() != provided_values.size()) {
     return unconstrained;
   }
-  auto is_missing = [&](const std::string& name) {
-    const std::string base = base_name(name);
-    return all_bases.count(base) > 0 && provided.count(base) == 0;
+  auto is_missing = [&](const std::string& flat) {
+    return provided.count(slot_name(flat)) == 0;
   };
   std::vector<size_t> missing_u;
   for (size_t n = 0; n < unconstrained_names.size(); ++n) {
