@@ -8,9 +8,11 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
 #include <stan/math/prim.hpp>
+#include <algorithm>
 #include <chrono>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -25,9 +27,8 @@ namespace internal {
  *
  * The parameters that <code>init</code> provides keep their constrained
  * values.  The other (missing) parameters take the random unconstrained
- * values of <code>random_context</code>.  Each innermost tuple slot counts
- * as a separate parameter, so <code>init</code> can provide some slots of
- * a tuple and not others.
+ * values of <code>random_context</code>.  <code>init</code> must provide
+ * all slots of a tuple or none (<code>initialize</code> checks this).
  *
  * A fixed-point iteration finds the unconstrained values of the provided
  * parameters.  It works on flat vectors in the order of
@@ -72,26 +73,15 @@ std::vector<double> partial_init_unconstrained(
   std::vector<std::string> param_names;
   model.get_param_names(param_names, false, false);
 
-  // The parameter names have one name per innermost tuple slot, for
-  // example "at.2" or "w.2.1".  A flat name puts ".i" before an index and
-  // ":k" before a tuple slot.  The slot name keeps each ":k" as ".k" and
-  // drops each ".i": "at.1:2.3" belongs to "at.2", "w:2:1" to "w.2.1".
-  auto slot_name = [](const std::string& flat) {
-    size_t pos = flat.find_first_of(".:");
-    std::string slot = flat.substr(0, pos);
-    while (pos != std::string::npos) {
-      const size_t next = flat.find_first_of(".:", pos + 1);
-      if (flat[pos] == ':') {
-        slot += "." + flat.substr(pos + 1, next - pos - 1);
-      }
-      pos = next;
-    }
-    return slot;
+  // Tuple slots are "t.1" in the parameter names and "t:1" in the flat
+  // names; the part before the first "." or ":" is the parameter.
+  auto base_name = [](const std::string& name) {
+    return name.substr(0, name.find_first_of(".:"));
   };
   std::set<std::string> provided;
   for (const auto& name : param_names) {
     if (init.contains_r(name)) {
-      provided.insert(name);
+      provided.insert(base_name(name));
     }
   }
 
@@ -114,7 +104,7 @@ std::vector<double> partial_init_unconstrained(
     return unconstrained;
   }
   auto is_missing = [&](const std::string& flat) {
-    return provided.count(slot_name(flat)) == 0;
+    return provided.count(base_name(flat)) == 0;
   };
   std::vector<size_t> missing_u;
   for (size_t n = 0; n < unconstrained_names.size(); ++n) {
@@ -154,6 +144,59 @@ std::vector<double> partial_init_unconstrained(
   return unconstrained;
 }
 
+/**
+ * Throws if <code>init</code> has some but not all slots of a tuple
+ * parameter.
+ *
+ * A tuple parameter has one parameter name per slot ("t.1", "w.2.1"); the
+ * names of other parameters contain no ".".  The message lists each
+ * incomplete tuple in declaration order with its missing slots.
+ *
+ * @tparam InitContext the type of the user-provided var_context
+ * @param[in] param_names parameter names from <code>get_param_names</code>
+ * @param[in] init a var_context with initial values
+ * @throws std::invalid_argument if a tuple is incomplete
+ */
+template <typename InitContext>
+void check_complete_tuples(const std::vector<std::string>& param_names,
+                           const InitContext& init) {
+  std::vector<std::string> tuples;
+  std::vector<bool> any_provided;
+  std::vector<std::string> missing;
+  for (const auto& name : param_names) {
+    const size_t dot = name.find('.');
+    if (dot == std::string::npos) {
+      continue;
+    }
+    const std::string tuple = name.substr(0, dot);
+    const size_t k
+        = std::find(tuples.begin(), tuples.end(), tuple) - tuples.begin();
+    if (k == tuples.size()) {
+      tuples.push_back(tuple);
+      any_provided.push_back(false);
+      missing.emplace_back();
+    }
+    if (init.contains_r(name)) {
+      any_provided[k] = true;
+    } else {
+      missing[k] += (missing[k].empty() ? "" : ", ") + name;
+    }
+  }
+  std::string incomplete;
+  for (size_t k = 0; k < tuples.size(); ++k) {
+    if (any_provided[k] && !missing[k].empty()) {
+      incomplete += (incomplete.empty() ? "" : "; ") + tuples[k] + " (missing "
+                    + missing[k] + ")";
+    }
+  }
+  if (!incomplete.empty()) {
+    throw std::invalid_argument(
+        "Initial values must include all slots of a tuple parameter or"
+        " none. Incomplete tuple parameters: "
+        + incomplete);
+  }
+}
+
 }  // namespace internal
 
 /**
@@ -170,7 +213,8 @@ std::vector<double> partial_init_unconstrained(
  * kept on the constrained scale, also when an offset or multiplier of a
  * missing parameter depends on a provided parameter or the reverse.  An
  * attempt is still rejected if the random constrained value of a missing
- * parameter violates a bound that depends on a provided value.
+ * parameter violates a bound that depends on a provided value.  The
+ * provided values must include all slots of a tuple or none.
  *
  * When the <code>var_context</code> provides all variables or
  * the init_radius is 0, this function will only evaluate the
@@ -205,6 +249,8 @@ std::vector<double> partial_init_unconstrained(
  *   will be re-tried to achieve a finite log density and gradient. Default 100.
  * @throws exception passed through from the model if the model has a
  *   fatal error (not a std::domain_error)
+ * @throws std::invalid_argument if <code>init</code> has some but not
+ *   all slots of a tuple parameter
  * @throws std::domain_error if the model can not be initialized and
  *   the model does not have a fatal error (only allows for
  *   std::domain_error)
@@ -228,6 +274,8 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     is_fully_initialized &= init.contains_r(param_names[n]);
     any_initialized |= init.contains_r(param_names[n]);
   }
+
+  internal::check_complete_tuples(param_names, init);
 
   bool is_initialized_with_zero = init_radius == 0.0;
 

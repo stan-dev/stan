@@ -68,13 +68,9 @@ class ServicesUtilInitializePartial : public testing::Test {
 
   // Runs initialize with the given seed and checks the result.  expected
   // holds the constrained values of the provided parameters by flat name
-  // (the names of constrained_param_names).  provided_u lists the
-  // unconstrained names of the provided entries; if it is empty, all
-  // entries of a variable named in provided count as provided.  Leave it
-  // empty only when provided has all slots of each tuple it names.
+  // (the names of constrained_param_names).
   void check(const std::vector<entry>& provided, const values_t& expected,
-             int seed, double init_radius,
-             const std::set<std::string>& provided_u = {}) {
+             int seed, double init_radius) {
     stan::io::array_var_context init_context = make_context(provided);
     rng = stan::services::util::create_rng(seed, 1);
     stan::rng_t rng_copy = rng;
@@ -95,10 +91,7 @@ class ServicesUtilInitializePartial : public testing::Test {
     model.unconstrained_param_names(u_names, false, false);
     ASSERT_EQ(params.size(), u_names.size());
     for (size_t n = 0; n < params.size(); ++n) {
-      const bool is_provided
-          = provided_u.empty() ? provided_bases.count(base_name(u_names[n])) > 0
-                               : provided_u.count(u_names[n]) > 0;
-      if (!is_provided) {
+      if (provided_bases.count(base_name(u_names[n])) == 0) {
         EXPECT_EQ(u_random[n], params[n])
             << "seed " << seed << ", " << u_names[n];
       }
@@ -210,40 +203,39 @@ TEST_F(ServicesUtilInitializePartial, provided_array_of_tuples) {
   }
 }
 
-TEST_F(ServicesUtilInitializePartial, partially_provided_tuple) {
-  // Only slot 1 of t is provided.  Slot 2 has multiplier=sigma and is
-  // missing, so it must keep its random unconstrained value.
+TEST_F(ServicesUtilInitializePartial, provided_nested_tuple) {
+  // All slots of the nested tuple w are provided; w.2.2 has
+  // multiplier=sigma with a missing sigma.
   for (int seed = 0; seed < 10; ++seed) {
-    check({{"sigma", {1e-20}, {}}, {"t.1", {0.7}, {}}},
-          {{"sigma", 1e-20}, {"t:1", 0.7}}, seed, 2, {"sigma", "t:1"});
+    check({{"w.1", {0.1}, {}}, {"w.2.1", {0.4}, {}}, {"w.2.2", {0.3}, {}}},
+          {{"w:1", 0.1}, {"w:2:1", 0.4}, {"w:2:2", 0.3}}, seed, 2);
   }
 }
 
-TEST_F(ServicesUtilInitializePartial, partially_provided_array_of_tuples) {
-  // Only slot 1 of at is provided; slot 2 has multiplier=sigma.  The first
-  // transform_inits reads slot 2 from random_var_context, which puts the
-  // values of an array of tuples into the wrong slots.  This test passes
-  // because slot 2 has no bound.
-  for (int seed = 0; seed < 10; ++seed) {
-    check({{"sigma", {1e-20}, {}}, {"at.1", {0.3, -0.7}, {2}}},
-          {{"sigma", 1e-20}, {"at.1:1", 0.3}, {"at.2:1", -0.7}}, seed, 2,
-          {"sigma", "at.1:1", "at.2:1"});
-  }
-}
-
-TEST_F(ServicesUtilInitializePartial, partially_provided_vector_slot) {
-  // Slot 2 of tv is a vector with multiplier=sigma and is missing.
-  for (int seed = 0; seed < 10; ++seed) {
-    check({{"sigma", {1e-20}, {}}, {"tv.1", {0.6}, {}}},
-          {{"sigma", 1e-20}, {"tv:1", 0.6}}, seed, 2, {"sigma", "tv:1"});
-  }
-}
-
-TEST_F(ServicesUtilInitializePartial, partially_provided_nested_tuple) {
-  // Only w.2.1 of the nested tuple is provided; w.2.2 has multiplier=sigma.
-  for (int seed = 0; seed < 10; ++seed) {
-    check({{"sigma", {1e-20}, {}}, {"w.2.1", {0.4}, {}}},
-          {{"sigma", 1e-20}, {"w:2:1", 0.4}}, seed, 2, {"sigma", "w:2:1"});
+TEST_F(ServicesUtilInitializePartial, partial_tuple_is_rejected) {
+  // Initial values must include all slots of a tuple or none.
+  const std::string prefix
+      = "Initial values must include all slots of a tuple parameter or"
+        " none. Incomplete tuple parameters: ";
+  const std::vector<std::pair<std::vector<entry>, std::string>> cases
+      = {{{{"t.1", {0.7}, {}}}, "t (missing t.2)"},
+         {{{"at.1", {0.3, -0.7}, {2}}}, "at (missing at.2)"},
+         {{{"tv.1", {0.6}, {}}}, "tv (missing tv.2)"},
+         {{{"w.2.1", {0.4}, {}}}, "w (missing w.1, w.2.2)"},
+         {{{"w.2.1", {0.4}, {}}, {"t.2", {0.1}, {}}},
+          "t (missing t.1); w (missing w.1, w.2.2)"}};
+  for (const auto& c : cases) {
+    stan::test::unit::instrumented_logger case_logger;
+    stan::io::array_var_context init_context = make_context(c.first);
+    std::string what;
+    try {
+      stan::services::util::initialize(model, init_context, rng, 2, false,
+                                       case_logger, init);
+    } catch (const std::invalid_argument& e) {
+      what = e.what();
+    }
+    EXPECT_EQ(prefix + c.second, what);
+    EXPECT_EQ(0, case_logger.call_count()) << c.second;
   }
 }
 
