@@ -102,14 +102,11 @@ int bfgs(Model& model, const stan::io::var_context& init,
       model.write_array(rng, cont_vector, disc_vector, values, true, true,
                         &msg);
     } catch (const std::exception& e) {
-      if (msg.str().length() > 0) {
-        logger.info(msg);
-      }
+      log_if_nonempty(logger, msg);
       logger.error(e.what());
       return error_codes::SOFTWARE;
     }
-    if (msg.str().length() > 0)
-      logger.info(msg);
+    log_if_nonempty(logger, msg);
 
     values.insert(values.begin(), {lp, static_cast<double>(ret)});
     parameter_writer(values);
@@ -166,8 +163,7 @@ int bfgs(Model& model, const stan::io::var_context& init,
                           &msg);
 
         // This if is here to match the pre-refactor behavior
-        if (msg.str().length() > 0)
-          logger.info(msg);
+        log_if_nonempty(logger, msg);
 
         values.insert(values.begin(), {lp, static_cast<double>(ret)});
         parameter_writer(values);
@@ -185,14 +181,11 @@ int bfgs(Model& model, const stan::io::var_context& init,
       model.write_array(rng, cont_vector, disc_vector, values, true, true,
                         &msg);
     } catch (const std::exception& e) {
-      if (msg.str().length() > 0) {
-        logger.info(msg);
-      }
+      log_if_nonempty(logger, msg);
       logger.error(e.what());
       return error_codes::SOFTWARE;
     }
-    if (msg.str().length() > 0)
-      logger.info(msg);
+    log_if_nonempty(logger, msg);
     values.insert(values.begin(), {lp, static_cast<double>(ret)});
     parameter_writer(values);
   }
