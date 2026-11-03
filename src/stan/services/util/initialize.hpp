@@ -7,6 +7,7 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/math/prim.hpp>
 #include <algorithm>
 #include <chrono>
@@ -24,51 +25,37 @@ namespace internal {
 
 /**
  * Returns the unconstrained parameters for a partial initialization.
+ * The provided parameters keep their values from <code>init</code>, and
+ * the missing parameters keep the random unconstrained values of
+ * <code>random_context</code>.  <code>init</code> must provide all slots
+ * of a tuple or none.
  *
- * The parameters that <code>init</code> provides keep their constrained
- * values.  The other (missing) parameters take the random unconstrained
- * values of <code>random_context</code>.  <code>init</code> must provide
- * all slots of a tuple or none (<code>initialize</code> checks this).
- *
- * A fixed-point iteration finds the unconstrained values of the provided
- * parameters.  It works on flat vectors in the order of
- * <code>write_array</code>.  Each pass constrains the current values with
- * <code>write_array</code>, puts back the provided values, frees the
- * result with <code>unconstrain_array</code>, and resets the missing
- * entries to the random values.  A transform uses only parameters
- * declared before it, so the iteration needs at most one pass per
- * parameter.
- *
- * One call of <code>transform_inits</code> with <code>init</code> and
- * <code>random_context</code>, followed by <code>write_array</code>, puts
- * the provided values into this order.  They can differ from
- * <code>init</code> by rounding, or by the projection onto a constraint
- * such as a simplex.  If a random value violates a bound that uses a
- * provided value (for example <code>lower=a</code> with a provided
- * <code>a</code>), <code>transform_inits</code> throws, and the caller
- * rejects the attempt.
- *
- * If the number of names differs from the size of a parameter vector,
- * the function returns the result of that <code>transform_inits</code>
- * call.  Only a hand-written model can cause this.
+ * The offset, multiplier or bounds of a parameter can use other
+ * parameters, so provided and missing parameters can depend on each
+ * other.  The model constrains or frees all parameters together, so a
+ * fixed-point iteration finds the result (at most one pass per
+ * parameter).  Example: <code>real a; real&lt;offset=a&gt; b;
+ * real&lt;offset=b&gt; c;</code> with <code>a</code> and <code>c</code>
+ * provided needs two passes.  The first pass computes <code>b</code> from
+ * the provided <code>a</code> and frees <code>c</code> with it; the second
+ * pass finds no change.  The caller still rejects the attempt if the
+ * random constrained value of a missing parameter violates a bound that
+ * uses a provided value.
  *
  * @tparam Model the type of the model class
  * @tparam InitContext the type of the user-provided var_context
- * @tparam RNG the type of the random number generator
  * @param[in] model the model
  * @param[in] init a var_context with initial values for some parameters
  * @param[in] random_context random initial values for all parameters
- * @param[in,out] rng random number generator (<code>write_array</code>
- *   is called without generated quantities and does not draw from it)
  * @param[in,out] msg stream for messages from the model
  * @throws std::domain_error if a transform or a constraint check fails;
  *   other exceptions from the model are passed through
  * @return unconstrained parameters
  */
-template <typename Model, typename InitContext, typename RNG>
+template <typename Model, typename InitContext>
 std::vector<double> partial_init_unconstrained(
     Model& model, const InitContext& init,
-    const stan::io::random_var_context& random_context, RNG& rng,
+    const stan::io::random_var_context& random_context,
     std::stringstream& msg) {
   std::vector<std::string> param_names;
   model.get_param_names(param_names, false, false);
@@ -78,68 +65,68 @@ std::vector<double> partial_init_unconstrained(
   auto base_name = [](const std::string& name) {
     return name.substr(0, name.find_first_of(".:"));
   };
-  std::set<std::string> provided;
+  std::set<std::string> provided_param_names;
   for (const auto& name : param_names) {
     if (init.contains_r(name)) {
-      provided.insert(base_name(name));
+      provided_param_names.insert(base_name(name));
     }
   }
 
+  // write_array needs an RNG but uses it only for generated quantities,
+  // which these calls exclude.  The random initial values come from
+  // random_context.
+  stan::rng_t rng;
   std::vector<int> disc_vector;
   std::vector<double> unconstrained;
   stan::io::chained_var_context first_context(init, random_context);
   model.transform_inits(first_context, disc_vector, unconstrained, &msg);
-  std::vector<double> provided_values;
-  model.write_array(rng, unconstrained, disc_vector, provided_values, false,
-                    false, &msg);
+  std::vector<double> init_constrained_params;
+  model.write_array(rng, unconstrained, disc_vector, init_constrained_params,
+                    false, false, &msg);
 
   std::vector<std::string> unconstrained_names;
   model.unconstrained_param_names(unconstrained_names, false, false);
   std::vector<std::string> constrained_names;
   model.constrained_param_names(constrained_names, false, false);
-  const std::vector<double> u_random = random_context.get_unconstrained();
-  if (unconstrained_names.size() != u_random.size()
-      || unconstrained_names.size() != unconstrained.size()
-      || constrained_names.size() != provided_values.size()) {
-    return unconstrained;
-  }
+  const std::vector<double> random_unconstrained
+      = random_context.get_unconstrained();
   auto is_missing = [&](const std::string& flat) {
-    return provided.count(base_name(flat)) == 0;
+    return provided_param_names.count(base_name(flat)) == 0;
   };
-  std::vector<size_t> missing_u;
+  std::vector<size_t> missing_unconstrained_idxs;
   for (size_t n = 0; n < unconstrained_names.size(); ++n) {
     if (is_missing(unconstrained_names[n])) {
-      missing_u.push_back(n);
+      missing_unconstrained_idxs.push_back(n);
     }
   }
-  std::vector<size_t> provided_c;
+  std::vector<size_t> provided_constrained_idxs;
   for (size_t n = 0; n < constrained_names.size(); ++n) {
     if (!is_missing(constrained_names[n])) {
-      provided_c.push_back(n);
+      provided_constrained_idxs.push_back(n);
     }
   }
 
-  for (size_t n : missing_u) {
-    unconstrained[n] = u_random[n];
+  for (size_t n : missing_unconstrained_idxs) {
+    unconstrained[n] = random_unconstrained[n];
   }
-  std::vector<double> constrained;
-  std::vector<double> next;
+  std::vector<double> constrained_params;
+  std::vector<double> next_unconstrained;
   // Without convergence (for example a NaN in init) the last pass is
   // returned; the log density check of the caller usually rejects it.
   for (size_t pass = 0; pass <= param_names.size(); ++pass) {
-    model.write_array(rng, unconstrained, disc_vector, constrained, false,
-                      false, &msg);
-    for (size_t n : provided_c) {
-      constrained[n] = provided_values[n];
+    model.write_array(rng, unconstrained, disc_vector, constrained_params,
+                      false, false, &msg);
+    for (size_t n : provided_constrained_idxs) {
+      constrained_params[n] = init_constrained_params[n];
     }
-    model.unconstrain_array(constrained, next, &msg);
-    for (size_t n : missing_u) {
-      next[n] = u_random[n];
+    model.unconstrain_array(constrained_params, next_unconstrained, &msg);
+    for (size_t n : missing_unconstrained_idxs) {
+      next_unconstrained[n] = random_unconstrained[n];
     }
-    if (next == unconstrained) {
+    if (next_unconstrained == unconstrained) {
       break;
     }
-    std::swap(unconstrained, next);
+    std::swap(unconstrained, next_unconstrained);
   }
   return unconstrained;
 }
@@ -210,11 +197,10 @@ void check_complete_tuples(const std::vector<std::string>& param_names,
  * <code>stan::io::var_context</code>, then it will generate
  * random uniform values from -init_radius to +init_radius on the
  * unconstrained scale for missing parameters.  The provided values are
- * kept on the constrained scale, also when an offset or multiplier of a
- * missing parameter depends on a provided parameter or the reverse.  An
- * attempt is still rejected if the random constrained value of a missing
- * parameter violates a bound that depends on a provided value.  The
- * provided values must include all slots of a tuple or none.
+ * kept on the constrained scale.  <code>initialize</code> rejects an
+ * attempt if the random constrained value of a missing parameter
+ * violates a bound that depends on a provided value.  The provided values
+ * must include all slots of a tuple or none.
  *
  * When the <code>var_context</code> provides all variables or
  * the init_radius is 0, this function will only evaluate the
@@ -296,7 +282,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
         model.transform_inits(context, disc_vector, unconstrained, &msg);
       } else {
         unconstrained = internal::partial_init_unconstrained(
-            model, init, random_context, rng, msg);
+            model, init, random_context, msg);
       }
     } catch (std::domain_error& e) {
       if (msg.str().length() > 0) {
