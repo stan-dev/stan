@@ -23,9 +23,11 @@ class var_adaptation : public windowed_adaptation {
 
       estimator_.sample_variance(var);
 
-      double n = static_cast<double>(estimator_.num_samples());
-      var = (n / (n + 5.0)) * var
-            + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
+      if (estimator_.num_samples() > 1) {
+        double n = static_cast<double>(estimator_.num_samples());
+        var = (n / (n + 5.0)) * var
+              + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
+      }
 
       if (!var.allFinite())
         throw std::runtime_error(
