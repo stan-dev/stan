@@ -27,6 +27,8 @@ namespace model {
  * index_max - index from 1:max
  * index_min_max - index from min:max
  * nil_index_list - no-op
+ * Ranges are empty when the lower bound exceeds the upper bound, including
+ * min > N for index_min and max < 1 for index_max.
  * The order of the overloads are
  * vector / row_vector:
  *  - all index overloads
@@ -169,11 +171,16 @@ template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name, index_min idx) {
-  stan::math::check_range("vector[min] assign", name, x.size(), idx.min_);
-  stan::math::check_size_match("vector[min] assign", name,
-                               x.size() - idx.min_ + 1, "right hand side",
-                               y.size());
-  internal::assign_impl(x.tail(x.size() - idx.min_ + 1), y, name);
+  if (likely(idx.min_ <= x.size())) {
+    stan::math::check_range("vector[min] assign", name, x.size(), idx.min_);
+    stan::math::check_size_match("vector[min] assign", name,
+                                 x.size() - idx.min_ + 1, "right hand side",
+                                 y.size());
+    internal::assign_impl(x.tail(x.size() - idx.min_ + 1), y, name);
+  } else {
+    stan::math::check_size_match("vector[min > size] assign", name, 0,
+                                 "right hand side", y.size());
+  }
 }
 
 /**
@@ -329,13 +336,20 @@ template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name, index_min idx) {
-  const auto row_size = x.rows() - (idx.min_ - 1);
-  stan::math::check_range("matrix[min] assign row", name, x.rows(), idx.min_);
-  stan::math::check_size_match("matrix[min] assign rows", name, row_size,
-                               "right hand side rows", y.rows());
-  stan::math::check_size_match("matrix[min] assign columns", name, x.cols(),
-                               "right hand side columns", y.cols());
-  internal::assign_impl(x.bottomRows(row_size), y, name);
+  if (likely(idx.min_ <= x.rows())) {
+    stan::math::check_range("matrix[min] assign row", name, x.rows(), idx.min_);
+    const auto row_size = x.rows() - idx.min_ + 1;
+    stan::math::check_size_match("matrix[min] assign rows", name, row_size,
+                                 "right hand side rows", y.rows());
+    stan::math::check_size_match("matrix[min] assign columns", name, x.cols(),
+                                 "right hand side columns", y.cols());
+    internal::assign_impl(x.bottomRows(row_size), y, name);
+  } else {
+    stan::math::check_size_match("matrix[min > rows] assign rows", name, 0,
+                                 "right hand side rows", y.rows());
+    stan::math::check_size_match("matrix[min] assign columns", name, x.cols(),
+                                 "right hand side columns", y.cols());
+  }
 }
 
 /**
@@ -685,13 +699,17 @@ template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const Idx& row_idx, index_min col_idx) {
-  const auto start_col = col_idx.min_ - 1;
-  const auto col_size = x.cols() - start_col;
-  stan::math::check_range("matrix[..., min] assign column", name, x.cols(),
-                          col_idx.min_);
-  stan::math::check_size_match("matrix[..., min] assign columns", name,
-                               col_size, "right hand side columns", y.cols());
-  assign(x.rightCols(col_size), y, name, row_idx);
+  if (likely(col_idx.min_ <= x.cols())) {
+    stan::math::check_range("matrix[..., min] assign column", name, x.cols(),
+                            col_idx.min_);
+    const auto col_size = x.cols() - col_idx.min_ + 1;
+    stan::math::check_size_match("matrix[..., min] assign columns", name,
+                                 col_size, "right hand side columns", y.cols());
+    assign(x.rightCols(col_size), y, name, row_idx);
+  } else {
+    stan::math::check_size_match("matrix[..., min > cols] assign columns", name,
+                                 0, "right hand side columns", y.cols());
+  }
 }
 
 /**

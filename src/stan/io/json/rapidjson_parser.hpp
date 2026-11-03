@@ -16,6 +16,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 namespace stan {
 namespace json {
@@ -64,7 +65,7 @@ struct RapidJSONHandler {
     return true;
   }
   bool String(const char *str, rapidjson::SizeType length, bool copy) {
-    h_.string(str);
+    h_.string(std::string_view(str, length));
     return check_start();
   }
   bool StartObject() {
@@ -74,8 +75,8 @@ struct RapidJSONHandler {
     return true;
   }
   bool Key(const char *str, rapidjson::SizeType length, bool copy) {
-    h_.key(str);
-    last_key_ = str;
+    h_.key(std::string_view(str, length));
+    last_key_.assign(str, length);
     return check_start();
   }
   bool EndObject(rapidjson::SizeType memberCount) {

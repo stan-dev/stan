@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -26,8 +27,8 @@ class recording_handler : public stan::json::json_handler {
   void end_object() { os_ << "E:obj"; }
   void null() { os_ << "NULL:null"; }
   void boolean(bool p) { os_ << "BOOL:" << p; }
-  void string(const std::string &s) { os_ << "STR:\"" << s << "\""; }
-  void key(const std::string &key) { os_ << "KEY:\"" << key << "\""; }
+  void string(std::string_view s) override { os_ << "STR:\"" << s << "\""; }
+  void key(std::string_view key) override { os_ << "KEY:\"" << key << "\""; }
   void number_double(double x) { os_ << "D(REAL):" << x; }
   void number_int(int n) { os_ << "I(INT):" << n; }
   void number_unsigned_int(unsigned n) { os_ << "U(INT):" << n; }
