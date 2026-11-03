@@ -144,6 +144,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           windowsUnit: {
           node('windows') {
             stage('Windows Headers & Unit') {
+              deleteDir()
               checkout scm
               bat """$WINSETENV
                   make -f lib/stan_math/make/standalone math-libs
@@ -167,6 +168,7 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
         }, macUnit: {
           node('macos') {
             stage('Mac Unit') {
+              deleteDir()
               checkout scm
               runUnit(cxx: MAC_CXX)
             }
