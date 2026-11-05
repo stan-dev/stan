@@ -6,6 +6,7 @@
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <gtest/gtest.h>
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -170,9 +171,21 @@ void reset_std_streams() {
  * Validate JSON using rapidjson parser.
  * @param text String of JSON
  */
-bool is_valid_JSON(std::string& text) {
+inline bool is_valid_JSON(const std::string& text) {
   rapidjson::Document document;
-  return !document.Parse<0>(text.c_str()).HasParseError();
+  const auto& res
+      = document.Parse<rapidjson::kParseNanAndInfFlag
+                       | rapidjson::kParseValidateEncodingFlag
+                       | rapidjson::kParseFullPrecisionFlag>(text.c_str());
+  if (res.HasParseError()) {
+    rapidjson::ParseErrorCode err = res.GetParseError();
+
+    std::cerr << "Error in JSON parsing at offset " << res.GetErrorOffset()
+              << ": " << std::endl;
+
+    std::cerr << rapidjson::GetParseError_En(err) << std::endl;
+  }
+  return !res.HasParseError();
 }
 
 }  // namespace test

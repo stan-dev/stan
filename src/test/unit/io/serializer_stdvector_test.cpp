@@ -17,11 +17,11 @@ TEST(serializer_stdvec_vector, write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  int sentinal = 0;
+  int sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j]);
-      ++sentinal;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i][j]);
+      ++sentinel;
     }
   }
 }
@@ -41,14 +41,14 @@ TEST(serializer_stdvec_vector, complex_write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j].real())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i][j].imag())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      sentinal += 2;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i][j].real())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      EXPECT_FLOAT_EQ(theta[sentinel + 1], x_stdvec[i][j].imag())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      sentinel += 2;
     }
   }
 }
@@ -66,11 +66,11 @@ TEST(serializer_stdvec_rowvector, write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  int sentinal = 0;
+  int sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j]);
-      ++sentinal;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i][j]);
+      ++sentinel;
     }
   }
 }
@@ -90,14 +90,14 @@ TEST(serializer_stdvec_rowvector, complex_write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j].real())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i][j].imag())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      sentinal += 2;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i][j].real())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      EXPECT_FLOAT_EQ(theta[sentinel + 1], x_stdvec[i][j].imag())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      sentinel += 2;
     }
   }
 }
@@ -116,11 +116,11 @@ TEST(serializer_stdvec_matrix, write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  int sentinal = 0;
+  int sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 16U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i](j));
-      ++sentinal;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i](j));
+      ++sentinel;
     }
   }
 }
@@ -140,14 +140,14 @@ TEST(serializer_stdvec_matrix, complex_write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 16U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i](j).real())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i](j).imag())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      sentinal += 2;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i](j).real())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      EXPECT_FLOAT_EQ(theta[sentinel + 1], x_stdvec[i](j).imag())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      sentinel += 2;
     }
   }
 }
@@ -164,11 +164,11 @@ TEST(serializer_stdvec_stdvector, write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  int sentinal = 0;
+  int sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j]);
-      ++sentinal;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i][j]);
+      ++sentinel;
     }
   }
 }
@@ -187,14 +187,14 @@ TEST(serializer_stdvec_stdvector, complex_write) {
   }
   stan::io::serializer<double> serializer(theta);
   serializer.write(x_stdvec);
-  Eigen::Index sentinal = 0;
+  Eigen::Index sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j].real())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i][j].imag())
-          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
-      sentinal += 2;
+      EXPECT_FLOAT_EQ(theta[sentinel], x_stdvec[i][j].real())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      EXPECT_FLOAT_EQ(theta[sentinel + 1], x_stdvec[i][j].imag())
+          << "For idx: " << sentinel << " i: " << i << "j: " << j << "\n";
+      sentinel += 2;
     }
   }
 }

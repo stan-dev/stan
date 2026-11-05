@@ -55,6 +55,40 @@ TEST_F(RankNormalizedRhat, const_fail) {
   EXPECT_TRUE(std::isnan(rhat.second));
 }
 
+TEST_F(RankNormalizedRhat, constant_chain) {
+  // computed via R pkg posterior
+  chains_theta.col(3).setConstant(0.3);
+  auto rhat = stan::analyze::split_rank_normalized_rhat(chains_theta);
+  EXPECT_NEAR(1.02823450102704, rhat.first, 1e-10);
+  EXPECT_NEAR(1.45003968210345, rhat.second, 1e-10);
+}
+
+TEST_F(RankNormalizedRhat, half_constant_chain) {
+  // computed via R pkg posterior
+  chains_theta.col(3).tail(500).setConstant(0.3);
+  auto rhat = stan::analyze::split_rank_normalized_rhat(chains_theta);
+  EXPECT_NEAR(1.0180859586561, rhat.first, 1e-10);
+  EXPECT_NEAR(1.04306019991553, rhat.second, 1e-10);
+}
+
+TEST_F(RankNormalizedRhat, chain_in_other_mode) {
+  // computed via R pkg posterior
+  chains_theta.col(3).array() += 1.0;
+  auto rhat = stan::analyze::split_rank_normalized_rhat(chains_theta);
+  EXPECT_NEAR(1.5350029828821, rhat.first, 1e-10);
+  EXPECT_NEAR(1.52846407802517, rhat.second, 1e-10);
+}
+
+TEST_F(RankNormalizedRhat, every_chain_constant) {
+  Eigen::MatrixXd chains(1000, 4);
+  for (int i = 0; i < 4; ++i) {
+    chains.col(i).setConstant(i + 1);
+  }
+  auto rhat = stan::analyze::split_rank_normalized_rhat(chains);
+  EXPECT_TRUE(std::isnan(rhat.first));
+  EXPECT_TRUE(std::isnan(rhat.second));
+}
+
 TEST_F(RankNormalizedRhat, inf_fail) {
   chains_theta(0, 0) = std::numeric_limits<double>::infinity();
   auto rhat = stan::analyze::split_rank_normalized_rhat(chains_theta);
