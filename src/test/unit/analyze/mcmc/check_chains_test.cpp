@@ -46,3 +46,29 @@ TEST(CheckChains, good_and_bad) {
   chain_1(0, 0) = std::numeric_limits<double>::infinity();
   EXPECT_FALSE(stan::analyze::is_finite_and_varies(chain_1));
 }
+
+TEST(CheckChains, some_chains_constant) {
+  Eigen::MatrixXd chains(10, 3);
+  for (int i = 0; i < 10; ++i) {
+    chains(i, 0) = i;
+    chains(i, 1) = 0.3;
+    chains(i, 2) = -2.5;
+  }
+  // one chain varies
+  EXPECT_TRUE(stan::analyze::is_finite_and_varies(chains));
+
+  // every chain constant, at different values
+  chains.col(0).setConstant(1.0);
+  EXPECT_FALSE(stan::analyze::is_finite_and_varies(chains));
+
+  // every chain constant, at the same value
+  chains.setConstant(0.3);
+  EXPECT_FALSE(stan::analyze::is_finite_and_varies(chains));
+
+  // one chain varies, another chain has a non-finite value
+  for (int i = 0; i < 10; ++i) {
+    chains(i, 0) = i;
+  }
+  chains(4, 1) = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_FALSE(stan::analyze::is_finite_and_varies(chains));
+}
