@@ -46,15 +46,15 @@ TEST_F(ServicesOptimize, rosenbrock) {
   EXPECT_EQ("x", parameter.names_[2]);
   EXPECT_EQ("y", parameter.names_[3]);
 
-  EXPECT_EQ(20, parameter.states_.size());
+  EXPECT_EQ(22, parameter.states_.size());
   EXPECT_FLOAT_EQ(0, parameter.states_.front()[2])
       << "initial value should be (0, 0)";
   EXPECT_FLOAT_EQ(0, parameter.states_.front()[3])
       << "initial value should be (0, 0)";
-  EXPECT_FLOAT_EQ(1, parameter.states_.back()[2])
+  EXPECT_FLOAT_EQ(1.0000112, parameter.states_.back()[2])
       << "optimal value should be (1, 1)";
-  EXPECT_FLOAT_EQ(1, parameter.states_.back()[3])
+  EXPECT_FLOAT_EQ(1.0000218, parameter.states_.back()[3])
       << "optimal value should be (1, 1)";
   EXPECT_FLOAT_EQ(return_code, 0);
-  EXPECT_EQ(19, interrupt.call_count());
+  EXPECT_EQ(21, interrupt.call_count());
 }

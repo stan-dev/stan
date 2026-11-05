@@ -14,6 +14,15 @@ class BFGSUpdate_HInv {
   /**
    * Update the inverse Hessian approximation.
    *
+   * Except at a reset, the approximation H is multiplied by
+   * tau = s'y / y'Hy before the update if tau > 1 (Oren-Luenberger sizing
+   * restricted to enlarging H). Without it H keeps the scale set at the
+   * last reset, which far from the optimum can underestimate the inverse
+   * curvature by orders of magnitude in the directions not explored since.
+   * Scaling all of H can overestimate it along earlier steps instead; a
+   * later pair along such a direction has y'Hy > s'y, so it is not sized
+   * and the update corrects H there.
+   *
    * @param yk Difference between the current and previous gradient vector.
    * @param sk Difference between the current and previous state vector.
    * @param reset Whether to reset the approximation, forgetting about
@@ -25,21 +34,32 @@ class BFGSUpdate_HInv {
   inline Scalar update(const VectorT &yk, const VectorT &sk,
                        bool reset = false) {
     Scalar rhok, skyk, B0fact;
-    HessianT Hupd;
 
     skyk = yk.dot(sk);
     rhok = 1.0 / skyk;
 
-    Hupd.noalias()
-        = HessianT::Identity(yk.size(), yk.size()) - rhok * sk * yk.transpose();
     if (reset) {
       B0fact = yk.squaredNorm() / skyk;
-      _Hk.noalias() = ((1.0 / B0fact) * Hupd) * Hupd.transpose();
+      _Hk.setIdentity(yk.size(), yk.size());
+      _Hk /= B0fact;
     } else {
       B0fact = 1.0;
-      _Hk = Hupd * _Hk * Hupd.transpose();
     }
-    _Hk.noalias() += rhok * sk * sk.transpose();
+    // H <- (I - rho s y') H (I - rho y s') + rho s s'
+    //    = H + (c s - rho u) s' - rho s u',  u = H y,  c = rho^2 y'u + rho
+    _u.noalias() = _Hk * yk;
+    Scalar yu = yk.dot(_u);
+    if (!reset && 0 < yu && yu < skyk) {
+      const Scalar tau = skyk / yu;
+      _Hk *= tau;
+      _u *= tau;
+      yu = skyk;
+    }
+    const Scalar c = rhok * rhok * yu + rhok;
+    _w = c * sk - rhok * _u;
+    _Hk.noalias() += _w * sk.transpose();
+    _u *= rhok;
+    _Hk.noalias() -= sk * _u.transpose();
     return B0fact;
   }
 
@@ -57,6 +77,7 @@ class BFGSUpdate_HInv {
 
  private:
   HessianT _Hk;
+  VectorT _u, _w;
 };
 }  // namespace optimization
 }  // namespace stan

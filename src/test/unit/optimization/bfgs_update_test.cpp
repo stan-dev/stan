@@ -35,6 +35,25 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
   }
 }
 
+TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_enlarges_small_estimate) {
+  // The reset on a pair with curvature 1e4 along e1 sets H = 1e-4 I. The next
+  // pair has curvature 1 along e2, so H is first multiplied by 1e4, also
+  // along e3, which no pair has explored (H e3 stayed 1e-4 e3 before). A
+  // pair with curvature 100 along e3, where H is then 1, does not shrink H:
+  // H e1 stays e1, although the first pair measured curvature 1e4 along e1.
+  stan::optimization::BFGSUpdate_HInv<> bfgsUp;
+  Eigen::VectorXd s = Eigen::VectorXd::Unit(3, 0), p;
+  bfgsUp.update(1e4 * s, s, true);
+  s = Eigen::VectorXd::Unit(3, 1);
+  bfgsUp.update(s, s);
+  bfgsUp.search_direction(p, Eigen::VectorXd::Unit(3, 2));
+  EXPECT_FLOAT_EQ(-1, p[2]);
+  s = Eigen::VectorXd::Unit(3, 2);
+  bfgsUp.update(100 * s, s);
+  bfgsUp.search_direction(p, Eigen::VectorXd::Unit(3, 0));
+  EXPECT_FLOAT_EQ(-1, p[0]);
+}
+
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
   const int nDim = 10;
 
