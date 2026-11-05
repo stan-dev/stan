@@ -8,6 +8,7 @@
 #include <stan/io/deserializer.hpp>
 #include <stan/io/serializer.hpp>
 #include <stan/io/read_from_context.hpp>
+#include <stan/io/json/write_json_value.hpp>
 
 #include <stan/model/rethrow_located.hpp>
 #include <stan/model/prob_grad.hpp>

@@ -77,6 +77,9 @@ void autocorrelation(const Eigen::MatrixBase<DerivedA>& y,
  * <p>This method is just a light wrapper around the three-argument
  * autocovariance function
  *
+ * <p>If all values of the input sequence are equal, the autocovariances
+ * are zero at every lag.
+ *
  * @tparam T Scalar type.
  * @param y Input sequence.
  * @param acov Autocovariances.
@@ -84,6 +87,11 @@ void autocorrelation(const Eigen::MatrixBase<DerivedA>& y,
 template <typename T, typename DerivedA, typename DerivedB>
 void autocovariance(const Eigen::MatrixBase<DerivedA>& y,
                     Eigen::MatrixBase<DerivedB>& acov) {
+  // the autocorrelations of a constant sequence are 0 / 0
+  if (y.size() > 0 && (y.array() == y(0)).all()) {
+    acov = Eigen::Matrix<T, Eigen::Dynamic, 1>::Zero(y.size());
+    return;
+  }
   Eigen::FFT<T> fft;
   autocorrelation(y, acov, fft);
 
