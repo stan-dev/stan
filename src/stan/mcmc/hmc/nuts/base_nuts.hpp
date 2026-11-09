@@ -107,7 +107,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     Eigen::VectorXd p_sharp_bck_bck = p_sharp_fwd_fwd;
 
     // Integrated momenta along trajectory
-    Eigen::VectorXd rho = this->z_.p.transpose();
+    Eigen::VectorXd rho = this->z_.p;
 
     // Log sum of state weights (offset by H0) along trajectory
     double log_sum_weight = 0;  // log(exp(H0 - H0))
