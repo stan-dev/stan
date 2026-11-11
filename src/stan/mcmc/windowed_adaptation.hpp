@@ -67,6 +67,7 @@ class windowed_adaptation : public base_adaptation {
       logger.info(term_buffer_msg);
 
       logger.info("");
+      restart();
       return;
     }
 
