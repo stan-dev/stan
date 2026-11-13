@@ -38,7 +38,7 @@ class chainset {
 
  public:
   /* Construct a chainset from a single sample.
-   * Throws execption if sample is empty.
+   * Throws exception if sample is empty.
    */
   explicit chainset(const stan::io::stan_csv& stan_csv) {
     if (chains_.size() > 0) {
@@ -53,7 +53,7 @@ class chainset {
   }
 
   /* Construct a chainset from a set of samples.
-   * Throws execption if sample column names and shapes don't match.
+   * Throws exception if sample column names and shapes don't match.
    */
   explicit chainset(const std::vector<stan::io::stan_csv>& stan_csv) {
     if (stan_csv.empty())
@@ -472,7 +472,7 @@ class chainset {
   /**
    * Compute autocorrelation for one column of one chain.
    * Throws exception if column index is out of bounds.
-   * Autocorrelation is computed using Stan math library implmentation.
+   * Autocorrelation is computed using Stan math library implementation.
    *
    * @param chain chain index
    * @param index column index
@@ -490,7 +490,7 @@ class chainset {
   /**
    * Compute autocorrelation for one column of one chain.
    * Throws exception if column index is out of bounds.
-   * Autocorrelation is computed using Stan math library implmentation.
+   * Autocorrelation is computed using Stan math library implementation.
    *
    * @param chain chain index
    * @param name column name

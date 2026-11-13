@@ -36,17 +36,26 @@ class MonteCarloStandardError : public testing::Test {
 
 TEST_F(MonteCarloStandardError, test_mcse) {
   // computed via R pkg posterior
-  double mcse_mean_lp_expect = 0.02016;
-  double mcse_mean_theta_expect = 0.00323;
+  double mcse_mean_lp_expect = 0.0201647780004714;
+  double mcse_mean_theta_expect = 0.00323399160714608;
 
-  double mcse_sd_lp_expect = 0.03553;
-  double mcse_sd_theta_expect = 0.00216;
-  EXPECT_NEAR(mcse_mean_lp_expect, stan::analyze::mcse_mean(chains_lp), 1e-4);
+  double mcse_sd_lp_expect = 0.0308898300566685;
+  double mcse_sd_theta_expect = 0.00216421366907844;
+  EXPECT_NEAR(mcse_mean_lp_expect, stan::analyze::mcse_mean(chains_lp), 1e-10);
   EXPECT_NEAR(mcse_mean_theta_expect, stan::analyze::mcse_mean(chains_theta),
-              1e-4);
+              1e-10);
 
-  EXPECT_NEAR(mcse_sd_lp_expect, stan::analyze::mcse_sd(chains_lp), 1e-4);
-  EXPECT_NEAR(mcse_sd_theta_expect, stan::analyze::mcse_sd(chains_theta), 1e-4);
+  EXPECT_NEAR(mcse_sd_lp_expect, stan::analyze::mcse_sd(chains_lp), 1e-10);
+  EXPECT_NEAR(mcse_sd_theta_expect, stan::analyze::mcse_sd(chains_theta),
+              1e-10);
+}
+
+TEST_F(MonteCarloStandardError, constant_chain) {
+  // computed via R pkg posterior
+  chains_theta.col(3).setConstant(0.3);
+  EXPECT_NEAR(0.00355436328690979, stan::analyze::mcse_mean(chains_theta),
+              1e-10);
+  EXPECT_NEAR(0.0121180542262653, stan::analyze::mcse_sd(chains_theta), 1e-10);
 }
 
 TEST_F(MonteCarloStandardError, const_fail) {
