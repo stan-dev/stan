@@ -108,24 +108,39 @@ Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
 
 /**
  * An internal utility function for implementing WolfeLineSearch()
+ *
+ * Gives up (returns 1) when the bracket collapses or after max_failed
+ * failed function evaluations.
  **/
 template <typename FunctorType, typename Scalar, typename XType>
 int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
                FunctorType &func, const XType &x, const Scalar &f,
                const Scalar &dfp, const Scalar &c1dfp, const Scalar &c2dfp,
                const XType &p, Scalar alo, Scalar aloF, Scalar aloDFp,
-               Scalar ahi, Scalar ahiF, Scalar ahiDFp,
-               const Scalar &min_range) {
+               Scalar ahi, Scalar ahiF, Scalar ahiDFp, const Scalar &min_range,
+               Scalar max_failed = std::numeric_limits<Scalar>::infinity()) {
   Scalar d1, d2, newDFp;
   int itNum(0);
+  int nFailed(0);
+  Scalar width_1(std::numeric_limits<Scalar>::infinity());
+  Scalar width_2(width_1);
 
   while (1) {
     itNum++;
 
-    if (std::fabs(alo - ahi) < min_range || std::nextafter(alo, ahi) == ahi)
+    if (std::fabs(alo - ahi) < min_range || std::nextafter(alo, ahi) == ahi
+        || nFailed >= max_failed)
       return 1;
 
-    if (itNum % 5 == 0) {
+    // Bisect when the last two trials did not shrink the bracket to 0.66 of
+    // its width (More and Thuente, 1994): a trial kept 1% from one end can
+    // remove only 1% of the bracket when the minimizer is near the other end.
+    const Scalar width = std::fabs(ahi - alo);
+    const bool slow = width > 0.66 * width_2;
+    width_2 = width_1;
+    width_1 = width;
+
+    if (itNum % 5 == 0 || slow) {
       alpha = 0.5 * (alo + ahi);
     } else {
       // Perform cubic interpolation to determine next point to try
@@ -135,18 +150,29 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
         d2 = -d2;
       alpha
           = ahi - (ahi - alo) * (ahiDFp + d2 - d1) / (ahiDFp - aloDFp + 2 * d2);
-      if (!std::isfinite(alpha)
-          || alpha < std::min(alo, ahi) + 0.01 * std::fabs(alo - ahi)
-          || alpha > std::max(alo, ahi) - 0.01 * std::fabs(alo - ahi))
+      if (std::isfinite(alpha)) {
+        // Keep the trial at least 1% of the bracket away from both ends. When
+        // the minimizer is very close to one end (a first step far too long
+        // for the curvature), this shrinks the bracket 100-fold per trial,
+        // where falling back to bisection would only halve it.
+        const Scalar margin = 0.01 * std::fabs(alo - ahi);
+        alpha = std::min(std::max(alpha, std::min(alo, ahi) + margin),
+                         std::max(alo, ahi) - margin);
+      }
+      // Bisect instead when the trial is not finite, or when it is an end of
+      // a bracket so narrow (below about 50 ulps) that the margin rounded away
+      if (!(std::min(alo, ahi) < alpha && alpha < std::max(alo, ahi))) {
         alpha = 0.5 * (alo + ahi);
+      }
     }
 
     newX = x + alpha * p;
     while (func(newX, newF, newDF)) {
+      ++nFailed;
       const Scalar alpha_prev = alpha;
       alpha = 0.5 * (alpha + std::min(alo, ahi));
       if (std::fabs(std::min(alo, ahi) - alpha) < min_range
-          || alpha == alpha_prev)
+          || alpha == alpha_prev || nFailed >= max_failed)
         return 1;
       newX = x + alpha * p;
     }
@@ -220,7 +246,8 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  *
  * @param minAlpha Smallest allowable step-size.
  *
- * @param maxLSIts Maximum number line search iterations.
+ * @param maxLSIts Maximum number of line search iterations for expanding
+ * the step, and of failed function evaluations while zooming in.
  *
  * @param maxLSRestarts Maximum number of times line search will
  * restart with \f$ f() \f$ failing.
@@ -234,6 +261,12 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
                     const Scalar &c1, const Scalar &c2, const Scalar &minAlpha,
                     const Scalar &maxLSIts, const Scalar &maxLSRestarts) {
   const Scalar dfp(gradx0.dot(p));
+  // The bracketing below assumes that f decreases along p. Refuse an ascent
+  // (or NaN) direction at once, so that the caller resets to -g instead of
+  // spending evaluations on a search that cannot bracket a decrease.
+  if (!(dfp <= 0)) {
+    return 1;
+  }
   const Scalar c1dfp(c1 * dfp);
   const Scalar c2dfp(c2 * dfp);
 
@@ -271,7 +304,7 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
     if ((func_val > f0 + alpha * c1dfp) || (func_val >= prevF && nits > 0)) {
       retCode = WolfLSZoom(alpha, x1, func_val, gradx1, func, x0, f0, dfp,
                            c1dfp, c2dfp, p, alpha0, prevF, prevDFp, alpha1,
-                           func_val, newDFp, 1e-16);
+                           func_val, newDFp, 1e-16, maxLSIts);
       break;
     }
     if (std::fabs(newDFp) <= -c2dfp) {
@@ -281,7 +314,7 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
     if (newDFp >= 0) {
       retCode = WolfLSZoom(alpha, x1, func_val, gradx1, func, x0, f0, dfp,
                            c1dfp, c2dfp, p, alpha1, func_val, newDFp, alpha0,
-                           prevF, prevDFp, 1e-16);
+                           prevF, prevDFp, 1e-16, maxLSIts);
       break;
     }
 
