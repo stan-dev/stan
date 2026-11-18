@@ -58,7 +58,7 @@ class BFGSMinimizer {
 
  protected:
   FunctorType _func;
-  VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
+  VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1, _sk, _yk;
   Scalar _fk, _fk_1, _alphak_1;
   Scalar _alpha, _alpha0;
   size_t _itNum;
@@ -164,7 +164,6 @@ class BFGSMinimizer {
 
   int step() {
     Scalar gradNorm, stepNorm;
-    VectorT sk, yk;
     int retCode(0);
     int resetB(0);
 
@@ -226,21 +225,21 @@ class BFGSMinimizer {
     _gk.swap(_gk_1);
     _pk.swap(_pk_1);
 
-    sk.noalias() = _xk - _xk_1;
-    yk.noalias() = _gk - _gk_1;
+    _sk.noalias() = _xk - _xk_1;
+    _yk.noalias() = _gk - _gk_1;
 
     gradNorm = _gk.norm();
-    stepNorm = sk.norm();
+    stepNorm = _sk.norm();
 
     // Update QN approximation
     if (resetB) {
       // If the QN approximation was reset, automatically scale it
       // and update the step-size accordingly
-      Scalar B0fact = _qn.update(yk, sk, true);
+      Scalar B0fact = _qn.update(_yk, _sk, true);
       _pk_1 /= B0fact;
       _alphak_1 = _alpha * B0fact;
     } else {
-      _qn.update(yk, sk);
+      _qn.update(_yk, _sk);
       _alphak_1 = _alpha;
     }
     // Compute search direction for next step
@@ -288,7 +287,8 @@ class ModelAdaptor {
   M &_model;
   std::vector<int> _params_i;
   std::ostream *_msgs;
-  std::vector<double> _x, _g;
+  std::vector<double> _x;
+  std::vector<stan::math::var> _ad;
   size_t _fevals;
 
  public:
@@ -327,36 +327,40 @@ class ModelAdaptor {
   }
   int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x, double &f,
                  Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
-    using Eigen::Dynamic;
-    using Eigen::Matrix;
-    using stan::math::index_type;
-    using stan::model::log_prob_grad;
-    typedef typename index_type<Matrix<double, Dynamic, 1> >::type idx_t;
-
-    _x.resize(x.size());
-    for (idx_t i = 0; i < x.size(); i++)
-      _x[i] = x[i];
-
     _fevals++;
 
+    // stan::model::log_prob_grad<true, jacobian> on a member vector of vars:
+    // no allocation per call and no copies through std::vector<double>
+    _ad.resize(x.size());
+    for (Eigen::Index i = 0; i < x.size(); ++i) {
+      _ad[i] = stan::math::var(x.coeff(i));
+    }
     try {
-      f = -log_prob_grad<true, jacobian>(_model, _x, _params_i, _g, _msgs);
+      stan::math::var lp
+          = _model.template log_prob<true, jacobian>(_ad, _params_i, _msgs);
+      f = -lp.val();
+      lp.grad();
     } catch (const std::domain_error &e) {
+      stan::math::recover_memory();
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
       return 1;
+    } catch (...) {
+      stan::math::recover_memory();
+      throw;
     }
+    g.resize(x.size());
+    for (Eigen::Index i = 0; i < x.size(); ++i) {
+      g.coeffRef(i) = -_ad[i].adj();
+    }
+    stan::math::recover_memory();
 
-    g.resize(_g.size());
-    for (size_t i = 0; i < _g.size(); i++) {
-      if (!std::isfinite(_g[i])) {
-        if (_msgs)
-          *_msgs << "Error evaluating model log probability: "
-                    "Non-finite gradient."
-                 << std::endl;
-        return 3;
-      }
-      g[i] = -_g[i];
+    if (!g.allFinite()) {
+      if (_msgs)
+        *_msgs << "Error evaluating model log probability: "
+                  "Non-finite gradient."
+               << std::endl;
+      return 3;
     }
 
     if (std::isfinite(f)) {
