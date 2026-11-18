@@ -30,7 +30,8 @@ namespace optimize {
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
  * @param[in] history_size amount of history to keep for L-BFGS
- * @param[in] init_alpha line search step size for first iteration
+ * @param[in] init_alpha line search step size for first iteration, reduced
+ *   if needed so that the first trial step moves no parameter by more than 1
  * @param[in] tol_obj convergence tolerance on absolute changes in
  *   objective function value
  * @param[in] tol_rel_obj convergence tolerance on relative changes
@@ -79,6 +80,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
   Optimizer lbfgs(model, cont_vector, disc_vector, &lbfgs_ss);
   lbfgs.get_qnupdate().set_history_size(history_size);
   lbfgs._ls_opts.alpha0 = init_alpha;
+  lbfgs._ls_opts.maxStep0 = 1;
   lbfgs._conv_opts.tolAbsF = tol_obj;
   lbfgs._conv_opts.tolRelF = tol_rel_obj;
   lbfgs._conv_opts.tolAbsGrad = tol_grad;

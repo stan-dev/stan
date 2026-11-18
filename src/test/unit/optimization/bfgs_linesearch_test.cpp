@@ -239,6 +239,34 @@ TEST(OptimizationBfgsLinesearch, wolfeLineSearch_jump_terminates) {
   EXPECT_LT(func.n_evals_, 1000);
 }
 
+TEST(OptimizationBfgsLinesearch, wolfeLineSearch_tiny_first_step) {
+  // phi(x) = -x + 1e17 x^2 / 2. The first trial step 2.35e-17 (one unit
+  // along a gradient of 4.3e16) overshoots the minimiser 1e-17. The bracket
+  // it gives, of width 2.35e-17, is narrower than the fixed width 1e-16 at
+  // which the zoom used to give up. minAlpha = 1e-20 lies below the first
+  // trial step.
+  using stan::optimization::WolfeLineSearch;
+  const double c1 = 1e-4, c2 = 0.9;
+  auto func = [](const Eigen::Matrix<double, Eigen::Dynamic, 1> &x, double &f,
+                 Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
+    f = -x[0] + 0.5e17 * x[0] * x[0];
+    g.resize(1);
+    g[0] = -1 + 1e17 * x[0];
+    return 0;
+  };
+  Eigen::Matrix<double, -1, 1> x0(1), x1, p(1), gradx0, gradx1;
+  double f0, f1;
+  x0 << 0.0;
+  func(x0, f0, gradx0);
+  p << 1.0;
+  double alpha = 2.35e-17;
+  int ret = WolfeLineSearch(func, alpha, x1, f1, gradx1, p, x0, f0, gradx0, c1,
+                            c2, 1e-20, 20.0, 10.0);
+  EXPECT_EQ(0, ret);
+  EXPECT_LE(f1, f0 + c1 * alpha * p.dot(gradx0));
+  EXPECT_LE(std::fabs(p.dot(gradx1)), c2 * std::fabs(p.dot(gradx0)));
+}
+
 TEST(OptimizationBfgsLinesearch, WolfLSZoom_adjacent_bracket) {
   // alo and ahi are adjacent doubles and every trial step rounds to ahi;
   // this looped forever (#3229)
