@@ -58,3 +58,22 @@ TEST(ProbAutocovariance, test2) {
   EXPECT_NEAR(1.10, ac(4), 0.01);
   EXPECT_NEAR(0.89, ac(5), 0.01);
 }
+
+TEST(ProbAutocovariance, constant_sequence) {
+  size_t N = 10;
+  Eigen::VectorXd y = Eigen::VectorXd::Constant(N, 0.3);
+  Eigen::VectorXd ac(N);
+  stan::analyze::autocovariance<double>(y, ac);
+  EXPECT_EQ(N, ac.size());
+  for (size_t i = 0; i < N; ++i) {
+    EXPECT_EQ(0.0, ac(i));
+  }
+
+  std::vector<double> y_vec(N, 0.3);
+  std::vector<double> ac_vec;
+  stan::analyze::autocovariance(y_vec, ac_vec);
+  EXPECT_EQ(N, ac_vec.size());
+  for (size_t i = 0; i < N; ++i) {
+    EXPECT_EQ(0.0, ac_vec[i]);
+  }
+}

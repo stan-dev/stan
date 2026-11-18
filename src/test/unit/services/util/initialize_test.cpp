@@ -234,6 +234,8 @@ class mock_throwing_model : public stan::model::prob_grad {
       param_names__.push_back(param_name.str());
     }
   }
+  void write_transformed_data_json(std::ostream* out) const { *out << "{}"; }
+
   template <typename RNG>
   void write_array(RNG& base_rng__, std::vector<double>& params_r__,
                    std::vector<int>& params_i__, std::vector<double>& vars__,
@@ -243,6 +245,13 @@ class mock_throwing_model : public stan::model::prob_grad {
     vars__.resize(0);
     for (size_t i = 0; i < params_r__.size(); ++i)
       vars__.push_back(params_r__[i]);
+  }
+
+  // Needed to compile initialize; these tests do not use partial inits.
+  void unconstrain_array(const std::vector<double>& params_r_constrained,
+                         std::vector<double>& params_r,
+                         std::ostream* msgs = nullptr) const {
+    params_r = params_r_constrained;
   }
 
   mutable int templated_log_prob_calls;
@@ -382,6 +391,13 @@ class mock_error_model : public stan::model::prob_grad {
       vars__.push_back(params_r__[i]);
   }
 
+  // Needed to compile initialize; these tests do not use partial inits.
+  void unconstrain_array(const std::vector<double>& params_r_constrained,
+                         std::vector<double>& params_r,
+                         std::ostream* msgs = nullptr) const {
+    params_r = params_r_constrained;
+  }
+
   mutable int templated_log_prob_calls;
   mutable int transform_inits_calls;
   mutable int write_array_calls;
@@ -516,6 +532,13 @@ class mock_throwing_model_in_write_array : public stan::model::prob_grad {
     vars__.resize(0);
     for (size_t i = 0; i < params_r__.size(); ++i)
       vars__.push_back(params_r__[i]);
+  }
+
+  // Needed to compile initialize; these tests do not use partial inits.
+  void unconstrain_array(const std::vector<double>& params_r_constrained,
+                         std::vector<double>& params_r,
+                         std::ostream* msgs = nullptr) const {
+    params_r = params_r_constrained;
   }
 
   mutable int templated_log_prob_calls;
@@ -654,6 +677,13 @@ class mock_inf_model : public stan::model::prob_grad {
     vars__.resize(0);
     for (size_t i = 0; i < params_r__.size(); ++i)
       vars__.push_back(params_r__[i]);
+  }
+
+  // Needed to compile initialize; these tests do not use partial inits.
+  void unconstrain_array(const std::vector<double>& params_r_constrained,
+                         std::vector<double>& params_r,
+                         std::ostream* msgs = nullptr) const {
+    params_r = params_r_constrained;
   }
 
   mutable int templated_log_prob_calls;
