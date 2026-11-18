@@ -118,10 +118,10 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           def pre = args.pre ?: ''
           deleteDir()
           checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/performance-tests-cmdstan']],
-            extensions: [cloneOption(shallow: true, depth: 2), submodule(recursiveSubmodules: true, shallow: true, depth: 32)])
+            extensions: [cloneOption(shallow: true, depth: 2, timeout: 30), submodule(recursiveSubmodules: true, shallow: true, depth: 32, timeout: 30)])
           dir('stanc3') {
             checkout scmGit(userRemoteConfigs: [[url: 'https://github.com/stan-dev/stanc3']],
-              extensions: [cloneOption(shallow: true, depth: 8)])
+              extensions: [cloneOption(shallow: true, depth: 8, timeout: 30)])
           }
           checkoutPR('cmdstan', params.cmdstan_pr)
           dir('cmdstan/stan') {
@@ -144,6 +144,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           windowsUnit: {
           node('windows') {
             stage('Windows Headers & Unit') {
+              deleteDir()
               checkout scm
               bat """$WINSETENV
                   make -f lib/stan_math/make/standalone math-libs
@@ -167,6 +168,7 @@ LDFLAGS_OPENCL=-L/usr/local/cuda/targets/x86_64-linux/lib
         }, macUnit: {
           node('macos') {
             stage('Mac Unit') {
+              deleteDir()
               checkout scm
               runUnit(cxx: MAC_CXX)
             }

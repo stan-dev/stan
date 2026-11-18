@@ -68,11 +68,11 @@ TEST(serializer_stdvector_varmat, read) {
   }
   stan::io::serializer<stan::math::var> serializer(theta);
   serializer.write(x);
-  int sentinal = 0;
+  int sentinel = 0;
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 9U; ++j) {
-      EXPECT_FLOAT_EQ(theta[sentinal].val(), x[i].val()(j));
-      ++sentinal;
+      EXPECT_FLOAT_EQ(theta[sentinel].val(), x[i].val()(j));
+      ++sentinel;
     }
   }
   EXPECT_THROW(serializer.write(4), std::runtime_error);

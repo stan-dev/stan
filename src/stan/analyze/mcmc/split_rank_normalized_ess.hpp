@@ -43,14 +43,9 @@ inline std::pair<double, double> split_rank_normalized_ess(
                             .cast<double>();
   double ess_tail_95 = ess(q95);
 
-  double ess_tail;
-  if (std::isnan(ess_tail_05)) {
-    ess_tail = ess_tail_95;
-  } else if (std::isnan(ess_tail_95)) {
-    ess_tail = ess_tail_05;
-  } else {
-    ess_tail = std::min(ess_tail_05, ess_tail_95);
-  }
+  double ess_tail = std::isnan(ess_tail_05) || std::isnan(ess_tail_95)
+                        ? std::numeric_limits<double>::quiet_NaN()
+                        : std::min(ess_tail_05, ess_tail_95);
   return std::make_pair(ess_bulk, ess_tail);
 }
 
