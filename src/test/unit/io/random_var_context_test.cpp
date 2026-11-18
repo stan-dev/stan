@@ -71,6 +71,9 @@ class mock_throwing_model_in_write_array : public stan::model::prob_grad {
       param_names__.push_back(param_name.str());
     }
   }
+
+  void write_transformed_data_json(std::ostream* out) const { *out << "{}"; }
+
   template <typename RNG>
   void write_array(RNG& base_rng__, std::vector<double>& params_r__,
                    std::vector<int>& params_i__, std::vector<double>& vars__,

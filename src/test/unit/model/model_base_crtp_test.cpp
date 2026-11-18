@@ -34,6 +34,8 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
                                  bool include_tparams,
                                  bool include_gqs) const override {}
 
+  void write_transformed_data_json(std::ostream* out) const { *out << "{}"; }
+
   template <bool propto, bool jacobian, typename T>
   T log_prob(Eigen::Matrix<T, -1, 1>& params_r, std::ostream* msgs) const {
     if constexpr (std::is_same<T, double>::value) {
