@@ -14,16 +14,16 @@ namespace psis {
 namespace internal {
 
 /**
- * Compute log joint likelihood parameter estimates from generalized pareto
+ * Compute log joint likelihood parameter estimates from generalized Pareto
  * distribution and the samples the parameters were estimated from.
  * @tparam EigArray1 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @tparam EigArray2 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
- * @param[in] theta Estimates from generalized pareto distribution estimation
+ * @param[in] theta Estimates from generalized Pareto distribution estimation
  * @param[in] x The sample that the parameters were estimated from.
  * @return Array of the joint log likelihood of parameter estimates from
- * generalized pareto distribution and the samples the parameters were estimated
+ * generalized Pareto distribution and the samples the parameters were estimated
  * from.
  */
 template <typename EigArray1, typename EigArray2>
@@ -41,10 +41,10 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> profile_loglikelihood(
 }
 
 /**
- * Estimate parameters of the Generalized Pareto distribution
+ * Estimate parameters of the generalized Pareto distribution
  *
  * Given a sample `x`, Estimate the parameters `k` and $sigma$ of
- * the Generalized Pareto Distribution (GPD), assuming the location parameter is
+ * the generalized Pareto distribution (GPD), assuming the location parameter is
  * 0. By default the fit uses a prior for `k`, which will stabilize
  * estimates for very small sample sizes (and low effective sample sizes in the
  * case of MCMC samples). The weakly informative prior is a Gaussian prior
@@ -57,7 +57,8 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> profile_loglikelihood(
  * @param[in] min_grid_pts The minimum number of grid points used in the fitting
  *   algorithm.
  * @return A pair of doubles with the first element `sigma` and the second
- * element `k`.
+ * element `k`. Both are NaN if the first quartile of `x` is not larger than
+ * the smallest value of `x`.
  *
  * @details Here the parameter `k is the negative of `k` in Zhang & Stephens
  * (2009).
@@ -80,6 +81,13 @@ inline std::pair<double, double> gpdfit(const EigArray& x,
   const double x_1st_qt = x_ref.coeff(
       static_cast<Eigen::Index>(std::floor(static_cast<double>(N) / 4.0 + 0.5))
       - 1l);
+  // At least a quarter of x equals the minimum. The sample is then far from a
+  // generalized Pareto distribution, and with a minimum of 0 the grid for
+  // theta below divides by 0.
+  if (!(x_1st_qt > x_ref.coeff(0))) {
+    constexpr double nan = std::numeric_limits<double>::quiet_NaN();
+    return {nan, nan};
+  }
   array_vec_t theta
       = 1.0 / x_ref.coeff(N - 1)
         + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt);
@@ -97,7 +105,7 @@ inline std::pair<double, double> gpdfit(const EigArray& x,
 }
 
 /**
- * Inverse CDF of generalized pareto distribution
+ * Inverse CDF of generalized Pareto distribution
  * (assuming location parameter is 0)
  *
  * @tparam EigArray An Eigen type inheriting from `ArrayBase` with dynamic
@@ -121,7 +129,8 @@ inline auto qgpd(const EigArray& p, const double k, const double sigma) {
  * @param[in] cutoff
  * @return A pair containing:
  * `first`: Eigen Array same size as `x` containing the logs of the
- *   order statistics of the generalized pareto distribution.
+ *   order statistics of the generalized Pareto distribution, or `x` itself
+ *   if the shape parameter estimate is not finite.
  * `second`: scalar shape parameter estimate.
  */
 template <typename EigArray>
@@ -129,7 +138,7 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
   const double exp_cutoff = std::exp(cutoff);
   const auto fit = gpdfit(x.array().exp() - exp_cutoff);
   const double k = fit.second;
-  if (!std::isinf(k)) {
+  if (std::isfinite(k)) {
     const Eigen::Index x_size = x.size();
     const double sigma = fit.first;
     auto p
@@ -253,8 +262,8 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
        std::string("In PSIS Weight Calculation: Difference "
        "between the tails is ") +
         std::to_string(eps_diff) +
-        " which is too small for estimating the generalized pareto values."
-        " Returning non-pareto smoothed weights.");
+        " which is too small for estimating the generalized Pareto values."
+        " Returning non-Pareto smoothed weights.");
     } else {
       auto smoothed = internal::psis_smooth_tail(lw_tail, cutoff);
       auto idx = max_n.second.tail(tail_len);
@@ -262,7 +271,13 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
       for (Eigen::Index i = 0; i < idx_size; ++i) {
         llr_weights.coeffRef(idx.coeff(i)) = smoothed.first.coeff(i);
       }
-      if (smoothed.second > 0.7) {
+      if (!std::isfinite(smoothed.second)) {
+        logger.warn(
+            "In PSIS Weight Calculation: At least a quarter of the importance "
+            "ratios in the tail are equal to the smallest one, which is too "
+            "many for estimating the generalized Pareto values. Returning "
+            "non-Pareto smoothed weights.");
+      } else if (smoothed.second > 0.7) {
         std::stringstream s;
         s << "Pareto k value (" << std::setprecision(2) << smoothed.second
           << ") is greater than 0.7. Importance resampling was not able to "
