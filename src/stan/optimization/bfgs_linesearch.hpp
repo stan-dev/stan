@@ -268,7 +268,7 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
     lsRestarts = 0;
 
     newDFp = gradx1.dot(p);
-    if ((func_val > f0 + alpha * c1dfp) || (func_val >= prevF && nits > 0)) {
+    if ((func_val > f0 + alpha1 * c1dfp) || (func_val >= prevF && nits > 0)) {
       retCode = WolfLSZoom(alpha, x1, func_val, gradx1, func, x0, f0, dfp,
                            c1dfp, c2dfp, p, alpha0, prevF, prevDFp, alpha1,
                            func_val, newDFp, 1e-16);
