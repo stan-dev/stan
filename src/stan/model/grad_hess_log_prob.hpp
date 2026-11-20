@@ -37,15 +37,16 @@ double grad_hess_log_prob(const M& model, std::vector<double>& params_r,
                           std::vector<double>& hessian,
                           std::ostream* msgs = 0) {
   static const double epsilon = 1e-3;
-  static const double half_epsilon = 0.5 * epsilon;
+  // each estimate is added to both H(d, dd) and H(dd, d), hence the 0.5
+  static const double half_inv_epsilon = 0.5 / epsilon;
   static const int order = 4;
   static const double perturbations[order]
       = {-2 * epsilon, -1 * epsilon, epsilon, 2 * epsilon};
   static const double coefficients[order]
       = {1.0 / 12.0, -2.0 / 3.0, 2.0 / 3.0, -1.0 / 12.0};
-  static const double half_epsilon_coeff[order]
-      = {half_epsilon * coefficients[0], half_epsilon * coefficients[1],
-         half_epsilon * coefficients[2], half_epsilon * coefficients[3]};
+  static const double scaled_coefficients[order] = {
+      half_inv_epsilon * coefficients[0], half_inv_epsilon * coefficients[1],
+      half_inv_epsilon * coefficients[2], half_inv_epsilon * coefficients[3]};
   double result = log_prob_grad<propto, jacobian_adjust_transform>(
       model, params_r, params_i, gradient, msgs);
   hessian.assign(params_r.size() * params_r.size(), 0);
@@ -58,7 +59,7 @@ double grad_hess_log_prob(const M& model, std::vector<double>& params_r,
       log_prob_grad<propto, jacobian_adjust_transform>(model, perturbed_params,
                                                        params_i, temp_grad);
       for (size_t dd = 0; dd < params_r.size(); ++dd) {
-        const double increment = half_epsilon_coeff[i] * temp_grad[dd];
+        const double increment = scaled_coefficients[i] * temp_grad[dd];
         const int col_iter = dd * params_r.size();
         hessian[dd + row_iter] += increment;
         hessian[d + col_iter] += increment;
