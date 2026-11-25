@@ -489,6 +489,7 @@ class advi {
 
     // The first row of lp_, log_p, and log_g.
     values.insert(values.begin(), {0, 0, 0});
+    coerce_infinite_to_max(values);
     parameter_writer(values);
 
     // Draw more from posterior and write on subsequent lines
@@ -514,10 +515,27 @@ class advi {
         logger.info(msg2);
       // Write lp__, log_p, and log_g.
       values.insert(values.begin(), {0, log_p, log_g});
+      coerce_infinite_to_max(values);
       parameter_writer(values);
     }
     logger.info("COMPLETED.");
     return stan::services::error_codes::OK;
+  }
+
+  /**
+   * Replace infinite values with the largest finite double of the same
+   * sign. Infinite values cannot be read back from CSV output on Windows
+   * (they are written as "1.#INF"), so they are coerced to the nearest
+   * finite value before writing.
+   *
+   * @param[in,out] values values to be written
+   */
+  static void coerce_infinite_to_max(std::vector<double>& values) {
+    const double max_val = std::numeric_limits<double>::max();
+    for (double& v : values) {
+      if (std::isinf(v))
+        v = (v > 0) ? max_val : -max_val;
+    }
   }
 
   // TODO(akucukelbir): move these things to stan math and test there
