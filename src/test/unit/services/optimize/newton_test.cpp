@@ -90,3 +90,23 @@ TEST_F(ServicesOptimize, rosenbrock_no_save_iterations) {
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_LT(0, interrupt.call_count());
 }
+
+TEST_F(ServicesOptimize, newton_timing_info) {
+  unsigned int seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+
+  int num_iterations = 1000;
+  bool save_iterations = true;
+  stan::test::unit::instrumented_interrupt interrupt;
+
+  int return_code = stan::services::optimize::newton(
+      model, context, seed, chain, init_radius, num_iterations, save_iterations,
+      interrupt, logger, init, parameter);
+
+  EXPECT_EQ(return_code, 0);
+  EXPECT_TRUE(parameter_ss.str().find("Elapsed Time:") != std::string::npos)
+      << "Should find 'Elapsed Time:' in parameter_writer output";
+  EXPECT_TRUE(logger.find_info("Elapsed Time:") > 0)
+      << "Should find 'Elapsed Time:' in logger info output";
+}
